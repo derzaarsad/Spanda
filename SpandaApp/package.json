@@ -7,24 +7,26 @@
 		"id": "org.nativescript.SpandaApp"
 	},
 	"dependencies": {
-		"@angular/animations": "~6.0.6",
-		"@angular/common": "~6.0.6",
-		"@angular/compiler": "~6.0.6",
-		"@angular/core": "~6.0.6",
-		"@angular/forms": "~6.0.6",
-		"@angular/http": "~6.0.6",
-		"@angular/platform-browser": "~6.0.6",
-		"@angular/platform-browser-dynamic": "~6.0.6",
-		"@angular/router": "~6.0.6",
-		"nativescript-angular": "~6.0.6",
+		"@angular/animations": "8.0.0",
+		"@angular/common": "8.0.0",
+		"@angular/compiler": "8.0.0",
+		"@angular/core": "8.0.0",
+		"@angular/forms": "8.0.0",
+		"@angular/http": "8.0.0-beta.10",
+		"@angular/platform-browser": "8.0.0",
+		"@angular/platform-browser-dynamic": "8.0.0",
+		"@angular/router": "8.0.0",
+		"nativescript-angular": "8.0.2",
 		"nativescript-theme-core": "~1.0.4",
 		"reflect-metadata": "~0.1.8",
-		"rxjs": "~6.1.0",
-		"tns-core-modules": "~4.1.0",
-		"zone.js": "~0.8.26"
+		"rxjs": "6.3.3",
+		"tns-core-modules": "6.0.1",
+		"zone.js": "0.9.1"
 	},
 	"devDependencies": {
-		"nativescript-dev-typescript": "~0.7.0",
-		"typescript": "~2.7.2"
+		"typescript": "3.4.5",
+		"nativescript-dev-webpack": "1.0.1",
+		"@angular/compiler-cli": "8.0.0",
+		"@ngtools/webpack": "8.0.0"
 	}
 }
