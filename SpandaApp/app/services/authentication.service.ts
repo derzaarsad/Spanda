@@ -4,7 +4,9 @@ import * as appSettings from "tns-core-modules/application-settings";
 
 @Injectable()
 export class AuthenticationService {
-    private serverUrl = "https://sandbox.finapi.io/oauth/token";
+    private serverUrl = "https://sandbox.finapi.io";
+    private client_id = "3996d8ae-abaf-490f-9abe-41c64bd82ab6";
+    private client_secret = "35525147-fec5-4a48-8a3f-5511221a32f1";
 
     constructor(private http: HttpClient) { }
 
@@ -12,29 +14,72 @@ export class AuthenticationService {
 
         const data = new HttpParams()
         .set('grant_type', "password")
-        .set('client_id', "3996d8ae-abaf-490f-9abe-41c64bd82ab6")
-        .set('client_secret', "35525147-fec5-4a48-8a3f-5511221a32f1")
+        .set('client_id', this.client_id)
+        .set('client_secret', this.client_secret)
         .set('username', username)
         .set('password', password);
 
         let headerOptions = new HttpHeaders();
         headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
 
-        return this.http.post(this.serverUrl, data, { headers: headerOptions }).toPromise()
+        return this.http.post(this.serverUrl + "/oauth/token", data, { headers: headerOptions }).toPromise()
         .then(res => {
             appSettings.setString("username", username);
             appSettings.setString("password", password);
-            appSettings.setString("access_token", res["access_token"]);
-            appSettings.setString("refresh_token", res["refresh_token"]);
+            this.setTokensAtApp(res["access_token"], res["refresh_token"], res["token_type"]);
 
-            console.log(appSettings.getString("username"));
-            console.log(appSettings.getString("access_token"));
-            console.log(appSettings.getString("refresh_token"));
             return true;
         }, err => {
             console.log("there is an error");
             console.log(err);
             return false;
         });
+    }
+
+    setNewRefreshAndAccessToken(refresh_token: string) : Promise<boolean> {
+        const data = new HttpParams()
+        .set('grant_type', "refresh_token")
+        .set('client_id', this.client_id)
+        .set('client_secret', this.client_secret)
+        .set('refresh_token', refresh_token);
+
+        let headerOptions = new HttpHeaders();
+        headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
+
+        return this.http.post(this.serverUrl + "/oauth/token", data, { headers: headerOptions }).toPromise()
+        .then(res => {
+            this.setTokensAtApp(res["access_token"], res["refresh_token"], res["token_type"]);
+            
+            return true;
+        }, err => {
+            console.log("invalid refresh_token");
+            console.log(err);
+            return false;
+        });
+    }
+
+    isUserAuthenticated(access_token: string, token_type: string) : Promise<boolean> {
+
+        let headerOptions = new HttpHeaders({
+            "Authorization": token_type + " " + access_token,
+            "Content-Type": "application/x-www-form-urlencoded",
+         });
+
+        return this.http.get(this.serverUrl + "/api/v1/users", { headers: headerOptions }).toPromise()
+        .then(res => {
+            console.log("user is authenticated!");
+            console.log(res);
+            return true;
+        }, err => {
+            console.log("user not authenticated!");
+            console.log(err);
+            return false;
+        });
+    }
+
+    private setTokensAtApp(access_token: string, refresh_token: string, token_type: string): void {
+        appSettings.setString("access_token", access_token);
+        appSettings.setString("refresh_token", refresh_token);
+        appSettings.setString("token_type", token_type);
     }
 }

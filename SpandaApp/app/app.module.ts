@@ -9,9 +9,12 @@ import { NativeScriptHttpClientModule } from "nativescript-angular/http-client";
 import { AppComponent } from "./app.component";
 import { HomeComponent } from "./views/home/home.component";
 
+import { AuthenticationService } from "./services/authentication.service";
+
 @NgModule({
   providers: [
-    authProviders
+    authProviders,
+    AuthenticationService
   ],
   declarations: [
     AppComponent,
