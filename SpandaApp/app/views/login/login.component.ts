@@ -7,6 +7,8 @@ import { Page } from "tns-core-modules/ui/page";
 import { User } from "../../models/user.model";
 import { UserService } from "../../services/user.service";
 
+import * as appSettings from "tns-core-modules/application-settings";
+
 @Component({
     selector: "login",
     templateUrl: "./login.html",
@@ -21,8 +23,14 @@ export class LoginComponent {
     constructor(private page: Page, private userService: UserService, private router: Router) {
         this.page.actionBarHidden = true;
         this.user = new User();
-        // this.user.email = "foo2@foo.com";
-        // this.user.password = "foo";
+
+        if(appSettings.hasKey("username")) {
+            this.user.Email = appSettings.getString("username");
+        }
+
+        if(appSettings.hasKey("password")) {
+            this.user.Password = appSettings.getString("password");
+        }
     }
 
     ngOnInit(): void {
@@ -49,7 +57,7 @@ export class LoginComponent {
     login() {
         this.userService.login(this.user)
             .then(() => {
-                this.router.navigate(["/home"]);
+                this.router.navigate(["allowance"]);
             })
             .catch(() => {
                 this.alert("Unfortunately we could not find your account.");

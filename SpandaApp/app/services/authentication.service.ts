@@ -29,10 +29,6 @@ export class AuthenticationService {
             this.setTokensAtApp(res["access_token"], res["refresh_token"], res["token_type"]);
 
             return true;
-        }, err => {
-            console.log("there is an error");
-            console.log(err);
-            return false;
         });
     }
 
