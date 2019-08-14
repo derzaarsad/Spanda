@@ -44,4 +44,38 @@ export class BankService {
             return undefined;
         });
     }
+
+    /*
+     * return [ Id , Access Token, Status ]
+     */
+    getWebformIdAndToken(bank: Bank, user_token_type: string, user_access_token: string): Promise<[string, string, string]> {
+
+        let headerOptions = new HttpHeaders({
+            "Authorization": user_token_type + " " + user_access_token,
+            "Content-Type": "application/json"
+        });
+
+        return this.http.post(this.serverUrl + "/api/v1/bankConnections/import", { bankId: bank.Id }, { headers: headerOptions }).toPromise()
+        .then(res => {
+            // It has to be an error (code 451), because we want to open the Web Form
+            return undefined;
+        }, err => {
+            let webId = err["error"]["errors"][0]["message"];
+            console.log(webId);
+            
+            let headerOptions = new HttpHeaders({
+                "Authorization": user_token_type + " " + user_access_token
+            });
+            return this.http.get(this.serverUrl + "/api/v1/webForms/" + webId, { headers: headerOptions }).toPromise()
+            .then(res => {
+                console.log("WebForm Valid");
+                console.log(res);
+                return [res["id"], res["token"], res["status"]];
+            }, err => {
+                console.log("WebForm Invalid");
+                console.log(err);
+                return undefined;
+            });
+        });
+    }
 }

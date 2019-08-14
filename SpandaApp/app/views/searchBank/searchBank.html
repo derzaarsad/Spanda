@@ -2,5 +2,5 @@
     <Label text="Search a Bank" class="label"></Label>
     <TextField class="input" [(ngModel)]="SearchedBlz" hint="Enter a BLZ..."></TextField>
     <Button text="Search" (tap)="onSearch()" ></Button>
-    <Button [text]="'Add ' + BankName" (tap)="onAddAccount()" [isEnabled]="EnableBank" ></Button>
+    <Button [text]="'Add ' + bank.Name" (tap)="onAddAccount()" [isEnabled]="EnableBank" ></Button>
 </StackLayout>

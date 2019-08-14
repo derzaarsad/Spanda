@@ -17,7 +17,7 @@ import { Bank } from "~/models/bank.model";
 })
 export class SearchBankComponent implements OnInit {
     private SearchedBlz: string;
-    private BankName: string;
+    private bank: Bank;
     private EnableBank: boolean;
 
     constructor(
@@ -29,7 +29,8 @@ export class SearchBankComponent implements OnInit {
     ngOnInit(): void {
         this.page.actionBarHidden = true;
         this.SearchedBlz = "";
-        this.BankName = "Unknown Bank";
+        this.bank = new Bank();
+        this.bank.Name = "Unknown Bank";
         this.EnableBank = false;
     }
 
@@ -48,7 +49,7 @@ export class SearchBankComponent implements OnInit {
         }
 
         this.bankService.getBankByBLZ(this.SearchedBlz).then((bank) => {
-            this.BankName = bank.Name;
+            this.bank = bank;
             this.EnableBank = true;
         }).catch(()=>{
             this.alert("Bank not found!");
@@ -56,46 +57,10 @@ export class SearchBankComponent implements OnInit {
     }
 
     private onAddAccount() {
-
-    }
-
-    // private serverUrl = "https://sandbox.finapi.io";
-    // postData(data: any) {
-    //     let options = this.createRequestOptions();
-    //     return this.http.post(this.serverUrl + "/api/v1/bankConnections/import", data, { headers: options });
-    // }
-
-    // private createRequestOptions() {
-    //     let headers = new HttpHeaders({
-    //         "Authorization": appSettings.getString("token_type") + " " + appSettings.getString("access_token"),
-    //         "Content-Type": "application/json"
-    //     });
-    //     return headers;
-    // }
-
-    private goToWebForm() {
-        // this.postData({ bankId: 277672 }).toPromise()
-        // .then(res => {
-        //     // It has to be an error (code 451), because we want to open the Web Form
-        // }, err => {
-        //     let webId = err["error"]["errors"][0]["message"];
-        //     console.log(webId);
-
-        //     let headerOptions = new HttpHeaders({
-        //         "Authorization": appSettings.getString("token_type") + " " + appSettings.getString("access_token")
-        //      });
-        //     this.http.get(this.serverUrl + "/api/v1/webForms/" + webId, { headers: headerOptions }).toPromise()
-        // .then(res => {
-        //     console.log("WebForm Valid");
-        //     console.log(res);
-        //     return true;
-        // }, err => {
-        //     console.log("WebForm Invalid");
-        //     console.log(err);
-        //     return false;
-        // });
-
-        // });
-        // //this.routerExtensions.navigate(["registration"]);
+        this.bankService.getWebformIdAndToken(this.bank, appSettings.getString("token_type"), appSettings.getString("access_token")).then((res) => {
+            console.log(res[0]);
+            console.log(res[1]);
+            console.log(res[2]);
+        });
     }
 }
