@@ -7,8 +7,38 @@ export class AuthenticationService {
     private serverUrl = "https://sandbox.finapi.io";
     private client_id = "3996d8ae-abaf-490f-9abe-41c64bd82ab6";
     private client_secret = "35525147-fec5-4a48-8a3f-5511221a32f1";
+    private client_access_token: string;
+    private client_token_type: string;
 
     constructor(private http: HttpClient) { }
+
+    getClientAccessToken(): string {
+        return this.client_access_token;
+    }
+
+    getClientTokenType(): string {
+        return this.client_token_type;
+    }
+
+    authenticateClientAndSave() : Promise<boolean> {
+
+        const data = new HttpParams()
+        .set('grant_type', "client_credentials")
+        .set('client_id', this.client_id)
+        .set('client_secret', this.client_secret);
+
+        let headerOptions = new HttpHeaders();
+        headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
+
+        return this.http.post(this.serverUrl + "/oauth/token", data, { headers: headerOptions }).toPromise()
+        .then(res => {
+            console.log("client auth success");
+            this.client_access_token = res["access_token"];
+            this.client_token_type = res["token_type"];
+
+            return true;
+        });
+    }
 
     authenticateAndSave(username: string, password: string) : Promise<boolean> {
 
