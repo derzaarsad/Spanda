@@ -11,12 +11,14 @@ import { HomeComponent } from "./views/home/home.component";
 
 import { AuthenticationService } from "./services/authentication.service";
 import { UserService } from "./services/user.service";
+import { BankService } from "./services/bank.service";
 
 @NgModule({
   providers: [
     authProviders,
     AuthenticationService,
-    UserService
+    UserService,
+    BankService
   ],
   declarations: [
     AppComponent,
