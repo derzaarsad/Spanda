@@ -12,16 +12,16 @@ import { AuthenticationService } from "~/services/authentication.service";
 })
 export class LoginComponent {
     isLoggingIn = true;
-    Username = "";
-    Password = "";
-    ConfirmPassword = "";
-    @ViewChild("password", {static: true}) password: ElementRef;
-    @ViewChild("confirmPassword", {static: true}) confirmPassword: ElementRef;
+    Username: string;
+    Password: string;
+    ConfirmPassword: string;
+    @ViewChild("password", {static: false}) password: ElementRef;
+    @ViewChild("confirmPassword", {static: false}) confirmPassword: ElementRef;
 
     constructor(private page: Page, private router: Router, private authenticationService: AuthenticationService) {
         this.page.actionBarHidden = true;
 
-        if(this.authenticationService.getStoredUser()) {
+        if(this.authenticationService.getStoredUser().Username && this.authenticationService.getStoredUser().Password) {
             this.Username = this.authenticationService.getStoredUser().Username;
             this.Password = this.authenticationService.getStoredUser().Password;
         }
@@ -69,7 +69,8 @@ export class LoginComponent {
                 this.isLoggingIn = true;
                 this.router.navigate(["searchBank"]);
             })
-            .catch(() => {
+            .catch((err) => {
+                console.log(err);
                 this.alert("Unfortunately we were unable to create your account.");
             });
     }
