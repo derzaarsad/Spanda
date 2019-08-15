@@ -88,7 +88,7 @@ export class AuthenticationService {
 
         let headerOptions = new HttpHeaders({
             "Authorization": token_type + " " + access_token,
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/x-www-form-urlencoded"
          });
 
         return this.http.get(this.serverUrl + "/api/v1/users", { headers: headerOptions }).toPromise()
