@@ -23,6 +23,7 @@ export class SearchBankComponent implements OnInit {
     private bank: Bank;
     private EnableBank: boolean = false;
     private webViewSrc: string = "";
+    private invalidUrl = "https://invalidurl";
 
     @ViewChild("myWebView", { read: ElementRef, static: false }) webViewRef: ElementRef;
     @ViewChild("labelResult", { read: ElementRef, static: false }) labelResultRef: ElementRef;
@@ -42,7 +43,12 @@ export class SearchBankComponent implements OnInit {
         let label: Label = this.labelResultRef.nativeElement;
         label.text = "WebView is still loading...";
 
-        webview.on(WebView.loadFinishedEvent, function (args: LoadEventData) {
+        webview.on(WebView.loadFinishedEvent, (args: LoadEventData) => {
+            if((args.url !== undefined) && (args.url.startsWith(this.invalidUrl))) {
+                // This is a workaround until I get a better solution
+                this.routerExtensions.navigate(["allowance"]);
+            }
+
             let message;
             if (!args.error) {
                 message = "WebView finished loading of " + args.url;
@@ -79,7 +85,7 @@ export class SearchBankComponent implements OnInit {
 
     private onAddAccount() {
         this.bankService.getWebformIdAndToken(this.bank, appSettings.getString("token_type"), appSettings.getString("access_token")).then((res) => {
-            this.webViewSrc = "https://sandbox.finapi.io/webForm/" + res[1];
+            this.webViewSrc = "https://sandbox.finapi.io/webForm/" + res[1] + "?redirectUrl=" + this.invalidUrl;
             console.log(res[0]);
             console.log(res[1]);
             console.log(res[2]);
