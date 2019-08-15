@@ -70,8 +70,7 @@ export class LoginComponent {
                 this.router.navigate(["searchBank"]);
             })
             .catch((err) => {
-                console.log(err);
-                this.alert("Unfortunately we were unable to create your account.");
+                this.alert(err["error"]["errors"][0]["message"]);
             });
     }
 
