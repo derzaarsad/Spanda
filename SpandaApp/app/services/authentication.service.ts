@@ -169,6 +169,12 @@ export class AuthenticationService {
         return token;
     }
 
+    removeAllUserAuthentication(): void {
+        appSettings.clear();
+        this.storedUser = new User();
+        this.storedUser.userToken = new Token();
+    }
+
     register(username: string, password: string) : any {
         //TODO
     }
