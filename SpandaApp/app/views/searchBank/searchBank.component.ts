@@ -4,9 +4,8 @@ import { NavigationOptions } from "nativescript-angular/router/ns-location-strat
 import { Page, EventData } from "tns-core-modules/ui/page";
 import { alert } from "tns-core-modules/ui/dialogs";
 
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
-import * as appSettings from "tns-core-modules/application-settings";
 import { BankService } from "../../services/bank.service";
+import { AuthenticationService } from "~/services/authentication.service";
 import { Bank } from "~/models/bank.model";
 
 import { WebView, LoadEventData } from "tns-core-modules/ui/web-view";
@@ -33,7 +32,8 @@ export class SearchBankComponent implements OnInit {
     constructor(
         private routerExtensions: RouterExtensions,
         private page: Page,
-        private bankService: BankService) {
+        private bankService: BankService,
+        private authenticationService: AuthenticationService) {
     }
 
     ngOnInit(): void {
@@ -50,7 +50,7 @@ export class SearchBankComponent implements OnInit {
                 // This is a workaround until I get a better solution
 
                 // fetch the info from webform
-                this.bankService.fetchWebformInfo(this.webId, appSettings.getString("token_type"), appSettings.getString("access_token")).then((res) => {
+                this.bankService.fetchWebformInfo(this.webId).then((res) => {
                     console.log(res);
                     this.routerExtensions.navigate(["allowance"]);
                 }).catch((err) => {
@@ -93,9 +93,9 @@ export class SearchBankComponent implements OnInit {
     }
 
     private onAddAccount() {
-        this.bankService.getWebformIdAndToken(this.bank, appSettings.getString("token_type"), appSettings.getString("access_token")).then((res) => {
+        this.bankService.getWebformIdAndToken(this.bank).then((res) => {
             this.webId = res[0];
-            this.webViewSrc = "https://sandbox.finapi.io/webForm/" + res[1] + "?redirectUrl=" + this.invalidUrl;
+            this.webViewSrc = this.authenticationService.getServerUrl() + "/webForm/" + res[1] + "?redirectUrl=" + this.invalidUrl;
             console.log(res[0]);
             console.log(res[1]);
             console.log(res[2]);

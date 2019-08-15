@@ -5,9 +5,6 @@ import { AuthenticationService } from "../services/authentication.service";
 
 @Injectable()
 export class BankService {
-    private serverUrl = "https://sandbox.finapi.io";
-    private client_id = "3996d8ae-abaf-490f-9abe-41c64bd82ab6";
-    private client_secret = "35525147-fec5-4a48-8a3f-5511221a32f1";
     private bankPerPage = "2";
 
     constructor(private http: HttpClient, private authenticationService: AuthenticationService) { }
@@ -21,7 +18,7 @@ export class BankService {
                 "Content-Type": "application/x-www-form-urlencoded"
             });
 
-            return this.http.get(this.serverUrl + "/api/v1/banks?search=" + blz + "&page=1&perPage=" + this.bankPerPage + "&order=id", { headers: headerOptions }).toPromise()
+            return this.http.get(this.authenticationService.getServerUrl() + "/api/v1/banks?search=" + blz + "&page=1&perPage=" + this.bankPerPage + "&order=id", { headers: headerOptions }).toPromise()
             .then(res => {
                 // always take the first element, assumed blz is unique only to one bank
                 let bank = new Bank();
@@ -48,14 +45,14 @@ export class BankService {
     /*
      * return [ Id , Access Token, Status ]
      */
-    getWebformIdAndToken(bank: Bank, user_token_type: string, user_access_token: string): Promise<[string, string, string]> {
+    getWebformIdAndToken(bank: Bank): Promise<[string, string, string]> {
 
         let headerOptions = new HttpHeaders({
-            "Authorization": user_token_type + " " + user_access_token,
+            "Authorization": this.authenticationService.getStoredUser().userToken.TokenType + " " + this.authenticationService.getStoredUser().userToken.AccessToken,
             "Content-Type": "application/json"
         });
 
-        return this.http.post(this.serverUrl + "/api/v1/bankConnections/import", { bankId: bank.Id }, { headers: headerOptions }).toPromise()
+        return this.http.post(this.authenticationService.getServerUrl() + "/api/v1/bankConnections/import", { bankId: bank.Id }, { headers: headerOptions }).toPromise()
         .then(res => {
             // It has to be an error (code 451), because we want to open the Web Form
             return undefined;
@@ -64,9 +61,9 @@ export class BankService {
             console.log(webId);
             
             let headerOptions = new HttpHeaders({
-                "Authorization": user_token_type + " " + user_access_token
+                "Authorization": this.authenticationService.getStoredUser().userToken.TokenType + " " + this.authenticationService.getStoredUser().userToken.AccessToken
             });
-            return this.http.get(this.serverUrl + "/api/v1/webForms/" + webId, { headers: headerOptions }).toPromise()
+            return this.http.get(this.authenticationService.getServerUrl() + "/api/v1/webForms/" + webId, { headers: headerOptions }).toPromise()
             .then(res => {
                 console.log("WebForm Valid");
                 console.log(res);
@@ -79,13 +76,13 @@ export class BankService {
         });
     }
 
-    fetchWebformInfo(webId: string, user_token_type: string, user_access_token: string): Promise<JSON> {
+    fetchWebformInfo(webId: string): Promise<JSON> {
         let headerOptions = new HttpHeaders({
-            "Authorization": user_token_type + " " + user_access_token,
+            "Authorization": this.authenticationService.getStoredUser().userToken.TokenType + " " + this.authenticationService.getStoredUser().userToken.AccessToken,
             "Content-Type": "application/x-www-form-urlencoded"
-        });console.log("Bring the boys outtttttttttttttttttttttttttttttttttttttt"); console.log(webId);
+        });
 
-        return this.http.get(this.serverUrl + "/api/v1/webForms/" + webId, { headers: headerOptions }).toPromise()
+        return this.http.get(this.authenticationService.getServerUrl() + "/api/v1/webForms/" + webId, { headers: headerOptions }).toPromise()
         .then(res => {
             // always take the first element, assumed blz is unique only to one bank
             let serviceResponseBody = res["serviceResponseBody"];

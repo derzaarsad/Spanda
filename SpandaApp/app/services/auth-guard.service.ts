@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
 import { Router, CanActivate } from "@angular/router";
-import * as appSettings from "tns-core-modules/application-settings";
 import { AuthenticationService } from "./authentication.service";
 
 @Injectable()
@@ -10,14 +9,14 @@ export class AuthGuard implements CanActivate {
   canActivate() : Promise<boolean> | boolean {
     
     // Check whether there are saved credentials
-    if(appSettings.hasKey("access_token")) {
-      console.log("get in");
+    if(this.authenticationService.getStoredUser()) {
+      console.log("stored user available");
       // Is access token still valid?
-      return this.authenticationService.isUserAuthenticated(appSettings.getString("access_token"), appSettings.getString("token_type")).then((resultAuth) => {
+      return this.authenticationService.isUserAuthenticated(this.authenticationService.getStoredUser().userToken.AccessToken, this.authenticationService.getStoredUser().userToken.TokenType).then((resultAuth) => {
         if(!resultAuth) {
           console.log("get to refresh token")
           // Get access token using refresh token
-          return this.authenticationService.setNewRefreshAndAccessToken(appSettings.getString("refresh_token")).then((resultRefresh) => {
+          return this.authenticationService.setNewRefreshAndAccessToken(this.authenticationService.getStoredUser().userToken.RefreshToken).then((resultRefresh) => {
             if(!resultRefresh) {
               this.router.navigate(['login']);
             }

@@ -3,11 +3,7 @@ import { Component, ElementRef, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { alert, prompt } from "tns-core-modules/ui/dialogs";
 import { Page } from "tns-core-modules/ui/page";
-
-import { User } from "../../models/user.model";
-import { UserService } from "../../services/user.service";
-
-import * as appSettings from "tns-core-modules/application-settings";
+import { AuthenticationService } from "~/services/authentication.service";
 
 @Component({
     selector: "login",
@@ -16,20 +12,18 @@ import * as appSettings from "tns-core-modules/application-settings";
 })
 export class LoginComponent {
     isLoggingIn = true;
-    user: User;
+    Username = "";
+    Password = "";
+    ConfirmPassword = "";
     @ViewChild("password", {static: true}) password: ElementRef;
     @ViewChild("confirmPassword", {static: true}) confirmPassword: ElementRef;
 
-    constructor(private page: Page, private userService: UserService, private router: Router) {
+    constructor(private page: Page, private router: Router, private authenticationService: AuthenticationService) {
         this.page.actionBarHidden = true;
-        this.user = new User();
 
-        if(appSettings.hasKey("username")) {
-            this.user.Email = appSettings.getString("username");
-        }
-
-        if(appSettings.hasKey("password")) {
-            this.user.Password = appSettings.getString("password");
+        if(this.authenticationService.getStoredUser()) {
+            this.Username = this.authenticationService.getStoredUser().Username;
+            this.Password = this.authenticationService.getStoredUser().Password;
         }
     }
 
@@ -42,7 +36,7 @@ export class LoginComponent {
     }
 
     submit() {
-        if (!this.user.Email || !this.user.Password) {
+        if (!this.Username || !this.Password) {
             this.alert("Please provide both an email address and password.");
             return;
         }
@@ -55,7 +49,7 @@ export class LoginComponent {
     }
 
     login() {
-        this.userService.login(this.user)
+        this.authenticationService.authenticateAndSave(this.Username,this.Password)
             .then(() => {
                 this.router.navigate(["allowance"]);
             })
@@ -65,11 +59,11 @@ export class LoginComponent {
     }
 
     register() {
-        if (this.user.Password != this.user.ConfirmPassword) {
+        if (this.Password != this.ConfirmPassword) {
             this.alert("Your passwords do not match.");
             return;
         }
-        this.userService.register(this.user)
+        this.authenticationService.register(this.Username, this.Password)
             .then(() => {
                 this.alert("Your account was successfully created.");
                 this.isLoggingIn = true;
@@ -89,7 +83,7 @@ export class LoginComponent {
             cancelButtonText: "Cancel"
         }).then((data) => {
             if (data.result) {
-                this.userService.resetPassword(data.text.trim())
+                this.authenticationService.resetPassword(data.text.trim())
                     .then(() => {
                         this.alert("Your password was successfully reset. Please check your email for instructions on choosing a new password.");
                     }).catch(() => {

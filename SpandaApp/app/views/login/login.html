@@ -4,17 +4,17 @@
 		<Label class="header" text="DERZA APP"></Label>
 
 		<StackLayout class="input-field">
-			<TextField class="input" hint="Email" keyboardType="email" autocorrect="false" autocapitalizationType="none" [(ngModel)]="user.Email" returnKeyType="next" (returnPress)="focusPassword()"></TextField>
+			<TextField class="input" hint="Email" keyboardType="email" autocorrect="false" autocapitalizationType="none" [(ngModel)]="Username" returnKeyType="next" (returnPress)="focusPassword()"></TextField>
 			<StackLayout class="hr-light"></StackLayout>
 		</StackLayout>
 
 		<StackLayout class="input-field">
-			<TextField #password class="input" hint="Password" secure="true" [(ngModel)]="user.Password" [returnKeyType]="isLoggingIn ? 'done' : 'next'" (returnPress)="focusConfirmPassword()"></TextField>
+			<TextField #password class="input" hint="Password" secure="true" [(ngModel)]="Password" [returnKeyType]="isLoggingIn ? 'done' : 'next'" (returnPress)="focusConfirmPassword()"></TextField>
 			<StackLayout class="hr-light"></StackLayout>
 		</StackLayout>
 
 		<StackLayout *ngIf="!isLoggingIn" class="input-field">
-			<TextField #confirmPassword class="input" hint="Confirm password" secure="true" [(ngModel)]="user.confirmPassword" returnKeyType="done"></TextField>
+			<TextField #confirmPassword class="input" hint="Confirm password" secure="true" [(ngModel)]="ConfirmPassword" returnKeyType="done"></TextField>
 			<StackLayout class="hr-light"></StackLayout>
 		</StackLayout>
 
