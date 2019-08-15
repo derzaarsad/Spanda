@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
-import { Bank } from "../models/bank.model";
-import { AuthenticationService } from "../services/authentication.service";
+import { Bank } from "~/models/bank.model";
+import { AuthenticationService } from "~/services/authentication.service";
 
 @Injectable()
 export class BankService {

@@ -4,7 +4,7 @@ import { NavigationOptions } from "nativescript-angular/router/ns-location-strat
 import { Page, EventData } from "tns-core-modules/ui/page";
 import { alert } from "tns-core-modules/ui/dialogs";
 
-import { BankService } from "../../services/bank.service";
+import { BankService } from "~/services/bank.service";
 import { AuthenticationService } from "~/services/authentication.service";
 import { Bank } from "~/models/bank.model";
 
