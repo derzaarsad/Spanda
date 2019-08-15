@@ -175,8 +175,24 @@ export class AuthenticationService {
         this.storedUser.userToken = new Token();
     }
 
-    register(username: string, password: string) : any {
-        //TODO
+    register(username: string, password: string) : Promise<boolean> {
+
+        return this.authenticateClientAndSave().then(() => {
+
+            let headerOptions = new HttpHeaders({
+                "Authorization": this.clientToken.TokenType + " " + this.clientToken.AccessToken,
+                "Content-Type": "application/json"
+            });
+
+            return this.http.post(this.serverUrl + "/api/v1/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, { headers: headerOptions }).toPromise()
+            .then(res => {
+
+                console.log("registration successful");
+                console.log(res);
+
+                return true;
+            });
+        });
     }
 
     resetPassword(textSTr: string) : any {
