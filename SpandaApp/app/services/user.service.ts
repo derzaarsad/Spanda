@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
-import * as appSettings from "tns-core-modules/application-settings";
 import { User } from "../models/user.model";
 import { AuthenticationService } from "../services/authentication.service";
 
