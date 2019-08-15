@@ -25,6 +25,8 @@ export class SearchBankComponent implements OnInit {
     private webViewSrc: string = "";
     private invalidUrl = "https://invalidurl";
 
+    private webId: string = "";
+
     @ViewChild("myWebView", { read: ElementRef, static: false }) webViewRef: ElementRef;
     @ViewChild("labelResult", { read: ElementRef, static: false }) labelResultRef: ElementRef;
 
@@ -46,7 +48,14 @@ export class SearchBankComponent implements OnInit {
         webview.on(WebView.loadFinishedEvent, (args: LoadEventData) => {
             if((args.url !== undefined) && (args.url.startsWith(this.invalidUrl))) {
                 // This is a workaround until I get a better solution
-                this.routerExtensions.navigate(["allowance"]);
+
+                // fetch the info from webform
+                this.bankService.fetchWebformInfo(this.webId, appSettings.getString("token_type"), appSettings.getString("access_token")).then((res) => {
+                    console.log(res);
+                    this.routerExtensions.navigate(["allowance"]);
+                }).catch((err) => {
+                    this.routerExtensions.navigate(["allowance"]);
+                });
             }
 
             let message;
@@ -85,6 +94,7 @@ export class SearchBankComponent implements OnInit {
 
     private onAddAccount() {
         this.bankService.getWebformIdAndToken(this.bank, appSettings.getString("token_type"), appSettings.getString("access_token")).then((res) => {
+            this.webId = res[0];
             this.webViewSrc = "https://sandbox.finapi.io/webForm/" + res[1] + "?redirectUrl=" + this.invalidUrl;
             console.log(res[0]);
             console.log(res[1]);

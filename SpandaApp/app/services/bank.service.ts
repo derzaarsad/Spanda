@@ -78,4 +78,27 @@ export class BankService {
             });
         });
     }
+
+    fetchWebformInfo(webId: string, user_token_type: string, user_access_token: string): Promise<JSON> {
+        let headerOptions = new HttpHeaders({
+            "Authorization": user_token_type + " " + user_access_token,
+            "Content-Type": "application/x-www-form-urlencoded"
+        });console.log("Bring the boys outtttttttttttttttttttttttttttttttttttttt"); console.log(webId);
+
+        return this.http.get(this.serverUrl + "/api/v1/webForms/" + webId, { headers: headerOptions }).toPromise()
+        .then(res => {
+            // always take the first element, assumed blz is unique only to one bank
+            let serviceResponseBody = res["serviceResponseBody"];
+            if (serviceResponseBody === undefined) {
+                throw "serviceResponseBody undefined!";
+            }
+
+            return JSON.parse(serviceResponseBody);
+        })
+        .catch((err) => {
+            console.log("Fetching webform failed!");
+            console.log(err);
+            return undefined;
+        });
+    }
 }
