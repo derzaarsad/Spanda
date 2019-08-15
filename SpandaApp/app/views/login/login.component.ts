@@ -67,6 +67,7 @@ export class LoginComponent {
             .then(() => {
                 this.alert("Your account was successfully created.");
                 this.isLoggingIn = true;
+                this.router.navigate(["searchBank"]);
             })
             .catch(() => {
                 this.alert("Unfortunately we were unable to create your account.");
