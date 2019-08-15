@@ -9,7 +9,7 @@ export class AuthGuard implements CanActivate {
   canActivate() : Promise<boolean> | boolean {
     
     // Check whether there are saved credentials
-    if(this.authenticationService.getStoredUser()) {
+    if(this.authenticationService.getStoredUser().userToken.AccessToken) {
       console.log("stored user available");
       // Is access token still valid?
       return this.authenticationService.isUserAuthenticated(this.authenticationService.getStoredUser().userToken.AccessToken, this.authenticationService.getStoredUser().userToken.TokenType).then((resultAuth) => {
