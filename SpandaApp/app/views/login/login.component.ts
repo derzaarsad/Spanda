@@ -67,7 +67,10 @@ export class LoginComponent {
             .then(() => {
                 this.alert("Your account was successfully created.");
                 this.isLoggingIn = true;
-                this.router.navigate(["searchBank"]);
+                this.authenticationService.authenticateAndSave(this.Username,this.Password)
+                .then(() => {
+                    this.router.navigate(["searchBank"]);
+                });
             })
             .catch((err) => {
                 this.alert(err["error"]["errors"][0]["message"]);
