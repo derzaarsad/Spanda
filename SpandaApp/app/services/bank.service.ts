@@ -48,7 +48,7 @@ export class BankService {
     getWebformIdAndToken(bank: Bank): Promise<[string, string, string]> {
 
         let headerOptions = new HttpHeaders({
-            "Authorization": this.authenticationService.getStoredUser().userToken.TokenType + " " + this.authenticationService.getStoredUser().userToken.AccessToken,
+            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
             "Content-Type": "application/json"
         });
 
@@ -61,7 +61,7 @@ export class BankService {
             console.log(webId);
             
             let headerOptions = new HttpHeaders({
-                "Authorization": this.authenticationService.getStoredUser().userToken.TokenType + " " + this.authenticationService.getStoredUser().userToken.AccessToken
+                "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken
             });
             return this.http.get(this.authenticationService.getServerUrl() + "/api/v1/webForms/" + webId, { headers: headerOptions }).toPromise()
             .then(res => {
@@ -78,7 +78,7 @@ export class BankService {
 
     fetchWebformInfo(webId: string): Promise<JSON> {
         let headerOptions = new HttpHeaders({
-            "Authorization": this.authenticationService.getStoredUser().userToken.TokenType + " " + this.authenticationService.getStoredUser().userToken.AccessToken,
+            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
             "Content-Type": "application/x-www-form-urlencoded"
         });
 

@@ -12,7 +12,7 @@ export class AuthGuard implements CanActivate {
     if(this.authenticationService.isStoredUserAvailable()) {
       console.log("stored user available");
       // Is access token still valid?
-      return this.authenticationService.isUserAuthenticated(this.authenticationService.getStoredUser().userToken.AccessToken, this.authenticationService.getStoredUser().userToken.TokenType).then((resultAuth) => {
+      return this.authenticationService.isUserAuthenticated(this.authenticationService.getStoredUser().UserToken.AccessToken, this.authenticationService.getStoredUser().UserToken.TokenType).then((resultAuth) => {
         if(!resultAuth) {
           console.log("get to refresh token")
           // Get access token using refresh token

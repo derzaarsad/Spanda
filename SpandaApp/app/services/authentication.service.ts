@@ -22,7 +22,7 @@ export class AuthenticationService {
 
             this.storedUser.Username = appSettings.getString("username");
             this.storedUser.Password = appSettings.getString("password");
-            this.storedUser.userToken = this.setTokensAtApp(appSettings.getString("access_token"), appSettings.getString("refresh_token"), appSettings.getString("token_type"));
+            this.storedUser.UserToken = this.setTokensAtApp(appSettings.getString("access_token"), appSettings.getString("refresh_token"), appSettings.getString("token_type"));
         }
     }
 
@@ -105,7 +105,7 @@ export class AuthenticationService {
 
             appSettings.setString("username", this.storedUser.Username);
             appSettings.setString("password", this.storedUser.Password);
-            this.storedUser.userToken = this.setTokensAtApp(res["access_token"], res["refresh_token"], res["token_type"]);
+            this.storedUser.UserToken = this.setTokensAtApp(res["access_token"], res["refresh_token"], res["token_type"]);
 
             return true;
         });
@@ -116,14 +116,14 @@ export class AuthenticationService {
         .set('grant_type', "refresh_token")
         .set('client_id', this.client_id)
         .set('client_secret', this.client_secret)
-        .set('refresh_token', this.storedUser.userToken.RefreshToken);
+        .set('refresh_token', this.storedUser.UserToken.RefreshToken);
 
         let headerOptions = new HttpHeaders();
         headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
 
         return this.http.post(this.serverUrl + "/oauth/token", data, { headers: headerOptions }).toPromise()
         .then(res => {
-            this.storedUser.userToken = this.setTokensAtApp(res["access_token"], res["refresh_token"], res["token_type"]);
+            this.storedUser.UserToken = this.setTokensAtApp(res["access_token"], res["refresh_token"], res["token_type"]);
             
             return true;
         }, err => {
