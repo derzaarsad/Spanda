@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Token } from "~/models/token.model";
 import * as appSettings from "tns-core-modules/application-settings";
 import { User } from "~/models/user.model";
+import { JsonConvert } from "json2typescript";
 
 @Injectable()
 export class AuthenticationService {
@@ -11,29 +12,18 @@ export class AuthenticationService {
     private client_secret = "35525147-fec5-4a48-8a3f-5511221a32f1";
     private clientToken: Token;
     private storedUser: User;
+    private jsonConvert: JsonConvert;
 
     constructor(private http: HttpClient) {
-        if(!this.clientToken) {
-            this.clientToken = new Token();
-        }
+        this.jsonConvert = new JsonConvert();
 
         if(this.isStoredUserAvailable()) {
-            this.storedUser = new User();
-
-            this.storedUser.Username = appSettings.getString("username");
-            this.storedUser.Password = appSettings.getString("password");
-            this.storedUser.UserToken = this.setTokensAtApp(appSettings.getString("access_token"), appSettings.getString("refresh_token"), appSettings.getString("token_type"));
+            this.storedUser = this.jsonConvert.deserializeObject(JSON.parse(appSettings.getString("storedUser")), User);
         }
     }
 
     isStoredUserAvailable(): boolean {
-        return (
-            appSettings.hasKey("username") &&
-            appSettings.hasKey("password") &&
-            appSettings.hasKey("access_token") &&
-            appSettings.hasKey("refresh_token") &&
-            appSettings.hasKey("token_type")
-            );
+        return appSettings.hasKey("storedUser");
     }
 
     getStoredUser(): User {
@@ -73,9 +63,14 @@ export class AuthenticationService {
         return this.http.post(this.serverUrl + "/oauth/token", data, { headers: headerOptions }).toPromise()
         .then(res => {
             console.log("client auth success");
-            this.clientToken.AccessToken = res["access_token"];
-            this.clientToken.RefreshToken = res["refresh_token"];
-            this.clientToken.TokenType = res["token_type"];
+            if(!this.clientToken) {
+                this.clientToken = new Token(res["access_token"],res["refresh_token"],res["token_type"]);
+            }
+            else {
+                this.clientToken.AccessToken = res["access_token"];
+                this.clientToken.RefreshToken = res["refresh_token"];
+                this.clientToken.TokenType = res["token_type"];
+            }
 
             return true;
         });
@@ -100,12 +95,12 @@ export class AuthenticationService {
             }
             this.storedUser.Username = username;
             this.storedUser.Password = password;
-            this.storedUser.Email = res["email"];
-            this.storedUser.IsAutoUpdateEnabled = res["isAutoUpdateEnabled"];
-
-            appSettings.setString("username", this.storedUser.Username);
-            appSettings.setString("password", this.storedUser.Password);
-            this.storedUser.UserToken = this.setTokensAtApp(res["access_token"], res["refresh_token"], res["token_type"]);
+            this.storedUser.Allowance = 0; // TODO: from backend
+            this.storedUser.Email = "testuser@testdomain.com"; // TODO: from backend
+            this.storedUser.IsAutoUpdateEnabled = false; // TODO: from backend
+            this.storedUser.UserToken = new Token(res["access_token"], res["refresh_token"], res["token_type"]);
+            let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
+            appSettings.setString("storedUser",storedUserJson);
 
             return true;
         });
@@ -123,7 +118,9 @@ export class AuthenticationService {
 
         return this.http.post(this.serverUrl + "/oauth/token", data, { headers: headerOptions }).toPromise()
         .then(res => {
-            this.storedUser.UserToken = this.setTokensAtApp(res["access_token"], res["refresh_token"], res["token_type"]);
+            this.storedUser.UserToken = new Token(res["access_token"], res["refresh_token"], res["token_type"]);
+            let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
+            appSettings.setString("storedUser",storedUserJson);
             
             return true;
         }, err => {
@@ -152,21 +149,8 @@ export class AuthenticationService {
         });
     }
 
-    private setTokensAtApp(access_token: string, refresh_token: string, token_type: string): Token {
-        let token = new Token();
-        token.AccessToken = access_token;
-        token.RefreshToken = refresh_token;
-        token.TokenType = token_type;
-
-        appSettings.setString("access_token", token.AccessToken);
-        appSettings.setString("refresh_token", token.RefreshToken);
-        appSettings.setString("token_type", token.TokenType);
-
-        return token;
-    }
-
     removeAllUserAuthentication(): void {
-        appSettings.clear();
+        appSettings.remove("storedUser");
     }
 
     register(username: string, password: string) : Promise<boolean> {
