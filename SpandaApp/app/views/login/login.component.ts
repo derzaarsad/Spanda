@@ -21,7 +21,7 @@ export class LoginComponent {
     constructor(private page: Page, private router: Router, private authenticationService: AuthenticationService) {
         this.page.actionBarHidden = true;
 
-        if(this.authenticationService.getStoredUser().Username && this.authenticationService.getStoredUser().Password) {
+        if(this.authenticationService.isStoredUserAvailable()) {
             this.Username = this.authenticationService.getStoredUser().Username;
             this.Password = this.authenticationService.getStoredUser().Password;
         }

@@ -17,30 +17,23 @@ export class AuthenticationService {
             this.clientToken = new Token();
         }
 
-        if(!this.storedUser) {
+        if(this.isStoredUserAvailable()) {
             this.storedUser = new User();
-            this.storedUser.userToken = new Token();
-        }
 
-        if(appSettings.hasKey("username")) {
             this.storedUser.Username = appSettings.getString("username");
-        }
-
-        if(appSettings.hasKey("password")) {
             this.storedUser.Password = appSettings.getString("password");
+            this.storedUser.userToken = this.setTokensAtApp(appSettings.getString("access_token"), appSettings.getString("refresh_token"), appSettings.getString("token_type"));
         }
+    }
 
-        if(appSettings.hasKey("access_token")) {
-            this.storedUser.userToken.AccessToken = appSettings.getString("access_token");
-        }
-
-        if(appSettings.hasKey("refresh_token")) {
-            this.storedUser.userToken.RefreshToken = appSettings.getString("refresh_token");
-        }
-
-        if(appSettings.hasKey("token_type")) {
-            this.storedUser.userToken.TokenType = appSettings.getString("token_type");
-        }
+    isStoredUserAvailable(): boolean {
+        return (
+            appSettings.hasKey("username") &&
+            appSettings.hasKey("password") &&
+            appSettings.hasKey("access_token") &&
+            appSettings.hasKey("refresh_token") &&
+            appSettings.hasKey("token_type")
+            );
     }
 
     getStoredUser(): User {
@@ -102,6 +95,9 @@ export class AuthenticationService {
 
         return this.http.post(this.serverUrl + "/oauth/token", data, { headers: headerOptions }).toPromise()
         .then(res => {
+            if(!this.storedUser) {
+                this.storedUser = new User();
+            }
             this.storedUser.Username = username;
             this.storedUser.Password = password;
             this.storedUser.Email = res["email"];
@@ -115,12 +111,12 @@ export class AuthenticationService {
         });
     }
 
-    setNewRefreshAndAccessToken(refresh_token: string) : Promise<boolean> {
+    setNewRefreshAndAccessToken() : Promise<boolean> {
         const data = new HttpParams()
         .set('grant_type', "refresh_token")
         .set('client_id', this.client_id)
         .set('client_secret', this.client_secret)
-        .set('refresh_token', refresh_token);
+        .set('refresh_token', this.storedUser.userToken.RefreshToken);
 
         let headerOptions = new HttpHeaders();
         headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -171,8 +167,6 @@ export class AuthenticationService {
 
     removeAllUserAuthentication(): void {
         appSettings.clear();
-        this.storedUser = new User();
-        this.storedUser.userToken = new Token();
     }
 
     register(username: string, password: string) : Promise<boolean> {
