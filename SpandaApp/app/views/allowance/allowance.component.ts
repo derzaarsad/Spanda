@@ -10,7 +10,6 @@ import { AuthenticationService } from "~/services/authentication.service";
     styleUrls: ["./allowance.css"]
 })
 export class AllowanceComponent implements OnInit {
-    allowanceValue: number;
 
     constructor(
         private routerExtensions: RouterExtensions,
@@ -20,7 +19,6 @@ export class AllowanceComponent implements OnInit {
 
     ngOnInit(): void {
         this.page.actionBarHidden = true;
-        this.allowanceValue = 34;
     }
 
     onTap() {
