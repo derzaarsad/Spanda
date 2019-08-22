@@ -8,6 +8,7 @@ import { JsonConvert } from "json2typescript";
 @Injectable()
 export class AuthenticationService {
     private serverUrl = "https://sandbox.finapi.io";
+    private backendUrl = "https://192.168.1.194:8443/spanda";
     private client_id = "3996d8ae-abaf-490f-9abe-41c64bd82ab6";
     private client_secret = "35525147-fec5-4a48-8a3f-5511221a32f1";
     private clientToken: Token;
@@ -32,14 +33,6 @@ export class AuthenticationService {
 
     getServerUrl(): string {
         return this.serverUrl;
-    }
-
-    getClientId(): string {
-        return this.client_id;
-    }
-
-    getClientSecret(): string {
-        return this.client_secret;
     }
 
     getClientAccessToken(): string {
@@ -137,7 +130,7 @@ export class AuthenticationService {
             "Content-Type": "application/x-www-form-urlencoded"
          });
 
-        return this.http.get(this.serverUrl + "/api/v1/users", { headers: headerOptions }).toPromise()
+        return this.http.get(this.backendUrl + "/users", { headers: headerOptions }).toPromise()
         .then(res => {
             console.log("user is authenticated!");
             console.log(res);
