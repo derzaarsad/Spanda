@@ -73,7 +73,9 @@ export class LoginComponent {
                 });
             })
             .catch((err) => {
-                this.alert(err["error"]["errors"][0]["message"]);
+                console.log(err);
+                if(err["error"]["errors"])
+                    this.alert(err["error"]["errors"][0]["message"]);
             });
     }
 
