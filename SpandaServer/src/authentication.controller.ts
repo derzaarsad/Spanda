@@ -1,0 +1,223 @@
+import { ClientAccessModel } from "./client_access";
+import { Controller, Route, Get, Post, BodyProp, Put, Delete, Header } from "tsoa";
+import * as https from "https";
+import { Token } from "./token.model";
+import * as querystring from "querystring";
+import { resolve } from "url";
+import { rejects } from "assert";
+
+@Route('spanda')
+export class AuthenticationController extends Controller {
+
+    @Get('/users')
+    public async isUserAuthenticated(@Header('Authorization') authorization: string): Promise<any> {
+        
+        return new Promise((resolve, reject) => {
+
+            ClientAccessModel.findOne({ 'name': 'default_client' }, (err, clientAccess) => {
+
+                if(err || !clientAccess) {
+                    const errorMessage = { error: (err) ? err : 'client_not_found' };
+                    resolve(errorMessage);
+                    return;
+                }
+
+                // Set the headers
+                const headers = {
+                    'Authorization': authorization,
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                };
+            
+                // Configure the request
+                const options = {
+                    host: clientAccess.server_url.replace('https://',''),
+                    port: 443, // standard port of https
+                    path: '/api/v1/users',
+                    method: 'GET',
+                    headers: headers
+                };
+
+                const req = https.request(options, (res) => {
+                    
+                    // accumulate data
+                    let body = [];
+                    res.on('data', (chunk) => {
+                        body.push(chunk);
+                    });
+                    
+                    // resolve on end
+                    res.on('end', () => {
+                        try {
+                            body = JSON.parse(Buffer.concat(body).toString());
+                        } catch(e) {
+                            reject(e);
+                        }
+                        this.setStatus(res.statusCode);
+                        resolve(body);
+                    });
+                });
+                
+                // reject on request error
+                req.on('error', (err) => {
+                    // This is not a "Second reject", just a different sort of failure
+                    reject(err);
+                });
+                
+                // IMPORTANT
+                req.end();
+            });
+        });
+
+    }
+
+    @Post('/users')
+    public async register(@BodyProp() id: string, @BodyProp() password: string, @BodyProp() email: string, @BodyProp() phone: string, @BodyProp() isAutoUpdateEnabled: boolean) : Promise<any> {
+
+        return new Promise((resolve, reject) => {
+
+            ClientAccessModel.findOne({ 'name': 'default_client' }, (err, clientAccess) => {
+
+                if(err || !clientAccess) {
+                    const errorMessage = { error: (err) ? err : 'client_not_found' };
+                    resolve(errorMessage);
+                    return;
+                }
+
+                this.authenticateClientAndSave().then((clientToken) => {
+                    
+                    if(!clientToken) {
+                        reject("backend failure!");
+                    }
+
+                    // Set the headers
+                    const headers = {
+                        "Authorization": clientToken.TokenType + " " + clientToken.AccessToken,
+                        'Content-Type': "application/json"
+                    };
+
+                    var postData = JSON.stringify({
+                        'id' : id,
+                        'password' : password,
+                        'email' : email,
+                        'phone' : phone,
+                        'isAutoUpdateEnabled' : isAutoUpdateEnabled
+                    });
+
+                    // Configure the request
+                    const options = {
+                        host: clientAccess.server_url.replace('https://',''),
+                        port: 443, // standard port of https
+                        path: '/api/v1/users',
+                        method: 'POST',
+                        headers: headers
+                    };
+
+                    const req = https.request(options, (res) => {
+                    
+                        // accumulate data
+                        let body = [];
+                        res.on('data', (chunk) => {
+                            body.push(chunk);
+                        });
+                        
+                        // resolve on end
+                        res.on('end', () => {
+                            try {
+                                body = JSON.parse(Buffer.concat(body).toString());
+                            } catch(e) {
+                                reject(e);
+                            }
+                            this.setStatus(res.statusCode);
+                            resolve(body);
+                        });
+                    });
+                    
+                    // reject on request error
+                    req.on('error', (err) => {
+                        // This is not a "Second reject", just a different sort of failure
+                        reject(err);
+                    });
+                    
+                    // IMPORTANT
+                    req.write(postData);
+                    req.end();
+                });
+            });
+        });
+    }
+
+    private authenticateClientAndSave() : Promise<Token> {
+        return new Promise((resolve, reject) => {ClientAccessModel.findOne({ 'name': 'default_client' }).then((clientAccess) => {
+            if(!clientAccess) {
+                console.log('no clientAccess found!');
+                resolve(undefined);
+            }
+
+            // Set the headers
+            const headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            };
+
+            var postData = querystring.stringify({
+                'grant_type' : 'client_credentials',
+                'client_id' : clientAccess.client_id,
+                'client_secret' : clientAccess.client_secret
+            });
+            
+        
+            // Configure the request
+            const options = {
+                host: clientAccess.server_url.replace('https://',''),
+                port: 443, // standard port of https
+                path: '/oauth/token',
+                method: 'POST',
+                headers: headers
+            };
+
+            const req = https.request(options, (res) => {
+                    
+                // accumulate data
+                let body = [];
+                res.on('data', (chunk) => {
+                    body.push(chunk);
+                });
+                
+                // resolve on end
+                res.on('end', () => {
+                    try {
+                        body = JSON.parse(Buffer.concat(body).toString());
+                    } catch(e) {
+                        console.log(e);
+                        resolve(undefined);
+                    }
+                    this.setStatus(res.statusCode);
+                    if(res.statusCode === 200) {
+                        console.log(body);
+                        let clientToken: Token = new Token(body['access_token'],body['refresh_token'],body['token_type']);
+                        console.log(clientToken.AccessToken);
+                        console.log(clientToken.RefreshToken);
+                        console.log(clientToken.TokenType);
+
+                        resolve(clientToken);
+                    }
+                    else {
+                        resolve(undefined);
+                    }
+                });
+            });
+            
+            // reject on request error
+            req.on('error', (err) => {
+                // This is not a "Second reject", just a different sort of failure
+                console.log(err);
+                resolve(undefined);
+            });
+            
+            // IMPORTANT
+            req.write(postData);
+            req.end();
+
+        });
+    });
+    }
+}
