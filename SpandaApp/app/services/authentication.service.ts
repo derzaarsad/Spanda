@@ -148,14 +148,11 @@ export class AuthenticationService {
 
     register(username: string, password: string) : Promise<boolean> {
 
-        return this.authenticateClientAndSave().then(() => {
-
             let headerOptions = new HttpHeaders({
-                "Authorization": this.clientToken.TokenType + " " + this.clientToken.AccessToken,
                 "Content-Type": "application/json"
             });
 
-            return this.http.post(this.serverUrl + "/api/v1/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, { headers: headerOptions }).toPromise()
+            return this.http.post(this.backendUrl + "/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, { headers: headerOptions }).toPromise()
             .then(res => {
 
                 console.log("registration successful");
@@ -163,7 +160,6 @@ export class AuthenticationService {
 
                 return true;
             });
-        });
     }
 
     resetPassword(textSTr: string) : any {
