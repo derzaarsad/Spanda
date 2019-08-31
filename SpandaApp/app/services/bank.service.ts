@@ -10,10 +10,6 @@ export class BankService {
 
     constructor(private http: HttpClient, private authenticationService: AuthenticationService) { }
 
-    getServerUrl(): string {
-        return this.serverUrl;
-    }
-
     getBankByBLZ(blz: string) : Promise<Bank> {
 
         let headerOptions = new HttpHeaders({
@@ -42,7 +38,7 @@ export class BankService {
     /*
      * return [ Id , Access Token, Status ]
      */
-    getWebformIdAndToken(bank: Bank): Promise<[string, string, string]> {
+    getWebformIdAndToken(bank: Bank): Promise<[string, string, string, string]> {
 
         let headerOptions = new HttpHeaders({
             "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
@@ -64,7 +60,7 @@ export class BankService {
             .then(res => {
                 console.log("WebForm Valid");
                 console.log(res);
-                return [res["id"], res["token"], res["status"]];
+                return [res["id"], res["token"], res["status"], this.serverUrl];
             }, err => {
                 console.log("WebForm Invalid");
                 console.log(err);
