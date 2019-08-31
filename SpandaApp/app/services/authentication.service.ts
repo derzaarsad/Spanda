@@ -7,11 +7,7 @@ import { JsonConvert } from "json2typescript";
 
 @Injectable()
 export class AuthenticationService {
-    private serverUrl = "https://sandbox.finapi.io";
     private backendUrl = "https://192.168.1.194:8443/spanda";
-    private client_id = "3996d8ae-abaf-490f-9abe-41c64bd82ab6";
-    private client_secret = "35525147-fec5-4a48-8a3f-5511221a32f1";
-    private clientToken: Token;
     private storedUser: User;
     private jsonConvert: JsonConvert;
 
@@ -23,50 +19,16 @@ export class AuthenticationService {
         }
     }
 
+    getBackendUrl(): string {
+        return this.backendUrl;
+    }
+
     isStoredUserAvailable(): boolean {
         return appSettings.hasKey("storedUser");
     }
 
     getStoredUser(): User {
         return this.storedUser;
-    }
-
-    getServerUrl(): string {
-        return this.serverUrl;
-    }
-
-    getClientAccessToken(): string {
-        return this.clientToken.AccessToken;
-    }
-
-    getClientTokenType(): string {
-        return this.clientToken.TokenType;
-    }
-
-    authenticateClientAndSave() : Promise<boolean> {
-
-        const data = new HttpParams()
-        .set('grant_type', "client_credentials")
-        .set('client_id', this.client_id)
-        .set('client_secret', this.client_secret);
-
-        let headerOptions = new HttpHeaders();
-        headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
-
-        return this.http.post(this.serverUrl + "/oauth/token", data, { headers: headerOptions }).toPromise()
-        .then(res => {
-            console.log("client auth success");
-            if(!this.clientToken) {
-                this.clientToken = new Token(res["access_token"],res["refresh_token"],res["token_type"]);
-            }
-            else {
-                this.clientToken.AccessToken = res["access_token"];
-                this.clientToken.RefreshToken = res["refresh_token"];
-                this.clientToken.TokenType = res["token_type"];
-            }
-
-            return true;
-        });
     }
 
     authenticateAndSave(username: string, password: string) : Promise<boolean> {
@@ -93,16 +55,11 @@ export class AuthenticationService {
     }
 
     setNewRefreshAndAccessToken() : Promise<boolean> {
-        const data = new HttpParams()
-        .set('grant_type', "refresh_token")
-        .set('client_id', this.client_id)
-        .set('client_secret', this.client_secret)
-        .set('refresh_token', this.storedUser.UserToken.RefreshToken);
 
         let headerOptions = new HttpHeaders();
         headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
 
-        return this.http.post(this.serverUrl + "/oauth/token", data, { headers: headerOptions }).toPromise()
+        return this.http.post(this.backendUrl + "/oauth/token", { refresh_token: this.storedUser.UserToken.RefreshToken }, { headers: headerOptions }).toPromise()
         .then(res => {
             this.storedUser.UserToken = new Token(res["access_token"], res["refresh_token"], res["token_type"]);
             let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));

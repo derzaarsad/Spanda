@@ -32,8 +32,7 @@ export class SearchBankComponent implements OnInit {
     constructor(
         private routerExtensions: RouterExtensions,
         private page: Page,
-        private bankService: BankService,
-        private authenticationService: AuthenticationService) {
+        private bankService: BankService) {
     }
 
     ngOnInit(): void {
@@ -95,7 +94,7 @@ export class SearchBankComponent implements OnInit {
     private onAddAccount() {
         this.bankService.getWebformIdAndToken(this.bank).then((res) => {
             this.webId = res[0];
-            this.webViewSrc = this.authenticationService.getServerUrl() + "/webForm/" + res[1] + "?redirectUrl=" + this.invalidUrl;
+            this.webViewSrc = this.bankService.getServerUrl() + "/webForm/" + res[1] + "?redirectUrl=" + this.invalidUrl;
             console.log(res[0]);
             console.log(res[1]);
             console.log(res[2]);
