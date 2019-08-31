@@ -146,6 +146,80 @@ export class AuthenticationController extends Controller {
         });
     }
 
+    @Post('/oauth/token')
+    public async authenticateAndSave(@BodyProp() username: string, @BodyProp() password: string) : Promise<any> {
+        return new Promise((resolve, reject) => {ClientAccessModel.findOne({ 'name': 'default_client' }).then((clientAccess) => {
+            if(!clientAccess) {
+                console.log('no clientAccess found!');
+                resolve(undefined);
+            }
+
+            // Set the headers
+            const headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            };
+
+            var postData = querystring.stringify({
+                'grant_type' : 'password',
+                'client_id' : clientAccess.client_id,
+                'client_secret' : clientAccess.client_secret,
+                'username': username,
+                'password': password
+            });
+            
+        
+            // Configure the request
+            const options = {
+                host: clientAccess.server_url.replace('https://',''),
+                port: 443, // standard port of https
+                path: '/oauth/token',
+                method: 'POST',
+                headers: headers
+            };
+
+            const req = https.request(options, (res) => {
+                    
+                // accumulate data
+                let body = [];
+                res.on('data', (chunk) => {
+                    body.push(chunk);
+                });
+                
+                // resolve on end
+                res.on('end', () => {
+                    try {
+                        body = JSON.parse(Buffer.concat(body).toString());
+                    } catch(e) {
+                        console.log(e);
+                        resolve(undefined);
+                    }
+                    this.setStatus(res.statusCode);
+                    if(res.statusCode === 200) {
+                        console.log(body);
+
+                        resolve(body);
+                    }
+                    else {
+                        resolve(undefined);
+                    }
+                });
+            });
+            
+            // reject on request error
+            req.on('error', (err) => {
+                // This is not a "Second reject", just a different sort of failure
+                console.log(err);
+                resolve(undefined);
+            });
+            
+            // IMPORTANT
+            req.write(postData);
+            req.end();
+
+        });
+    });
+    }
+
     private authenticateClientAndSave() : Promise<Token> {
         return new Promise((resolve, reject) => {ClientAccessModel.findOne({ 'name': 'default_client' }).then((clientAccess) => {
             if(!clientAccess) {

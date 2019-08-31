@@ -71,17 +71,10 @@ export class AuthenticationService {
 
     authenticateAndSave(username: string, password: string) : Promise<boolean> {
 
-        const data = new HttpParams()
-        .set('grant_type', "password")
-        .set('client_id', this.client_id)
-        .set('client_secret', this.client_secret)
-        .set('username', username)
-        .set('password', password);
-
         let headerOptions = new HttpHeaders();
         headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
 
-        return this.http.post(this.serverUrl + "/oauth/token", data, { headers: headerOptions }).toPromise()
+        return this.http.post(this.backendUrl + "/oauth/token", { username: username, password: password }, { headers: headerOptions }).toPromise()
         .then(res => {
             if(!this.storedUser) {
                 this.storedUser = new User();

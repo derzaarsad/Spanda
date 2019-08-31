@@ -105,6 +105,46 @@
 				]
 			}
 		},
+		"/spanda/oauth/token": {
+			"post": {
+				"operationId": "AuthenticateAndSave",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"additionalProperties": true,
+							"type": "object"
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"username": {
+									"type": "string"
+								},
+								"password": {
+									"type": "string"
+								}
+							},
+							"title": "AuthenticateAndSaveBody",
+							"type": "object",
+							"required": [
+								"username",
+								"password"
+							]
+						}
+					}
+				]
+			}
+		},
 		"/todo": {
 			"get": {
 				"operationId": "GetAll",

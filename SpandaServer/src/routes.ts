@@ -77,6 +77,29 @@ export function RegisterRoutes(app: express.Express) {
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/spanda/oauth/token',
+        function(request: any, response: any, next: any) {
+            const args = {
+                username: { "in": "body-prop", "name": "username", "required": true, "dataType": "string" },
+                password: { "in": "body-prop", "name": "password", "required": true, "dataType": "string" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = new AuthenticationController();
+
+
+            const promise = controller.authenticateAndSave.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.get('/todo',
         function(request: any, response: any, next: any) {
             const args = {
