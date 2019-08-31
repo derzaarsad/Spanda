@@ -4,6 +4,7 @@ import * as bodyparser from 'body-parser';
 
 import { requestLoggerMiddleware } from "./request.logger.middleware";
 import './authentication.controller';
+import './bank.controller';
 
 import { RegisterRoutes } from "./routes";
 import * as swaggerUi from "swagger-ui-express";

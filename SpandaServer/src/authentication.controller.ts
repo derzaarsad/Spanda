@@ -1,4 +1,4 @@
-import { ClientAccessModel } from "./client_access";
+import { ClientAccessModel, GetClientToken } from "./client_access";
 import { Controller, Route, Get, Post, BodyProp, Put, Delete, Header } from "tsoa";
 import * as https from "https";
 import { Token } from "./token.model";
@@ -83,7 +83,7 @@ export class AuthenticationController extends Controller {
                     return;
                 }
 
-                this.authenticateClientAndSave().then((clientToken) => {
+                GetClientToken().then((clientToken) => {
                     
                     if(!clientToken) {
                         reject("backend failure!");
@@ -220,7 +220,8 @@ export class AuthenticationController extends Controller {
     });
     }
 
-    private authenticateClientAndSave() : Promise<Token> {
+    @Post('/oauth/token')
+    public async setNewRefreshAndAccessToken(@BodyProp() refresh_token: string) : Promise<any> {
         return new Promise((resolve, reject) => {ClientAccessModel.findOne({ 'name': 'default_client' }).then((clientAccess) => {
             if(!clientAccess) {
                 console.log('no clientAccess found!');
@@ -233,9 +234,10 @@ export class AuthenticationController extends Controller {
             };
 
             var postData = querystring.stringify({
-                'grant_type' : 'client_credentials',
+                'grant_type' : 'refresh_token',
                 'client_id' : clientAccess.client_id,
-                'client_secret' : clientAccess.client_secret
+                'client_secret' : clientAccess.client_secret,
+                'refresh_token': refresh_token
             });
             
         
@@ -267,12 +269,8 @@ export class AuthenticationController extends Controller {
                     this.setStatus(res.statusCode);
                     if(res.statusCode === 200) {
                         console.log(body);
-                        let clientToken: Token = new Token(body['access_token'],body['refresh_token'],body['token_type']);
-                        console.log(clientToken.AccessToken);
-                        console.log(clientToken.RefreshToken);
-                        console.log(clientToken.TokenType);
 
-                        resolve(clientToken);
+                        resolve(body);
                     }
                     else {
                         resolve(undefined);

@@ -107,7 +107,7 @@
 		},
 		"/spanda/oauth/token": {
 			"post": {
-				"operationId": "AuthenticateAndSave",
+				"operationId": "SetNewRefreshAndAccessToken",
 				"produces": [
 					"application/json"
 				],
@@ -127,20 +127,42 @@
 						"name": "body",
 						"schema": {
 							"properties": {
-								"username": {
-									"type": "string"
-								},
-								"password": {
+								"refresh_token": {
 									"type": "string"
 								}
 							},
-							"title": "AuthenticateAndSaveBody",
+							"title": "SetNewRefreshAndAccessTokenBody",
 							"type": "object",
 							"required": [
-								"username",
-								"password"
+								"refresh_token"
 							]
 						}
+					}
+				]
+			}
+		},
+		"/spanda/banks/{blz}": {
+			"get": {
+				"operationId": "GetBankByBLZ",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"additionalProperties": true,
+							"type": "object"
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "blz",
+						"required": true,
+						"type": "string"
 					}
 				]
 			}
