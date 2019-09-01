@@ -79,7 +79,7 @@ export function RegisterRoutes(app: express.Express) {
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    app.post('/spanda/oauth/token',
+    app.post('/spanda/oauth/login',
         function(request: any, response: any, next: any) {
             const args = {
                 username: { "in": "body-prop", "name": "username", "required": true, "dataType": "string" },
@@ -143,6 +143,53 @@ export function RegisterRoutes(app: express.Express) {
 
 
             const promise = controller.getBankByBLZ.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/spanda/bankConnections/import',
+        function(request: any, response: any, next: any) {
+            const args = {
+                authorization: { "in": "header", "name": "Authorization", "required": true, "dataType": "string" },
+                bankId: { "in": "body-prop", "name": "bankId", "required": true, "dataType": "double" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = new BankController();
+
+
+            const promise = controller.getWebformId.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/spanda/webForms/:webId',
+        function(request: any, response: any, next: any) {
+            const args = {
+                webId: { "in": "path", "name": "webId", "required": true, "dataType": "string" },
+                authorization: { "in": "header", "name": "Authorization", "required": true, "dataType": "string" },
+                contentType: { "in": "header", "name": "Content-Type", "required": true, "dataType": "string" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = new BankController();
+
+
+            const promise = controller.fetchWebformInfo.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

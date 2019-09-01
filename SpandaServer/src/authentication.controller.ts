@@ -267,9 +267,8 @@ export class AuthenticationController extends Controller {
                         resolve(undefined);
                     }
                     this.setStatus(res.statusCode);
+                    console.log(body);
                     if(res.statusCode === 200) {
-                        console.log(body);
-
                         resolve(body);
                     }
                     else {

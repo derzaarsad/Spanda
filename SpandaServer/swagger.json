@@ -105,6 +105,46 @@
 				]
 			}
 		},
+		"/spanda/oauth/login": {
+			"post": {
+				"operationId": "AuthenticateAndSave",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"additionalProperties": true,
+							"type": "object"
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"username": {
+									"type": "string"
+								},
+								"password": {
+									"type": "string"
+								}
+							},
+							"title": "AuthenticateAndSaveBody",
+							"type": "object",
+							"required": [
+								"username",
+								"password"
+							]
+						}
+					}
+				]
+			}
+		},
 		"/spanda/oauth/token": {
 			"post": {
 				"operationId": "SetNewRefreshAndAccessToken",
@@ -161,6 +201,87 @@
 					{
 						"in": "path",
 						"name": "blz",
+						"required": true,
+						"type": "string"
+					}
+				]
+			}
+		},
+		"/spanda/bankConnections/import": {
+			"post": {
+				"operationId": "GetWebformId",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"additionalProperties": true,
+							"type": "object"
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Authorization",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"schema": {
+							"properties": {
+								"bankId": {
+									"type": "number",
+									"format": "double"
+								}
+							},
+							"title": "GetWebformIdBody",
+							"type": "object",
+							"required": [
+								"bankId"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/spanda/webForms/{webId}": {
+			"get": {
+				"operationId": "FetchWebformInfo",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"additionalProperties": true,
+							"type": "object"
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "webId",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "header",
+						"name": "Authorization",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "header",
+						"name": "Content-Type",
 						"required": true,
 						"type": "string"
 					}

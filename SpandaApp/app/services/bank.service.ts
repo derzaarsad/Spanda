@@ -6,7 +6,6 @@ import { Token } from "~/models/token.model";
 
 @Injectable()
 export class BankService {
-    private serverUrl = "https://sandbox.finapi.io";
 
     constructor(private http: HttpClient, private authenticationService: AuthenticationService) { }
 
@@ -45,27 +44,15 @@ export class BankService {
             "Content-Type": "application/json"
         });
 
-        return this.http.post(this.serverUrl + "/api/v1/bankConnections/import", { bankId: bank.Id }, { headers: headerOptions }).toPromise()
+        return this.http.post(this.authenticationService.getBackendUrl() + "/bankConnections/import", { bankId: bank.Id }, { headers: headerOptions }).toPromise()
         .then(res => {
-            // It has to be an error (code 451), because we want to open the Web Form
-            return undefined;
+            console.log("WebForm Valid");
+            console.log(res[0]);
+            return [res[0]["id"], res[0]["token"], res[0]["status"], res[1]];
         }, err => {
-            let webId = err["error"]["errors"][0]["message"];
-            console.log(webId);
-            
-            let headerOptions = new HttpHeaders({
-                "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken
-            });
-            return this.http.get(this.serverUrl + "/api/v1/webForms/" + webId, { headers: headerOptions }).toPromise()
-            .then(res => {
-                console.log("WebForm Valid");
-                console.log(res);
-                return [res["id"], res["token"], res["status"], this.serverUrl];
-            }, err => {
-                console.log("WebForm Invalid");
-                console.log(err);
-                return undefined;
-            });
+            console.log("WebForm Invalid");
+            console.log(err);
+            return undefined;
         });
     }
 
@@ -75,7 +62,7 @@ export class BankService {
             "Content-Type": "application/x-www-form-urlencoded"
         });
 
-        return this.http.get(this.serverUrl + "/api/v1/webForms/" + webId, { headers: headerOptions }).toPromise()
+        return this.http.get(this.authenticationService.getBackendUrl() + "/webForms/" + webId, { headers: headerOptions }).toPromise()
         .then(res => {
             // always take the first element, assumed blz is unique only to one bank
             let serviceResponseBody = res["serviceResponseBody"];
