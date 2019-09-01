@@ -146,7 +146,7 @@ export class AuthenticationController extends Controller {
         });
     }
 
-    @Post('/oauth/token')
+    @Post('/oauth/login')
     public async authenticateAndSave(@BodyProp() username: string, @BodyProp() password: string) : Promise<any> {
         return new Promise((resolve, reject) => {ClientAccessModel.findOne({ 'name': 'default_client' }).then((clientAccess) => {
             if(!clientAccess) {

@@ -36,7 +36,7 @@ export class AuthenticationService {
         let headerOptions = new HttpHeaders();
         headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
 
-        return this.http.post(this.backendUrl + "/oauth/token", { username: username, password: password }, { headers: headerOptions }).toPromise()
+        return this.http.post(this.backendUrl + "/oauth/login", { username: username, password: password }, { headers: headerOptions }).toPromise()
         .then(res => {
             if(!this.storedUser) {
                 this.storedUser = new User();
