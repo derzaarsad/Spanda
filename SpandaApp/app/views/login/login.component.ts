@@ -76,6 +76,8 @@ export class LoginComponent {
                 console.log(err);
                 if(err["error"]["errors"])
                     this.alert(err["error"]["errors"][0]["message"]);
+                else
+                    this.alert(err["error"]);
             });
     }
 
