@@ -1,4 +1,5 @@
 import { ClientAccessModel, GetClientToken } from "./client_access";
+import { UserModel } from "./model/user.model";
 import { Controller, Route, Get, Post, BodyProp, Put, Delete, Header } from "tsoa";
 import * as https from "https";
 import { Token } from "./token.model";
@@ -75,72 +76,96 @@ export class AuthenticationController extends Controller {
 
         return new Promise((resolve, reject) => {
 
-            ClientAccessModel.findOne({ 'name': 'default_client' }, (err, clientAccess) => {
-
-                if(err || !clientAccess) {
-                    const errorMessage = { error: (err) ? err : 'client_not_found' };
-                    resolve(errorMessage);
-                    return;
+            UserModel.findOne({ 'username': id }, (err, foundUser) => {
+                if(err) {
+                    reject(new Error('Backend failure'));
                 }
 
-                GetClientToken().then((clientToken) => {
-                    
-                    if(!clientToken) {
-                        reject("backend failure!");
+                if(foundUser) {
+                    reject(new Error('User already exist!'));
+                }
+
+                ClientAccessModel.findOne({ 'name': 'default_client' }, (err, clientAccess) => {
+
+                    if(err || !clientAccess) {
+                        const errorMessage = { error: (err) ? err : 'client_not_found' };
+                        reject(errorMessage);
                     }
+    
+                    GetClientToken().then((clientToken) => {
+                        
+                        if(!clientToken) {
+                            reject("backend failure!");
+                        }
+    
+                        // Set the headers
+                        const headers = {
+                            "Authorization": clientToken.TokenType + " " + clientToken.AccessToken,
+                            'Content-Type': "application/json"
+                        };
+    
+                        var postData = JSON.stringify({
+                            'id' : id,
+                            'password' : password,
+                            'email' : email,
+                            'phone' : phone,
+                            'isAutoUpdateEnabled' : isAutoUpdateEnabled
+                        });
+    
+                        // Configure the request
+                        const options = {
+                            host: clientAccess.server_url.replace('https://',''),
+                            port: 443, // standard port of https
+                            path: '/api/v1/users',
+                            method: 'POST',
+                            headers: headers
+                        };
+    
+                        const req = https.request(options, (res) => {
+                        
+                            // accumulate data
+                            let body = [];
+                            res.on('data', (chunk) => {
+                                body.push(chunk);
+                            });
+                            
+                            // resolve on end
+                            res.on('end', () => {
+                                try {
+                                    body = JSON.parse(Buffer.concat(body).toString());
+                                } catch(e) {
+                                    reject(e);
+                                }
+                                this.setStatus(res.statusCode);
+                                if(res.statusCode === 201) {
+                                    UserModel.create({ username: id,
+                                        allowance: 0,
+                                        email: email,
+                                        phone: phone,
+                                        isAutoUpdateEnabled: isAutoUpdateEnabled }, function (err) {
+                                            if (err) {
+                                                reject(err);
+                                            }
 
-                    // Set the headers
-                    const headers = {
-                        "Authorization": clientToken.TokenType + " " + clientToken.AccessToken,
-                        'Content-Type': "application/json"
-                    };
-
-                    var postData = JSON.stringify({
-                        'id' : id,
-                        'password' : password,
-                        'email' : email,
-                        'phone' : phone,
-                        'isAutoUpdateEnabled' : isAutoUpdateEnabled
-                    });
-
-                    // Configure the request
-                    const options = {
-                        host: clientAccess.server_url.replace('https://',''),
-                        port: 443, // standard port of https
-                        path: '/api/v1/users',
-                        method: 'POST',
-                        headers: headers
-                    };
-
-                    const req = https.request(options, (res) => {
-                    
-                        // accumulate data
-                        let body = [];
-                        res.on('data', (chunk) => {
-                            body.push(chunk);
+                                            resolve(body);
+                                        });
+                                }
+                                else {
+                                    reject(res.statusMessage);
+                                }
+                            });
                         });
                         
-                        // resolve on end
-                        res.on('end', () => {
-                            try {
-                                body = JSON.parse(Buffer.concat(body).toString());
-                            } catch(e) {
-                                reject(e);
-                            }
-                            this.setStatus(res.statusCode);
-                            resolve(body);
+                        // reject on request error
+                        req.on('error', (err) => {
+                            // This is not a "Second reject", just a different sort of failure
+                            reject(err);
                         });
+                        
+                        // IMPORTANT
+                        req.write(postData);
+                        req.end();
                     });
-                    
-                    // reject on request error
-                    req.on('error', (err) => {
-                        // This is not a "Second reject", just a different sort of failure
-                        reject(err);
-                    });
-                    
-                    // IMPORTANT
-                    req.write(postData);
-                    req.end();
                 });
             });
         });
