@@ -45,7 +45,7 @@ export class SearchBankComponent implements OnInit {
         label.text = "WebView is still loading...";
 
         webview.on(WebView.loadFinishedEvent, (args: LoadEventData) => {
-            if((args.url !== undefined) && (args.url.startsWith(this.invalidUrl))) {
+            if(args.error && (args.url !== undefined) && (args.url.startsWith(this.invalidUrl))) {
                 // This is a workaround until I get a better solution
 
                 // fetch the info from webform
