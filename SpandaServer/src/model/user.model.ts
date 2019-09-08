@@ -5,6 +5,7 @@ interface IUser extends mongoose.Document {
     email: string;
     phone: string;
     isAutoUpdateEnabled: boolean;
+    bankConnections: [number];
 }
 
 const UserSchema = new mongoose.Schema({
@@ -12,7 +13,8 @@ const UserSchema = new mongoose.Schema({
     allowance: Number,
     email: String,
     phone: String,
-    isAutoUpdateEnabled: Boolean
+    isAutoUpdateEnabled: Boolean,
+    bankConnections: [Number]
 });
 
 const UserModel = mongoose.model<IUser>('User', UserSchema);
