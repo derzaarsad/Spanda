@@ -154,7 +154,7 @@ export class BankController extends Controller {
 
                 if(err || !clientAccess) {
                     const errorMessage = { error: (err) ? err : 'client_not_found' };
-                    resolve(errorMessage);
+                    reject(errorMessage);
                     return;
                 }
 
@@ -188,7 +188,7 @@ export class BankController extends Controller {
                         body = JSON.parse(Buffer.concat(body).toString());
                     } catch(e) {
                         console.log(e);
-                        resolve(undefined);
+                        reject(undefined);
                     }
                     this.setStatus(res.statusCode);
                     if(res.statusCode === 200) {
@@ -197,7 +197,7 @@ export class BankController extends Controller {
                         resolve(body);
                     }
                     else {
-                        resolve(undefined);
+                        reject(undefined);
                     }
                 });
             });
@@ -206,7 +206,7 @@ export class BankController extends Controller {
             req.on('error', (err) => {
                 // This is not a "Second reject", just a different sort of failure
                 console.log(err);
-                resolve(undefined);
+                reject(undefined);
             });
             
             // IMPORTANT
