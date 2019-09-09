@@ -173,6 +173,7 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 webId: { "in": "path", "name": "webId", "required": true, "dataType": "string" },
+                username: { "in": "header", "name": "Username", "required": true, "dataType": "any" },
                 authorization: { "in": "header", "name": "Authorization", "required": true, "dataType": "string" },
                 contentType: { "in": "header", "name": "Content-Type", "required": true, "dataType": "string" },
             };

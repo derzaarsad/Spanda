@@ -4,6 +4,8 @@ import * as https from "https";
 import { Token } from "./token.model";
 import { resolve } from "url";
 import { rejects } from "assert";
+import { UserModel } from "./model/user.model";
+import { BankConnectionModel } from "./model/bankConnection.model";
 
 @Route('spanda')
 export class BankController extends Controller {
@@ -147,7 +149,7 @@ export class BankController extends Controller {
     }
 
     @Get('/webForms/{webId}')
-    public async fetchWebformInfo(webId: string, @Header('Authorization') authorization: string, @Header('Content-Type') contentType: string) : Promise<any> {
+    public async fetchWebformInfo(webId: string,@Header('Username') username, @Header('Authorization') authorization: string, @Header('Content-Type') contentType: string) : Promise<any> {
         return new Promise((resolve, reject) => {
 
             ClientAccessModel.findOne({ 'name': 'default_client' }, (err, clientAccess) => {
@@ -194,7 +196,34 @@ export class BankController extends Controller {
                     if(res.statusCode === 200) {
                         console.log(body);
 
-                        resolve(body);
+                        UserModel.findOne({ 'username': username }, (err, user) => {
+
+                            if(err || !user) {
+                                const errorMessage = { error: (err) ? err : 'user_not_found' };
+                                reject(errorMessage);
+                                return;
+                            }
+
+                            if(body['serviceResponseCode'] === 201) {
+                                let serviceResponseBody = JSON.parse(body['serviceResponseBody']);
+
+                                BankConnectionModel.create({ id: serviceResponseBody['id'],
+                                bankId: serviceResponseBody['bankId'] }, function (err, bankConnection) {
+                                    if (err) {
+                                        reject(err);
+                                        return;
+                                    }
+
+                                    user.bankConnections.push(bankConnection.id);
+                                    user.save();
+
+                                    resolve(body);
+                                });
+                            }
+                            else {
+                                reject(undefined);
+                            }
+                        });
                     }
                     else {
                         reject(undefined);

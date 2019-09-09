@@ -58,6 +58,7 @@ export class BankService {
 
     fetchWebformInfo(webId: string): Promise<JSON> {
         let headerOptions = new HttpHeaders({
+            "Username": this.authenticationService.getStoredUser().Username,
             "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
             "Content-Type": "application/x-www-form-urlencoded"
         });

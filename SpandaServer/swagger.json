@@ -275,6 +275,12 @@
 					},
 					{
 						"in": "header",
+						"name": "Username",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "header",
 						"name": "Authorization",
 						"required": true,
 						"type": "string"
