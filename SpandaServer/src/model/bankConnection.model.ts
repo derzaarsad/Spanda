@@ -5,7 +5,7 @@ interface IBankConnection extends mongoose.Document {
 }
 
 const BankConnectionSchema = new mongoose.Schema({
-    id: Number,
+    id: { type: Number, unique: true },
     bankId: Number
 });
 
