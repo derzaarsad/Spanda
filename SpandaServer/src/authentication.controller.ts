@@ -1,11 +1,8 @@
-import { ClientAccessModel, GetClientToken } from "./client_access";
+import { GetClientAccess, GetClientToken } from "./client_access";
 import { UserModel } from "./model/user.model";
 import { Controller, Route, Get, Post, BodyProp, Put, Delete, Header } from "tsoa";
 import * as https from "https";
-import { Token } from "./token.model";
 import * as querystring from "querystring";
-import { resolve } from "url";
-import { rejects } from "assert";
 
 @Route('spanda')
 export class AuthenticationController extends Controller {
@@ -15,14 +12,7 @@ export class AuthenticationController extends Controller {
         
         return new Promise((resolve, reject) => {
 
-            ClientAccessModel.findOne({ 'name': 'default_client' }, (err, clientAccess) => {
-
-                if(err || !clientAccess) {
-                    const errorMessage = { error: (err) ? err : 'client_not_found' };
-                    resolve(errorMessage);
-                    return;
-                }
-
+            GetClientAccess().then((clientAccess) => {
                 // Set the headers
                 const headers = {
                     'Authorization': authorization,
@@ -66,6 +56,8 @@ export class AuthenticationController extends Controller {
                 
                 // IMPORTANT
                 req.end();
+            }).catch(() => {
+                reject("backend failure!")
             });
         });
 
@@ -85,13 +77,7 @@ export class AuthenticationController extends Controller {
                     reject(new Error('User already exist!'));
                 }
 
-                ClientAccessModel.findOne({ 'name': 'default_client' }, (err, clientAccess) => {
-
-                    if(err || !clientAccess) {
-                        const errorMessage = { error: (err) ? err : 'client_not_found' };
-                        reject(errorMessage);
-                    }
-    
+                GetClientAccess().then((clientAccess) => {
                     GetClientToken().then((clientToken) => {
                         
                         if(!clientToken) {
@@ -166,6 +152,8 @@ export class AuthenticationController extends Controller {
                         req.write(postData);
                         req.end();
                     });
+                }).catch(() => {
+                    reject("backend failure!")
                 });
             });
         });
@@ -173,147 +161,143 @@ export class AuthenticationController extends Controller {
 
     @Post('/oauth/login')
     public async authenticateAndSave(@BodyProp() username: string, @BodyProp() password: string) : Promise<any> {
-        return new Promise((resolve, reject) => {ClientAccessModel.findOne({ 'name': 'default_client' }).then((clientAccess) => {
-            if(!clientAccess) {
-                console.log('no clientAccess found!');
-                resolve(undefined);
-            }
-
-            // Set the headers
-            const headers = {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            };
-
-            var postData = querystring.stringify({
-                'grant_type' : 'password',
-                'client_id' : clientAccess.client_id,
-                'client_secret' : clientAccess.client_secret,
-                'username': username,
-                'password': password
-            });
+        return new Promise((resolve, reject) => {
             
-        
-            // Configure the request
-            const options = {
-                host: clientAccess.server_url.replace('https://',''),
-                port: 443, // standard port of https
-                path: '/oauth/token',
-                method: 'POST',
-                headers: headers
-            };
+            GetClientAccess().then((clientAccess) => {
+                // Set the headers
+                const headers = {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                };
 
-            const req = https.request(options, (res) => {
-                    
-                // accumulate data
-                let body = [];
-                res.on('data', (chunk) => {
-                    body.push(chunk);
+                var postData = querystring.stringify({
+                    'grant_type' : 'password',
+                    'client_id' : clientAccess.client_id,
+                    'client_secret' : clientAccess.client_secret,
+                    'username': username,
+                    'password': password
                 });
                 
-                // resolve on end
-                res.on('end', () => {
-                    try {
-                        body = JSON.parse(Buffer.concat(body).toString());
-                    } catch(e) {
-                        console.log(e);
-                        resolve(undefined);
-                    }
-                    this.setStatus(res.statusCode);
-                    if(res.statusCode === 200) {
-                        console.log(body);
+                
+                // Configure the request
+                const options = {
+                    host: clientAccess.server_url.replace('https://',''),
+                    port: 443, // standard port of https
+                    path: '/oauth/token',
+                    method: 'POST',
+                    headers: headers
+                };
 
-                        resolve(body);
-                    }
-                    else {
-                        resolve(undefined);
-                    }
+                const req = https.request(options, (res) => {
+
+                    // accumulate data
+                    let body = [];
+                    res.on('data', (chunk) => {
+                        body.push(chunk);
+                    });
+                    
+                    // resolve on end
+                    res.on('end', () => {
+                        try {
+                            body = JSON.parse(Buffer.concat(body).toString());
+                        } catch(e) {
+                            console.log(e);
+                            resolve(undefined);
+                        }
+                        this.setStatus(res.statusCode);
+                        if(res.statusCode === 200) {
+                            console.log(body);
+
+                            resolve(body);
+                        }
+                        else {
+                            resolve(undefined);
+                        }
+                    });
                 });
+                
+                // reject on request error
+                req.on('error', (err) => {
+                    // This is not a "Second reject", just a different sort of failure
+                    console.log(err);
+                    resolve(undefined);
+                });
+                
+                // IMPORTANT
+                req.write(postData);
+                req.end();
+            }).catch(() => {
+                reject("backend failure!")
             });
-            
-            // reject on request error
-            req.on('error', (err) => {
-                // This is not a "Second reject", just a different sort of failure
-                console.log(err);
-                resolve(undefined);
-            });
-            
-            // IMPORTANT
-            req.write(postData);
-            req.end();
-
-        });
     });
     }
 
     @Post('/oauth/token')
     public async setNewRefreshAndAccessToken(@BodyProp() refresh_token: string) : Promise<any> {
-        return new Promise((resolve, reject) => {ClientAccessModel.findOne({ 'name': 'default_client' }).then((clientAccess) => {
-            if(!clientAccess) {
-                console.log('no clientAccess found!');
-                resolve(undefined);
-            }
-
-            // Set the headers
-            const headers = {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            };
-
-            var postData = querystring.stringify({
-                'grant_type' : 'refresh_token',
-                'client_id' : clientAccess.client_id,
-                'client_secret' : clientAccess.client_secret,
-                'refresh_token': refresh_token
-            });
+        return new Promise((resolve, reject) => {
             
-        
-            // Configure the request
-            const options = {
-                host: clientAccess.server_url.replace('https://',''),
-                port: 443, // standard port of https
-                path: '/oauth/token',
-                method: 'POST',
-                headers: headers
-            };
+            GetClientAccess().then((clientAccess) => {
+                
+                // Set the headers
+                const headers = {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                };
 
-            const req = https.request(options, (res) => {
-                    
-                // accumulate data
-                let body = [];
-                res.on('data', (chunk) => {
-                    body.push(chunk);
+                var postData = querystring.stringify({
+                    'grant_type' : 'refresh_token',
+                    'client_id' : clientAccess.client_id,
+                    'client_secret' : clientAccess.client_secret,
+                    'refresh_token': refresh_token
                 });
                 
-                // resolve on end
-                res.on('end', () => {
-                    try {
-                        body = JSON.parse(Buffer.concat(body).toString());
-                    } catch(e) {
-                        console.log(e);
-                        resolve(undefined);
-                    }
-                    this.setStatus(res.statusCode);
-                    console.log(body);
-                    if(res.statusCode === 200) {
-                        resolve(body);
-                    }
-                    else {
-                        resolve(undefined);
-                    }
-                });
-            });
-            
-            // reject on request error
-            req.on('error', (err) => {
-                // This is not a "Second reject", just a different sort of failure
-                console.log(err);
-                resolve(undefined);
-            });
-            
-            // IMPORTANT
-            req.write(postData);
-            req.end();
+                // Configure the request
+                const options = {
+                    host: clientAccess.server_url.replace('https://',''),
+                    port: 443, // standard port of https
+                    path: '/oauth/token',
+                    method: 'POST',
+                    headers: headers
+                };
 
-        });
+                const req = https.request(options, (res) => {
+
+                    // accumulate data
+                    let body = [];
+                    res.on('data', (chunk) => {
+                        body.push(chunk);
+                    });
+                    
+                    // resolve on end
+                    res.on('end', () => {
+                        try {
+                            body = JSON.parse(Buffer.concat(body).toString());
+                        } catch(e) {
+                            console.log(e);
+                            resolve(undefined);
+                        }
+                        this.setStatus(res.statusCode);
+                        console.log(body);
+                        if(res.statusCode === 200) {
+                            resolve(body);
+                        }
+                        else {
+                            resolve(undefined);
+                        }
+                    });
+                });
+                
+                // reject on request error
+                req.on('error', (err) => {
+                    // This is not a "Second reject", just a different sort of failure
+                    console.log(err);
+                    resolve(undefined);
+                });
+                
+                // IMPORTANT
+                req.write(postData);
+                req.end();
+            }).catch(() => {
+                reject("backend failure!")
+            });
     });
     }
 }
