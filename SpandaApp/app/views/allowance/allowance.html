@@ -1,5 +1,6 @@
 <StackLayout>
     <Label [text]="authenticationService.getStoredUser().Allowance" class="label"></Label>
     <Button text="Add Bank Account" (tap)="onTap()" ></Button>
+    <Button text="Refresh Allowance" (tap)="onRefreshAllowance()" ></Button>
     <Button text="Log Out" (tap)="onLogOut()" ></Button>
 </StackLayout>

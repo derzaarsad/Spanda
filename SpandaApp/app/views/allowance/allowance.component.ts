@@ -3,6 +3,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { NavigationOptions } from "nativescript-angular/router/ns-location-strategy";
 import { Page } from "tns-core-modules/ui/page";
 import { AuthenticationService } from "~/services/authentication.service";
+import { BankService } from "~/services/bank.service"
 
 @Component({
     selector: "allowance",
@@ -14,7 +15,8 @@ export class AllowanceComponent implements OnInit {
     constructor(
         private routerExtensions: RouterExtensions,
         private page: Page,
-        private authenticationService: AuthenticationService) {
+        private authenticationService: AuthenticationService,
+        private bankService: BankService) {
     }
 
     ngOnInit(): void {
@@ -28,5 +30,11 @@ export class AllowanceComponent implements OnInit {
     onLogOut() {
         this.authenticationService.removeAllUserAuthentication();
         this.routerExtensions.navigate(["login"]);
+    }
+
+    onRefreshAllowance() {
+        this.bankService.getAllowance().then((res) => {
+            this.authenticationService.getStoredUser().Allowance = res;
+        });
     }
 }

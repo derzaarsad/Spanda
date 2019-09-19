@@ -233,6 +233,29 @@ export class BankController extends Controller {
         });
     }
 
+    @Get('/allowance')
+    public async getAllowance(@Header('Username') username, @Header('Authorization') authorization: string, @Header('Content-Type') contentType: string) : Promise<any> {
+        return new Promise((resolve, reject) => {
+
+            GetUserByUsername(username).then((user) => {
+
+                if(!user) {
+                    reject("user not found");
+                    return;
+                }
+
+                GetClientAccess().then((clientAccess) => {
+                    // TODO
+                    resolve("{\"allowance\":" + user.allowance.toString() + "}");
+                }).catch((err) => {
+                    reject(err);
+                });
+            }).catch((err)=> {
+                reject(err);
+            });
+        });
+    }
+
     private connectToBank(authorization: string, bankId: number) : Promise<any> {
         return new Promise((resolve, reject) => {
             GetClientAccess().then((clientAccess) => {

@@ -194,6 +194,30 @@ export function RegisterRoutes(app: express.Express) {
             promiseHandler(controller, promise, response, next);
         });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/spanda/allowance',
+        function(request: any, response: any, next: any) {
+            const args = {
+                username: { "in": "header", "name": "Username", "required": true, "dataType": "any" },
+                authorization: { "in": "header", "name": "Authorization", "required": true, "dataType": "string" },
+                contentType: { "in": "header", "name": "Content-Type", "required": true, "dataType": "string" },
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = new BankController();
+
+
+            const promise = controller.getAllowance.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.get('/todo',
         function(request: any, response: any, next: any) {
             const args = {

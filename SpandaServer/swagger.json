@@ -294,6 +294,44 @@
 				]
 			}
 		},
+		"/spanda/allowance": {
+			"get": {
+				"operationId": "GetAllowance",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"schema": {
+							"additionalProperties": true,
+							"type": "object"
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Username",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "header",
+						"name": "Authorization",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "header",
+						"name": "Content-Type",
+						"required": true,
+						"type": "string"
+					}
+				]
+			}
+		},
 		"/todo": {
 			"get": {
 				"operationId": "GetAll",

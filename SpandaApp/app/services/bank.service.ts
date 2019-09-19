@@ -79,4 +79,22 @@ export class BankService {
             return undefined;
         });
     }
+
+    getAllowance(): Promise<number> {
+        let headerOptions = new HttpHeaders({
+            "Username": this.authenticationService.getStoredUser().Username,
+            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
+            "Content-Type": "application/x-www-form-urlencoded"
+        });
+
+        return this.http.get(this.authenticationService.getBackendUrl() + "/allowance", { headers: headerOptions }).toPromise()
+        .then(res => {
+            return res["allowance"];
+        })
+        .catch((err) => {
+            console.log("Get allowance failed!");
+            console.log(err);
+            return undefined;
+        });
+    }
 }
