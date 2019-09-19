@@ -198,13 +198,13 @@ export class BankController extends Controller {
                                 bankId: serviceResponseBody['bankId'] }, function (err, bankConnection) {
                                     if (err) {
                                         reject(err);
-                                        return;
                                     }
-
-                                    user.bankConnections.push(bankConnection.id);
-                                    user.save();
-
-                                    resolve(body);
+                                    else {
+                                        user.bankConnections.push(bankConnection.id);
+                                        user.save();
+                                        
+                                        resolve(body);
+                                    }
                                 });
                             }
                             else {
