@@ -56,8 +56,8 @@ export class AuthenticationController extends Controller {
                 
                 // IMPORTANT
                 req.end();
-            }).catch(() => {
-                reject("backend failure!")
+            }).catch((err) => {
+                reject(err);
             });
         });
 
@@ -152,8 +152,8 @@ export class AuthenticationController extends Controller {
                         req.write(postData);
                         req.end();
                     });
-                }).catch(() => {
-                    reject("backend failure!")
+                }).catch((err) => {
+                    reject(err);
                 });
             });
         });
@@ -225,8 +225,8 @@ export class AuthenticationController extends Controller {
                 // IMPORTANT
                 req.write(postData);
                 req.end();
-            }).catch(() => {
-                reject("backend failure!")
+            }).catch((err) => {
+                reject(err);
             });
     });
     }
@@ -295,8 +295,8 @@ export class AuthenticationController extends Controller {
                 // IMPORTANT
                 req.write(postData);
                 req.end();
-            }).catch(() => {
-                reject("backend failure!")
+            }).catch((err) => {
+                reject(err);
             });
     });
     }
