@@ -195,7 +195,7 @@ export class BankController extends Controller {
                                 let serviceResponseBody = JSON.parse(body['serviceResponseBody']);
 
                                 BankConnectionModel.create({ id: serviceResponseBody['id'],
-                                bankId: serviceResponseBody['bankId'] }, function (err, bankConnection) {
+                                bankId: serviceResponseBody['bankId'], bankAccounts: serviceResponseBody['accountIds'] }, function (err, bankConnection) {
                                     if (err) {
                                         reject(err);
                                     }
