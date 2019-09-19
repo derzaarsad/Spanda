@@ -1,5 +1,5 @@
 import { GetClientAccess, GetClientToken } from "./client_access";
-import { UserModel } from "./model/user.model";
+import { GetUserByUsername, CreateUserInDB } from "./model/user.model";
 import { Controller, Route, Get, Post, BodyProp, Put, Delete, Header } from "tsoa";
 import * as https from "https";
 import * as querystring from "querystring";
@@ -68,13 +68,11 @@ export class AuthenticationController extends Controller {
 
         return new Promise((resolve, reject) => {
 
-            UserModel.findOne({ 'username': id }, (err, foundUser) => {
-                if(err) {
-                    reject(new Error('Backend failure'));
-                }
+            GetUserByUsername(id).then((foundUser) => {
 
                 if(foundUser) {
                     reject(new Error('User already exist!'));
+                    return;
                 }
 
                 GetClientAccess().then((clientAccess) => {
@@ -124,17 +122,11 @@ export class AuthenticationController extends Controller {
                                 }
                                 this.setStatus(res.statusCode);
                                 if(res.statusCode === 201) {
-                                    UserModel.create({ username: id,
-                                        allowance: 0,
-                                        email: email,
-                                        phone: phone,
-                                        isAutoUpdateEnabled: isAutoUpdateEnabled }, function (err) {
-                                            if (err) {
-                                                reject(err);
-                                            }
-
-                                            resolve(body);
-                                        });
+                                    CreateUserInDB(id, email, phone, isAutoUpdateEnabled).then((user) => {
+                                        resolve(body);
+                                    }).catch((err)=> {
+                                        reject(err);
+                                    });
                                 }
                                 else {
                                     reject(res.statusMessage);
@@ -155,6 +147,8 @@ export class AuthenticationController extends Controller {
                 }).catch((err) => {
                     reject(err);
                 });
+            }).catch((err) => {
+                reject(err);
             });
         });
     }

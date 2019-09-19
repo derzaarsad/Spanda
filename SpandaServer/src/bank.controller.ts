@@ -1,7 +1,7 @@
 import { GetClientAccess, GetClientToken } from "./client_access";
 import { Controller, Route, Get, Post, BodyProp, Put, Delete, Header } from "tsoa";
 import * as https from "https";
-import { UserModel } from "./model/user.model";
+import { GetUserByUsername } from "./model/user.model";
 import { BankConnectionModel } from "./model/bankConnection.model";
 
 @Route('spanda')
@@ -183,11 +183,9 @@ export class BankController extends Controller {
                     if(res.statusCode === 200) {
                         console.log(body);
 
-                        UserModel.findOne({ 'username': username }, (err, user) => {
-
-                            if(err || !user) {
-                                const errorMessage = { error: (err) ? err : 'user_not_found' };
-                                reject(errorMessage);
+                        GetUserByUsername(username).then((user) => {
+                            if(!user) {
+                                reject("user not found");
                                 return;
                             }
 
@@ -210,6 +208,8 @@ export class BankController extends Controller {
                             else {
                                 reject(undefined);
                             }
+                        }).catch((err) => {
+                            reject(err);
                         });
                     }
                     else {
