@@ -1,9 +1,6 @@
-import { ClientAccessModel, GetClientToken } from "./client_access";
+import { GetClientAccess, GetClientToken } from "./client_access";
 import { Controller, Route, Get, Post, BodyProp, Put, Delete, Header } from "tsoa";
 import * as https from "https";
-import { Token } from "./token.model";
-import { resolve } from "url";
-import { rejects } from "assert";
 import { UserModel } from "./model/user.model";
 import { BankConnectionModel } from "./model/bankConnection.model";
 
@@ -16,13 +13,7 @@ export class BankController extends Controller {
         
         return new Promise((resolve, reject) => {
 
-            ClientAccessModel.findOne({ 'name': 'default_client' }, (err, clientAccess) => {
-
-                if(err || !clientAccess) {
-                    const errorMessage = { error: (err) ? err : 'client_not_found' };
-                    resolve(errorMessage);
-                    return;
-                }
+            GetClientAccess().then((clientAccess) => {
 
                 GetClientToken().then((clientToken) => {
                     
@@ -75,6 +66,8 @@ export class BankController extends Controller {
                     req.end();
 
                 });
+            }).catch((err) => {
+                reject(err);
             });
         });
 
@@ -152,13 +145,7 @@ export class BankController extends Controller {
     public async fetchWebformInfo(webId: string,@Header('Username') username, @Header('Authorization') authorization: string, @Header('Content-Type') contentType: string) : Promise<any> {
         return new Promise((resolve, reject) => {
 
-            ClientAccessModel.findOne({ 'name': 'default_client' }, (err, clientAccess) => {
-
-                if(err || !clientAccess) {
-                    const errorMessage = { error: (err) ? err : 'client_not_found' };
-                    reject(errorMessage);
-                    return;
-                }
+            GetClientAccess().then((clientAccess) => {
 
                 // Set the headers
             const headers = {
@@ -240,16 +227,15 @@ export class BankController extends Controller {
             
             // IMPORTANT
             req.end();
+            }).catch((err) => {
+                reject(err);
             });
         });
     }
 
     private connectToBank(authorization: string, bankId: number) : Promise<any> {
-        return new Promise((resolve, reject) => {ClientAccessModel.findOne({ 'name': 'default_client' }).then((clientAccess) => {
-            if(!clientAccess) {
-                console.log('no clientAccess found!');
-                resolve(undefined);
-            }
+        return new Promise((resolve, reject) => {
+            GetClientAccess().then((clientAccess) => {
 
             // Set the headers
             const headers = {
@@ -311,6 +297,8 @@ export class BankController extends Controller {
             req.write(postData);
             req.end();
 
+        }).catch((err) => {
+            reject(err);
         });
     });
     }
