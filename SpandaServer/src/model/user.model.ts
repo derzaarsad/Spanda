@@ -2,6 +2,7 @@ import * as mongoose from "mongoose";
 interface IUser extends mongoose.Document {
     username: string;
     allowance: number;
+    isAllowanceReady: boolean;
     email: string;
     phone: string;
     isAutoUpdateEnabled: boolean;
@@ -11,6 +12,7 @@ interface IUser extends mongoose.Document {
 const UserSchema = new mongoose.Schema({
     username: { type: String, unique: true },
     allowance: Number,
+    isAllowanceReady: Boolean,
     email: String,
     phone: String,
     isAutoUpdateEnabled: Boolean,
@@ -36,6 +38,7 @@ function CreateUserInDB(id: string, email: string, phone: string, isAutoUpdateEn
     return new Promise((resolve, reject) => {
         UserModel.create({ username: id,
             allowance: 0,
+            isAllowanceReady: false,
             email: email,
             phone: phone,
             isAutoUpdateEnabled: isAutoUpdateEnabled }, function (err, user) {

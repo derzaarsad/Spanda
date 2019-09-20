@@ -43,7 +43,6 @@ export class AuthenticationService {
             }
             this.storedUser.Username = username;
             this.storedUser.Password = password;
-            this.storedUser.Allowance = 0; // TODO: from backend
             this.storedUser.Email = "testuser@testdomain.com"; // TODO: from backend
             this.storedUser.IsAutoUpdateEnabled = false; // TODO: from backend
             this.storedUser.UserToken = new Token(res["access_token"], res["refresh_token"], res["token_type"]);

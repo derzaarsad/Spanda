@@ -12,6 +12,8 @@ import { BankService } from "~/services/bank.service"
 })
 export class AllowanceComponent implements OnInit {
 
+    private allowanceValue: number = 0;
+
     constructor(
         private routerExtensions: RouterExtensions,
         private page: Page,
@@ -34,7 +36,7 @@ export class AllowanceComponent implements OnInit {
 
     onRefreshAllowance() {
         this.bankService.getAllowance().then((res) => {
-            this.authenticationService.getStoredUser().Allowance = res;
+            this.allowanceValue = res;
         });
     }
 }

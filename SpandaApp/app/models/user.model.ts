@@ -7,9 +7,6 @@ export class User {
     @JsonProperty("Username", String)
     Username: string = undefined;
 
-    @JsonProperty("Allowance", Number)
-    Allowance: number = undefined;
-
     @JsonProperty("Email", String)
     Email: string = undefined;
 
