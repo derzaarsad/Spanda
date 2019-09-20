@@ -43,8 +43,6 @@ export class AuthenticationService {
             }
             this.storedUser.Username = username;
             this.storedUser.Password = password;
-            this.storedUser.Email = "testuser@testdomain.com"; // TODO: from backend
-            this.storedUser.IsAutoUpdateEnabled = false; // TODO: from backend
             this.storedUser.UserToken = new Token(res["access_token"], res["refresh_token"], res["token_type"]);
             let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
             appSettings.setString("storedUser",storedUserJson);
