@@ -4,10 +4,10 @@ import { Token } from "~/models/token.model";
 import * as appSettings from "tns-core-modules/application-settings";
 import { User } from "~/models/user.model";
 import { JsonConvert } from "json2typescript";
+import { environment } from "~/environments/environment";
 
 @Injectable()
 export class AuthenticationService {
-    private backendUrl = "https://192.168.1.194:8443/spanda";
     private storedUser: User;
     private jsonConvert: JsonConvert;
 
@@ -20,7 +20,7 @@ export class AuthenticationService {
     }
 
     getBackendUrl(): string {
-        return this.backendUrl;
+        return environment.backendUrl;
     }
 
     isStoredUserAvailable(): boolean {
@@ -36,7 +36,7 @@ export class AuthenticationService {
         let headerOptions = new HttpHeaders();
         headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
 
-        return this.http.post(this.backendUrl + "/oauth/login", { username: username, password: password }, { headers: headerOptions }).toPromise()
+        return this.http.post(environment.backendUrl + "/oauth/login", { username: username, password: password }, { headers: headerOptions }).toPromise()
         .then(res => {
             if(!this.storedUser) {
                 this.storedUser = new User();
@@ -56,7 +56,7 @@ export class AuthenticationService {
         let headerOptions = new HttpHeaders();
         headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
 
-        return this.http.post(this.backendUrl + "/oauth/token", { refresh_token: this.storedUser.UserToken.RefreshToken }, { headers: headerOptions }).toPromise()
+        return this.http.post(environment.backendUrl + "/oauth/token", { refresh_token: this.storedUser.UserToken.RefreshToken }, { headers: headerOptions }).toPromise()
         .then(res => {
             this.storedUser.UserToken = new Token(res["access_token"], res["refresh_token"], res["token_type"]);
             let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
@@ -77,7 +77,7 @@ export class AuthenticationService {
             "Content-Type": "application/x-www-form-urlencoded"
          });
 
-        return this.http.get(this.backendUrl + "/users", { headers: headerOptions }).toPromise()
+        return this.http.get(environment.backendUrl + "/users", { headers: headerOptions }).toPromise()
         .then(res => {
             console.log("user is authenticated!");
             console.log(res);
@@ -99,7 +99,7 @@ export class AuthenticationService {
                 "Content-Type": "application/json"
             });
 
-            return this.http.post(this.backendUrl + "/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, { headers: headerOptions }).toPromise()
+            return this.http.post(environment.backendUrl + "/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, { headers: headerOptions }).toPromise()
             .then(res => {
 
                 console.log("registration successful");
