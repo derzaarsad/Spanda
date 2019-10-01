@@ -10,13 +10,13 @@ export class BankController extends Controller {
 
     @Get('/banks/{blz}')
     public async getBankByBLZ(blz: string): Promise<any> {
-        
+
         return new Promise((resolve, reject) => {
 
             GetClientAccess().then((clientAccess) => {
 
                 GetClientToken().then((clientToken) => {
-                    
+
                     if(!clientToken) {
                         reject("backend failure!");
                     }
@@ -37,13 +37,13 @@ export class BankController extends Controller {
                     };
 
                     const req = https.request(options, (res) => {
-                    
+
                         // accumulate data
                         let body = [];
                         res.on('data', (chunk) => {
                             body.push(chunk);
                         });
-                        
+
                         // resolve on end
                         res.on('end', () => {
                             try {
@@ -55,13 +55,13 @@ export class BankController extends Controller {
                             resolve(body);
                         });
                     });
-                    
+
                     // reject on request error
                     req.on('error', (err) => {
                         // This is not a "Second reject", just a different sort of failure
                         reject(err);
                     });
-                    
+
                     // IMPORTANT
                     req.end();
 
@@ -70,7 +70,6 @@ export class BankController extends Controller {
                 reject(err);
             });
         });
-
     }
 
     @Post('/bankConnections/import')
@@ -88,8 +87,7 @@ export class BankController extends Controller {
             const headers = {
                 'Authorization': authorization
             };
-            
-        
+
             // Configure the request
             const options = {
                 host: fromConnectToBank[1].replace('https://',''),
@@ -100,13 +98,13 @@ export class BankController extends Controller {
             };
 
             const req = https.request(options, (res) => {
-                    
+
                 // accumulate data
                 let body = [];
                 res.on('data', (chunk) => {
                     body.push(chunk);
                 });
-                
+
                 // resolve on end
                 res.on('end', () => {
                     try {
@@ -126,14 +124,14 @@ export class BankController extends Controller {
                     }
                 });
             });
-            
+
             // reject on request error
             req.on('error', (err) => {
                 // This is not a "Second reject", just a different sort of failure
                 console.log(err);
                 resolve(undefined);
             });
-            
+
             // IMPORTANT
             req.end();
 
@@ -152,8 +150,7 @@ export class BankController extends Controller {
                 'Authorization': authorization,
                 'Content-Type': contentType
             };
-            
-        
+
             // Configure the request
             const options = {
                 host: clientAccess.server_url.replace('https://',''),
@@ -164,13 +161,13 @@ export class BankController extends Controller {
             };
 
             const req = https.request(options, (res) => {
-                    
+
                 // accumulate data
                 let body = [];
                 res.on('data', (chunk) => {
                     body.push(chunk);
                 });
-                
+
                 // resolve on end
                 res.on('end', () => {
                     try {
@@ -200,7 +197,7 @@ export class BankController extends Controller {
                                     else {
                                         user.bankConnections.push(bankConnection.id);
                                         user.save();
-                                        
+
                                         resolve(body);
                                     }
                                 });
@@ -217,14 +214,14 @@ export class BankController extends Controller {
                     }
                 });
             });
-            
+
             // reject on request error
             req.on('error', (err) => {
                 // This is not a "Second reject", just a different sort of failure
                 console.log(err);
                 reject(undefined);
             });
-            
+
             // IMPORTANT
             req.end();
             }).catch((err) => {
@@ -269,8 +266,7 @@ export class BankController extends Controller {
             var postData = JSON.stringify({
                 'bankId' : bankId
             });
-            
-        
+
             // Configure the request
             const options = {
                 host: clientAccess.server_url.replace('https://',''),
@@ -281,13 +277,13 @@ export class BankController extends Controller {
             };
 
             const req = https.request(options, (res) => {
-                    
+
                 // accumulate data
                 let body = [];
                 res.on('data', (chunk) => {
                     body.push(chunk);
                 });
-                
+
                 // resolve on end
                 res.on('end', () => {
                     try {
@@ -300,7 +296,7 @@ export class BankController extends Controller {
                     // It has to be an error (code 451), because we want to open the Web Form
                     if(res.statusCode === 451) {
                         console.log(body);
-                        
+
                         resolve([body,clientAccess.server_url]);
                     }
                     else {
@@ -308,14 +304,14 @@ export class BankController extends Controller {
                     }
                 });
             });
-            
+
             // reject on request error
             req.on('error', (err) => {
                 // This is not a "Second reject", just a different sort of failure
                 console.log(err);
                 resolve(undefined);
             });
-            
+
             // IMPORTANT
             req.write(postData);
             req.end();

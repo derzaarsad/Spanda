@@ -1,0 +1,4 @@
+*.swp
+
+SpandaServer/src/routes.ts
+SpandaServer/swagger.json
