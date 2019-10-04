@@ -1,4 +1,3 @@
 *.swp
-
-SpandaServer/src/routes.ts
-SpandaServer/swagger.json
+*node_modules
+.aws-sam
