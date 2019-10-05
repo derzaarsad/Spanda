@@ -1,66 +1,65 @@
 'use strict'
 
-const Mutex = require('./mutex');
+const Mutex = require('./mutex')
 
 const resolved = (clientId, clientSecret) => {
   return {
-    'getSecrets': async () => {
-      return { 'clientId': clientId, 'clientSecret': clientSecret }
-    }
+    getSecrets: async () => {
+      return { clientId: clientId, clientSecret: clientSecret }
+    },
   }
-};
+}
 
-exports.FromSSM = (props) => {
-  const ssm = props.ssm;
-  const clientIdParam = props.clientIdParam;
-  const clientSecretParam = props.clientSecretParam;
+exports.FromSSM = (ssm, clientIdParam, clientSecretParam) => {
+  const mutex = new Mutex()
 
-  const mutex = new Mutex();
-
-  let resolved = false;
-  let credentials = null;
-  let error = null;
+  let resolved = false
+  let credentials = null
+  let error = null
 
   const requestParam = (paramName, encrypted) => {
-    const clientIdReq = {
-        Name: paramName,
-        WithDecryption: encrypted,
-    };
+    const parameterRequest = {
+      Name: paramName,
+      WithDecryption: encrypted,
+    }
 
     return new Promise((resolve, reject) => {
-      ssm.getParameter(clientIdReq, function(err, data) {
+      ssm.getParameter(parameterRequest, function(err, data) {
         if (err) {
-          reject(err);
+          reject(err)
         } else {
-          resolve(data.Parameter.Value);
+          resolve(data.Parameter.Value)
         }
-      });
-    });
-  };
+      })
+    })
+  }
 
-  const resolveCredentials = async() => {
+  const resolveCredentials = async () => {
     if (!resolved) {
       try {
-        const results = await Promise.all([requestParam(props.clientIdParam, false), requestParam(props.clientSecretParam, true)]);
-        credentials = { 'clientId': results[0], 'clientSecret': results[1] }
+        const results = await Promise.all([
+          requestParam(clientIdParam, false),
+          requestParam(clientSecretParam, true),
+        ])
+        credentials = { clientId: results[0], clientSecret: results[1] }
       } catch (err) {
-        error = err;
+        error = err
       } finally {
-        resolved = true;
+        resolved = true
       }
     }
   }
 
   return {
-    'getSecrets': async () => {
-      await mutex.synchronize(resolveCredentials);
+    getSecrets: async () => {
+      await mutex.synchronize(resolveCredentials)
 
       if (error) {
-        throw error;
+        throw error
       } else {
-        return credentials;
+        return credentials
       }
-    }
+    },
   }
 }
 
