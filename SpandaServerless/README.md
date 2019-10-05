@@ -159,7 +159,38 @@ The response the API obtains when successfully authenticating against oauth.
 {
   access_token: string,
   token_type: string,
-  expires_in: int,
+  expires_in: number,
   scope: string
 }
+```
+
+### Banks Resulstet
+
+Encapsulates the results of a bank search.
+
+```js
+{
+  banks: [
+    bank...,
+  ]
+```
+
+### Web Form ID
+
+Identifies a web form (part of the Web Form Flow).
+
+```js
+{
+  location: string,
+  formId: string
+}
+```
+
+### Resolved Web Form
+
+```js
+[
+  webform: object,
+  location: string
+]
 ```

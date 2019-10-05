@@ -59,7 +59,7 @@ exports.FromSSM = (ssm, clientIdParam, clientSecretParam) => {
       } else {
         return credentials
       }
-    },
+    }
   }
 }
 

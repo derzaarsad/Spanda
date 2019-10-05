@@ -15,7 +15,13 @@ const ssm = new SSM({
   region: region,
 })
 
-const secrets = clientSecrets.FromSSM(ssm, clientIdParam, clientSecretParam)
-const auth = authentication.Basic('https://sandbox.finapi.io/', secrets)
+const authClient = axios.create({
+  baseURL: 'https://sandbox.finapi.io',
+  timeout: 1000,
+  headers: { Accept: 'application/json' },
+})
 
-auth.getClientCredentials().then(credentials => console.log(credentials))
+const secrets = clientSecrets.FromSSM(ssm, clientIdParam, clientSecretParam)
+const auth = authentication.Basic(authClient)
+
+auth.getClientCredentialsToken(secrets).then(credentials => console.log(credentials))
