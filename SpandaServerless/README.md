@@ -4,12 +4,12 @@ This project contains source code and supporting files for a serverless applicat
 
 - hello-world - Code for the application's Lambda function.
 - events - Invocation events that you can use to invoke the function.
-- hello-world/tests - Unit tests for the application code. 
+- hello-world/tests - Unit tests for the application code.
 - template.yaml - A template that defines the application's AWS resources.
 
 The application uses several AWS resources, including Lambda functions and an API Gateway API. These resources are defined in the `template.yaml` file in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
 
-If you prefer to use an integrated development environment (IDE) to build and test your application, you can use the AWS Toolkit.  
+If you prefer to use an integrated development environment (IDE) to build and test your application, you can use the AWS Toolkit.
 The AWS Toolkit is an open source plug-in for popular IDEs that uses the SAM CLI to build and deploy serverless applications on AWS. The AWS Toolkit also adds a simplified step-through debugging experience for Lambda function code. See the following links to get started.
 
 * [PyCharm](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
@@ -42,7 +42,7 @@ sam-app$ sam package \
     --s3-bucket BUCKET_NAME
 ```
 
-The SAM CLI creates deployment packages, uploads them to the S3 bucket, and creates a new version of the template that refers to the artifacts in the bucket. 
+The SAM CLI creates deployment packages, uploads them to the S3 bucket, and creates a new version of the template that refers to the artifacts in the bucket.
 
 To deploy the application, use the `sam deploy` command.
 
@@ -60,7 +60,7 @@ sam-app$ aws cloudformation describe-stacks \
     --stack-name sam-app \
     --query 'Stacks[].Outputs[?OutputKey==`HelloWorldApi`]' \
     --output table
-``` 
+```
 
 ## Use the SAM CLI to build and test locally
 
@@ -137,3 +137,29 @@ sam-app$ aws s3 rb s3://BUCKET_NAME
 See the [AWS SAM developer guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html) for an introduction to SAM specification, the SAM CLI, and serverless application concepts.
 
 Next, you can use AWS Serverless Application Repository to deploy ready to use Apps that go beyond hello world samples and learn how authors developed their applications: [AWS Serverless Application Repository main page](https://aws.amazon.com/serverless/serverlessrepo/)
+
+## Object Descriptions
+
+### Client Secrets
+
+Encapsulates the data needed for authentication against oauth.
+
+```js
+{
+  clientId: string,
+  clientSecret: string
+}
+```
+
+### Client Credentials
+
+The response the API obtains when successfully authenticating against oauth.
+
+```js
+{
+  access_token: string,
+  token_type: string,
+  expires_in: int,
+  scope: string
+}
+```
