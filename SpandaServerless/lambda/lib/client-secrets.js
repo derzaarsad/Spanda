@@ -2,7 +2,7 @@
 
 const Mutex = require('./mutex')
 
-const resolved = (clientId, clientSecret) => {
+exports.Resolved = (clientId, clientSecret) => {
   return {
     getSecrets: async () => {
       return { clientId: clientId, clientSecret: clientSecret }
@@ -62,5 +62,3 @@ exports.FromSSM = (ssm, clientIdParam, clientSecretParam) => {
     }
   }
 }
-
-exports.Resolved = resolved
