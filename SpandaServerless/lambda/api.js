@@ -31,3 +31,46 @@ exports.lambdaHandler = async (event, context) => {
 
     return response
 };
+
+/*
+ * Bank Controller
+ * ---------------
+ */
+
+// @Get('/banks/{blz}')
+// @Param('blz') blz
+exports.getBankByBLZ = async(event, context) => {
+}
+
+// @Post('/bankConnections/import')
+// @Header('Authorization') authorization: string
+// @BodyProp() bankId: number)
+exports.getWebFormId = async(event, context) => {
+}
+
+
+// @Post('/bankConnections/import')
+// @Header('Authorization') authorization: string,
+// @BodyProp() bankId: number)
+exports.getWebformId = async(event, context) => {
+  // call api.importConnection
+}
+
+// @Get('/webForms/{webId}')
+// @Param('webId') webId
+// @Header('Username') username
+// @Header('Authorization') authorization: string
+exports.fetchWebFormInfo = async(event, context) => {
+  // fetch user by id; if non existing, return immediately
+  // get the form by the given id
+  // create a new bank connection
+  // update the user's bank connections
+}
+
+// @Get('/allowance')
+// @Header('Username') username
+// @Header('Authorization') authorization: string
+exports.getAllowance = async(event, context) => {
+  // fetch the user by id
+  // return their allowance { allowance: user.allowance }
+}
