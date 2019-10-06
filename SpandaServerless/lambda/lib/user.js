@@ -12,7 +12,7 @@ interface IUser extends mongoose.Document {
 }
 */
 
-exports.NewUser = (username, email, phone, isAutoUpdateEnabled) => {
+exports.New = (username, email, phone, isAutoUpdateEnabled) => {
   return {
     'username': username,
     'allowance': 0,
@@ -24,7 +24,7 @@ exports.NewUser = (username, email, phone, isAutoUpdateEnabled) => {
   }
 }
 
-exports.NewDynamoUsersRepository = (client, tableName) => {
+exports.NewDynamoDbRepository = (client, tableName) => {
   const decodeUser = data => {
     return {
       username: data['username']['S'],
@@ -50,7 +50,7 @@ exports.NewDynamoUsersRepository = (client, tableName) => {
   }
 
   return {
-    findOneById: async (username) => {
+    findById: async (username) => {
       const params = {
         Key: {
           'username': {
@@ -90,4 +90,3 @@ exports.NewDynamoUsersRepository = (client, tableName) => {
     }
   }
 }
-
