@@ -79,7 +79,7 @@ exports.NewDynamoUsersRepository = (client, tableName) => {
       }
 
       return new Promise((resolve, reject) => {
-        dynamodb.putItem(params, function(err, data) {
+        dynamodb.updateItem(params, function(err, data) {
           if (err) {
             reject(err)
           } else {
