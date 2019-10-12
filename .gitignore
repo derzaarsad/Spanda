@@ -2,3 +2,4 @@
 
 SpandaServer/src/routes.ts
 SpandaServer/swagger.json
+SpandaServer/node_modules/
