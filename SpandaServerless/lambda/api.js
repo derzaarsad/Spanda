@@ -2,6 +2,8 @@
 // const url = 'http://checkip.amazonaws.com/';
 let response;
 
+// const authenticationController = authenticationController.NewLambdaController(logger, clientSecrets, authentication, finapi, users)
+
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -15,21 +17,21 @@ let response;
  *
  */
 exports.lambdaHandler = async (event, context) => {
-    try {
-        // const ret = await axios(url);
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: 'hello world',
-                // location: ret.data.trim()
-            })
-        }
-    } catch (err) {
-        console.log(err);
-        return err;
+  try {
+    // const ret = await axios(url);
+    response = {
+      'statusCode': 200,
+      'body': JSON.stringify({
+        message: 'hello world',
+        // location: ret.data.trim()
+      })
     }
+  } catch (err) {
+    console.log(err);
+    return err;
+  }
 
-    return response
+  return response
 };
 
 
@@ -41,7 +43,7 @@ exports.lambdaHandler = async (event, context) => {
 // @Get('/users')
 // @Header('Authorization') authorization: string
 exports.isUserAuthenticated = async (event, context) => {
-  // call finapi's userInfo
+  // call authenticationController.isUserAuthenticated
 }
 
 // @Post('/users')
@@ -51,23 +53,20 @@ exports.isUserAuthenticated = async (event, context) => {
 // @BodyProp() phone: string
 // @BodyProp() isAutoUpdateEnabled: boolean
 exports.register = async (event, context) => {
-  // fetch user by username; if exists, exit immediately
-  // authorize against finapi
-  // call finapi register user
-  // on success, add the user in the database
+  // call authenticationController.registerUser
 }
 
 // @Post('/oauth/login')
 // @BodyProp() username: string,
 // @BodyProp() password: string
 exports.authenticateAndSave = async (event, context) => {
-  // call authentication.getPasswordToken
+  // call authenticationController.authenticateAndSave
 }
 
 // @Post('/oauth/token')
 // @BodyProp() refresh_token: string
 exports.updateRefreshToken = async (event, context) => {
-  // call authentication.getRefreshToken
+  // call authenticationController.updateRefreshToken(refreshToken)
 }
 
 /*

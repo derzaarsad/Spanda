@@ -11,8 +11,7 @@ interface IUser extends mongoose.Document {
     bankConnections: [number];
 }
 */
-
-exports.New = (username, email, phone, isAutoUpdateEnabled) => {
+const createUser = (username, email, phone, isAutoUpdateEnabled) => {
   return {
     'username': username,
     'allowance': 0,
@@ -28,6 +27,8 @@ exports.NewInMemoryRepository => {
   const repository = {}
 
   return {
+    new: createUser,
+
     findById: async (username) => {
       return repository[username]
     },
@@ -65,6 +66,8 @@ exports.NewDynamoDbRepository = (client, tableName) => {
   }
 
   return {
+    new: createUser,
+
     findById: async (username) => {
       const params = {
         Key: {
