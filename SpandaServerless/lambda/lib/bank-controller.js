@@ -47,12 +47,12 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
 
     fetchWebFormInfo: async (authorization, username, webId) => {
       const unauthorized = await unauthorized(authorization)
-      if unauthorized {
+      if (unauthorized) {
         return unauthorized
       }
 
       const user = await users.findById(username)
-      if !user {
+      if (!user) {
         logger.log('info', 'no user found for username ' + username)
         return lambdaUtil.createError(404, 'user not found')
       }
@@ -78,13 +78,13 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
     getAllowance: async (authorization, username) => {
       const unauthorized = await unauthorized(authorization)
 
-      if unauthorized {
+      if (unauthorized) {
         return unauthorized
       }
 
       const user = await users.findById(username)
 
-      if !user {
+      if (!user) {
         logger.log('info', 'no user found for username ' + username)
         return lambdaUtil.createError(404, 'user not found')
       }

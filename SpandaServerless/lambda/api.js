@@ -143,10 +143,9 @@ exports.updateRefreshToken = async (event, context) => {
 // @Get('/banks/{blz}')
 // @Param('blz') blz
 exports.getBankByBLZ = async (event, context) => {
-  const path = Paths.createPath('/banks/:blz<\\d{8}>')
-  const pathParams = path.test(event.pathParameters)
+  const pathParams = event.pathParameters
 
-  if (!pathParams) {
+  if (!pathParams['blz']) {
     return lambdaUtil.createError(400, 'invalid BLZ')
   }
 
@@ -177,20 +176,13 @@ exports.fetchWebFormInfo = async (event, context) => {
     return lambdaUtil.createError(403, 'unauthorized')
   }
 
-  const path = Paths.createPath('/webForms/:webId')
-  const pathParams = path.test(event.pathParameters)
-
-  if (!pathParams) {
-    return lambdaUtil.createError(400, 'bad web id given')
-  }
-
   const username = event.headers['Username']
 
   if (!username) {
     return lambdaUtil.createError(400, 'no username given')
   }
 
-  const webId = pathParams['webId']
+  const webId = event.pathParameters['webFormId']
 
   return bankController.fetchWebFormInfo(authorization, username, webId)
 }

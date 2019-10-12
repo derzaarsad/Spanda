@@ -15,7 +15,7 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
     },
 
     registerUser: async (username, password, email, phone, isAutoUpdateEnabled) => {
-      if await users.findById(username) {
+      if (await users.findById(username)) {
         return lambdaUtil.createError(409, 'user already exists')
       }
 

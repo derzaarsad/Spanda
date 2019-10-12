@@ -73,7 +73,7 @@ Resources:
         GetBankByBLZ:
           Type: Api
           Properties:
-            Path: /banks
+            Path: /banks/{blz}
             Method: get
   GetWebFormIdFunction:
     Type: AWS::Serverless::Function
@@ -93,7 +93,7 @@ Resources:
         GetWebFormId:
           Type: Api
           Properties:
-            Path: /webForms
+            Path: /webForms/{webFormId}
             Method: get
   GetAllowanceFunction:
     Type: AWS::Serverless::Function
