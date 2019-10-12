@@ -1,8 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  Spanda Server
-  Spanda's backend implemented according to the Serverless Application Model.
+Description: Spanda's backend implemented in the Serverless Application Model.
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Parameters:
   Stage:
@@ -11,29 +10,109 @@ Parameters:
 
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 45
+    CodeUri: lambda/
+    Runtime: nodejs10.x
 
 Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: lambda/
-      Handler: api.lambdaHandler
-      Runtime: nodejs10.x
+      Handler: api.helloWorld
       Events:
         HelloWorld:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /hello
             Method: get
+  IsUserAuthenticatedFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api.isUserAuthenticated
+      Events:
+        GetAuthorization:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: get
+  RegisterUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api.registerUser
+      Events:
+        PostCredentials:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
+  AuthenticateAndSaveUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api.authenticateAndSaveUser
+      Events:
+        PostLogin:
+          Type: Api
+          Properties:
+            Path: /oauth/login
+            Method: post
+  UpdateRefreshTokenFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api.updateRefreshToken
+      Events:
+        PostRefreshToken:
+          Type: Api
+          Properties:
+            Path: /oauth/token
+            Method: post
+  GetBankByBLZFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api.getBankByBLZ
+      Events:
+        GetBankByBLZ:
+          Type: Api
+          Properties:
+            Path: /banks
+            Method: get
+  GetWebFormIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api.getWebFormId
+      Events:
+        PostBankId:
+          Type: Api
+          Properties:
+            Path: /bankConnections/import
+            Method: post
+  FetchWebFormInfoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api.getWebFormInfo
+      Events:
+        GetWebFormId:
+          Type: Api
+          Properties:
+            Path: /webForms
+            Method: get
+  GetAllowanceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api.getAllowance
+      Events:
+        GetAllowance:
+          Type: Api
+          Properties:
+            Path: /allowance
+            Method: get
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
+  SpandaAPI:
     Description: "API gateway endpoint URL for the stage"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/hello/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
   HelloWorldFunction:
     Description: "Hello World Lambda Function ARN"
     Value: !GetAtt HelloWorldFunction.Arn

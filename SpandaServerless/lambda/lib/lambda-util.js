@@ -3,7 +3,7 @@
 const util = require('./util')
 
 const createResponse = (status, body) => {
-  return { "statusCode": status, "body": body }
+  return { "statusCode": status, "headers": { "Content-Type": "application/json" }, "body": JSON.stringify(body) }
 }
 
 const createError = (status, message) => {

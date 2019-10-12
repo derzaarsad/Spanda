@@ -27,11 +27,13 @@ const logger = winston.createLogger({
   level: env['LOGGER_LEVEL'] || 'debug',
   format: winston.format.json(),
   transports: [
-    new winston.transports.Console({}),
+    new winston.transports.Console({
+      format: winston.format.json()
+    }),
   ]
 });
 
-const baseURL = env['FINAPI_URL']
+const baseURL = env['FINAPI_URL'] || 'https://sandbox.finapi.io'
 const options = { timeout: env['FINAPI_TIMEOUT'] || 3000 }
 
 const httpClient = axios.create({
@@ -56,6 +58,36 @@ const connections = BankConnections.NewInMemoryRepository()
 const authenticationController = AuthenticationController.NewLambdaController(logger, clientSecrets, authentication, finapi, users)
 const bankController = BankController.NewLambdaController(logger, clientSecrets, authentication, finapi, users, connections)
 
+/**
+ *
+ * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
+ * @param {Object} event - API Gateway Lambda Proxy Input Format
+ *
+ * Context doc: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
+ * @param {Object} context
+ *
+ * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
+ * @returns {Object} object - API Gateway Lambda Proxy Output Format
+ *
+ */
+exports.helloWorld = async (event, context) => {
+  let response
+  try {
+    // const ret = await axios(url);
+    response = {
+      'statusCode': 200,
+      'body': JSON.stringify({
+        message: 'hello world',
+      })
+    }
+  } catch (err) {
+    logger.log('info', err);
+    return err;
+  }
+
+  return response
+};
+
 /*
  * Authentication Controller
  * -------------------------
@@ -79,7 +111,7 @@ exports.isUserAuthenticated = async (event, context) => {
 // @BodyProp() email: string
 // @BodyProp() phone: string
 // @BodyProp() isAutoUpdateEnabled: boolean
-exports.register = async (event, context) => {
+exports.registerUser = async (event, context) => {
   const user = event.body
   logger('debug', 'user: ' + user)
   // TODO check parameters
@@ -89,7 +121,7 @@ exports.register = async (event, context) => {
 // @Post('/oauth/login')
 // @BodyProp() username: string,
 // @BodyProp() password: string
-exports.authenticateAndSave = async (event, context) => {
+exports.authenticateAndSaveUser = async (event, context) => {
   const credentials = event.body
   logger('debug', 'credentials: ' + credentials)
   return authenticationController.authenticateAndSave(credentials.username, credentials.password)
@@ -124,7 +156,7 @@ exports.getBankByBLZ = async (event, context) => {
 // @Post('/bankConnections/import')
 // @Header('Authorization') authorization: string,
 // @BodyProp() bankId: number)
-exports.getWebformId = async (event, context) => {
+exports.getWebFormId = async (event, context) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
