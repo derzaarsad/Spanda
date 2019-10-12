@@ -1,6 +1,6 @@
 'use strict';
 
-exports.initializeFromEnvironmentObject = env => {
+module.exports = env => {
   const axios = require('axios');
   const winston = require('winston');
   const lambdaUtil = require('./lambda-util').default;

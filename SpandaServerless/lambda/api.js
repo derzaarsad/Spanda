@@ -2,7 +2,7 @@ const env = process.env
 const lambdaUtil = require('./lib/lambda-util').default
 const lambdaHandlers = require('./lib/lambda-handlers')
 
-const services = lambdaHandlers.initializeFromEnvironmentObject(env)
+const services = lambdaHandlers(env)
 
 const finapi = services.finapi
 const authentication = services.authentication

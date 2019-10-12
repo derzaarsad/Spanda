@@ -1,7 +1,7 @@
 'use strict'
 
 const handlers = require('../lib/lambda-handlers')
-const services = handlers.initializeFromEnvironmentObject(process.env)
+const services = handlers(process.env)
 
 const bankController = services.bankController
 
