@@ -1,8 +1,56 @@
-// const axios = require('axios')
-// const url = 'http://checkip.amazonaws.com/';
-let response;
+const axios = require('axios')
+const winston = require('winston')
+const lambdaUtil = require('./lib/lambda-util')
 
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  defaultMeta: { service: 'user-service' },
+  transports: [
+    //
+    // - Write to all logs with level `info` and below to `combined.log` 
+    // - Write all logs error (and below) to `error.log`.
+    //
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' })
+  ]
+});
+
+//
+// If we're not in production then log to the `console` with the format:
+// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+// 
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple()
+  }));
+}
+
+const ClientSecrets = require('./lib/client-secrets')
+const Authentication = require('./lib/authentication')
+const FinAPI = require('./lib/finapi')
+
+// const url = 'http://checkip.amazonaws.com/';
+const baseURL = 'https://sandbox.finapi.io'
+const options = { timeout: 3000 }
+
+const httpClient = axios.create({
+  baseURL: baseURL,
+  timeout: options.timeout,
+  headers: { 'Accept': 'application/json' },
+});
+
+const env = process.env
+
+// Configuration from environment
+// AUTH_TYPE
+// AUTH_CLIENT_ID
+// AUTH_CLIENT_SECRET
+// PERSISTENCE_TYPE (only in-memory for now)
+
+const finapi = FinAPI.NewClient(httpClient)
 // const authenticationController = authenticationController.NewLambdaController(logger, clientSecrets, authentication, finapi, users)
+// const bankController = bankController.NewLambdaController(logger, clientSecrets, authentication, finapi, users, connections)
 
 /**
  *
@@ -19,7 +67,7 @@ let response;
 exports.lambdaHandler = async (event, context) => {
   try {
     // const ret = await axios(url);
-    response = {
+    const response = {
       'statusCode': 200,
       'body': JSON.stringify({
         message: 'hello world',
