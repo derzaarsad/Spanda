@@ -24,5 +24,6 @@ exports.default = {
   'handleException': handleException,
   'createResponse': createResponse,
   'createError': createError,
+  'hasAuthorization': hasAuthorization,
   'authorizationHeader': util.authorizationHeader
 }
