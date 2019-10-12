@@ -23,7 +23,7 @@ const createUser = (username, email, phone, isAutoUpdateEnabled) => {
   }
 }
 
-exports.NewInMemoryRepository => {
+exports.NewInMemoryRepository = () => {
   const repository = {}
 
   return {

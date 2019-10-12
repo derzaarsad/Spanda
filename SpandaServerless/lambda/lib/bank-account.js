@@ -10,7 +10,7 @@ interface IBankAccount extends mongoose.Document {
 }
 */
 
-exports.NewInMemoryRepository => {
+exports.NewInMemoryRepository = () => {
   const repository = {}
 
   return {

@@ -36,21 +36,20 @@ const Basic = (http) => {
 
   return {
     getClientCredentialsToken: async (clientSecrets) => {
-      return clientSecrets
-        .getSecrets()
+      return clientSecrets.getSecrets()
         .then(secrets => http.post('/oauth/token', ccRequest(secrets)))
         .then(response => response.data)
     },
 
     getPasswordToken: async (clientSecrets, user, pass) => {
-      return http
-        .post('/oauth/token', passwordRequest(clientSecrets, user, pass))
+      return clientSecrets.getSecrets()
+        .then(secrets => http.post('/oauth/token', passwordRequest(secrets , user, pass)))
         .then(response => response.data)
     },
 
     getRefreshToken: async (clientSecrets, refreshToken) => {
-      return http
-        .post('/oauth/token', refresthTokenRequest(clientSecret, refreshToken))
+      return clientSecrets.getSecrets()
+        .then(secrets => http.post('/oauth/token', refresthTokenRequest(secrets, refreshToken)))
         .then(response => response.data)
     }
   }

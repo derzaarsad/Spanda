@@ -1,62 +1,17 @@
-const axios = require('axios')
-const winston = require('winston')
-const lambdaUtil = require('./lib/lambda-util').default
-
-const Path = require('path-parser').default
-const ClientSecrets = require('./lib/client-secrets')
-const Authentication = require('./lib/authentication')
-const FinAPI = require('./lib/finapi')
-const Users = require('./lib/users')
-const BankConnections = require('./lib/bank-connections')
-const AuthenticationController = require('./lib/authentication-controller')
-const BankController = require('./lib/bank-controller')
-
 const env = process.env
+const lambdaUtil = require('./lib/lambda-util').default
+const lambdaHandlers = require('./lib/lambda-handlers')
 
-// Configuration from environment
-// LOGGER_LEVEL
-// FINAPI_URL
-// FINAPI_TIMEOUT
-// AWS_REGION
-// AUTH_TYPE
-// AUTH_CLIENT_ID
-// AUTH_CLIENT_SECRET
-// PERSISTENCE_TYPE (only in-memory for now)
+const services = lambdaHandlers.initializeFromEnvironmentObject(env)
 
-const logger = winston.createLogger({
-  level: env['LOGGER_LEVEL'] || 'debug',
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.Console({
-      format: winston.format.json()
-    }),
-  ]
-});
+const finapi = services.finapi
+const authentication = services.authentication
 
-const baseURL = env['FINAPI_URL'] || 'https://sandbox.finapi.io'
-const options = { timeout: env['FINAPI_TIMEOUT'] || 3000 }
+const users = services.users
+const connections = services.connections
 
-const httpClient = axios.create({
-  baseURL: baseURL,
-  timeout: options.timeout,
-  headers: { 'Accept': 'application/json' },
-});
-
-const finapi = FinAPI.NewClient(httpClient)
-const authentication = Authentication.Basic(httpClient)
-
-let clientSecrets
-if (env['AUTH_TYPE'] === 'simple') {
-  clientSecrets = ClientSecrets.Resolved(env['AUTH_CLIENT_ID'], env['AUTH_CLIENT_SECRET'])
-} else {
-  throw 'unsupported auth type'
-}
-
-const users = Users.NewInMemoryRepository()
-const connections = BankConnections.NewInMemoryRepository()
-
-const authenticationController = AuthenticationController.NewLambdaController(logger, clientSecrets, authentication, finapi, users)
-const bankController = BankController.NewLambdaController(logger, clientSecrets, authentication, finapi, users, connections)
+const authenticationController = services.authenticationController
+const bankController = services.bankController
 
 /**
  *
@@ -101,7 +56,11 @@ exports.isUserAuthenticated = async (event, context) => {
   if (!authorization) {
     return lambdaUtil.createError(403, 'unauthorized')
   } else {
-    return authenticationController.isUserAuthenticated(authorization)
+    try {
+      return authenticationController.isUserAuthenticated(authorization)
+    } catch (err) {
+      return lambdaUtil.handleException(err)
+    }
   }
 }
 
@@ -115,7 +74,12 @@ exports.registerUser = async (event, context) => {
   const user = event.body
   logger('debug', 'user: ' + user)
   // TODO check parameters
-  return authenticationController.registerUser(user.id, user.password, user.email, user.phone, user.isAutoUpdateEnabled)
+
+  try {
+    return authenticationController.registerUser(user.id, user.password, user.email, user.phone, user.isAutoUpdateEnabled)
+  } catch (err) {
+    return lambdaUtil.handleException(err)
+  }
 }
 
 // @Post('/oauth/login')
@@ -124,7 +88,12 @@ exports.registerUser = async (event, context) => {
 exports.authenticateAndSaveUser = async (event, context) => {
   const credentials = event.body
   logger('debug', 'credentials: ' + credentials)
-  return authenticationController.authenticateAndSave(credentials.username, credentials.password)
+
+  try {
+    return authenticationController.authenticateAndSave(credentials.username, credentials.password)
+  } catch (err) {
+    return lambdaUtil.handleException(err)
+  }
 }
 
 // @Post('/oauth/token')
@@ -132,7 +101,12 @@ exports.authenticateAndSaveUser = async (event, context) => {
 exports.updateRefreshToken = async (event, context) => {
   const body = event.body
   logger('debug', 'body: ' + body)
-  authenticationController.updateRefreshToken(body.refreshToken)
+
+  try {
+    return authenticationController.updateRefreshToken(body.refreshToken)
+  } catch (err) {
+    return lambdaUtil.handleException(err)
+  }
 }
 
 /*
@@ -145,11 +119,16 @@ exports.updateRefreshToken = async (event, context) => {
 exports.getBankByBLZ = async (event, context) => {
   const pathParams = event.pathParameters
 
+  // TODO: validate parameters
   if (!pathParams['blz']) {
     return lambdaUtil.createError(400, 'invalid BLZ')
   }
 
-  return bankController.getBankByBLZ(pathParams['blz'])
+  try {
+    return bankController.getBankByBLZ(pathParams['blz'])
+  } catch (err) {
+    return lambdaUtil.handleException(err)
+  }
 }
 
 // @Post('/bankConnections/import')
@@ -162,7 +141,11 @@ exports.getWebFormId = async (event, context) => {
     return lambdaUtil.createError(403, 'unauthorized')
   }
 
-  return bankController.getWebformId(authorization, event.body.bankId)
+  try {
+    return bankController.getWebformId(authorization, event.body.bankId)
+  } catch (err) {
+    return lambdaUtil.handleException(err)
+  }
 }
 
 // @Get('/webForms/{webId}')
@@ -184,7 +167,11 @@ exports.fetchWebFormInfo = async (event, context) => {
 
   const webId = event.pathParameters['webFormId']
 
-  return bankController.fetchWebFormInfo(authorization, username, webId)
+  try {
+    return bankController.fetchWebFormInfo(authorization, username, webId)
+  } catch (err) {
+    return lambdaUtil.handleException(err)
+  }
 }
 
 // @Get('/allowance')
@@ -203,5 +190,9 @@ exports.getAllowance = async (event, context) => {
     return lambdaUtil.createError(400, 'no username given')
   }
 
-  return bankController.getAllowance(authorization, username)
+  try {
+    return bankController.getAllowance(authorization, username)
+  } catch (err) {
+    return lambdaUtil.handleException(err)
+  }
 }

@@ -16,7 +16,7 @@ const createConnection = (id, bankId) => {
   }
 }
 
-exports.NewInMemoryRepository => {
+exports.NewInMemoryRepository = () => {
   const repository = {}
 
   return {

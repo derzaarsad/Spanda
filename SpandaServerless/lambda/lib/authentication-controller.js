@@ -22,9 +22,8 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
       let authorizaiton
 
       try {
-        authorization = await clientSecrets.getSecrets()
-          .then(secrets => authentication.getClientCredentialsToken)
-          .then(token => lambdaUtil.authorizationHeader)
+        authorization = await authentication.getClientCredentialsToken(clientSecrets)
+          .then(token => lambdaUtil.authorizationHeader(token))
       } catch (err) {
         logger.log('error', 'error while authorizing against finapi', err)
         return lambdaUtil.createError(401, 'could not obtain an authentication token: ' + err)
@@ -79,4 +78,3 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
     }
   }
 }
-
