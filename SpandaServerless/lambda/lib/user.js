@@ -24,6 +24,21 @@ exports.New = (username, email, phone, isAutoUpdateEnabled) => {
   }
 }
 
+exports.NewInMemoryRepository => {
+  const repository = {}
+
+  return {
+    findById: async (username) => {
+      return repository[username]
+    },
+
+    save: async (user) => {
+      repository[user.username] = user
+      return user
+    }
+  }
+}
+
 exports.NewDynamoDbRepository = (client, tableName) => {
   const decodeUser = data => {
     return {

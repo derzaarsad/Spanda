@@ -10,6 +10,21 @@ interface IBankAccount extends mongoose.Document {
 }
 */
 
+exports.NewInMemoryRepository => {
+  const repository = {}
+
+  return {
+    findById: async (id) => {
+      return repository[id]
+    },
+
+    save: async (bankAccount) => {
+      repository[bankAccount.id] = bankAccount
+      return bankAccount
+    }
+  }
+}
+
 exports.NewDynamoDbRepository = (client, tableName) => {
   const decodeBankAccount = data = {
     id: data['id']['N'],
@@ -63,7 +78,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
           if (err) {
             reject(err)
           } else {
-            resolve(user)
+            resolve(bankAccount)
           }
         })
       })

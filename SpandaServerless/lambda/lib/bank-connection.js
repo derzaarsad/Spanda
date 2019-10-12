@@ -16,6 +16,21 @@ exports.New = (id, bankId) => {
   }
 }
 
+exports.NewInMemoryRepository => {
+  const repository = {}
+
+  return {
+    findById: async (id) => {
+      return repository[id]
+    },
+
+    save: async (bankConnection) => {
+      repository[bankConnection.id] = bankConnection
+      return bankConnection
+    }
+  }
+}
+
 exports.NewDynamoDbRepository = (client, tableName) => {
   const decodeBankConnection = data => {
     return {
@@ -67,7 +82,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
           if (err) {
             reject(err)
           } else {
-            resolve(user)
+            resolve(bankConnection)
           }
         })
       })
