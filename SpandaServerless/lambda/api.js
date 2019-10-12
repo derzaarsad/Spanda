@@ -32,6 +32,44 @@ exports.lambdaHandler = async (event, context) => {
     return response
 };
 
+
+/*
+ * Authentication Controller
+ * -------------------------
+ */
+
+// @Get('/users')
+// @Header('Authorization') authorization: string
+exports.isUserAuthenticated = async (event, context) => {
+  // call finapi's userInfo
+}
+
+// @Post('/users')
+// @BodyProp() id: string
+// @BodyProp() password
+// @BodyProp() email: string
+// @BodyProp() phone: string
+// @BodyProp() isAutoUpdateEnabled: boolean
+exports.register = async (event, context) => {
+  // fetch user by username; if exists, exit immediately
+  // authorize against finapi
+  // call finapi register user
+  // on success, add the user in the database
+}
+
+// @Post('/oauth/login')
+// @BodyProp() username: string,
+// @BodyProp() password: string
+exports.authenticateAndSave = async (event, context) => {
+  // call authentication.getPasswordToken
+}
+
+// @Post('/oauth/token')
+// @BodyProp() refresh_token: string
+exports.updateRefreshToken = async (event, context) => {
+  // call authentication.getRefreshToken
+}
+
 /*
  * Bank Controller
  * ---------------
@@ -39,13 +77,13 @@ exports.lambdaHandler = async (event, context) => {
 
 // @Get('/banks/{blz}')
 // @Param('blz') blz
-exports.getBankByBLZ = async(event, context) => {
+exports.getBankByBLZ = async (event, context) => {
 }
 
 // @Post('/bankConnections/import')
 // @Header('Authorization') authorization: string,
 // @BodyProp() bankId: number)
-exports.getWebformId = async(event, context) => {
+exports.getWebformId = async (event, context) => {
   // call api.importConnection
 }
 
@@ -53,7 +91,7 @@ exports.getWebformId = async(event, context) => {
 // @Param('webId') webId
 // @Header('Username') username
 // @Header('Authorization') authorization: string
-exports.fetchWebFormInfo = async(event, context) => {
+exports.fetchWebFormInfo = async (event, context) => {
   // fetch user by id; if non existing, return immediately
   // get the form by the given id
   // create a new bank connection
@@ -63,7 +101,7 @@ exports.fetchWebFormInfo = async(event, context) => {
 // @Get('/allowance')
 // @Header('Username') username
 // @Header('Authorization') authorization: string
-exports.getAllowance = async(event, context) => {
+exports.getAllowance = async (event, context) => {
   // fetch the user by id
   // return their allowance { allowance: user.allowance }
 }
