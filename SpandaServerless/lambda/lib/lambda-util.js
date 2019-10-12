@@ -16,13 +16,14 @@ const handleException = (err) => {
   return createResponse(500, { "message": err })
 }
 
-const hasAuthorization = header => {
-  return header['authorization'] || header['Authorization']
+const hasAuthorization = (header) => {
+  return header['authorization'] || header['Authorization'];
 }
 
 exports.default = {
   'handleException': handleException,
   'createResponse': createResponse,
   'createError': createError,
-  'authorizationHeader': util.authorizationHeader
+  'authorizationHeader': util.authorizationHeader,
+  'hasAuthorization': hasAuthorization
 }
