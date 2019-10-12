@@ -1,6 +1,6 @@
 'use strict'
 
-exports.NewClient = (client) => {
+exports.NewClient = (http) => {
   const requestWebForm = async (authorization, bankId) => {
     const params = {
       headers: {
@@ -13,7 +13,7 @@ exports.NewClient = (client) => {
       validateStatus: status => status === 451
     }
 
-    return client.post('/api/v1/bankConnections/import', params).then(response => {
+    return http.post('/api/v1/bankConnections/import', params).then(response => {
       const body = response.data
       const headers = response.headers
 
@@ -31,7 +31,7 @@ exports.NewClient = (client) => {
           'Authorization': authorization,
         },
       }
-      return client.get('/api/v1/users', params).then(response => response.data)
+      return http.get('/api/v1/users', params).then(response => response.data)
     },
 
     registerUser: async (authorization, user) => {
@@ -43,7 +43,7 @@ exports.NewClient = (client) => {
         }
       }
 
-      return client.post('/api/v1/users', req).then(response => response.data)
+      return http.post('/api/v1/users', req).then(response => response.data)
     },
 
     fetchWebForm: async (authorization, formId) => {
@@ -57,7 +57,7 @@ exports.NewClient = (client) => {
       }
 
       const resource = '/api/v1/webForms/' + formId
-      return client.get(resource, req).then(response => response.data)
+      return http.get(resource, req).then(response => response.data)
     },
 
     listBanksByBLZ: async (authorization, blz, pagination = { page: 1, itemsPerPage: 2 }) => {
@@ -72,7 +72,7 @@ exports.NewClient = (client) => {
         }
       }
 
-      return client.get('/api/v1/banks', req).then(response => response.data)
+      return http.get('/api/v1/banks', req).then(response => response.data)
     },
 
     importConnection: async (authorization, bankId) => {
@@ -88,7 +88,7 @@ exports.NewClient = (client) => {
           }
         }
 
-        return client.post(resource, params)
+        return http.post(resource, params)
           .then(response => [ response.data, formId ]);
       })
     }

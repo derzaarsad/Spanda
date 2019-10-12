@@ -2,7 +2,7 @@
 
 const qs = require('querystring')
 
-const Basic = (client) => {
+const Basic = (http) => {
   const requestParams = secrets => {
     return {
       client_id: secrets.clientId,
@@ -38,18 +38,18 @@ const Basic = (client) => {
     getClientCredentialsToken: async (clientSecrets) => {
       return clientSecrets
         .getSecrets()
-        .then(secrets => client.post('/oauth/token', ccRequest(secrets)))
+        .then(secrets => http.post('/oauth/token', ccRequest(secrets)))
         .then(response => response.data)
     },
 
     getPasswordToken: async (clientSecrets, user, pass) => {
-      return client
+      return http
         .post('/oauth/token', passwordRequest(clientSecrets, user, pass))
         .then(response => response.data)
     },
 
     getRefreshToken: async (clientSecrets, refreshToken) => {
-      return client
+      return http
         .post('/oauth/token', refresthTokenRequest(clientSecret, refreshToken))
         .then(response => response.data)
     }
