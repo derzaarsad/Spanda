@@ -2,14 +2,18 @@
 
 const util = require('./util')
 
-const createResponse = (status, body) {
+const createResponse = (status, body) => {
   return { "statusCode": status, "body": body }
 }
 
-const createError = (status, message) {
+const createError = (status, message) => {
   return createResponse(status, {
     "message": message
   })
+}
+
+const hasAuthorization = header => {
+  return header['authorization'] || header['Authorization']
 }
 
 exports.default = {

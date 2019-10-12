@@ -1,6 +1,6 @@
 'use strict'
 
-const lambdaUtil = require('./lambda-util.js')
+const lambdaUtil = require('./lambda-util.js').default
 
 exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, users, connections) => {
   const unauthorized = async (authorization) => {

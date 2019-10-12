@@ -1,6 +1,6 @@
 'use strict'
 
-const lambdaUtil = require('./lambda-util.js')
+const lambdaUtil = require('./lambda-util.js').default
 
 exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, users) => {
   return {
@@ -14,7 +14,7 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
       }
     },
 
-    register: async (username, password, email, phone, isAutoUpdateEnabled) => {
+    registerUser: async (username, password, email, phone, isAutoUpdateEnabled) => {
       if await users.findById(username) {
         return lambdaUtil.createError(409, 'user already exists')
       }
