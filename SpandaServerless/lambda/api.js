@@ -43,13 +43,6 @@ exports.getBankByBLZ = async(event, context) => {
 }
 
 // @Post('/bankConnections/import')
-// @Header('Authorization') authorization: string
-// @BodyProp() bankId: number)
-exports.getWebFormId = async(event, context) => {
-}
-
-
-// @Post('/bankConnections/import')
 // @Header('Authorization') authorization: string,
 // @BodyProp() bankId: number)
 exports.getWebformId = async(event, context) => {
