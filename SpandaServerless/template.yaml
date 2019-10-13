@@ -17,8 +17,6 @@ Parameters:
 Globals:
   Function:
     Timeout: 45
-    CodeUri: spanda/
-    Runtime: nodejs10.x
     Environment:
       Variables:
         LOGGER_LEVEL: "debug"
@@ -31,7 +29,9 @@ Resources:
   IsUserAuthenticatedFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.isUserAuthenticated
+      Runtime: nodejs10.x
       Events:
         GetAuthorization:
           Type: Api
@@ -41,7 +41,9 @@ Resources:
   RegisterUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.registerUser
+      Runtime: nodejs10.x
       Events:
         PostCredentials:
           Type: Api
@@ -51,7 +53,9 @@ Resources:
   AuthenticateAndSaveUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.authenticateAndSaveUser
+      Runtime: nodejs10.x
       Events:
         PostLogin:
           Type: Api
@@ -61,7 +65,9 @@ Resources:
   UpdateRefreshTokenFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.updateRefreshToken
+      Runtime: nodejs10.x
       Events:
         PostRefreshToken:
           Type: Api
@@ -71,7 +77,9 @@ Resources:
   GetBankByBLZFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.getBankByBLZ
+      Runtime: nodejs10.x
       Events:
         GetBankByBLZ:
           Type: Api
@@ -81,7 +89,9 @@ Resources:
   GetWebFormIdFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.getWebFormId
+      Runtime: nodejs10.x
       Events:
         PostBankId:
           Type: Api
@@ -91,7 +101,9 @@ Resources:
   FetchWebFormInfoFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.getWebFormInfo
+      Runtime: nodejs10.x
       Events:
         GetWebFormId:
           Type: Api
@@ -101,7 +113,9 @@ Resources:
   GetAllowanceFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.getAllowance
+      Runtime: nodejs10.x
       Events:
         GetAllowance:
           Type: Api
