@@ -1,6 +1,6 @@
 'use strict';
 
-const app = require('../../app.js');
+const app = require('../../api.js');
 const chai = require('chai');
 
 const expect = chai.expect;
@@ -8,7 +8,13 @@ var event, context;
 
 describe('Tests index', function () {
     it('verifies successful response', async () => {
-        const result = await app.lambdaHandler(event, context)
+        event = {
+            headers: {
+                "Authorization": "bearer 5325626"
+            }
+        };
+
+        const result = await app.isUserAuthenticated(event, context)
 
         expect(result).to.be.an('object');
         expect(result.statusCode).to.equal(200);
