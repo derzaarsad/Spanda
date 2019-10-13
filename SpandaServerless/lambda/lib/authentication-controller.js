@@ -5,13 +5,12 @@ const lambdaUtil = require('./lambda-util.js');
 exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, users) => {
   return {
     isUserAuthenticated: async (authorization) => {
-      try {
-        logger.log('info', 'authenticating user', { 'authorization': authorizaiton })
-        return finapi.userInfo(authorizaiton)
-      } catch (err) {
-        logger.log('error', 'error authenticating user', err)
-        return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
-      }
+      
+      return finapi.userInfo(authorizaiton).then(response => lambdaUtil.CreateResponse(200, response))
+        .catch(err => {
+          logger.log('error', 'error authenticating user', err)
+          return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
+        });
     },
 
     registerUser: async (username, password, email, phone, isAutoUpdateEnabled) => {
@@ -32,7 +31,7 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
       const user = users.new(username, email, phone, isUserAuthenticated)
 
       try {
-        finapi.registerUser(authorization, user)
+        await finapi.registerUser(authorization, user)
       } catch (err) {
         logger.log('error', 'could not register user', err)
         return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration' + err);
@@ -51,12 +50,12 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
         return lambdaUtil.CreateErrorResponse(500, 'could not obtain client secrets');
       }
 
-      try {
-        return authentication.getPasswordToken(secrets, users, password)
-      } catch (err) {
-        logger.log('error', 'could not obtain password token for user ' + username, err)
-        return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
-      }
+      return authentication.getPasswordToken(secrets, users, password)
+        .then(response => lambdaUtil.CreateResponse(200, response))
+        .catch(err => {
+          logger.log('error', 'could not obtain password token for user ' + username, err)
+          return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
+        });
     },
 
     updateRefreshToken: async (refreshToken) => {
@@ -69,12 +68,12 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
         return lambdaUtil.CreateErrorResponse(500, 'could not obtain client secrets');
       }
 
-      try {
-        return authentication.getRefreshToken(secrets, refreshToken)
-      } catch (err) {
-        logger.log('error', 'could not obtain refresh token', err)
-        return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
-      }
+      return authentication.getRefreshToken(secrets, refreshToken)
+        .then(response => lambdaUtil.CreateResponse(200, response))
+        .catch(err => {
+          logger.log('error', 'could not obtain refresh token', err)
+          return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
+        });
     }
   }
 }

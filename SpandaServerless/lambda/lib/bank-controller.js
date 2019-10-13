@@ -24,24 +24,23 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
         logger.log('error', 'error while authorizing against finapi', err)
         return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token: ' + err);
       }
-
-      try {
-        return finapi.listBanksByBLZ(authorization, blz)
-      } catch (err) {
-        // TODO distinguish unauthorized from other errors
-        logger.log('error', 'error listing banks by BLZ', err)
-        return lambdaUtil.CreateErrorResponse(500, 'could not list banks');
-      }
+      
+      return finapi.listBanksByBLZ(authorization, blz)
+        .then(response => lambdaUtil.CreateResponse(200, response))
+        .catch(err => {
+          // TODO distinguish unauthorized from other errors
+          logger.log('error', 'error listing banks by BLZ', err)
+          return lambdaUtil.CreateErrorResponse(500, 'could not list banks')
+        })
     },
 
     getWebformId: async (authorization, bankId) => {
-      try {
-        return finapi.importConnection(authorization, bankId)
-      } catch (err) {
-        // TODO distinguish unauthorized from other errors
-        logger.log('error', 'error importing connection', err)
-        return lambdaUtil.CreateErrorResponse(500, 'could not import connection');
-      }
+      return finapi.importConnection(authorization, bankId)
+        .then(response => lambdaUtil.CreateResponse(200, response))
+        .catch(err => {
+          logger.log('error', 'error importing connection', err)
+          return lambdaUtil.CreateErrorResponse(500, 'could not import connection')
+        });
     },
 
     fetchWebFormInfo: async (authorization, username, webId) => {
@@ -71,7 +70,9 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
       user.bankConnections.push(body.id)
 
       // TODO: rollback
-      return Promise.all([users.save(user), connections.save(bankConnection)]).then(res => webForm)
+      return Promise.all([users.save(user), connections.save(bankConnection)])
+        .then(res => lambdaUtil.createResponse(200, webForm))
+        .catch(err => lambdaUtil.createError(500, 'could not persist user data'))
     },
 
     getAllowance: async (authorization, username) => {
