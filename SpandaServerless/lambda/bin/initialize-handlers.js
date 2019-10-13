@@ -1,6 +1,6 @@
 'use strict'
 
-const handlers = require('../lib/ControllerProvider')
+const handlers = require('../ControllerProvider')
 const services = handlers(process.env)
 
 const bankController = services.bankController

@@ -7,13 +7,13 @@ module.exports = env => {
   const axios = require('axios');
   const winston = require('winston');
 
-  const ClientSecrets = require('./client-secrets');
-  const Authentication = require('./authentication');
-  const FinAPI = require('./finapi');
-  const Users = require('./users');
-  const BankConnections = require('./bank-connections');
-  const AuthenticationController = require('./authentication-controller');
-  const BankController = require('./bank-controller');
+  const ClientSecrets = require('./lib/client-secrets');
+  const Authentication = require('./lib/authentication');
+  const FinAPI = require('./lib/finapi');
+  const Users = require('./lib/users');
+  const BankConnections = require('./lib/bank-connections');
+  const AuthenticationController = require('./lib/authentication-controller');
+  const BankController = require('./lib/bank-controller');
 
   const logger = winston.createLogger({
     level: env['LOGGER_LEVEL'] || 'debug',
