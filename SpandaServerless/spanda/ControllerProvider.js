@@ -3,7 +3,7 @@
 /*
  * Initialize controllers with environment variables
  */
-module.exports = (env, logger) => {
+module.exports = (env) => {
   console.log('Configuring controllers from environment:')
   console.log(JSON.stringify(env))
 
@@ -33,7 +33,6 @@ module.exports = (env, logger) => {
   const connections = BankConnections.NewInMemoryRepository();
 
   return {
-    'logger': logger,
     'clientSecrets': clientSecrets,
     'authentication': authentication,
     'finapi': finapi,
