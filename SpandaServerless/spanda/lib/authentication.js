@@ -43,7 +43,7 @@ const Basic = (http) => {
 
     getPasswordToken: async (clientSecrets, user, pass) => {
       return clientSecrets.getSecrets()
-        .then(secrets => http.post('/oauth/token', passwordRequest(secrets , user, pass)))
+        .then(secrets => http.post('/oauth/token', passwordRequest(secrets, user, pass)))
         .then(response => response.data)
     },
 

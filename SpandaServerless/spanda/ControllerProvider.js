@@ -3,7 +3,7 @@
 /*
  * Initialize controllers with environment variables
  */
-module.exports = (env,logger) => {
+module.exports = (env, logger) => {
   console.log('Configuring controllers from environment:')
   console.log(JSON.stringify(env))
 
@@ -14,8 +14,6 @@ module.exports = (env,logger) => {
   const FinAPI = require('./lib/finapi');
   const Users = require('./lib/users');
   const BankConnections = require('./lib/bank-connections');
-  const AuthenticationController = require('./controllers/authentication-controller');
-  const BankController = require('./controllers/bank-controller');
 
   const baseURL = env['FINAPI_URL'] || 'https://sandbox.finapi.io';
   const options = { timeout: env['FINAPI_TIMEOUT'] || 3000 };
@@ -35,7 +33,11 @@ module.exports = (env,logger) => {
   const connections = BankConnections.NewInMemoryRepository();
 
   return {
-    'bankController': BankController(logger, clientSecrets, authentication, finapi, users, connections),
-    'authenticationController': AuthenticationController(logger, clientSecrets, authentication, finapi, users)
+    'logger': logger,
+    'clientSecrets': clientSecrets,
+    'authentication': authentication,
+    'finapi': finapi,
+    'users': users,
+    'connections': connections
   };
 };
