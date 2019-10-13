@@ -8,9 +8,7 @@
  *
  * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
- *
  */
-
 const env = process.env;
 const lambdaUtil = require('./lib/lambda-util');
 const ControllerProvider = require('./ControllerProvider')(env)
@@ -34,6 +32,7 @@ exports.isUserAuthenticated = async (event, context) => {
     try {
       return authenticationController.isUserAuthenticated(authorization)
     } catch (err) {
+      logger.log('error', 'error authorizing', err)
       return lambdaUtil.CreateInternalErrorResponse(err)
     }
   }
@@ -53,6 +52,7 @@ exports.registerUser = async (event, context) => {
   try {
     return authenticationController.registerUser(user.id, user.password, user.email, user.phone, user.isAutoUpdateEnabled)
   } catch (err) {
+    logger.log('error', 'error registering user', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
@@ -67,6 +67,7 @@ exports.authenticateAndSaveUser = async (event, context) => {
   try {
     return authenticationController.authenticateAndSave(credentials.username, credentials.password)
   } catch (err) {
+    logger.log('error', 'error logging in user', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
@@ -80,6 +81,7 @@ exports.updateRefreshToken = async (event, context) => {
   try {
     return authenticationController.updateRefreshToken(body.refreshToken)
   } catch (err) {
+    logger.log('error', 'error refreshing token', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
@@ -102,6 +104,7 @@ exports.getBankByBLZ = async (event, context) => {
   try {
     return bankController.getBankByBLZ(pathParams['blz'])
   } catch (err) {
+    logger.log('error', 'error listing banks', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
@@ -119,6 +122,7 @@ exports.getWebFormId = async (event, context) => {
   try {
     return bankController.getWebformId(authorization, event.body.bankId)
   } catch (err) {
+    logger.log('error', 'error importing bank connection', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
@@ -145,6 +149,7 @@ exports.fetchWebFormInfo = async (event, context) => {
   try {
     return bankController.fetchWebFormInfo(authorization, username, webId)
   } catch (err) {
+    logger.log('error', 'error fetching webform id', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
@@ -168,6 +173,7 @@ exports.getAllowance = async (event, context) => {
   try {
     return bankController.getAllowance(authorization, username)
   } catch (err) {
+    logger.log('error', 'error fetching fetching allowance', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }

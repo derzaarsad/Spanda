@@ -25,7 +25,7 @@ module.exports = (logger, clientSecrets, authentication, finapi, users) => {
           .then(token => lambdaUtil.CreateAuthHeader(token))
       } catch (err) {
         logger.log('error', 'error while authorizing against finapi', err)
-        return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token: ' + err);
+        return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token');
       }
 
       const user = users.new(username, email, phone, isUserAuthenticated)
@@ -34,7 +34,7 @@ module.exports = (logger, clientSecrets, authentication, finapi, users) => {
         await finapi.registerUser(authorization, user)
       } catch (err) {
         logger.log('error', 'could not register user', err)
-        return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration' + err);
+        return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration');
       }
 
       return users.save(user).then(userData => lambdaUtil.CreateResponse(201, userData));

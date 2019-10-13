@@ -6,6 +6,9 @@ module.exports = (logger, clientSecrets, authentication, finapi, users, connecti
   const unauthorized = async (authorization) => {
     try {
       logger.log('info', 'authenticating user', { 'authorization': authorizaiton })
+      await finapi.userInfo(authorization)
+
+      // Return nothing on success.
       return null
     } catch (err) {
       logger.log('error', 'invalid token', { 'authorization': authorizaiton })
@@ -22,7 +25,7 @@ module.exports = (logger, clientSecrets, authentication, finapi, users, connecti
           .then(token => lambdaUtil.CreateAuthHeader(token))
       } catch (err) {
         logger.log('error', 'error while authorizing against finapi', err)
-        return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token: ' + err);
+        return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token');
       }
 
       return finapi.listBanksByBLZ(authorization, blz)

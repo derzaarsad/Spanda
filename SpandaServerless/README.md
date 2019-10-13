@@ -98,6 +98,15 @@ The SAM CLI reads the application template to determine the API's routes and the
             Method: get
 ```
 
+Note: the `start-api` command doesn't require a previously built and packaged application. In fact,
+it's more convenient to let SAM build dynamically on every request, enabling hot reloading.
+
+To test the backend locally, you need to pass the FinAPI credentials on the command-line:
+
+```bash
+sam local start-api --parameter-overrides "ParameterKey=FinAPIClientId,ParameterValue=<client-id> ParameterKey=FinAPIClientSecret,ParameterValue=<client-secret>"
+```
+
 ## Add a resource to your application
 The application template uses AWS Serverless Application Model (AWS SAM) to define application resources. AWS SAM is an extension of AWS CloudFormation with a simpler syntax for configuring common serverless application resources such as functions, triggers, and APIs. For resources not included in [the SAM specification](https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md), you can use standard [AWS CloudFormation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html) resource types.
 

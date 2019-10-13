@@ -4,6 +4,12 @@ Description: Spanda's backend implemented in the Serverless Application Model.
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Parameters:
+  FinAPIClientId:
+    Description: The client id to use to access FinAPI
+    Type: String
+  FinAPIClientSecret:
+    Description: The client secret to use to access FinAPI
+    Type: String
   Stage:
     Description: The deployment stage
     Type: String
@@ -13,6 +19,13 @@ Globals:
     Timeout: 45
     CodeUri: lambda/
     Runtime: nodejs10.x
+    Environment:
+      Variables:
+        LOGGER_LEVEL: "debug"
+        FINAPI_URL: "https://sandbox.finapi.io"
+        FINAPI_CLIENT_ID: !Ref FinAPIClientId
+        FINAPI_CLIENT_SECRET: !Ref FinAPIClientSecret
+        FINAPI_TIMEOUT: 3000
 
 Resources:
   IsUserAuthenticatedFunction:
