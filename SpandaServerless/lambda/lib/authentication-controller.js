@@ -2,10 +2,10 @@
 
 const lambdaUtil = require('./lambda-util.js');
 
-exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, users) => {
+module.exports = (logger, clientSecrets, authentication, finapi, users) => {
   return {
     isUserAuthenticated: async (authorization) => {
-      
+
       return finapi.userInfo(authorizaiton).then(response => lambdaUtil.CreateResponse(200, response))
         .catch(err => {
           logger.log('error', 'error authenticating user', err)
@@ -76,4 +76,4 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
         });
     }
   }
-}
+};

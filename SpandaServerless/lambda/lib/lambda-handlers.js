@@ -50,7 +50,7 @@ module.exports = env => {
     'authentication': authentication,
     'connections': connections,
     'users': users,
-    'bankController': BankController.NewLambdaController(logger, clientSecrets, authentication, finapi, users, connections),
-    'authenticationController': AuthenticationController.NewLambdaController(logger, clientSecrets, authentication, finapi, users)
+    'bankController': BankController(logger, clientSecrets, authentication, finapi, users, connections),
+    'authenticationController': AuthenticationController(logger, clientSecrets, authentication, finapi, users)
   };
 };

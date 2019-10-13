@@ -2,7 +2,7 @@
 
 const lambdaUtil = require('./lambda-util.js');
 
-exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, users, connections) => {
+module.exports = (logger, clientSecrets, authentication, finapi, users, connections) => {
   const unauthorized = async (authorization) => {
     try {
       logger.log('info', 'authenticating user', { 'authorization': authorizaiton })
@@ -24,7 +24,7 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
         logger.log('error', 'error while authorizing against finapi', err)
         return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token: ' + err);
       }
-      
+
       return finapi.listBanksByBLZ(authorization, blz)
         .then(response => lambdaUtil.CreateResponse(200, response))
         .catch(err => {
@@ -92,4 +92,4 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
       return lambdaUtil.CreateResponse(200, { 'allowance': user.allowance });
     }
   }
-}
+};
