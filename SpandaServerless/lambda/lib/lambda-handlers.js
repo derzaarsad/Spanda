@@ -37,8 +37,7 @@ const initializeFromEnvironmentObject = env => {
   const finapi = FinAPI.NewClient(httpClient)
   const authentication = Authentication.Basic(httpClient)
 
-  let clientSecrets = ClientSecrets.Resolved(env['AUTH_CLIENT_ID'], env['AUTH_CLIENT_SECRET'])
-  console.log('clientId: ' + env['AUTH_CLIENT_ID'] + ' clientSecret: ' + env['AUTH_CLIENT_SECRET'])
+  const clientSecrets = ClientSecrets.Resolved(env['FINAPI_CLIENT_ID'], env['FINAPI_CLIENT_SECRET'])
 
   const users = Users.NewInMemoryRepository()
   const connections = BankConnections.NewInMemoryRepository()
