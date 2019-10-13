@@ -5,13 +5,13 @@ const lambdaUtil = require('../lib/lambda-util.js');
 module.exports = (logger, clientSecrets, authentication, finapi, users, connections) => {
   const unauthorized = async (authorization) => {
     try {
-      logger.log('info', 'authenticating user', { 'authorization': authorizaiton })
+      logger.log('info', 'authenticating user', { 'authorization': authorization })
       await finapi.userInfo(authorization)
 
       // Return nothing on success.
       return null
     } catch (err) {
-      logger.log('error', 'invalid token', { 'authorization': authorizaiton })
+      logger.log('error', 'invalid token', { 'authorization': authorization })
       return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
     }
   }

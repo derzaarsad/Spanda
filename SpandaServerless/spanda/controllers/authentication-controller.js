@@ -6,7 +6,7 @@ module.exports = (logger, clientSecrets, authentication, finapi, users) => {
   return {
     isUserAuthenticated: async (authorization) => {
 
-      return finapi.userInfo(authorizaiton).then(response => lambdaUtil.CreateResponse(200, response))
+      return finapi.userInfo(authorization).then(response => lambdaUtil.CreateResponse(200, response))
         .catch(err => {
           logger.log('error', 'error authenticating user', err)
           return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
@@ -17,8 +17,6 @@ module.exports = (logger, clientSecrets, authentication, finapi, users) => {
       if (await users.findById(username)) {
         return lambdaUtil.CreateErrorResponse(409, 'user already exists');
       }
-
-      let authorizaiton
 
       try {
         authorization = await authentication.getClientCredentialsToken(clientSecrets)
