@@ -15,6 +15,8 @@ const unauthorized = async (logger, finapi, authorization) => {
   }
 }
 
+// @Get('/banks/{blz}')
+// @Param('blz') blz
 exports.getBankByBLZ = async(event, context, logger, clientSecrets, authentication, finapi) => {
   const pathParams = event.pathParameters
 
@@ -42,6 +44,9 @@ exports.getBankByBLZ = async(event, context, logger, clientSecrets, authenticati
     })
 }
 
+// @Post('/bankConnections/import')
+// @Header('Authorization') authorization: string,
+// @BodyProp() bankId: number)
 exports.getWebformId = async(event, context, logger, clientSecrets, authentication, finapi) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
@@ -57,6 +62,10 @@ exports.getWebformId = async(event, context, logger, clientSecrets, authenticati
     });
 }
 
+// @Get('/webForms/{webId}')
+// @Param('webId') webId
+// @Header('Username') username
+// @Header('Authorization') authorization: string
 exports.fetchWebFormInfo = async(event, context, logger, clientSecrets, authentication, finapi, users, connections) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
@@ -105,6 +114,9 @@ exports.fetchWebFormInfo = async(event, context, logger, clientSecrets, authenti
     })
 }
 
+// @Get('/allowance')
+// @Header('Username') username
+// @Header('Authorization') authorization: string
 exports.getAllowance = async(event, context, logger, clientSecrets, authentication, finapi, users) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 

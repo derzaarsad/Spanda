@@ -49,8 +49,6 @@ exports.authenticateAndSaveUser = async (event, context) => {
   }
 }
 
-// @Post('/oauth/token')
-// @BodyProp() refresh_token: string
 exports.updateRefreshToken = async (event, context) => {
   try {
     return authenticationController.updateRefreshToken(event, context, services.logger,
@@ -65,9 +63,6 @@ exports.updateRefreshToken = async (event, context) => {
  * Bank Controller
  * ---------------
  */
-
-// @Get('/banks/{blz}')
-// @Param('blz') blz
 exports.getBankByBLZ = async (event, context) => {
   try {
     return bankController.getBankByBLZ(event, context, services.logger, services.clientSecrets,
@@ -78,9 +73,6 @@ exports.getBankByBLZ = async (event, context) => {
   }
 }
 
-// @Post('/bankConnections/import')
-// @Header('Authorization') authorization: string,
-// @BodyProp() bankId: number)
 exports.getWebFormId = async (event, context) => {
   try {
     return bankController.getWebformId(event, context, services.logger, services.clientSecrets,
@@ -91,10 +83,6 @@ exports.getWebFormId = async (event, context) => {
   }
 }
 
-// @Get('/webForms/{webId}')
-// @Param('webId') webId
-// @Header('Username') username
-// @Header('Authorization') authorization: string
 exports.fetchWebFormInfo = async (event, context) => {
   try {
     return bankController.fetchWebFormInfo(event, context, services.logger, services.clientSecrets,
@@ -105,9 +93,6 @@ exports.fetchWebFormInfo = async (event, context) => {
   }
 }
 
-// @Get('/allowance')
-// @Header('Username') username
-// @Header('Authorization') authorization: string
 exports.getAllowance = async (event, context) => {
   try {
     return bankController.getAllowance(event, context, services.logger, services.clientSecrets,

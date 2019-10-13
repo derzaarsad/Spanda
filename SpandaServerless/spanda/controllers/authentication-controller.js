@@ -74,6 +74,8 @@ exports.authenticateAndSave = (event, context, logger, clientSecrets, authentica
     });
 }
 
+// @Post('/oauth/token')
+// @BodyProp() refresh_token: string
 exports.updateRefreshToken = (event, context, logger, clientSecrets, authentication) => {
   const body = event.body
   // TODO check parameters
