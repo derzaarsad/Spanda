@@ -1,21 +1,3 @@
-const env = process.env;
-
-const lambdaUtil = require('./lib/lambda-util');
-const lambdaHandlers = require('./lib/lambda-handlers')
-
-const services = lambdaHandlers(env)
-
-const finapi = services.finapi
-const authentication = services.authentication
-
-const users = services.users
-const connections = services.connections
-
-const authenticationController = services.authenticationController
-const bankController = services.bankController
-
-const logger = services.logger
-
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -28,23 +10,18 @@ const logger = services.logger
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-exports.helloWorld = async (event, context) => {
-  let response
-  try {
-    // const ret = await axios(url);
-    response = {
-      'statusCode': 200,
-      'body': JSON.stringify({
-        message: 'hello world',
-      })
-    }
-  } catch (err) {
-    logger.log('info', err);
-    return err;
-  }
 
-  return response
-};
+const env = process.env;
+const lambdaUtil = require('./lib/lambda-util');
+const lambdaHandlers = require('./lib/lambda-handlers')
+const services = lambdaHandlers(env)
+const finapi = services.finapi
+const authentication = services.authentication
+const users = services.users
+const connections = services.connections
+const authenticationController = services.authenticationController
+const bankController = services.bankController
+const logger = services.logger
 
 /*
  * Authentication Controller
