@@ -1,8 +1,8 @@
 'use strict';
 
 /*
-  Initialize controllers with environment variables
-*/
+ * Initialize controllers with environment variables
+ */
 module.exports = env => {
   console.log('Configuring from environment:')
   console.log(JSON.stringify(env))

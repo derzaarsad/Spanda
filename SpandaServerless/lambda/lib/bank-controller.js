@@ -5,13 +5,13 @@ const lambdaUtil = require('./lambda-util.js');
 module.exports = (logger, clientSecrets, authentication, finapi, users, connections) => {
   const unauthorized = async (authorization) => {
     try {
-      logger.log('info', 'authenticating user', { 'authorization': authorizaiton })
+      logger.log('info', 'authenticating user', { 'authorization': authorization })
       await finapi.userInfo(authorization)
 
       // Return nothing on success.
       return null
     } catch (err) {
-      logger.log('error', 'invalid token', { 'authorization': authorizaiton })
+      logger.log('error', 'invalid token', { 'authorization': authorization })
       return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
     }
   }
@@ -47,9 +47,9 @@ module.exports = (logger, clientSecrets, authentication, finapi, users, connecti
     },
 
     fetchWebFormInfo: async (authorization, username, webId) => {
-      const unauthorized = await unauthorized(authorization)
-      if (unauthorized) {
-        return unauthorized
+      const error = await unauthorized(authorization)
+      if (error) {
+        return error
       }
 
       const user = await users.findById(username)
@@ -62,7 +62,7 @@ module.exports = (logger, clientSecrets, authentication, finapi, users, connecti
       try {
         webForm = await finapi.fetchWebForm(authorization, webId)
       } catch (err) {
-        logger.log('error', 'could not fetch web form with id ' + webid)
+        logger.log('error', 'could not fetch web form with id ' + webId)
         return lambdaUtil.CreateErrorResponse(500, 'could not fetch web form');
       }
 
@@ -74,15 +74,18 @@ module.exports = (logger, clientSecrets, authentication, finapi, users, connecti
 
       // TODO: rollback
       return Promise.all([users.save(user), connections.save(bankConnection)])
-        .then(res => lambdaUtil.createResponse(200, webForm))
-        .catch(err => lambdaUtil.createError(500, 'could not persist user data'))
+        .then(() => lambdaUtil.createResponse(200, webForm))
+        .catch(err => {
+          logger.log('error', 'error persisting user data', err)
+          lambdaUtil.createError(500, 'could not persist user data')
+        })
     },
 
     getAllowance: async (authorization, username) => {
-      const unauthorized = await unauthorized(authorization)
+      const error = await unauthorized(authorization)
 
-      if (unauthorized) {
-        return unauthorized
+      if (error) {
+        return error
       }
 
       const user = await users.findById(username)

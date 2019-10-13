@@ -5,8 +5,7 @@ const lambdaUtil = require('./lambda-util.js');
 module.exports = (logger, clientSecrets, authentication, finapi, users) => {
   return {
     isUserAuthenticated: async (authorization) => {
-
-      return finapi.userInfo(authorizaiton).then(response => lambdaUtil.CreateResponse(200, response))
+      return finapi.userInfo(authorization).then(response => lambdaUtil.CreateResponse(200, response))
         .catch(err => {
           logger.log('error', 'error authenticating user', err)
           return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
@@ -18,7 +17,7 @@ module.exports = (logger, clientSecrets, authentication, finapi, users) => {
         return lambdaUtil.CreateErrorResponse(409, 'user already exists');
       }
 
-      let authorizaiton
+      let authorization
 
       try {
         authorization = await authentication.getClientCredentialsToken(clientSecrets)
@@ -28,7 +27,7 @@ module.exports = (logger, clientSecrets, authentication, finapi, users) => {
         return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token');
       }
 
-      const user = users.new(username, email, phone, isUserAuthenticated)
+      const user = users.new(username, email, phone, isAutoUpdateEnabled)
 
       try {
         await finapi.registerUser(authorization, user)
