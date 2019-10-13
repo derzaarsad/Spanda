@@ -51,9 +51,6 @@ exports.NewClient = (http) => {
         headers: {
           'Authorization': authorization,
         },
-        params: {
-          'bankId': bankId
-        },
       }
 
       const resource = '/api/v1/webForms/' + formId

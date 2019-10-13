@@ -2,76 +2,90 @@
 
 const lambdaUtil = require('../lib/lambda-util.js');
 
-module.exports = (logger, clientSecrets, authentication, finapi, users) => {
-  return {
-    isUserAuthenticated: async (authorization) => {
+// @Get('/users')
+// @Header('Authorization') authorization: string
+exports.isUserAuthenticated = async(event, context, logger, finapi) => {
+  const authorization = lambdaUtil.hasAuthorization(event.headers)
 
-      return finapi.userInfo(authorization).then(response => lambdaUtil.CreateResponse(200, response))
-        .catch(err => {
-          logger.log('error', 'error authenticating user', err)
-          return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
-        });
-    },
-
-    registerUser: async (username, password, email, phone, isAutoUpdateEnabled) => {
-      if (await users.findById(username)) {
-        return lambdaUtil.CreateErrorResponse(409, 'user already exists');
-      }
-
-      try {
-        authorization = await authentication.getClientCredentialsToken(clientSecrets)
-          .then(token => lambdaUtil.CreateAuthHeader(token))
-      } catch (err) {
-        logger.log('error', 'error while authorizing against finapi', err)
-        return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token');
-      }
-
-      const user = users.new(username, email, phone, isUserAuthenticated)
-
-      try {
-        await finapi.registerUser(authorization, user)
-      } catch (err) {
-        logger.log('error', 'could not register user', err)
-        return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration');
-      }
-
-      return users.save(user).then(userData => lambdaUtil.CreateResponse(201, userData));
-    },
-
-    authenticateAndSave: async (username, password) => {
-      let secrets
-
-      try {
-        secrets = await clientSecrets.getSecrets()
-      } catch (err) {
-        logger.log('error', 'could not obtain client secrets', err)
-        return lambdaUtil.CreateErrorResponse(500, 'could not obtain client secrets');
-      }
-
-      return authentication.getPasswordToken(secrets, users, password)
-        .then(response => lambdaUtil.CreateResponse(200, response))
-        .catch(err => {
-          logger.log('error', 'could not obtain password token for user ' + username, err)
-          return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
-        });
-    },
-
-    updateRefreshToken: async (refreshToken) => {
-      let secrets
-
-      try {
-        secrets = await clientSecrets.getSecrets()
-      } catch (err) {
-        logger.log('error', 'could not obtain client secrets', err)
-        return lambdaUtil.CreateErrorResponse(500, 'could not obtain client secrets');
-      }
-
-      return authentication.getRefreshToken(secrets, refreshToken)
-        .then(response => lambdaUtil.CreateResponse(200, response))
-        .catch(err => {
-          logger.log('error', 'could not obtain refresh token', err)
-          return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
-        });
-    }
+  if (!authorization) {
+    return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
   }
+
+  return finapi.userInfo(authorization).then(response => lambdaUtil.CreateResponse(200, response))
+    .catch(err => {
+      logger.log('error', 'error authenticating user', err)
+      return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
+    });
+}
+
+// @Post('/users')
+// @BodyProp() id: string
+// @BodyProp() password
+// @BodyProp() email: string
+// @BodyProp() phone: string
+// @BodyProp() isAutoUpdateEnabled: boolean
+exports.registerUser = async(event, context, logger, clientSecrets, authentication, finapi, users) => {
+  const user = event.body
+  logger.log('debug', 'user: ' + user)
+  // TODO check parameters
+
+  if (await users.findById(user.id)) {
+    return lambdaUtil.CreateErrorResponse(409, 'user already exists');
+  }
+
+  let authorization
+
+  try {
+    authorization = await authentication.getClientCredentialsToken(clientSecrets)
+      .then(token => lambdaUtil.CreateAuthHeader(token))
+  } catch (err) {
+    logger.log('error', 'error while authorizing against finapi', err)
+    return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token');
+  }
+
+  const newUser = users.new(user.id, user.email, user.phone, user.isAutoUpdateEnabled)
+
+  try {
+    await finapi.registerUser(authorization, newUser)
+  } catch (err) {
+    logger.log('error', 'could not register user', err)
+    return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration');
+  }
+
+  return users.save(user).then(userData => lambdaUtil.CreateResponse(201, userData));
+}
+
+// @Post('/oauth/login')
+// @BodyProp() username: string,
+// @BodyProp() password: string
+exports.authenticateAndSave = (event, context, logger, clientSecrets, authentication) => {
+  const credentials = event.body
+  // TODO check parameters
+  logger.log('debug', 'credentials: ' + credentials)
+
+  const username = credentials.username;
+  const password = credentials.password;
+
+  return authentication.getPasswordToken(clientSecrets, username, password)
+    .then(response => lambdaUtil.CreateResponse(200, response))
+    .catch(err => {
+      logger.log('error', 'could not obtain password token for user ' + username, err)
+      return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
+    });
+}
+
+// @Post('/oauth/token')
+// @BodyProp() refresh_token: string
+exports.updateRefreshToken = (event, context, logger, clientSecrets, authentication) => {
+  const body = event.body
+  // TODO check parameters
+  logger.log('debug', 'body: ' + body)
+
+  return authentication.getRefreshToken(clientSecrets, body['refresh_token'])
+    .then(response => lambdaUtil.CreateResponse(200, response))
+    .catch(err => {
+      logger.log('error', 'could not obtain refresh token', err)
+      return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
+    });
 };
+
