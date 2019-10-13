@@ -1,19 +1,3 @@
-const env = process.env
-
-const lambdaUtil = require('./lib/lambda-util').default
-const lambdaHandlers = require('./lib/lambda-handlers')
-
-const services = lambdaHandlers.initializeFromEnvironmentObject(env)
-
-const finapi = services.finapi
-const authentication = services.authentication
-
-const users = services.users
-const connections = services.connections
-
-const authenticationController = services.authenticationController
-const bankController = services.bankController
-
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -24,25 +8,16 @@ const bankController = services.bankController
  *
  * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
- *
  */
-exports.helloWorld = async (event, context) => {
-  let response
-  try {
-    // const ret = await axios(url);
-    response = {
-      'statusCode': 200,
-      'body': JSON.stringify({
-        message: 'hello world',
-      })
-    }
-  } catch (err) {
-    logger.log('info', err);
-    return err;
-  }
+const env = process.env
 
-  return response
-};
+const lambdaUtil = require('./lib/lambda-util').default
+const lambdaHandlers = require('./lib/lambda-handlers')
+
+const services = lambdaHandlers.initializeFromEnvironmentObject(env)
+
+const authenticationController = services.authenticationController
+const bankController = services.bankController
 
 /*
  * Authentication Controller
