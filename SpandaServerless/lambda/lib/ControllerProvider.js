@@ -1,7 +1,7 @@
 'use strict';
 
 /*
-  Initialize lambda-handlers with environment variables
+  Initialize controllers with environment variables
 */
 module.exports = env => {
   const axios = require('axios');

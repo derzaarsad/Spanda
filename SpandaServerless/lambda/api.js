@@ -13,11 +13,10 @@
 
 const env = process.env;
 const lambdaUtil = require('./lib/lambda-util');
-const lambdaHandlers = require('./lib/lambda-handlers')
-const services = lambdaHandlers(env)
-const authenticationController = services.authenticationController
-const bankController = services.bankController
-const logger = services.logger
+const ControllerProvider = require('./lib/ControllerProvider')(env)
+const authenticationController = ControllerProvider.authenticationController
+const bankController = ControllerProvider.bankController
+const logger = ControllerProvider.logger
 
 /*
  * Authentication Controller
