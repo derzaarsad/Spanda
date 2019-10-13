@@ -1,5 +1,5 @@
-const env = process.env
-const lambdaUtil = require('./lib/lambda-util').default
+const env = process.env;
+const lambdaUtil = require('./lib/lambda-util');
 const lambdaHandlers = require('./lib/lambda-handlers')
 
 const services = lambdaHandlers(env)
@@ -56,12 +56,12 @@ exports.isUserAuthenticated = async (event, context) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
-    return lambdaUtil.createError(403, 'unauthorized')
+    return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
   } else {
     try {
       return authenticationController.isUserAuthenticated(authorization)
     } catch (err) {
-      return lambdaUtil.handleException(err)
+      return lambdaUtil.CreateInternalErrorResponse(err)
     }
   }
 }
@@ -80,7 +80,7 @@ exports.registerUser = async (event, context) => {
   try {
     return authenticationController.registerUser(user.id, user.password, user.email, user.phone, user.isAutoUpdateEnabled)
   } catch (err) {
-    return lambdaUtil.handleException(err)
+    return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
 
@@ -94,7 +94,7 @@ exports.authenticateAndSaveUser = async (event, context) => {
   try {
     return authenticationController.authenticateAndSave(credentials.username, credentials.password)
   } catch (err) {
-    return lambdaUtil.handleException(err)
+    return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
 
@@ -107,7 +107,7 @@ exports.updateRefreshToken = async (event, context) => {
   try {
     return authenticationController.updateRefreshToken(body.refreshToken)
   } catch (err) {
-    return lambdaUtil.handleException(err)
+    return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
 
@@ -123,13 +123,13 @@ exports.getBankByBLZ = async (event, context) => {
 
   // TODO: validate parameters
   if (!pathParams['blz']) {
-    return lambdaUtil.createError(400, 'invalid BLZ')
+    return lambdaUtil.CreateErrorResponse(400, 'invalid BLZ');
   }
 
   try {
     return bankController.getBankByBLZ(pathParams['blz'])
   } catch (err) {
-    return lambdaUtil.handleException(err)
+    return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
 
@@ -140,13 +140,13 @@ exports.getWebFormId = async (event, context) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
-    return lambdaUtil.createError(403, 'unauthorized')
+    return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
   }
 
   try {
     return bankController.getWebformId(authorization, event.body.bankId)
   } catch (err) {
-    return lambdaUtil.handleException(err)
+    return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
 
@@ -158,13 +158,13 @@ exports.fetchWebFormInfo = async (event, context) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
-    return lambdaUtil.createError(403, 'unauthorized')
+    return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
   }
 
   const username = event.headers['Username']
 
   if (!username) {
-    return lambdaUtil.createError(400, 'no username given')
+    return lambdaUtil.CreateErrorResponse(400, 'no username given');
   }
 
   const webId = event.pathParameters['webFormId']
@@ -172,7 +172,7 @@ exports.fetchWebFormInfo = async (event, context) => {
   try {
     return bankController.fetchWebFormInfo(authorization, username, webId)
   } catch (err) {
-    return lambdaUtil.handleException(err)
+    return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
 
@@ -183,18 +183,18 @@ exports.getAllowance = async (event, context) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
-    return lambdaUtil.createError(403, 'unauthorized')
+    return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
   }
 
   const username = event.headers['Username']
 
   if (!username) {
-    return lambdaUtil.createError(400, 'no username given')
+    return lambdaUtil.CreateErrorResponse(400, 'no username given');
   }
 
   try {
     return bankController.getAllowance(authorization, username)
   } catch (err) {
-    return lambdaUtil.handleException(err)
+    return lambdaUtil.CreateInternalErrorResponse(err)
   }
 }
