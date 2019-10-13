@@ -25,7 +25,7 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
           .then(token => lambdaUtil.authorizationHeader(token))
       } catch (err) {
         logger.log('error', 'error while authorizing against finapi', err)
-        return lambdaUtil.createError(401, 'could not obtain an authentication token: ' + err)
+        return lambdaUtil.createError(500, 'could not obtain an authentication token')
       }
 
       return finapi.listBanksByBLZ(authorization, blz)
@@ -54,7 +54,7 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
 
       const user = await users.findById(username)
       if (!user) {
-        logger.log('info', 'no user found for username ' + username)
+        logger.log('debug', 'no user found for username ' + username)
         return lambdaUtil.createError(404, 'user not found')
       }
 
@@ -62,7 +62,7 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
       try {
         webForm = await finapi.fetchWebForm(authorization, webId)
       } catch (err) {
-        logger.log('error', 'could not fetch web form with id ' + webid)
+        logger.log('error', 'could not fetch web form with id ' + webid, err)
         return lambdaUtil.createError(500, 'could not fetch web form')
       }
 
@@ -88,7 +88,7 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
       const user = await users.findById(username)
 
       if (!user) {
-        logger.log('info', 'no user found for username ' + username)
+        logger.log('debug', 'no user found for username ' + username)
         return lambdaUtil.createError(404, 'user not found')
       }
 
