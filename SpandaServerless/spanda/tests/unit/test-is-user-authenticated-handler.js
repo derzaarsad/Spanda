@@ -14,7 +14,7 @@ describe('isUserAuthenticated handler', function() {
   })
 
   it('verifies an authorized request', async function() {
-    const finapi = {
+    const bankInterface = {
       userInfo: async () => {
         return 'ok';
       },
@@ -26,7 +26,7 @@ describe('isUserAuthenticated handler', function() {
       }
     };
 
-    const result = await handler.isUserAuthenticated(event, {}, logger, finapi)
+    const result = await handler.isUserAuthenticated(event, {}, logger, bankInterface)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(200);
@@ -35,14 +35,14 @@ describe('isUserAuthenticated handler', function() {
   });
 
   it('rejects an unauthorized request', async function() {
-    const finapi = {
+    const bankInterface = {
       userInfo: async () => {
         return 'ok';
       },
     }
 
     const event = { headers: {} };
-    const result = await handler.isUserAuthenticated(event, {}, logger, finapi)
+    const result = await handler.isUserAuthenticated(event, {}, logger, bankInterface)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(403);

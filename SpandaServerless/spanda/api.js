@@ -22,7 +22,7 @@ const bankController = require('./controllers/bank-controller')
  */
 exports.isUserAuthenticated = async (event, context) => {
   try {
-    return authenticationController.isUserAuthenticated(event, context, logger, services.finapi)
+    return authenticationController.isUserAuthenticated(event, context, logger, services.bankInterface)
   } catch (err) {
     logger.log('error', 'error authorizing', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -32,7 +32,7 @@ exports.isUserAuthenticated = async (event, context) => {
 exports.registerUser = async (event, context) => {
   try {
     return authenticationController.registerUser(event, context, logger,
-      services.clientSecrets, services.authentication, services.finapi, services.users)
+      services.clientSecrets, services.authentication, services.bankInterface, services.users)
   } catch (err) {
     logger.log('error', 'error registering user', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -66,7 +66,7 @@ exports.updateRefreshToken = async (event, context) => {
 exports.getBankByBLZ = async (event, context) => {
   try {
     return bankController.getBankByBLZ(event, context, logger, services.clientSecrets,
-      services.authentication, services.finapi)
+      services.authentication, services.bankInterface)
   } catch (err) {
     logger.log('error', 'error listing banks', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -76,7 +76,7 @@ exports.getBankByBLZ = async (event, context) => {
 exports.getWebFormId = async (event, context) => {
   try {
     return bankController.getWebformId(event, context, logger, services.clientSecrets,
-      services.authentication, services.finapi)
+      services.authentication, services.bankInterface)
   } catch (err) {
     logger.log('error', 'error importing bank connection', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -86,7 +86,7 @@ exports.getWebFormId = async (event, context) => {
 exports.fetchWebFormInfo = async (event, context) => {
   try {
     return bankController.fetchWebFormInfo(event, context, logger, services.clientSecrets,
-      services.authentication, services.finapi, services.users, services.connections)
+      services.authentication, services.bankInterface, services.users, services.connections)
   } catch (err) {
     logger.log('error', 'error fetching webform id', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -96,7 +96,7 @@ exports.fetchWebFormInfo = async (event, context) => {
 exports.getAllowance = async (event, context) => {
   try {
     return bankController.getAllowance(event, context, logger, services.clientSecrets,
-      services.authentication, services.finapi, services.users)
+      services.authentication, services.bankInterface, services.users)
   } catch (err) {
     logger.log('error', 'error fetching fetching allowance', err)
     return lambdaUtil.CreateInternalErrorResponse(err)

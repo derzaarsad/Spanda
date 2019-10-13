@@ -4,14 +4,14 @@ const lambdaUtil = require('../lib/lambda-util.js');
 
 // @Get('/users')
 // @Header('Authorization') authorization: string
-exports.isUserAuthenticated = async(event, context, logger, finapi) => {
+exports.isUserAuthenticated = async(event, context, logger, bankInterface) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
     return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
   }
 
-  return finapi.userInfo(authorization).then(response => lambdaUtil.CreateResponse(200, response))
+  return bankInterface.userInfo(authorization).then(response => lambdaUtil.CreateResponse(200, response))
     .catch(err => {
       logger.log('error', 'error authenticating user', err)
       return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
@@ -24,7 +24,7 @@ exports.isUserAuthenticated = async(event, context, logger, finapi) => {
 // @BodyProp() email: string
 // @BodyProp() phone: string
 // @BodyProp() isAutoUpdateEnabled: boolean
-exports.registerUser = async(event, context, logger, clientSecrets, authentication, finapi, users) => {
+exports.registerUser = async(event, context, logger, clientSecrets, authentication, bankInterface, users) => {
   const user = event.body
   logger.log('debug', 'user: ' + user)
   // TODO check parameters
@@ -39,14 +39,14 @@ exports.registerUser = async(event, context, logger, clientSecrets, authenticati
     authorization = await authentication.getClientCredentialsToken(clientSecrets)
       .then(token => lambdaUtil.CreateAuthHeader(token))
   } catch (err) {
-    logger.log('error', 'error while authorizing against finapi', err)
+    logger.log('error', 'error while authorizing against bankInterface', err)
     return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token');
   }
 
   const newUser = users.new(user.id, user.email, user.phone, user.isAutoUpdateEnabled)
 
   try {
-    await finapi.registerUser(authorization, newUser)
+    await bankInterface.registerUser(authorization, newUser)
   } catch (err) {
     logger.log('error', 'could not register user', err)
     return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration');
