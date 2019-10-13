@@ -16,6 +16,7 @@ const lambdaHandlers = require('./lib/lambda-handlers')
 
 const services = lambdaHandlers.initializeFromEnvironmentObject(env)
 
+const logger = services.logger
 const authenticationController = services.authenticationController
 const bankController = services.bankController
 
@@ -48,7 +49,7 @@ exports.isUserAuthenticated = async (event, context) => {
 // @BodyProp() isAutoUpdateEnabled: boolean
 exports.registerUser = async (event, context) => {
   const user = event.body
-  logger('debug', 'user: ' + user)
+  logger.log('debug', 'user: ' + user)
   // TODO check parameters
 
   try {
@@ -63,7 +64,7 @@ exports.registerUser = async (event, context) => {
 // @BodyProp() password: string
 exports.authenticateAndSaveUser = async (event, context) => {
   const credentials = event.body
-  logger('debug', 'credentials: ' + credentials)
+  logger.log('debug', 'credentials: ' + credentials)
 
   try {
     return authenticationController.authenticateAndSave(credentials.username, credentials.password)
@@ -76,7 +77,7 @@ exports.authenticateAndSaveUser = async (event, context) => {
 // @BodyProp() refresh_token: string
 exports.updateRefreshToken = async (event, context) => {
   const body = event.body
-  logger('debug', 'body: ' + body)
+  logger.log('debug', 'body: ' + body)
 
   try {
     return authenticationController.updateRefreshToken(body.refreshToken)

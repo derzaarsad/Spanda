@@ -1,7 +1,8 @@
 'use strict'
 
 const initializeFromEnvironmentObject = env => {
-  console.log(env)
+  console.log('Configuring from environment:')
+  console.log(JSON.stringify(env))
 
   const axios = require('axios')
   const winston = require('winston')
