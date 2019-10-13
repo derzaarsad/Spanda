@@ -1,8 +1,8 @@
-'use strict'
+'use strict';
 
-const lambdaUtil = require('./lambda-util.js').default
+const lambdaUtil = require('./lambda-util.js');
 
-exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, users, connections) => {
+module.exports = (logger, clientSecrets, authentication, finapi, users, connections) => {
   const unauthorized = async (authorization) => {
     try {
       logger.log('info', 'authenticating user', { 'authorization': authorizaiton })
@@ -12,7 +12,7 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
       return null
     } catch (err) {
       logger.log('error', 'invalid token', { 'authorization': authorizaiton })
-      return lambdaUtil.createError(401, 'unauthorized')
+      return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
     }
   }
 
@@ -22,28 +22,28 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
 
       try {
         authorization = await authentication.getClientCredentialsToken(clientSecrets)
-          .then(token => lambdaUtil.authorizationHeader(token))
+          .then(token => lambdaUtil.CreateAuthHeader(token))
       } catch (err) {
         logger.log('error', 'error while authorizing against finapi', err)
-        return lambdaUtil.createError(500, 'could not obtain an authentication token')
+        return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token');
       }
 
       return finapi.listBanksByBLZ(authorization, blz)
-        .then(response => lambdaUtil.createResponse(200, response))
+        .then(response => lambdaUtil.CreateResponse(200, response))
         .catch(err => {
           // TODO distinguish unauthorized from other errors
           logger.log('error', 'error listing banks by BLZ', err)
-          return lambdaUtil.createError(500, 'could not list banks')
+          return lambdaUtil.CreateErrorResponse(500, 'could not list banks')
         })
     },
 
     getWebformId: async (authorization, bankId) => {
       return finapi.importConnection(authorization, bankId)
-        .then(response => lambdaUtil.createResponse(200, response))
+        .then(response => lambdaUtil.CreateResponse(200, response))
         .catch(err => {
           logger.log('error', 'error importing connection', err)
-          return lambdaUtil.createError(500, 'could not import connection')
-        })
+          return lambdaUtil.CreateErrorResponse(500, 'could not import connection')
+        });
     },
 
     fetchWebFormInfo: async (authorization, username, webId) => {
@@ -54,16 +54,16 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
 
       const user = await users.findById(username)
       if (!user) {
-        logger.log('debug', 'no user found for username ' + username)
-        return lambdaUtil.createError(404, 'user not found')
+        logger.log('info', 'no user found for username ' + username)
+        return lambdaUtil.CreateErrorResponse(404, 'user not found');
       }
 
       let webForm
       try {
         webForm = await finapi.fetchWebForm(authorization, webId)
       } catch (err) {
-        logger.log('error', 'could not fetch web form with id ' + webid, err)
-        return lambdaUtil.createError(500, 'could not fetch web form')
+        logger.log('error', 'could not fetch web form with id ' + webid)
+        return lambdaUtil.CreateErrorResponse(500, 'could not fetch web form');
       }
 
       const body = webForm.serviceResponseBody
@@ -88,11 +88,11 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
       const user = await users.findById(username)
 
       if (!user) {
-        logger.log('debug', 'no user found for username ' + username)
-        return lambdaUtil.createError(404, 'user not found')
+        logger.log('info', 'no user found for username ' + username)
+        return lambdaUtil.CreateErrorResponse(404, 'user not found');
       }
 
-      return lambdaUtil.createResponse(200, { 'allowance': user.allowance })
+      return lambdaUtil.CreateResponse(200, { 'allowance': user.allowance });
     }
   }
-}
+};

@@ -27,6 +27,6 @@ const auth = authentication.Basic(client)
 const finClient = finAPI.NewClient(client)
 
 auth.getClientCredentialsToken(secrets)
-  .then(credentials => util.authorizationHeader(credentials))
+  .then(credentials => util.CreateAuthHeader(credentials))
   .then(authorization => finClient.listBanksByBLZ(authorization, blz))
   .then(data => console.log(data))

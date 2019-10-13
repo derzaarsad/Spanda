@@ -1,29 +1,25 @@
-'use strict'
+'use strict';
 
-const util = require('./util')
+const util = require('./util');
 
-const createResponse = (status, body) => {
-  return { "statusCode": status, "headers": { "Content-Type": "application/json" }, "body": JSON.stringify(body) }
-}
+const CreateResponse = (status, body) => {
+  return { "statusCode": status, "headers": { "Content-Type": "application/json" }, "body": JSON.stringify(body) };
+};
 
-const createError = (status, message) => {
-  return createResponse(status, {
+const CreateErrorResponse = (status, message) => {
+  return CreateResponse(status, {
     "message": message
-  })
-}
+  });
+};
 
-const handleException = (err) => {
-  return createResponse(500, { "message": err })
-}
+exports.CreateInternalErrorResponse = (err) => {
+  return CreateErrorResponse(500, err);
+};
 
-const hasAuthorization = header => {
-  return header['authorization'] || header['Authorization']
-}
+exports.hasAuthorization = (header) => {
+  return header['authorization'] || header['Authorization'];
+};
 
-exports.default = {
-  'handleException': handleException,
-  'createResponse': createResponse,
-  'createError': createError,
-  'hasAuthorization': hasAuthorization,
-  'authorizationHeader': util.authorizationHeader
-}
+exports.CreateAuthHeader = util.CreateAuthHeader;
+exports.CreateResponse = CreateResponse;
+exports.CreateErrorResponse = CreateErrorResponse;

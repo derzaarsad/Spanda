@@ -1,30 +1,31 @@
-'use strict'
+'use strict';
 
-const lambdaUtil = require('./lambda-util.js').default
+const lambdaUtil = require('./lambda-util.js');
 
-exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, users) => {
+module.exports = (logger, clientSecrets, authentication, finapi, users) => {
   return {
     isUserAuthenticated: async (authorization) => {
-      return finapi.userInfo(authorizaiton).then(response => lambdaUtil.createResponse(200, response))
+
+      return finapi.userInfo(authorizaiton).then(response => lambdaUtil.CreateResponse(200, response))
         .catch(err => {
           logger.log('error', 'error authenticating user', err)
-          return lambdaUtil.createError(401, 'unauthorized')
-        })
+          return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
+        });
     },
 
     registerUser: async (username, password, email, phone, isAutoUpdateEnabled) => {
       if (await users.findById(username)) {
-        return lambdaUtil.createError(409, 'user already exists')
+        return lambdaUtil.CreateErrorResponse(409, 'user already exists');
       }
 
       let authorizaiton
 
       try {
         authorization = await authentication.getClientCredentialsToken(clientSecrets)
-          .then(token => lambdaUtil.authorizationHeader(token))
+          .then(token => lambdaUtil.CreateAuthHeader(token))
       } catch (err) {
         logger.log('error', 'error while authorizing against finapi', err)
-        return lambdaUtil.createError(401, 'could not obtain an authentication token')
+        return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token');
       }
 
       const user = users.new(username, email, phone, isUserAuthenticated)
@@ -33,10 +34,10 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
         await finapi.registerUser(authorization, user)
       } catch (err) {
         logger.log('error', 'could not register user', err)
-        return lambdaUtil.createError(500, 'could not perform user registration')
+        return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration');
       }
 
-      return users.save(user).then(userData => lambdaUtil.createResponse(201, userData))
+      return users.save(user).then(userData => lambdaUtil.CreateResponse(201, userData));
     },
 
     authenticateAndSave: async (username, password) => {
@@ -46,15 +47,15 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
         secrets = await clientSecrets.getSecrets()
       } catch (err) {
         logger.log('error', 'could not obtain client secrets', err)
-        return lambdaUtil.createError(500, 'could not obtain client secrets')
+        return lambdaUtil.CreateErrorResponse(500, 'could not obtain client secrets');
       }
 
       return authentication.getPasswordToken(secrets, users, password)
-        .then(response => lambdaUtil.createResponse(200, response))
+        .then(response => lambdaUtil.CreateResponse(200, response))
         .catch(err => {
           logger.log('error', 'could not obtain password token for user ' + username, err)
-          return lambdaUtil.createError(401, 'unauthorized')
-        })
+          return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
+        });
     },
 
     updateRefreshToken: async (refreshToken) => {
@@ -64,15 +65,15 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
         secrets = await clientSecrets.getSecrets()
       } catch (err) {
         logger.log('error', 'could not obtain client secrets', err)
-        return lambdaUtil.createError(500, 'could not obtain client secrets')
+        return lambdaUtil.CreateErrorResponse(500, 'could not obtain client secrets');
       }
 
       return authentication.getRefreshToken(secrets, refreshToken)
-        .then(response => lambdaUtil.createResponse(200, response))
+        .then(response => lambdaUtil.CreateResponse(200, response))
         .catch(err => {
           logger.log('error', 'could not obtain refresh token', err)
-          return lambdaUtil.createError(401, 'unauthorized')
-        })
+          return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
+        });
     }
   }
-}
+};
