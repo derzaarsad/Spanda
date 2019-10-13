@@ -4,7 +4,7 @@
   Initialize controllers with environment variables
 */
 module.exports = env => {
-  console.log('Configuring from environment:')
+  console.log('Configuring controllers from environment:')
   console.log(JSON.stringify(env))
 
   const axios = require('axios');
@@ -15,8 +15,8 @@ module.exports = env => {
   const FinAPI = require('./lib/finapi');
   const Users = require('./lib/users');
   const BankConnections = require('./lib/bank-connections');
-  const AuthenticationController = require('./lib/authentication-controller');
-  const BankController = require('./lib/bank-controller');
+  const AuthenticationController = require('./controllers/authentication-controller');
+  const BankController = require('./controllers/bank-controller');
 
   const logger = winston.createLogger({
     level: env['LOGGER_LEVEL'] || 'debug',
