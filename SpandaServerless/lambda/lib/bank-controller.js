@@ -6,6 +6,9 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
   const unauthorized = async (authorization) => {
     try {
       logger.log('info', 'authenticating user', { 'authorization': authorizaiton })
+      await finapi.userInfo(authorization)
+
+      // Return nothing on success.
       return null
     } catch (err) {
       logger.log('error', 'invalid token', { 'authorization': authorizaiton })
