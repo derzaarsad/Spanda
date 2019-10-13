@@ -17,7 +17,7 @@ Parameters:
 Globals:
   Function:
     Timeout: 45
-    CodeUri: lambda/
+    CodeUri: spanda/
     Runtime: nodejs10.x
     Environment:
       Variables:
