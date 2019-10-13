@@ -24,7 +24,7 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
           .then(token => lambdaUtil.authorizationHeader(token))
       } catch (err) {
         logger.log('error', 'error while authorizing against finapi', err)
-        return lambdaUtil.createError(401, 'could not obtain an authentication token: ' + err)
+        return lambdaUtil.createError(401, 'could not obtain an authentication token')
       }
 
       const user = users.new(username, email, phone, isUserAuthenticated)
@@ -33,7 +33,7 @@ exports.NewLambdaController = (logger, clientSecrets, authentication, finapi, us
         await finapi.registerUser(authorization, user)
       } catch (err) {
         logger.log('error', 'could not register user', err)
-        return lambdaUtil.createError(500, 'could not perform user registration' + err)
+        return lambdaUtil.createError(500, 'could not perform user registration')
       }
 
       return users.save(user).then(userData => lambdaUtil.createResponse(201, userData))
