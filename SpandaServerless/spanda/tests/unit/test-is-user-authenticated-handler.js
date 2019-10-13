@@ -1,14 +1,19 @@
 'use strict';
+/* eslint-env node, mocha */
 
 const chai = require('chai');
 const expect = chai.expect;
 
 const handler = require('../../controllers/authentication-controller');
 
-describe('isUserAuthenticated handler', function () {
-  const logger = require('winston');
+describe('isUserAuthenticated handler', function() {
+  let logger
 
-  it('verifies an authorized request', async () => {
+  beforeEach(function() {
+    logger = require('winston');
+  })
+
+  it('verifies an authorized request', async function() {
     const finapi = {
       userInfo: async () => {
         return 'ok';
@@ -29,7 +34,7 @@ describe('isUserAuthenticated handler', function () {
     expect(result.body).to.equal(JSON.stringify('ok'));
   });
 
-  it('rejects an unauthorized request', async () => {
+  it('rejects an unauthorized request', async function() {
     const finapi = {
       userInfo: async () => {
         return 'ok';
