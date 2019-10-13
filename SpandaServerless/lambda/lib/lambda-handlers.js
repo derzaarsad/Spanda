@@ -45,11 +45,6 @@ module.exports = env => {
 
   return {
     'logger': logger,
-    'finapi': finapi,
-    'clientSecrets': clientSecrets,
-    'authentication': authentication,
-    'connections': connections,
-    'users': users,
     'bankController': BankController(logger, clientSecrets, authentication, finapi, users, connections),
     'authenticationController': AuthenticationController(logger, clientSecrets, authentication, finapi, users)
   };
