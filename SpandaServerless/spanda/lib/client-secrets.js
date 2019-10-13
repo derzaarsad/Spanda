@@ -45,7 +45,8 @@ exports.FromSSM = (ssm, clientIdParam, clientSecretParam) => {
       } catch (err) {
         error = err
       } finally {
-        resolved = true
+        // note that the mutex should prevent race conditions
+        resolved = true // eslint-disable-line require-atomic-updates
       }
     }
   }

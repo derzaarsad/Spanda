@@ -18,7 +18,7 @@ const Basic = (http) => {
   }
 
   const passwordRequest = (clientSecrets, user, pass) => {
-    const formData = requestParams(secrets)
+    const formData = requestParams(clientSecrets)
     formData['grant_type'] = 'password'
     formData['username'] = user
     formData['password'] = pass
@@ -27,9 +27,9 @@ const Basic = (http) => {
   }
 
   const refresthTokenRequest = (clientSecrets, refreshToken) => {
-    const formData = requestParams(secrets)
+    const formData = requestParams(clientSecrets)
     formData['grant_type'] = 'refresh_token'
-    formData['refresh_token'] = refresthToken
+    formData['refresh_token'] = refreshToken
 
     return qs.stringify(formData)
   }
