@@ -3,8 +3,6 @@
 /*
  * Initialize controllers with environment variables
  */
-module.exports = env => {
-  console.log('Configuring from environment:')
 module.exports = (env,logger) => {
   console.log('Configuring controllers from environment:')
   console.log(JSON.stringify(env))
