@@ -9,12 +9,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Run Tests
       uses: actions/setup-node@v1
       with:
         node-version: 12.x
     - name: npm install and test
       run: |
+        cd SpandaServerless/spanda
         npm cit
       env:
         CI: true
