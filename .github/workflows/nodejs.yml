@@ -9,11 +9,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Run Tests
+    - name: Setup Node
       uses: actions/setup-node@v1
       with:
         node-version: 12.x
-    - name: npm install and test
+    - name: Run Tests
       run: |
         cd SpandaServerless/spanda
         npm cit
