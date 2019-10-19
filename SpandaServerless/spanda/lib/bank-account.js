@@ -76,7 +76,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
       }
 
       return new Promise((resolve, reject) => {
-        client.updateItem(params, function(err, bankAccount) {
+        client.updateItem(params, function(err) {
           if (err) {
             reject(err)
           } else {

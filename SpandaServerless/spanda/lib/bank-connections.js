@@ -4,7 +4,7 @@
 interface IBankConnection extends mongoose.Document {
     id: number;
     bankId: number;
-    bankAccounts: [number];
+    bankAccountIds: [number];
 }
 */
 
@@ -12,7 +12,7 @@ const createConnection = (id, bankId) => {
   return {
     'id': id,
     'bankId': bankId,
-    'bankAccounts': []
+    'bankAccountIds': []
   }
 }
 
@@ -38,7 +38,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
     return {
       id: data['id']['N'],
       bankId: data['bankId']['N'],
-      bankAccounts: data['bankAccounts']['NS']
+      bankAccountIds: data['bankAccountIds']['NS']
     }
   }
 
@@ -46,7 +46,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
     return {
       id: { 'N': bankConnection.id },
       bankId: { 'N': bankConnection.bankId },
-      bankAccounts: { 'NS': bankConnection.bankAccounts }
+      bankAccountIds: { 'NS': bankConnection.bankAccountIds }
     }
   }
 
@@ -64,7 +64,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
       }
 
       return new Promise((resolve, reject) => {
-        dynamodb.getItem(params, function(err, data) {
+        client.getItem(params, function(err, data) {
           if (err) {
             reject(err)
           } else {
@@ -82,7 +82,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
       }
 
       return new Promise((resolve, reject) => {
-        dynamodb.updateItem(params, function(err, data) {
+        client.updateItem(params, function(err) {
           if (err) {
             reject(err)
           } else {
