@@ -132,9 +132,6 @@ Outputs:
   SpandaAPI:
     Description: "API gateway endpoint URL for the stage"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
-  HelloWorldFunction:
+  IsUserAuthenticatedFunction:
     Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+    Value: !GetAtt IsUserAuthenticatedFunction.Arn

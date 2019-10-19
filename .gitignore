@@ -4,3 +4,4 @@
 *.aws
 SpandaServer/src/routes.ts
 SpandaServer/swagger.json
+*packaged.yaml
