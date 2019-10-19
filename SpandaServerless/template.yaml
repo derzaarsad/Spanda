@@ -14,6 +14,8 @@ Parameters:
     Description: The deployment stage
     Type: String
 
+# Globals is a section in your SAM template to define properties common to all your Serverless Function and APIs.
+# All the AWS::Serverless::Function and AWS::Serverless::Api resources will inherit the properties defined here.
 Globals:
   Function:
     Timeout: 45
