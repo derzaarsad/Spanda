@@ -1,6 +1,7 @@
 'use strict';
 
 const lambdaUtil = require('../lib/lambda-util.js');
+const blzPattern = /^\d{8}$/
 
 const unauthorized = async (logger, finapi, authorization) => {
   try {
@@ -22,7 +23,12 @@ exports.getBankByBLZ = async(event, context, logger, clientSecrets, authenticati
 
   // TODO: validate parameters
   if (!pathParams['blz']) {
-    return lambdaUtil.CreateErrorResponse(400, 'invalid BLZ');
+    return lambdaUtil.CreateErrorResponse(400, 'no BLZ given');
+  }
+
+  const blz = pathParams['blz']
+  if (!blzPattern.test(blz)) {
+    return lambdaUtil.CreateErrorResponse(400, 'invalid BLZ given');
   }
 
   let authorization
