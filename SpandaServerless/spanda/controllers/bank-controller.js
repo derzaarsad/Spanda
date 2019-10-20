@@ -114,7 +114,7 @@ exports.fetchWebFormInfo = async(event, context, logger, finapi, users, connecti
 
   user.bankConnectionIds.push(body.id)
 
-  // TODO: rollback
+  // TODO: rollback on failure
   return Promise.all([users.save(user), connections.save(bankConnection)])
     .then(() => lambdaUtil.CreateResponse(200, body))
     .catch(err => {
