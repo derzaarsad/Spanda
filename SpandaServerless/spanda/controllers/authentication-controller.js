@@ -83,7 +83,7 @@ exports.registerUser = async(event, context, logger, clientSecrets, authenticati
     return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration');
   }
 
-  return users.save(user).then(userData => lambdaUtil.CreateResponse(201, userData));
+  return users.save(newUser).then(userData => lambdaUtil.CreateResponse(201, userData));
 }
 
 // @Post('/oauth/login')

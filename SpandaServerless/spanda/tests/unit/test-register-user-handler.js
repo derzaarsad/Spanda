@@ -122,7 +122,7 @@ describe('register user handler', function() {
     expect(result.statusCode).to.equal(409);
   })
 
-  it('adds a new user', async function() {
+  it('adds a new user to the repository', async function() {
     const user = { 'id': 'chapu', 'password': 'secret', 'email': 'chapu@mischung.net', 'phone': '+66 66 6666', 'isAutoUpdateEnabled': true }
 
     const finapi = {
@@ -139,6 +139,10 @@ describe('register user handler', function() {
     const result = await controller.registerUser(event, context, logger, clientSecrets, authentication, finapi, users)
 
     expect(result).to.be.an('object');
-    expect(result.statusCode).to.equal(201);
+    expect(result.statusCode).to.equal(201, 'expected status code created');
+
+    const newUser = await users.findById('chapu')
+    expect(newUser, 'expected the user to have been persisted').to.be.ok
+    expect(newUser).to.be.an('object');
   })
 })
