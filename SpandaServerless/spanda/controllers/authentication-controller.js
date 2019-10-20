@@ -1,6 +1,8 @@
 'use strict';
 
 const lambdaUtil = require('../lib/lambda-util.js');
+const expectedPasswordCredentialProperties = ['username', 'password']
+const expectedRefreshTokenProperties = ['refresh_token']
 const expectedUserProperties = ['id', 'password', 'email', 'phone', 'isAutoUpdateEnabled']
 
 // pasted from emailregex.com
@@ -90,9 +92,15 @@ exports.registerUser = async(event, context, logger, clientSecrets, authenticati
 // @BodyProp() username: string,
 // @BodyProp() password: string
 exports.authenticateAndSave = (event, context, logger, clientSecrets, authentication) => {
-  const credentials = event.body
+  logger.log('debug', 'credentials: ' + event.body)
+
+  const credentials = JSON.parse(event.body)
+
   // TODO check parameters
-  logger.log('debug', 'credentials: ' + credentials)
+  const missingProperty = lambdaUtil.HasMissingProperty(credentials, expectedPasswordCredentialProperties)
+  if (missingProperty) {
+    return lambdaUtil.CreateErrorResponse(400, 'missing property: ' + missingProperty)
+  }
 
   const username = credentials.username;
   const password = credentials.password;
@@ -108,9 +116,15 @@ exports.authenticateAndSave = (event, context, logger, clientSecrets, authentica
 // @Post('/oauth/token')
 // @BodyProp() refresh_token: string
 exports.updateRefreshToken = (event, context, logger, clientSecrets, authentication) => {
-  const body = event.body
+  logger.log('debug', 'body: ' + event.body)
+
+  const body = JSON.parse(event.body)
+
   // TODO check parameters
-  logger.log('debug', 'body: ' + body)
+  const missingProperty = lambdaUtil.HasMissingProperty(body, expectedRefreshTokenProperties)
+  if (missingProperty) {
+    return lambdaUtil.CreateErrorResponse(400, 'missing property: ' + missingProperty)
+  }
 
   return authentication.getRefreshToken(clientSecrets, body['refresh_token'])
     .then(response => lambdaUtil.CreateResponse(200, response))
