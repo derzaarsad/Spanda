@@ -57,7 +57,9 @@ To deploy the application, use the `sam deploy` command.
 sam-app$ sam deploy \
     --template-file packaged.yaml \
     --stack-name sam-app \
-    --capabilities CAPABILITY_IAM
+    --capabilities CAPABILITY_IAM \
+    --region eu-central-1 \
+    --parameter-overrides FinAPIClientSecret=<CLIENT_SECRET> FinAPIClientId=<CLIENT_ID> Stage=dev
 ```
 
 After deployment is complete you can run the following command to retrieve the API Gateway Endpoint URL:
