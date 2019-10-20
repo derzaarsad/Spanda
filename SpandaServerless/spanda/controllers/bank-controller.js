@@ -36,7 +36,7 @@ exports.getBankByBLZ = async(event, context, logger, clientSecrets, authenticati
     authorization = await authentication.getClientCredentialsToken(clientSecrets)
       .then(token => lambdaUtil.CreateAuthHeader(token))
   } catch (err) {
-    logger.log('error', 'error while authorizing against finapi', err)
+    logger.log('error', 'error while authorizing against finapi', { 'cause': err })
     return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token');
   }
 
@@ -44,7 +44,7 @@ exports.getBankByBLZ = async(event, context, logger, clientSecrets, authenticati
     .then(response => lambdaUtil.CreateResponse(200, response))
     .catch(err => {
       // TODO distinguish unauthorized from other errors
-      logger.log('error', 'error listing banks by BLZ', err)
+      logger.log('error', 'error listing banks by BLZ', { 'cause': err })
       return lambdaUtil.CreateErrorResponse(500, 'could not list banks')
     })
 }
@@ -62,7 +62,7 @@ exports.getWebformId = async(event, context, logger, finapi) => {
   return finapi.importConnection(authorization, event.body.bankId)
     .then(response => lambdaUtil.CreateResponse(200, response))
     .catch(err => {
-      logger.log('error', 'error importing connection', err)
+      logger.log('error', 'error importing connection', { 'cause': err })
       return lambdaUtil.CreateErrorResponse(500, 'could not import connection')
     });
 }
@@ -118,7 +118,7 @@ exports.fetchWebFormInfo = async(event, context, logger, finapi, users, connecti
   return Promise.all([users.save(user), connections.save(bankConnection)])
     .then(() => lambdaUtil.CreateResponse(200, body))
     .catch(err => {
-      logger.log('error', 'error persisting bank connection data', err)
+      logger.log('error', 'error persisting bank connection data', { 'cause': err })
       lambdaUtil.CreateInternalErrorResponse('could not persist bank connection data')
     })
 }

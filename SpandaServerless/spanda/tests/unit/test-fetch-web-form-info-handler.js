@@ -7,9 +7,9 @@ const expect = chai.expect;
 const Users = require('../../lib/users');
 const BankConnections = require('../../lib/bank-connections');
 
-const handler = require('../../controllers/bank-controller');
+const controller = require('../../controllers/bank-controller');
 
-describe('fetchWebFormInfo controller', function() {
+describe('fetchWebFormInfo handler', function() {
   let logger
   let users
   let connections
@@ -34,7 +34,7 @@ describe('fetchWebFormInfo controller', function() {
       }
     }
 
-    const result = await handler.fetchWebFormInfo(event, context, logger, finapi, users, connections)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(403);
@@ -53,7 +53,7 @@ describe('fetchWebFormInfo controller', function() {
       }
     }
 
-    const result = await handler.fetchWebFormInfo(event, context, logger, finapi, users, connections)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
@@ -77,7 +77,7 @@ describe('fetchWebFormInfo controller', function() {
       }
     }
 
-    const result = await handler.fetchWebFormInfo(event, context, logger, finapi, users, connections)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(404);
@@ -113,7 +113,7 @@ describe('fetchWebFormInfo controller', function() {
       }
     }
 
-    const result = await handler.fetchWebFormInfo(event, context, logger, finapi, users, connections)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
     expect(result.statusCode).to.equal(200);
     expect(result).to.be.an('object');
 

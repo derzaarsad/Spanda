@@ -4,7 +4,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-const handler = require('../../controllers/authentication-controller');
+const controller = require('../../controllers/authentication-controller');
 
 describe('isUserAuthenticated handler', function() {
   let logger
@@ -26,7 +26,7 @@ describe('isUserAuthenticated handler', function() {
       }
     };
 
-    const result = await handler.isUserAuthenticated(event, {}, logger, finapi)
+    const result = await controller.isUserAuthenticated(event, {}, logger, finapi)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(200);
@@ -42,7 +42,7 @@ describe('isUserAuthenticated handler', function() {
     }
 
     const event = { headers: {} };
-    const result = await handler.isUserAuthenticated(event, {}, logger, finapi)
+    const result = await controller.isUserAuthenticated(event, {}, logger, finapi)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(403);

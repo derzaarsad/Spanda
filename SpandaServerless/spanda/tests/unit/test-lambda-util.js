@@ -6,8 +6,8 @@ const chai = require('chai');
 
 const expect = chai.expect;
 
-describe('Tests hasAuthorization', function() {
-  it('matches upcase', async function() {
+describe('lambda util', function() {
+  it('matches upcase in hasAuthorization', async function() {
     const expected = "bearer 5325626"
 
     const headers = {
@@ -19,7 +19,7 @@ describe('Tests hasAuthorization', function() {
     expect(result).to.equal(expected);
   });
 
-  it('matches lowercase', async function() {
+  it('matches lowercase in hasAuthorization', async function() {
     const expected = "bearer 5325626"
 
     const headers = {
@@ -31,7 +31,7 @@ describe('Tests hasAuthorization', function() {
     expect(result).to.equal(expected);
   });
 
-  it('return falsy when header does not contain authorization', async function() {
+  it('returns falsy when header does not contain authorization in hasAuthorization', async function() {
     const headers = {
       "Accept-Language": "en-US,en;q=0.8",
     };
@@ -40,4 +40,25 @@ describe('Tests hasAuthorization', function() {
 
     expect(result).not.to.be.ok;
   });
+
+  it('returns nothing when all properties given', async function() {
+    const body = {
+      'id': 'chapu',
+      'email': 'chapu@mischung.net',
+      'cred': 5000,
+      'rad': true
+    }
+
+    expect(lambdaUtil.HasMissingProperty(body, ['id', 'email', 'cred', 'rad'])).not.to.be.ok
+  })
+
+  it('returns the first missing property', async function() {
+    const body = {
+      'id': 'chapu',
+      'rad': true
+    }
+
+    expect(lambdaUtil.HasMissingProperty(body, ['id', 'email', 'cred', 'rad'])).to.equal('email')
+  })
 });
+
