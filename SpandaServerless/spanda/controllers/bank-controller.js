@@ -115,8 +115,8 @@ exports.fetchWebFormInfo = async(event, context, logger, clientSecrets, authenti
   return Promise.all([users.save(user), connections.save(bankConnection)])
     .then(() => lambdaUtil.createResponse(200, webForm))
     .catch(err => {
-      logger.log('error', 'error persisting user data', err)
-      lambdaUtil.createError(500, 'could not persist user data')
+      logger.log('error', 'error persisting bank connection data', err)
+      lambdaUtil.createError(500, 'could not persist bank connection data')
     })
 }
 
