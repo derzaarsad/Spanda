@@ -107,9 +107,9 @@ exports.fetchWebFormInfo = async(event, context, logger, clientSecrets, authenti
 
   const body = webForm.serviceResponseBody
   const bankConnection = connections.new(body.id, body.bankId)
-  bankConnection.bankAccounts = body.accountIds
+  bankConnection.bankAccountIds = body.accountIds
 
-  user.bankConnections.push(body.id)
+  user.bankConnectionIds.push(body.id)
 
   // TODO: rollback
   return Promise.all([users.save(user), connections.save(bankConnection)])
