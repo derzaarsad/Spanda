@@ -8,7 +8,7 @@ interface IUser extends mongoose.Document {
     email: string;
     phone: string;
     isAutoUpdateEnabled: boolean;
-    bankConnections: [number];
+    bankConnectionIds: [number];
 }
 */
 const createUser = (username, email, phone, isAutoUpdateEnabled) => {
@@ -19,7 +19,7 @@ const createUser = (username, email, phone, isAutoUpdateEnabled) => {
     'email': email,
     'phone': phone,
     'isAutoUpdateEnabled': isAutoUpdateEnabled,
-    'bankConnections': []
+    'bankConnectionIds': []
   }
 }
 
@@ -49,7 +49,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
       email: data['email']['S'],
       phone: data['phone']['S'],
       isAutoUpdateEnabled: data['isAutoUpdateEnabled']['B'],
-      bankConnections: data['bankConnections']['NS']
+      bankConnectionIds: data['bankConnectionIds']['NS']
     }
   }
 
@@ -61,7 +61,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
       email: { 'S': user.email },
       phone: { 'S': user.phone },
       isAutoUpdateEnabled: { 'B': user.isAutoUpdateEnabled },
-      bankConnections: { 'NS': user.bankConnections }
+      bankConnectionIds: { 'NS': user.bankConnectionIds }
     }
   }
 
@@ -79,7 +79,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
       }
 
       return new Promise((resolve, reject) => {
-        dynamodb.getItem(params, function(err, data) {
+        client.getItem(params, function(err, data) {
           if (err) {
             reject(err)
           } else {
@@ -97,7 +97,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
       }
 
       return new Promise((resolve, reject) => {
-        dynamodb.updateItem(params, function(err, data) {
+        client.updateItem(params, function(err) {
           if (err) {
             reject(err)
           } else {

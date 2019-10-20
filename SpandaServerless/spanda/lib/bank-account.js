@@ -26,12 +26,14 @@ exports.NewInMemoryRepository = () => {
 }
 
 exports.NewDynamoDbRepository = (client, tableName) => {
-  const decodeBankAccount = data = {
-    id: data['id']['N'],
-    bankConnectionId: data['bankConnectionId']['N'],
-    accountName: data['accountName']['S'],
-    iban: data['iban']['S'],
-    accountCurrency: data['accountCurrency']['S']
+  const decodeBankAccount = data => {
+    return {
+      id: data['id']['N'],
+      bankConnectionId: data['bankConnectionId']['N'],
+      accountName: data['accountName']['S'],
+      iban: data['iban']['S'],
+      accountCurrency: data['accountCurrency']['S']
+    }
   }
 
   const encodeBankAccount = bankAccount => {
@@ -56,7 +58,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
       }
 
       return new Promise((resolve, reject) => {
-        dynamodb.getItem(params, function(err, data) {
+        client.getItem(params, function(err, data) {
           if (err) {
             reject(err)
           } else {
@@ -74,7 +76,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
       }
 
       return new Promise((resolve, reject) => {
-        dynamodb.updateItem(params, function(err, data) {
+        client.updateItem(params, function(err) {
           if (err) {
             reject(err)
           } else {

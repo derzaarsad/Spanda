@@ -75,8 +75,8 @@ exports.getBankByBLZ = async (event, context) => {
 
 exports.getWebFormId = async (event, context) => {
   try {
-    return bankController.getWebformId(event, context, logger, services.clientSecrets,
-      services.authentication, services.bankInterface)
+    return bankController.getWebformId(event, context, services.logger,
+      services.bankInterface)
   } catch (err) {
     logger.log('error', 'error importing bank connection', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -85,8 +85,8 @@ exports.getWebFormId = async (event, context) => {
 
 exports.fetchWebFormInfo = async (event, context) => {
   try {
-    return bankController.fetchWebFormInfo(event, context, logger, services.clientSecrets,
-      services.authentication, services.bankInterface, services.users, services.connections)
+    return bankController.fetchWebFormInfo(event, context, services.logger,
+      services.bankInterface, services.users, services.connections)
   } catch (err) {
     logger.log('error', 'error fetching webform id', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -95,8 +95,8 @@ exports.fetchWebFormInfo = async (event, context) => {
 
 exports.getAllowance = async (event, context) => {
   try {
-    return bankController.getAllowance(event, context, logger, services.clientSecrets,
-      services.authentication, services.bankInterface, services.users)
+    return bankController.getAllowance(event, context, services.logger,
+      services.bankInterface, services.users)
   } catch (err) {
     logger.log('error', 'error fetching fetching allowance', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
