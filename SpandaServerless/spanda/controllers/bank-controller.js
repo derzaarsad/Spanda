@@ -3,10 +3,10 @@
 const lambdaUtil = require('../lib/lambda-util.js');
 const blzPattern = /^\d{8}$/
 
-const unauthorized = async (logger, finapi, authorization) => {
+const unauthorized = async (logger, bankInterface, authorization) => {
   try {
     logger.log('info', 'authenticating user', { 'authorization': authorization })
-    await finapi.userInfo(authorization)
+    await bankInterface.userInfo(authorization)
 
     // Return nothing on success.
     return null
@@ -18,7 +18,7 @@ const unauthorized = async (logger, finapi, authorization) => {
 
 // @Get('/banks/{blz}')
 // @Param('blz') blz
-exports.getBankByBLZ = async(event, context, logger, clientSecrets, authentication, finapi) => {
+exports.getBankByBLZ = async(event, context, logger, clientSecrets, authentication, bankInterface) => {
   const pathParams = event.pathParameters
 
   if (!pathParams['blz']) {
@@ -36,11 +36,11 @@ exports.getBankByBLZ = async(event, context, logger, clientSecrets, authenticati
     authorization = await authentication.getClientCredentialsToken(clientSecrets)
       .then(token => lambdaUtil.CreateAuthHeader(token))
   } catch (err) {
-    logger.log('error', 'error while authorizing against finapi', { 'cause': err })
+    logger.log('error', 'error while authorizing against bank interface', { 'cause': err })
     return lambdaUtil.CreateErrorResponse(401, 'could not obtain an authentication token');
   }
 
-  return finapi.listBanksByBLZ(authorization, pathParams['blz'])
+  return bankInterface.listBanksByBLZ(authorization, pathParams['blz'])
     .then(response => lambdaUtil.CreateResponse(200, response))
     .catch(err => {
       // TODO distinguish unauthorized from other errors
@@ -52,14 +52,14 @@ exports.getBankByBLZ = async(event, context, logger, clientSecrets, authenticati
 // @Post('/bankConnections/import')
 // @Header('Authorization') authorization: string,
 // @BodyProp() bankId: number)
-exports.getWebformId = async(event, context, logger, finapi) => {
+exports.getWebformId = async(event, context, logger, bankInterface) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
     return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
   }
 
-  return finapi.importConnection(authorization, event.body.bankId)
+  return bankInterface.importConnection(authorization, event.body.bankId)
     .then(response => lambdaUtil.CreateResponse(200, response))
     .catch(err => {
       logger.log('error', 'error importing connection', { 'cause': err })
@@ -71,7 +71,7 @@ exports.getWebformId = async(event, context, logger, finapi) => {
 // @Param('webId') webId
 // @Header('Username') username
 // @Header('Authorization') authorization: string
-exports.fetchWebFormInfo = async(event, context, logger, finapi, users, connections) => {
+exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, connections) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
@@ -89,7 +89,7 @@ exports.fetchWebFormInfo = async(event, context, logger, finapi, users, connecti
     return lambdaUtil.CreateErrorResponse(400, 'no username given');
   }
 
-  const error = await unauthorized(logger, finapi, authorization)
+  const error = await unauthorized(logger, bankInterface, authorization)
   if (error) {
     return error
   }
@@ -102,7 +102,7 @@ exports.fetchWebFormInfo = async(event, context, logger, finapi, users, connecti
 
   let webForm
   try {
-    webForm = await finapi.fetchWebForm(authorization, webId)
+    webForm = await bankInterface.fetchWebForm(authorization, webId)
   } catch (err) {
     logger.log('error', 'could not fetch web form with id ' + webId)
     return lambdaUtil.CreateInternalErrorResponse('could not fetch web form');
@@ -126,7 +126,7 @@ exports.fetchWebFormInfo = async(event, context, logger, finapi, users, connecti
 // @Get('/allowance')
 // @Header('Username') username
 // @Header('Authorization') authorization: string
-exports.getAllowance = async(event, context, logger, finapi, users) => {
+exports.getAllowance = async(event, context, logger, bankInterface, users) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
@@ -139,7 +139,7 @@ exports.getAllowance = async(event, context, logger, finapi, users) => {
     return lambdaUtil.CreateErrorResponse(400, 'no username given');
   }
 
-  const error = await unauthorized(logger, finapi, authorization)
+  const error = await unauthorized(logger, bankInterface, authorization)
   if (error) {
     return error
   }

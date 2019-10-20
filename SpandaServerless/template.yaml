@@ -14,11 +14,11 @@ Parameters:
     Description: The deployment stage
     Type: String
 
+# Globals is a section in your SAM template to define properties common to all your Serverless Function and APIs.
+# All the AWS::Serverless::Function and AWS::Serverless::Api resources will inherit the properties defined here.
 Globals:
   Function:
     Timeout: 45
-    CodeUri: spanda/
-    Runtime: nodejs10.x
     Environment:
       Variables:
         LOGGER_LEVEL: "debug"
@@ -31,7 +31,9 @@ Resources:
   IsUserAuthenticatedFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.isUserAuthenticated
+      Runtime: nodejs10.x
       Events:
         GetAuthorization:
           Type: Api
@@ -41,7 +43,26 @@ Resources:
   RegisterUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.registerUser
+      Runtime: nodejs10.x
+      Policies:
+        - AWSLambdaBasicExecutionRole # Managed Policy
+        - Version: '2012-10-17' # Policy Document
+          Statement:
+            - Effect: Allow
+              Action:
+                - ec2:CreateNetworkInterface
+                - ec2:DescribeNetworkInterfaces
+                - ec2:DeleteNetworkInterface
+              Resource: '*'
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-0d4fd718b2a6a5377
+        SubnetIds:
+          - subnet-5a064f17
+          - subnet-a1c2b9dc
+          - subnet-e0dcd08b
       Events:
         PostCredentials:
           Type: Api
@@ -51,7 +72,9 @@ Resources:
   AuthenticateAndSaveUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.authenticateAndSaveUser
+      Runtime: nodejs10.x
       Events:
         PostLogin:
           Type: Api
@@ -61,7 +84,9 @@ Resources:
   UpdateRefreshTokenFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.updateRefreshToken
+      Runtime: nodejs10.x
       Events:
         PostRefreshToken:
           Type: Api
@@ -71,7 +96,9 @@ Resources:
   GetBankByBLZFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.getBankByBLZ
+      Runtime: nodejs10.x
       Events:
         GetBankByBLZ:
           Type: Api
@@ -81,7 +108,9 @@ Resources:
   GetWebFormIdFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.getWebFormId
+      Runtime: nodejs10.x
       Events:
         PostBankId:
           Type: Api
@@ -91,7 +120,9 @@ Resources:
   FetchWebFormInfoFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.getWebFormInfo
+      Runtime: nodejs10.x
       Events:
         GetWebFormId:
           Type: Api
@@ -101,7 +132,9 @@ Resources:
   GetAllowanceFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: spanda/
       Handler: api.getAllowance
+      Runtime: nodejs10.x
       Events:
         GetAllowance:
           Type: Api
@@ -116,9 +149,6 @@ Outputs:
   SpandaAPI:
     Description: "API gateway endpoint URL for the stage"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
-  HelloWorldFunction:
+  IsUserAuthenticatedFunction:
     Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+    Value: !GetAtt IsUserAuthenticatedFunction.Arn

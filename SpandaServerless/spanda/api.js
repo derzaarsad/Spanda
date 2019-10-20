@@ -12,7 +12,7 @@
 const env = process.env;
 const lambdaUtil = require('./lib/lambda-util');
 const logger = require('./CreateLogger')(env)
-const services = require('./ControllerProvider')(env, logger)
+const services = require('./ServiceProvider')(env)
 const authenticationController = require('./controllers/authentication-controller')
 const bankController = require('./controllers/bank-controller')
 
@@ -22,7 +22,7 @@ const bankController = require('./controllers/bank-controller')
  */
 exports.isUserAuthenticated = async (event, context) => {
   try {
-    return authenticationController.isUserAuthenticated(event, context, services.logger, services.finapi)
+    return authenticationController.isUserAuthenticated(event, context, logger, services.bankInterface)
   } catch (err) {
     logger.log('error', 'error authorizing', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -31,8 +31,8 @@ exports.isUserAuthenticated = async (event, context) => {
 
 exports.registerUser = async (event, context) => {
   try {
-    return authenticationController.registerUser(event, context, services.logger,
-      services.clientSecrets, services.authentication, services.finapi, services.users)
+    return authenticationController.registerUser(event, context, logger,
+      services.clientSecrets, services.authentication, services.bankInterface, services.users)
   } catch (err) {
     logger.log('error', 'error registering user', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -41,7 +41,7 @@ exports.registerUser = async (event, context) => {
 
 exports.authenticateAndSaveUser = async (event, context) => {
   try {
-    return authenticationController.authenticateAndSave(event, context, services.logger,
+    return authenticationController.authenticateAndSave(event, context, logger,
       services.clientSecrets, services.authentication)
   } catch (err) {
     logger.log('error', 'error logging in user', err)
@@ -51,7 +51,7 @@ exports.authenticateAndSaveUser = async (event, context) => {
 
 exports.updateRefreshToken = async (event, context) => {
   try {
-    return authenticationController.updateRefreshToken(event, context, services.logger,
+    return authenticationController.updateRefreshToken(event, context, logger,
       services.clientSecret, services.authentication)
   } catch (err) {
     logger.log('error', 'error refreshing token', err)
@@ -65,8 +65,8 @@ exports.updateRefreshToken = async (event, context) => {
  */
 exports.getBankByBLZ = async (event, context) => {
   try {
-    return bankController.getBankByBLZ(event, context, services.logger, services.clientSecrets,
-      services.authentication, services.finapi)
+    return bankController.getBankByBLZ(event, context, logger, services.clientSecrets,
+      services.authentication, services.bankInterface)
   } catch (err) {
     logger.log('error', 'error listing banks', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -76,7 +76,7 @@ exports.getBankByBLZ = async (event, context) => {
 exports.getWebFormId = async (event, context) => {
   try {
     return bankController.getWebformId(event, context, services.logger,
-      services.finapi)
+      services.bankInterface)
   } catch (err) {
     logger.log('error', 'error importing bank connection', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -86,7 +86,7 @@ exports.getWebFormId = async (event, context) => {
 exports.fetchWebFormInfo = async (event, context) => {
   try {
     return bankController.fetchWebFormInfo(event, context, services.logger,
-      services.finapi, services.users, services.connections)
+      services.bankInterface, services.users, services.connections)
   } catch (err) {
     logger.log('error', 'error fetching webform id', err)
     return lambdaUtil.CreateInternalErrorResponse(err)
@@ -96,7 +96,7 @@ exports.fetchWebFormInfo = async (event, context) => {
 exports.getAllowance = async (event, context) => {
   try {
     return bankController.getAllowance(event, context, services.logger,
-      services.finapi, services.users)
+      services.bankInterface, services.users)
   } catch (err) {
     logger.log('error', 'error fetching fetching allowance', err)
     return lambdaUtil.CreateInternalErrorResponse(err)

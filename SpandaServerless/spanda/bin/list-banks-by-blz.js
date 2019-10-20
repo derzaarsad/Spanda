@@ -5,7 +5,7 @@ const util = require('../lib/util')
 
 const clientSecrets = require('../lib/client-secrets')
 const authentication = require('../lib/authentication')
-const finAPI = require('../lib/finapi')
+const bankInterface = require('../lib/bankInterface')
 
 const args = process.argv
 const clientId = args[2]
@@ -24,7 +24,7 @@ const client = axios.create({
 const secrets = clientSecrets.Resolved(clientId, clientSecret)
 const auth = authentication.Basic(client)
 
-const finClient = finAPI.NewClient(client)
+const finClient = bankInterface(client)
 
 auth.getClientCredentialsToken(secrets)
   .then(credentials => util.CreateAuthHeader(credentials))

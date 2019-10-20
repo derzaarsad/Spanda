@@ -13,7 +13,7 @@ The source code includes the following files and folders.
 
 - api.js - Define the lambda interfaces and integrate information from environment variables.
 - controllers - Implementations of functions used for lambda.
-- ControllerProvider.js - Interface between api.js and the controllers.
+- ServiceProvider.js - Provide services needed for the controllers.
 - lib - Contains modules used for implementations.
 
 If you prefer to use an integrated development environment (IDE) to build and test your application, you can use the AWS Toolkit.
@@ -57,7 +57,9 @@ To deploy the application, use the `sam deploy` command.
 sam-app$ sam deploy \
     --template-file packaged.yaml \
     --stack-name sam-app \
-    --capabilities CAPABILITY_IAM
+    --capabilities CAPABILITY_IAM \
+    --region eu-central-1 \
+    --parameter-overrides FinAPIClientSecret=<CLIENT_SECRET> FinAPIClientId=<CLIENT_ID> Stage=dev
 ```
 
 After deployment is complete you can run the following command to retrieve the API Gateway Endpoint URL:

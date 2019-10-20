@@ -3,7 +3,7 @@
 /*
  * Initialize controllers with environment variables
  */
-module.exports = (env, logger) => {
+module.exports = (env) => {
   console.log('Configuring controllers from environment:')
   console.log(JSON.stringify(env))
 
@@ -11,7 +11,7 @@ module.exports = (env, logger) => {
 
   const ClientSecrets = require('./lib/client-secrets');
   const Authentication = require('./lib/authentication');
-  const FinAPI = require('./lib/finapi');
+  
   const Users = require('./lib/users');
   const BankConnections = require('./lib/bank-connections');
 
@@ -24,7 +24,6 @@ module.exports = (env, logger) => {
     headers: { 'Accept': 'application/json' },
   });
 
-  const finapi = FinAPI.NewClient(httpClient);
   const authentication = Authentication.Basic(httpClient);
 
   const clientSecrets = ClientSecrets.Resolved(env['FINAPI_CLIENT_ID'], env['FINAPI_CLIENT_SECRET']);
@@ -33,10 +32,9 @@ module.exports = (env, logger) => {
   const connections = BankConnections.NewInMemoryRepository();
 
   return {
-    'logger': logger,
     'clientSecrets': clientSecrets,
     'authentication': authentication,
-    'finapi': finapi,
+    'bankInterface': require('./lib/bankInterface')(httpClient),
     'users': users,
     'connections': connections
   };
