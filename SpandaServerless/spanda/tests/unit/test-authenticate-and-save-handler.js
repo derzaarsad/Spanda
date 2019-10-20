@@ -43,7 +43,7 @@ describe('register and save user handler', function() {
 
   it('rejects requests with failing authentication', async function() {
     const event = {
-      body: JSON.stringify({'username': 'user', 'password': 'secret'})
+      body: {'username': 'user', 'password': 'secret'}
     }
 
     const failingAuthentication = {
