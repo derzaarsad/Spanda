@@ -32,7 +32,7 @@ describe('register and save user handler', function() {
 
   it('rejects requests with missing parameters', async function() {
     const event = {
-      body: JSON.stringify({'password': 'secret'})
+      body: {'password': 'secret'}
     }
 
     const result = await controller.authenticateAndSave(event, context, logger, clientSecrets, authentication)
@@ -60,7 +60,7 @@ describe('register and save user handler', function() {
 
   it('obtains a password token', async function() {
     const event = {
-      body: JSON.stringify({'username': 'user', 'password': 'secret'})
+      body: {'username': 'user', 'password': 'secret'}
     }
 
     const result = await controller.authenticateAndSave(event, context, logger, clientSecrets, authentication)
