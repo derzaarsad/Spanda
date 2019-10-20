@@ -21,7 +21,6 @@ const unauthorized = async (logger, finapi, authorization) => {
 exports.getBankByBLZ = async(event, context, logger, clientSecrets, authentication, finapi) => {
   const pathParams = event.pathParameters
 
-  // TODO: validate parameters
   if (!pathParams['blz']) {
     return lambdaUtil.CreateErrorResponse(400, 'no BLZ given');
   }
@@ -53,7 +52,7 @@ exports.getBankByBLZ = async(event, context, logger, clientSecrets, authenticati
 // @Post('/bankConnections/import')
 // @Header('Authorization') authorization: string,
 // @BodyProp() bankId: number)
-exports.getWebformId = async(event, context, logger, clientSecrets, authentication, finapi) => {
+exports.getWebformId = async(event, context, logger, finapi) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
@@ -68,15 +67,20 @@ exports.getWebformId = async(event, context, logger, clientSecrets, authenticati
     });
 }
 
-// @Get('/webForms/{webId}')
+// @Get('/webForms/{webFormId}')
 // @Param('webId') webId
 // @Header('Username') username
 // @Header('Authorization') authorization: string
-exports.fetchWebFormInfo = async(event, context, logger, clientSecrets, authentication, finapi, users, connections) => {
+exports.fetchWebFormInfo = async(event, context, logger, finapi, users, connections) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
     return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
+  }
+
+  const webId = event.pathParameters['webFormId']
+  if (!webId) {
+    return lambdaUtil.CreateErrorResponse(400, 'no webform id given');
   }
 
   const username = event.headers['Username']
@@ -96,13 +100,12 @@ exports.fetchWebFormInfo = async(event, context, logger, clientSecrets, authenti
     return lambdaUtil.CreateErrorResponse(404, 'user not found');
   }
 
-  const webId = event.pathParameters['webFormId']
   let webForm
   try {
     webForm = await finapi.fetchWebForm(authorization, webId)
   } catch (err) {
     logger.log('error', 'could not fetch web form with id ' + webId)
-    return lambdaUtil.CreateErrorResponse(500, 'could not fetch web form');
+    return lambdaUtil.CreateInternalErrorResponse('could not fetch web form');
   }
 
   const body = webForm.serviceResponseBody
@@ -113,17 +116,17 @@ exports.fetchWebFormInfo = async(event, context, logger, clientSecrets, authenti
 
   // TODO: rollback
   return Promise.all([users.save(user), connections.save(bankConnection)])
-    .then(() => lambdaUtil.createResponse(200, webForm))
+    .then(() => lambdaUtil.CreateResponse(200, body))
     .catch(err => {
       logger.log('error', 'error persisting bank connection data', err)
-      lambdaUtil.createError(500, 'could not persist bank connection data')
+      lambdaUtil.CreateInternalErrorResponse('could not persist bank connection data')
     })
 }
 
 // @Get('/allowance')
 // @Header('Username') username
 // @Header('Authorization') authorization: string
-exports.getAllowance = async(event, context, logger, clientSecrets, authentication, finapi, users) => {
+exports.getAllowance = async(event, context, logger, finapi, users) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
