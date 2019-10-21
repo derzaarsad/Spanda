@@ -94,7 +94,7 @@ exports.registerUser = async(event, context, logger, clientSecrets, authenticati
 exports.authenticateAndSave = (event, context, logger, clientSecrets, authentication) => {
   logger.log('debug', 'credentials: ' + event.body)
 
-  const credentials = event.body
+  const credentials = JSON.parse(event.body);
 
   // TODO check parameters
   const missingProperty = lambdaUtil.HasMissingProperty(credentials, expectedPasswordCredentialProperties)
