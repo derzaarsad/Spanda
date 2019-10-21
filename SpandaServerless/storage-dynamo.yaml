@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "UsersTable"
+      BillingMode: "PAY_PER_REQUEST"
+      AttributeDefinitions:
+        -
+          AttributeName: "username"
+          AttributeType: "S"
+        -
+          AttributeName: "email"
+          AttributeType: "S"
+        -
+          AttributeName: "phone"
+          AttributeType: "S"
+        -
+          AttributeName: "allowance"
+          AttributeType: "N"
+        -
+          AttributeName: "isAllowanceReady"
+          AttributeType: "B"
+        -
+          AttributeName: "isAutoUpdateEnabled"
+          AttributeType: "B"
+        -
+          AttributeName: "bankConnectionIds"
+          AttributeType: "NS"
+      KeySchema:
+        -
+          AttributeName: "username"
+          KeyType: "HASH"
+  BankConnectionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "BankConnections"
+      BillingMode: "PAY_PER_REQUEST"
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "N"
+        -
+          AttributeName: "bankId"
+          AttributeType: "N"
+        -
+          AttributeName: "bankAccountIds"
+          AttributeType: "NS"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+  BankAccountsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "BankAccounts"
+      BillingMode: "PAY_PER_REQUEST"
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "N"
+        -
+          AttributeName: "bankAccountId"
+          AttributeType: "N"
+        -
+          AttributeName: "accountName"
+          AttributeType: "S"
+        -
+          AttributeName: "iban"
+          AttributeType: "S"
+        -
+          AttributeName: "accountCurrency"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+Outputs:
+  UsersTableName:
+    Description: The name of the users table
+    Value: !Ref UsersTable
+  BankConnectionsTableName:
+    Description: The name of the bank connections table
+    Value: !Ref BankConnectionsTable
+  BankAccountsTableName:
+    Description: The name of the bank accounts table
+    Value: !Ref BankAccountsTable
