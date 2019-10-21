@@ -3,17 +3,9 @@
 const lambdaUtil = require('../lib/lambda-util.js');
 const blzPattern = /^\d{8}$/
 
-const unauthorized = async (logger, bankInterface, authorization) => {
-  try {
-    logger.log('info', 'authenticating user', { 'authorization': authorization })
-    await bankInterface.userInfo(authorization)
-
-    // Return nothing on success.
-    return null
-  } catch (err) {
-    logger.log('error', 'invalid token', { 'authorization': authorization })
-    return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
-  }
+const getUserInfo = async (logger, bankInterface, authorization) => {
+  logger.log('info', 'authenticating user', { 'authorization': authorization })
+  return bankInterface.userInfo(authorization)
 }
 
 // @Get('/banks/{blz}')
@@ -69,7 +61,6 @@ exports.getWebformId = async(event, context, logger, bankInterface) => {
 
 // @Get('/webForms/{webFormId}')
 // @Param('webId') webId
-// @Header('Username') username
 // @Header('Authorization') authorization: string
 exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, connections) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
@@ -83,17 +74,15 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
     return lambdaUtil.CreateErrorResponse(400, 'no webform id given');
   }
 
-  const username = event.headers['Username']
-
-  if (!username) {
-    return lambdaUtil.CreateErrorResponse(400, 'no username given');
+  let userInfo
+  try {
+    userInfo = await getUserInfo(logger, bankInterface, authorization)
+  } catch(error) {
+    logger.log('error', 'invalid token', { 'authorization': authorization })
+    return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
   }
 
-  const error = await unauthorized(logger, bankInterface, authorization)
-  if (error) {
-    return error
-  }
-
+  const username = userInfo.id
   const user = await users.findById(username)
   if (!user) {
     logger.log('info', 'no user found for username ' + username)
@@ -124,7 +113,6 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
 }
 
 // @Get('/allowance')
-// @Header('Username') username
 // @Header('Authorization') authorization: string
 exports.getAllowance = async(event, context, logger, bankInterface, users) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
@@ -133,17 +121,15 @@ exports.getAllowance = async(event, context, logger, bankInterface, users) => {
     return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
   }
 
-  const username = event.headers['Username']
-
-  if (!username) {
-    return lambdaUtil.CreateErrorResponse(400, 'no username given');
+  let userInfo
+  try {
+    userInfo = await getUserInfo(logger, bankInterface, authorization)
+  } catch (error) {
+    logger.log('error', 'invalid token', { 'authorization': authorization })
+    return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
   }
 
-  const error = await unauthorized(logger, bankInterface, authorization)
-  if (error) {
-    return error
-  }
-
+  const username = userInfo.id
   const user = await users.findById(username)
 
   if (!user) {

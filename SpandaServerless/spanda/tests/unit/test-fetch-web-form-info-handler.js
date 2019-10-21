@@ -30,7 +30,25 @@ describe('fetch webform info handler', function() {
 
     const event = {
       'headers': {
-        'Username': 'chapu'
+      }
+    }
+
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
+
+    expect(result).to.be.an('object');
+    expect(result.statusCode).to.equal(401);
+    expect(JSON.parse(result.body).message).to.include('unauthorized');
+  })
+
+  it('rejects a request with wrong authorization', async function() {
+    const finapi = {
+      userInfo: async () => {
+        throw 'nada'
+      }
+    }
+
+    const event = {
+      'headers': {
       }
     }
 
@@ -46,7 +64,6 @@ describe('fetch webform info handler', function() {
 
     const event = {
       'headers': {
-        'Username': 'chapu',
         'Authorization': 'authorized'
       },
       'pathParameters': {
@@ -63,13 +80,12 @@ describe('fetch webform info handler', function() {
   it('rejects a request referring to a missing user', async function() {
     const finapi = {
       userInfo: async () => {
-        return { 'ok': true }
+        return { 'id': 'chapu' }
       }
     }
 
     const event = {
       'headers': {
-        'Username': 'chapu',
         'Authorization': 'authorized'
       },
       'pathParameters': {
@@ -89,7 +105,7 @@ describe('fetch webform info handler', function() {
 
     const finapi = {
       userInfo: async () => {
-        return { 'ok': true }
+        return { 'id': 'chapu' }
       },
 
       fetchWebForm: async () => {
@@ -105,7 +121,6 @@ describe('fetch webform info handler', function() {
 
     const event = {
       'headers': {
-        'Username': 'chapu',
         'Authorization': 'authorized'
       },
       'pathParameters': {
