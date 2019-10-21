@@ -54,8 +54,9 @@ export class AuthenticationService {
 
     setNewRefreshAndAccessToken() : Promise<boolean> {
 
-        let headerOptions = new HttpHeaders();
-        headerOptions.append('Content-Type', 'application/x-www-form-urlencoded');
+        let headerOptions = new HttpHeaders({
+            "Content-Type": "application/json"
+        });
 
         return this.http.post(environment.backendUrl + "/oauth/token", { refresh_token: this.storedUser.UserToken.RefreshToken }, { headers: headerOptions }).toPromise()
         .then(res => {
