@@ -118,7 +118,7 @@ exports.authenticateAndSave = (event, context, logger, clientSecrets, authentica
 exports.updateRefreshToken = (event, context, logger, clientSecrets, authentication) => {
   logger.log('debug', 'body: ' + event.body)
 
-  const body = event.body
+  const body = JSON.parse(event.body);
 
   // TODO check parameters
   const missingProperty = lambdaUtil.HasMissingProperty(body, expectedRefreshTokenProperties)
