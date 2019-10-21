@@ -32,7 +32,7 @@ describe('get refresh token handler', function() {
 
   it('rejects requests with missing parameters', async function() {
     const event = {
-      body: {}
+      body: JSON.stringify({})
     }
 
     const result = await controller.updateRefreshToken(event, context, logger, clientSecrets, authentication)
@@ -43,7 +43,7 @@ describe('get refresh token handler', function() {
 
   it('rejects requests with failing authentication', async function() {
     const event = {
-      body: {'refresh_token': 'secret'}
+      body: JSON.stringify({'refresh_token': 'secret'})
     }
 
     const failingAuthentication = {
