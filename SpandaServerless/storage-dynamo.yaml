@@ -9,24 +9,6 @@ Resources:
         -
           AttributeName: "username"
           AttributeType: "S"
-        -
-          AttributeName: "email"
-          AttributeType: "S"
-        -
-          AttributeName: "phone"
-          AttributeType: "S"
-        -
-          AttributeName: "allowance"
-          AttributeType: "N"
-        -
-          AttributeName: "isAllowanceReady"
-          AttributeType: "B"
-        -
-          AttributeName: "isAutoUpdateEnabled"
-          AttributeType: "B"
-        -
-          AttributeName: "bankConnectionIds"
-          AttributeType: "NS"
       KeySchema:
         -
           AttributeName: "username"
@@ -40,12 +22,6 @@ Resources:
         -
           AttributeName: "id"
           AttributeType: "N"
-        -
-          AttributeName: "bankId"
-          AttributeType: "N"
-        -
-          AttributeName: "bankAccountIds"
-          AttributeType: "NS"
       KeySchema:
         -
           AttributeName: "id"
@@ -59,18 +35,6 @@ Resources:
         -
           AttributeName: "id"
           AttributeType: "N"
-        -
-          AttributeName: "bankAccountId"
-          AttributeType: "N"
-        -
-          AttributeName: "accountName"
-          AttributeType: "S"
-        -
-          AttributeName: "iban"
-          AttributeType: "S"
-        -
-          AttributeName: "accountCurrency"
-          AttributeType: "S"
       KeySchema:
         -
           AttributeName: "id"

@@ -10,6 +10,10 @@ Parameters:
   FinAPIClientSecret:
     Description: The client secret to use to access FinAPI
     Type: String
+  Region:
+    Description: The region into which resources are deployed
+    Type: String
+    Default: eu-central-1
   Stage:
     Description: The deployment stage
     Type: String

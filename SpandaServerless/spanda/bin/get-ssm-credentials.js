@@ -1,10 +1,10 @@
 'use strict'
 
+const axios = require('axios');
 const SSM = require('aws-sdk/clients/ssm')
 
 const clientSecrets = require('../lib/client-secrets')
 const authentication = require('../lib/authentication')
-
 const args = process.argv
 const region = args[2]
 const clientIdParam = args[3]
