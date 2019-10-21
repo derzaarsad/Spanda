@@ -60,7 +60,7 @@ describe('get refresh token handler', function() {
 
   it('obtains a refresh token', async function() {
     const event = {
-      body: {'refresh_token': 'secret'}
+      body: JSON.stringify({'refresh_token': 'secret'})
     }
 
     const result = await controller.updateRefreshToken(event, context, logger, clientSecrets, authentication)

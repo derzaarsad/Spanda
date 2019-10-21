@@ -126,7 +126,7 @@ exports.updateRefreshToken = (event, context, logger, clientSecrets, authenticat
     return lambdaUtil.CreateErrorResponse(400, 'missing property: ' + missingProperty)
   }
 
-  return authentication.getRefreshToken(clientSecrets, body['refresh_token'])
+  return authentication.getRefreshToken(clientSecrets, body.refresh_token)
     .then(response => lambdaUtil.CreateResponse(200, response))
     .catch(err => {
       logger.log('error', 'could not obtain refresh token', { 'cause': err })
