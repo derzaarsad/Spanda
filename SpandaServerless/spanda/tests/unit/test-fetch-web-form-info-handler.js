@@ -9,7 +9,7 @@ const BankConnections = require('../../lib/bank-connections');
 
 const controller = require('../../controllers/bank-controller');
 
-describe('fetchWebFormInfo handler', function() {
+describe('fetch webform info handler', function() {
   let logger
   let users
   let connections
@@ -37,7 +37,7 @@ describe('fetchWebFormInfo handler', function() {
     const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
 
     expect(result).to.be.an('object');
-    expect(result.statusCode).to.equal(403);
+    expect(result.statusCode).to.equal(401);
     expect(JSON.parse(result.body).message).to.include('unauthorized');
   })
 

@@ -56,7 +56,7 @@ exports.getWebformId = async(event, context, logger, bankInterface) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
-    return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
+    return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
   }
 
   return bankInterface.importConnection(authorization, event.body.bankId)
@@ -75,7 +75,7 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
-    return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
+    return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
   }
 
   const webId = event.pathParameters['webFormId']
@@ -130,7 +130,7 @@ exports.getAllowance = async(event, context, logger, bankInterface, users) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
-    return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
+    return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
   }
 
   const username = event.headers['Username']

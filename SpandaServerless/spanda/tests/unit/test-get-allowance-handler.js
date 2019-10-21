@@ -34,7 +34,7 @@ describe('get allowance handler', function() {
     const result = await controller.getAllowance(event, context, logger, finapi, users)
 
     expect(result).to.be.an('object');
-    expect(result.statusCode).to.equal(403);
+    expect(result.statusCode).to.equal(401);
     expect(JSON.parse(result.body).message).to.include('unauthorized');
   })
 

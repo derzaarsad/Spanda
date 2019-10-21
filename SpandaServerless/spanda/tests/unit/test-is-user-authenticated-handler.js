@@ -45,6 +45,6 @@ describe('isUserAuthenticated handler', function() {
     const result = await controller.isUserAuthenticated(event, {}, logger, bankInterface)
 
     expect(result).to.be.an('object');
-    expect(result.statusCode).to.equal(403);
+    expect(result.statusCode).to.equal(401);
   });
 });

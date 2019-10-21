@@ -17,7 +17,7 @@ exports.isUserAuthenticated = async(event, context, logger, bankInterface) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
-    return lambdaUtil.CreateErrorResponse(403, 'unauthorized');
+    return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
   }
 
   return bankInterface.userInfo(authorization).then(response => lambdaUtil.CreateResponse(200, response))
