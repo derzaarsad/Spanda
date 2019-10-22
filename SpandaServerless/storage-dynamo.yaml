@@ -43,9 +43,18 @@ Outputs:
   UsersTableName:
     Description: The name of the users table
     Value: !Ref UsersTable
+  UsersTableArn:
+    Description: The ARN of the users table
+    Value: !GetAtt UsersTable.Arn
   BankConnectionsTableName:
     Description: The name of the bank connections table
     Value: !Ref BankConnectionsTable
+  BankConnectionsTableArn:
+    Description: The ARN of the bank connections table
+    Value: !GetAtt BankConnectionsTable.Arn
   BankAccountsTableName:
     Description: The name of the bank accounts table
-    Value: !Ref BankAccountsTable
+    Value: !Ref BankAccountsTable.Arn
+  BankAccountsTableArn:
+    Description: The ARN of the bank accounts table
+    Value: !GetAtt BankAccountsTable.Arn

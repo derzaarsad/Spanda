@@ -10,10 +10,12 @@ Parameters:
   FinAPIClientSecret:
     Description: The client secret to use to access FinAPI
     Type: String
-  Region:
-    Description: The region into which resources are deployed
+  DatabaseUser:
+    Description: Username of SQL database
     Type: String
-    Default: eu-central-1
+  DatabasePassword:
+    Description: Password of SQL database
+    Type: String
   Stage:
     Description: The deployment stage
     Type: String
@@ -30,6 +32,11 @@ Globals:
         FINAPI_CLIENT_ID: !Ref FinAPIClientId
         FINAPI_CLIENT_SECRET: !Ref FinAPIClientSecret
         FINAPI_TIMEOUT: 3000
+        PGDATABASE: "postgres"
+        PGHOST: !Sub "spanda-database.ctezy0xj9lfh.${AWS::Region}.rds.amazonaws.com"
+        PGPORT: "5432"
+        PGUSER: !Ref DatabaseUser
+        PGPASSWORD: !Ref DatabasePassword
 
 Resources:
   IsUserAuthenticatedFunction:
@@ -154,5 +161,26 @@ Outputs:
     Description: "API gateway endpoint URL for the stage"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
   IsUserAuthenticatedFunction:
-    Description: "Hello World Lambda Function ARN"
+    Description: "Is User Authenticated Function ARN"
     Value: !GetAtt IsUserAuthenticatedFunction.Arn
+  RegisterUserFunction:
+    Description: "Register User Function ARN"
+    Value: !GetAtt RegisterUserFunction.Arn
+  UpdateRefreshTokenFunction:
+    Description: "Update Refresh Token Function ARN"
+    Value: !GetAtt UpdateRefreshTokenFunction.Arn
+  AuthenticateAndSaveUserFunction:
+    Description: "Authenticate and Save User Function ARN"
+    Value: !GetAtt AuthenticateAndSaveUserFunction.Arn
+  GetBankByBLZFunction:
+    Description: "Get Bank by BLZ Function ARN"
+    Value: !GetAtt GetBankByBLZFunction.Arn
+  GetWebFormIdFunction:
+    Description: "Get Webform ID Function ARN"
+    Value: !GetAtt GetWebFormIdFunction.Arn
+  FetchWebFormInfoFunction:
+    Description: "Fetch WebForm Info Function ARN"
+    Value: !GetAtt FetchWebFormInfoFunction.Arn
+  GetAllowanceFunction:
+    Description: "Get Allowance Function ARN"
+    Value: !GetAtt GetAllowanceFunction.Arn

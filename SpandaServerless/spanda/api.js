@@ -52,7 +52,7 @@ exports.authenticateAndSaveUser = async (event, context) => {
 exports.updateRefreshToken = async (event, context) => {
   try {
     return authenticationController.updateRefreshToken(event, context, logger,
-      services.clientSecret, services.authentication)
+      services.clientSecrets, services.authentication)
   } catch (err) {
     logger.log('error', 'error refreshing token', err)
     return lambdaUtil.CreateInternalErrorResponse(err)

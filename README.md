@@ -1,5 +1,7 @@
 # Spanda
 
+![](https://github.com/derzaarsad/Spanda/.github/workflows/nodejs.yml/badge.svg)
+
 This app shows your budget allowance for every single day. The allowance is automatically adjusted according to your income / expense behaviour.
 
 List of features to be added:
