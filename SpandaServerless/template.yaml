@@ -57,23 +57,6 @@ Resources:
       CodeUri: spanda/
       Handler: api.registerUser
       Runtime: nodejs10.x
-      Policies:
-        - AWSLambdaBasicExecutionRole # Managed Policy
-        - Version: '2012-10-17' # Policy Document
-          Statement:
-            - Effect: Allow
-              Action:
-                - ec2:CreateNetworkInterface
-                - ec2:DescribeNetworkInterfaces
-                - ec2:DeleteNetworkInterface
-              Resource: '*'
-      VpcConfig:
-        SecurityGroupIds:
-          - sg-0d4fd718b2a6a5377
-        SubnetIds:
-          - subnet-5a064f17
-          - subnet-a1c2b9dc
-          - subnet-e0dcd08b
       Events:
         PostCredentials:
           Type: Api
