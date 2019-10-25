@@ -44,6 +44,12 @@ exports.NewClient = (http) => {
       }
 
       return http.post('/api/v1/users', req).then(response => response.data)
+      .catch((err) => {
+        throw({
+          'statusCode': err.response.status,
+          'message': err.response.data
+        });
+      });
     },
 
     fetchWebForm: async (authorization, formId) => {

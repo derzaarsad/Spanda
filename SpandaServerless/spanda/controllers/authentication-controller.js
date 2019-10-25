@@ -81,7 +81,7 @@ exports.registerUser = async(event, context, logger, clientSecrets, authenticati
   try {
     await bankInterface.registerUser(authorization, newUser)
   } catch (err) {
-    logger.log('error', 'could not register user', { 'cause': err })
+    logger.log('error', 'could not register user', { 'cause': err.message })
     return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration');
   }
 
