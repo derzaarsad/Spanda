@@ -1,4 +1,10 @@
 AWSTemplateFormatVersion: "2010-09-09"
+Description: Declares the DynamoDB tables and an execution role graning access to those tables to members of the Spanda API.
+Parameters:
+  DynamoDBAccessRoleName:
+    Description: The role name allowing access to the DynamoDB tables
+    Type: String
+    Default: SpandaAPIDynamoDBAccess
 Resources:
   UsersTable:
     Type: AWS::DynamoDB::Table
@@ -39,6 +45,58 @@ Resources:
         -
           AttributeName: "id"
           KeyType: "HASH"
+  DynamoAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref DynamoDBAccessRoleName
+      Path: "/"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+      Policies:
+        -
+          PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: Allow
+                Action:
+                  - dynamodb:BatchGetItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:BatchWriteItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                Resource: !GetAtt UsersTable.Arn
+              -
+                Effect: Allow
+                Action:
+                  - dynamodb:BatchGetItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:BatchWriteItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                Resource: !GetAtt BankConnectionsTable.Arn
+              -
+                Effect: Allow
+                Action:
+                  - dynamodb:BatchGetItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:BatchWriteItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                Resource: !GetAtt BankAccountsTable.Arn
 Outputs:
   UsersTableName:
     Description: The name of the users table
@@ -54,7 +112,10 @@ Outputs:
     Value: !GetAtt BankConnectionsTable.Arn
   BankAccountsTableName:
     Description: The name of the bank accounts table
-    Value: !Ref BankAccountsTable.Arn
+    Value: !Ref BankAccountsTable
   BankAccountsTableArn:
     Description: The ARN of the bank accounts table
     Value: !GetAtt BankAccountsTable.Arn
+  DynamoAccessRole:
+    Description: The ARN of the DynamoDB access role
+    Value: !GetAtt DynamoAccessRole.Arn
