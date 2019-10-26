@@ -42,15 +42,22 @@ exports.NewInMemoryRepository = () => {
 
 exports.NewDynamoDbRepository = (client, tableName) => {
   const decodeUser = data => {
-    return {
+    const user = {
       username: data['username']['S'],
-      allowance: data['allowance']['N'],
-      isAllowanceReady: data['isAllowanceReady']['BOOL'],
+      allowance: parseFloat(data['allowance']['N']),
+      isAllowanceReady: data['isAllowanceReady']['BOOL'] === 'true',
       email: data['email']['S'],
       phone: data['phone']['S'],
-      isAutoUpdateEnabled: data['isAutoUpdateEnabled']['BOOL'],
-      bankConnectionIds: data['bankConnectionIds']['NS'] || []
+      isAutoUpdateEnabled: data['isAutoUpdateEnabled']['BOOL'] === 'true',
     }
+
+    if (data['bankConnectionIds']) {
+      user['bankConnectionIds'] = data['bankConnectionIds']['NS'].map(id => parseInt(id))
+    } else {
+      user['bankConnectionIds'] = []
+    }
+
+    return user
   }
 
   const encodeUser = user => {
@@ -75,7 +82,7 @@ exports.NewDynamoDbRepository = (client, tableName) => {
     if (user.bankConnectionIds.length > 0) {
       expression = expression + ", #BC = :bc"
       attributes['#BC'] = 'bankConnectionIds'
-      values[':bc'] = { 'NS': user.bankConnectionIds }
+      values[':bc'] = { 'NS': user.bankConnectionIds.map(id => id.toString()) }
     }
 
     return {
@@ -120,8 +127,8 @@ exports.NewDynamoDbRepository = (client, tableName) => {
 
     save: async (user) => {
       const params = {
-        'ReturnValues': "ALL_NEW",
         'TableName': tableName,
+        'ReturnValues': "ALL_NEW",
         ...encodeUser(user)
       }
 

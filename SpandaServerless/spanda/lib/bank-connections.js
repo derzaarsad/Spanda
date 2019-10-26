@@ -35,18 +35,44 @@ exports.NewInMemoryRepository = () => {
 
 exports.NewDynamoDbRepository = (client, tableName) => {
   const decodeBankConnection = data => {
-    return {
-      id: data['id']['N'],
-      bankId: data['bankId']['N'],
-      bankAccountIds: data['bankAccountIds']['NS']
+    const bankConnection = {
+      id: parseInt(data['id']['N']),
+      bankId: parseInt(data['bankId']['N']),
     }
+
+    if (data['bankAccountIds']) {
+      bankConnection['bankAccountIds'] = data['bankAccountIds']['NS'].map(id => parseInt(id))
+    } else {
+      bankConnection['bankAccountIds'] = []
+    }
+
+    return bankConnection
   }
 
   const encodeBankConnection = bankConnection => {
+    let expression = "SET #B = :b"
+
+    const attributes = {
+        '#B': 'bankId',
+    }
+
+    const values = {
+      ':b': { 'N': bankConnection.bankId.toString() }
+    }
+
+    if (bankConnection.bankAccountIds.length > 0) {
+      expression = expression + ", #BA = :ba"
+      attributes['#BA'] = 'bankAccountIds'
+      values[':ba'] = { 'NS': bankConnection.bankConnectionIds.map(id => id.toString()) }
+    }
+
     return {
-      id: { 'N': bankConnection.id },
-      bankId: { 'N': bankConnection.bankId },
-      bankAccountIds: { 'NS': bankConnection.bankAccountIds }
+      Key: {
+        id: { 'N': bankConnection.id.toString() }
+      },
+      ExpressionAttributeNames: attributes,
+      ExpressionAttributeValues: values,
+      UpdateExpression: expression
     }
   }
 
@@ -82,9 +108,9 @@ exports.NewDynamoDbRepository = (client, tableName) => {
 
     save: async (bankConnection) => {
       const params = {
-        Item: encodeBankConnection(bankConnection),
-        ReturnConsumedCapacity: "TOTAL",
-        TableName: tableName
+        'ReturnValues': "ALL_NEW",
+        'TableName': tableName,
+        ...encodeBankConnection(bankConnection)
       }
 
       return new Promise((resolve, reject) => {
