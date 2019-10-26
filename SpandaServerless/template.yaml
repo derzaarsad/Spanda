@@ -13,6 +13,27 @@ Parameters:
   Stage:
     Description: The deployment stage
     Type: String
+    Default: ""
+  DatabaseUser:
+    Description: Username of SQL database
+    Type: String
+    Default: ""
+  DatabasePassword:
+    Description: Password of SQL database
+    Type: String
+    Default: ""
+  StorageBackend:
+    Description: The storage backend to use
+    Type: String
+    Default: "IN_MEMORY"
+  UsersTableName:
+    Description: The name of the users table (DynamoDB)
+    Type: String
+    Default: ""
+  BankConnectionsTableName:
+    Description: The name of the bank connections table (DynamoDB)
+    Type: String
+    Default: ""
 
 # Globals is a section in your SAM template to define properties common to all your Serverless Function and APIs.
 # All the AWS::Serverless::Function and AWS::Serverless::Api resources will inherit the properties defined here.
@@ -21,15 +42,20 @@ Globals:
     Timeout: 45
     Environment:
       Variables:
+        REGION: !Sub "${AWS::Region}"
         LOGGER_LEVEL: "debug"
         FINAPI_URL: "https://sandbox.finapi.io"
         FINAPI_CLIENT_ID: !Ref FinAPIClientId
         FINAPI_CLIENT_SECRET: !Ref FinAPIClientSecret
         FINAPI_TIMEOUT: 3000
-        STORAGE_BACKEND: DYNAMODB
-        USERS_TABLE_NAME: UsersTable
-        BANK_CONNECTIONS_TABLE_NAME: BankConnectionsTable
-        REGION: !Sub "${AWS::Region}"
+        PGDATABASE: "postgres"
+        PGHOST: !Sub "spanda-database.ctezy0xj9lfh.${AWS::Region}.rds.amazonaws.com"
+        PGPORT: "5432"
+        PGUSER: !Ref DatabaseUser
+        PGPASSWORD: !Ref DatabasePassword
+        # STORAGE_BACKEND: !Ref StorageBackend
+        # USERS_TABLE_NAME: !Ref UsersTableName
+        # BANK_CONNECTIONS_TABLE_NAME: !Ref BankConnectionsTableName
 
 Resources:
   IsUserAuthenticatedFunction:
