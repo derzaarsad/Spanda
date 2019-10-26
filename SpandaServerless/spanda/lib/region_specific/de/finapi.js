@@ -2,18 +2,19 @@
 
 exports.NewClient = (http) => {
   const requestWebForm = async (authorization, bankId) => {
-    const params = {
+    const data = {
+      'bankId': bankId
+    }
+
+    const config = {
       headers: {
         'Authorization': authorization,
         'Content-Type': 'application/json'
       },
-      data: {
-        'bankId': bankId
-      },
       validateStatus: status => status === 451
     }
 
-    return http.post('/api/v1/bankConnections/import', params).then(response => {
+    return http.post('/api/v1/bankConnections/import', data, config).then(response => {
       const body = response.data
       const headers = response.headers
 
@@ -77,14 +78,16 @@ exports.NewClient = (http) => {
         const url = webFormId.location
         const resource = '/api/v1/webForms/' + formId
 
-        const params = {
+        const data = {}
+
+        const config = {
           'baseURL': url,
           'headers': {
             'Authorization': authorization
           }
         }
 
-        return http.post(resource, params)
+        return http.post(resource, data, config)
           .then(response => [ response.data, formId ]);
       })
     }
