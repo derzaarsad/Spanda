@@ -10,12 +10,6 @@ Parameters:
   FinAPIClientSecret:
     Description: The client secret to use to access FinAPI
     Type: String
-  DatabaseUser:
-    Description: Username of SQL database
-    Type: String
-  DatabasePassword:
-    Description: Password of SQL database
-    Type: String
   Stage:
     Description: The deployment stage
     Type: String
@@ -32,11 +26,10 @@ Globals:
         FINAPI_CLIENT_ID: !Ref FinAPIClientId
         FINAPI_CLIENT_SECRET: !Ref FinAPIClientSecret
         FINAPI_TIMEOUT: 3000
-        PGDATABASE: "postgres"
-        PGHOST: !Sub "spanda-database.ctezy0xj9lfh.${AWS::Region}.rds.amazonaws.com"
-        PGPORT: "5432"
-        PGUSER: !Ref DatabaseUser
-        PGPASSWORD: !Ref DatabasePassword
+        STORAGE_BACKEND: DYNAMODB
+        USERS_TABLE_NAME: UsersTable
+        BANK_CONNECTIONS_TABLE_NAME: BankConnectionsTable
+        REGION: !Sub "${AWS::Region}"
 
 Resources:
   IsUserAuthenticatedFunction:

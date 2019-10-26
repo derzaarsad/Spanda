@@ -71,19 +71,19 @@ exports.registerUser = async(event, context, logger, clientSecrets, authenticati
     return lambdaUtil.CreateErrorResponse(409, 'user already exists');
   }
 
+  try {
+    await bankInterface.registerUser(authorization, user)
+  } catch (err) {
+    logger.log('error', 'could not register user', { 'cause': err })
+    return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration');
+  }
+
   const username = user.id
   const email = user.email
   const phone = user.phone
   const isAutoUpdateEnabled = user.isAutoUpdateEnabled === 'true'
 
   const newUser = users.new(username, email, phone, isAutoUpdateEnabled)
-
-  try {
-    await bankInterface.registerUser(authorization, newUser)
-  } catch (err) {
-    logger.log('error', 'could not register user', { 'cause': err.message })
-    return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration');
-  }
 
   return users.save(newUser).then(userData => lambdaUtil.CreateResponse(201, userData));
 }
