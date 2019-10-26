@@ -86,7 +86,13 @@ exports.NewDynamoDbRepository = (client, tableName) => {
             resolve(data)
           }
         });
-      }).then(data => decodeUser(data));
+      }).then(data => {
+        if (data.Item) {
+          return decodeUser(data.Item)
+        } else {
+          return null
+        }
+      });
     },
 
     save: async (user) => {

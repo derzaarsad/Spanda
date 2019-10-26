@@ -65,7 +65,13 @@ exports.NewDynamoDbRepository = (client, tableName) => {
             resolve(data)
           }
         });
-      }).then(data => decodeBankAccount(data));
+      }).then(data => {
+        if (data.Item) {
+          return decodeBankAccount(data.Item)
+        } else {
+          return null
+        }
+      });
     },
 
     save: async (bankAccount) => {

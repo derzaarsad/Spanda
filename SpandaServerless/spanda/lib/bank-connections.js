@@ -71,7 +71,13 @@ exports.NewDynamoDbRepository = (client, tableName) => {
             resolve(data)
           }
         });
-      }).then(data => decodeBankConnection(data));
+      }).then(data => {
+        if (data.Item) {
+          decodeBankConnection(data.Item)
+        } else {
+          return null
+        }
+      });
     },
 
     save: async (bankConnection) => {
