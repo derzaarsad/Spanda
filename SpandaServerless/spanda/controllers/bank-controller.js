@@ -85,8 +85,8 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
   const username = userInfo.id
   const user = await users.findById(username)
   if (!user) {
-    logger.log('info', 'no user found for username ' + username)
-    return lambdaUtil.CreateErrorResponse(404, 'user not found');
+    logger.log('error', 'no user found for username ' + username)
+    return lambdaUtil.CreateInternalErrorResponse('could not fetch web form');
   }
 
   let webForm
