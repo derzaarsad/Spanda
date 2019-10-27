@@ -112,7 +112,7 @@ paths:
     post:
       tags:
       - authentication
-      summary: Get refresh token
+      summary: Update refresh token
       description: Exchanges a refresh token
       operationId: updateRefreshToken
       requestBody:
