@@ -75,7 +75,14 @@ exports.registerUser = async(event, context, logger, clientSecrets, authenticati
     await bankInterface.registerUser(authorization, user)
   } catch (err) {
     logger.log('error', 'could not register user', { 'cause': err })
-    return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration');
+
+    // TODO: finAPI specific status code must be mapped to Spanda's status code before thrown
+    if(err.response.status === 422) {
+      logger.log('debug', 'there is a mismatch between server and provider database')
+      return lambdaUtil.CreateErrorResponse(409, 'user already exists');
+    } else {
+      return lambdaUtil.CreateErrorResponse(500, 'could not perform user registration');
+    }
   }
 
   const username = user.id
