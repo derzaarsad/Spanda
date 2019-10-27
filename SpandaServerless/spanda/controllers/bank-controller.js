@@ -133,8 +133,8 @@ exports.getAllowance = async(event, context, logger, bankInterface, users) => {
   const user = await users.findById(username)
 
   if (!user) {
-    logger.log('info', 'no user found for username ' + username)
-    return lambdaUtil.CreateErrorResponse(404, 'user not found');
+    logger.log('error', 'no user found for username ' + username)
+    return lambdaUtil.CreateInternalErrorResponse('error fetching allowance');
   }
 
   return lambdaUtil.CreateResponse(200, { 'allowance': user.allowance });
