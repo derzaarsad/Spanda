@@ -96,8 +96,8 @@ describe('fetch webform info handler', function() {
     const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
 
     expect(result).to.be.an('object');
-    expect(result.statusCode).to.equal(404);
-    expect(JSON.parse(result.body).message).to.include('user not found');
+    expect(result.statusCode).to.equal(500);
+    expect(JSON.parse(result.body).message).to.include('could not fetch');
   })
 
   it('adds a connection to the user', async function() {
