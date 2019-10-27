@@ -7,14 +7,13 @@ const expect = chai.expect;
 const ClientSecrets = require('../../lib/client-secrets');
 const handler = require('../../controllers/bank-controller');
 
-describe('getBankByBLZ handler', function() {
+describe('get banks by BLZ handler', function() {
   let logger
 
   beforeEach(function() {
     const winston = require('winston')
     logger = winston.createLogger({ transports: [ new winston.transports.Console() ] })
   })
-
 
   it('rejects a request with an invalid BLZ', async function() {
     const context = {}

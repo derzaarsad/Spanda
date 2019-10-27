@@ -26,20 +26,22 @@ describe('get allowance handler', function() {
     const finapi = {}
 
     const event = {
-      'headers': {
-        'Username': 'chapu'
-      }
+      'headers': {}
     }
 
     const result = await controller.getAllowance(event, context, logger, finapi, users)
 
     expect(result).to.be.an('object');
-    expect(result.statusCode).to.equal(403);
+    expect(result.statusCode).to.equal(401);
     expect(JSON.parse(result.body).message).to.include('unauthorized');
   })
 
-  it('rejects a request with missing username', async function() {
-    const finapi = {}
+  it('rejects a request with wrong authorization', async function() {
+    const finapi = {
+      userInfo: async () => {
+        throw 'nada'
+      }
+    }
 
     const event = {
       'headers': {
@@ -50,21 +52,20 @@ describe('get allowance handler', function() {
     const result = await controller.getAllowance(event, context, logger, finapi, users)
 
     expect(result).to.be.an('object');
-    expect(result.statusCode).to.equal(400);
-    expect(JSON.parse(result.body).message).to.include('no username');
+    expect(result.statusCode).to.equal(401);
+    expect(JSON.parse(result.body).message).to.include('unauthorized');
   })
 
   it('rejects a request with missing user', async function() {
     const finapi = {
       userInfo: async () => {
-        return { 'ok': true }
+        return { 'id': 'chapu' }
       }
     }
 
     const event = {
       'headers': {
-        'Authorization': 'ok',
-        'Username': 'chapu'
+        'Authorization': 'ok'
       }
     }
 
@@ -82,14 +83,13 @@ describe('get allowance handler', function() {
 
     const finapi = {
       userInfo: async () => {
-        return { 'ok': true }
+        return { 'id': 'chapu' }
       }
     }
 
     const event = {
       'headers': {
-        'Authorization': 'ok',
-        'Username': 'chapu'
+        'Authorization': 'ok'
       }
     }
 

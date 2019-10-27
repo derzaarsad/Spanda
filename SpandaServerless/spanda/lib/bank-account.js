@@ -28,8 +28,8 @@ exports.NewInMemoryRepository = () => {
 exports.NewDynamoDbRepository = (client, tableName) => {
   const decodeBankAccount = data => {
     return {
-      id: data['id']['N'],
-      bankConnectionId: data['bankConnectionId']['N'],
+      id: parseInt(data['id']['N']),
+      bankConnectionId: parseInt(data['bankConnectionId']['N']),
       accountName: data['accountName']['S'],
       iban: data['iban']['S'],
       accountCurrency: data['accountCurrency']['S']
@@ -37,12 +37,29 @@ exports.NewDynamoDbRepository = (client, tableName) => {
   }
 
   const encodeBankAccount = bankAccount => {
+    let expression = "SET #BC = :bc, #A = :a, #I = :i, #C = :c"
+
+    const attributes = {
+      '#BC': 'bankConnectionId',
+      '#A': 'accountName',
+      '#I': 'iban',
+      '#C': 'accountCurrency',
+    }
+
+    const values = {
+      ':bc': { 'N': bankAccount.bankConnectionId.toString() },
+      ':a': { 'S': bankAccount.accountName },
+      ':i': { 'S': bankAccount.iban },
+      ':c': { 'S': bankAccount.accountCurrency }
+    }
+
     return {
-      id: { 'N': bankAccount.id },
-      bankConnectionId: { 'N': bankAccount.bankConnectionId },
-      accountName: { 'S': bankAccount.accountName },
-      iban: { 'S': bankAccount.iban },
-      accountCurrency: { 'S': bankAccount.accountCurrency }
+      Key: {
+        id: { 'N': bankAccount.id.toString() }
+      },
+      ExpressionAttributeNames: attributes,
+      ExpressionAttributeValues: values,
+      UpdateExpression: expression
     }
   }
 
@@ -65,14 +82,20 @@ exports.NewDynamoDbRepository = (client, tableName) => {
             resolve(data)
           }
         });
-      }).then(data => decodeBankAccount(data));
+      }).then(data => {
+        if (data.Item) {
+          return decodeBankAccount(data.Item)
+        } else {
+          return null
+        }
+      });
     },
 
     save: async (bankAccount) => {
       const params = {
-        Item: encodeBankAccount(bankAccount),
-        ReturnConsumedCapacity: "TOTAL",
-        TableName: tableName
+        'ReturnValues': "ALL_NEW",
+        'TableName': tableName,
+        ...encodeBankAccount(bankAccount)
       }
 
       return new Promise((resolve, reject) => {

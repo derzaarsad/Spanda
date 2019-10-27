@@ -3,6 +3,29 @@
 /*
  * Initialize controllers with environment variables
  */
+const initializeInMemoryBackend = () => {
+  const Users = require('./lib/users');
+  const BankConnections = require('./lib/bank-connections');
+
+  return {
+    users: Users.NewInMemoryRepository(),
+    connections: BankConnections.NewInMemoryRepository()
+  }
+}
+
+const initializeDynamoDbBackend = env => {
+  const DynamoDB = require('aws-sdk/clients/dynamodb')
+  const Users = require('./lib/users');
+  const BankConnections = require('./lib/bank-connections');
+
+  const dynamoDbClient = new DynamoDB({apiVersion: '2012-08-10', region: env['REGION']});
+
+  return {
+    users: Users.NewDynamoDbRepository(dynamoDbClient, env['USERS_TABLE_NAME']),
+    connections: BankConnections.NewDynamoDbRepository(dynamoDbClient, env['BANK_CONNECTIONS_TABLE_NAME'])
+  }
+}
+
 module.exports = (env) => {
   console.log('Configuring controllers from environment:')
   console.log(JSON.stringify(env))
@@ -11,9 +34,13 @@ module.exports = (env) => {
 
   const ClientSecrets = require('./lib/client-secrets');
   const Authentication = require('./lib/authentication');
-  
-  const Users = require('./lib/users');
-  const BankConnections = require('./lib/bank-connections');
+
+  let storageBackend
+  if (env['STORAGE_BACKEND'] === 'DYNAMODB') {
+    storageBackend = initializeDynamoDbBackend(env);
+  } else {
+    storageBackend = initializeInMemoryBackend();
+  }
 
   const baseURL = env['FINAPI_URL'] || 'https://sandbox.finapi.io';
   const options = { timeout: env['FINAPI_TIMEOUT'] || 3000 };
@@ -28,14 +55,11 @@ module.exports = (env) => {
 
   const clientSecrets = ClientSecrets.Resolved(env['FINAPI_CLIENT_ID'], env['FINAPI_CLIENT_SECRET']);
 
-  const users = Users.NewInMemoryRepository();
-  const connections = BankConnections.NewInMemoryRepository();
-
   return {
     'clientSecrets': clientSecrets,
     'authentication': authentication,
     'bankInterface': require('./lib/bankInterface')(httpClient),
-    'users': users,
-    'connections': connections
+    'users': storageBackend.users,
+    'connections': storageBackend.connections
   };
 };

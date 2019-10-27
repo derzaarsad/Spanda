@@ -42,26 +42,56 @@ exports.NewInMemoryRepository = () => {
 
 exports.NewDynamoDbRepository = (client, tableName) => {
   const decodeUser = data => {
-    return {
+    const user = {
       username: data['username']['S'],
-      allowance: data['allowance']['N'],
-      isAllowanceReady: data['isAllowanceReady']['B'],
+      allowance: parseFloat(data['allowance']['N']),
+      isAllowanceReady: data['isAllowanceReady']['BOOL'] === 'true',
       email: data['email']['S'],
       phone: data['phone']['S'],
-      isAutoUpdateEnabled: data['isAutoUpdateEnabled']['B'],
-      bankConnectionIds: data['bankConnectionIds']['NS']
+      isAutoUpdateEnabled: data['isAutoUpdateEnabled']['BOOL'] === 'true',
     }
+
+    if (data['bankConnectionIds']) {
+      user['bankConnectionIds'] = data['bankConnectionIds']['NS'].map(id => parseInt(id))
+    } else {
+      user['bankConnectionIds'] = []
+    }
+
+    return user
   }
 
   const encodeUser = user => {
+    let expression = "SET #A = :a, #AR = :ar, #E = :e, #P = :p, #AU = :au"
+
+    const attributes = {
+        '#A': 'allowance',
+        '#AR': 'isAllowanceReady',
+        '#E': 'email',
+        '#P': 'phone',
+        '#AU': 'isAutoUpdateEnabled',
+    }
+
+    const values = {
+      ':a': { 'N': user.allowance.toString() },
+      ':ar': { 'BOOL': user.isAllowanceReady.toString() },
+      ':e': { 'S': user.email },
+      ':p': { 'S': user.phone },
+      ':au': { 'BOOL': user.isAutoUpdateEnabled.toString() },
+    }
+
+    if (user.bankConnectionIds.length > 0) {
+      expression = expression + ", #BC = :bc"
+      attributes['#BC'] = 'bankConnectionIds'
+      values[':bc'] = { 'NS': user.bankConnectionIds.map(id => id.toString()) }
+    }
+
     return {
-      username: { 'S': user.username },
-      allowance: { 'N': user.allowance },
-      isAllowanceReady: { 'B': user.isAllowanceReady },
-      email: { 'S': user.email },
-      phone: { 'S': user.phone },
-      isAutoUpdateEnabled: { 'B': user.isAutoUpdateEnabled },
-      bankConnectionIds: { 'NS': user.bankConnectionIds }
+      Key: {
+        username: { 'S': user.username }
+      },
+      ExpressionAttributeNames: attributes,
+      ExpressionAttributeValues: values,
+      UpdateExpression: expression
     }
   }
 
@@ -86,14 +116,20 @@ exports.NewDynamoDbRepository = (client, tableName) => {
             resolve(data)
           }
         });
-      }).then(data => decodeUser(data));
+      }).then(data => {
+        if (data.Item) {
+          return decodeUser(data.Item)
+        } else {
+          return null
+        }
+      });
     },
 
     save: async (user) => {
       const params = {
-        Item: encodeUser(user),
-        ReturnConsumedCapacity: "TOTAL",
-        TableName: tableName
+        'TableName': tableName,
+        'ReturnValues': "ALL_NEW",
+        ...encodeUser(user)
       }
 
       return new Promise((resolve, reject) => {

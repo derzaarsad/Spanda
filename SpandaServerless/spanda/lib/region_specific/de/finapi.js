@@ -2,18 +2,19 @@
 
 exports.NewClient = (http) => {
   const requestWebForm = async (authorization, bankId) => {
-    const params = {
+    const data = {
+      'bankId': bankId
+    }
+
+    const config = {
       headers: {
         'Authorization': authorization,
         'Content-Type': 'application/json'
       },
-      data: {
-        'bankId': bankId
-      },
       validateStatus: status => status === 451
     }
 
-    return http.post('/api/v1/bankConnections/import', params).then(response => {
+    return http.post('/api/v1/bankConnections/import', data, config).then(response => {
       const body = response.data
       const headers = response.headers
 
@@ -27,7 +28,7 @@ exports.NewClient = (http) => {
   return {
     userInfo: async (authorization) => {
       const params = {
-        headers: {
+        'headers': {
           'Authorization': authorization,
         },
       }
@@ -35,21 +36,14 @@ exports.NewClient = (http) => {
     },
 
     registerUser: async (authorization, user) => {
-      const req = {
-        data: user,
-        headers: {
+      const config = {
+        'headers': {
           'Authorization': authorization,
           'Content-Type': 'application/json'
         }
       }
 
-      return http.post('/api/v1/users', req).then(response => response.data)
-      .catch((err) => {
-        throw({
-          'statusCode': err.response.status,
-          'message': err.response.data
-        });
-      });
+      return http.post('/api/v1/users', user, config).then(response => response.data)
     },
 
     fetchWebForm: async (authorization, formId) => {
@@ -65,12 +59,12 @@ exports.NewClient = (http) => {
 
     listBanksByBLZ: async (authorization, blz, pagination = { page: 1, itemsPerPage: 2 }) => {
       const req = {
-        params: {
-          search: blz,
-          page: pagination.page,
-          perPage: pagination.itemsPerPage
+        'params': {
+          'search': blz,
+          'page': pagination.page,
+          'perPage': pagination.itemsPerPage
         },
-        headers: {
+        'headers': {
           'Authorization': authorization
         }
       }
@@ -84,14 +78,16 @@ exports.NewClient = (http) => {
         const url = webFormId.location
         const resource = '/api/v1/webForms/' + formId
 
-        const params = {
-          baseURL: url,
-          headers: {
-            'Authorization': authorization,
+        const data = {}
+
+        const config = {
+          'baseURL': url,
+          'headers': {
+            'Authorization': authorization
           }
         }
 
-        return http.post(resource, params)
+        return http.post(resource, data, config)
           .then(response => [ response.data, formId ]);
       })
     }
