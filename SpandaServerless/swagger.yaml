@@ -1,0 +1,303 @@
+openapi: 3.0.1
+info:
+  title: The Spanda API
+  description: Backend services for Dinodime
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: https://api.dinodime.domain/
+tags:
+- name: authentication
+  description: User authentication and authorization
+- name: bank
+  description: Bank Operations
+paths:
+  /users:
+    get:
+      tags:
+      - authentication
+      summary: Describe user
+      description: Calls the user information from the banking API and returns the
+        details on the logged in user on successfull authorization
+      operationId: isUserAuthenticated
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: user is logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        401:
+          description: unauthorized
+          content: {}
+    post:
+      tags:
+      - authentication
+      summary: User sign up
+      description: Registers a new user
+      operationId: registerUser
+      responses:
+        201:
+          description: user is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        401:
+          description: unauthorized
+          content: {}
+  /oauth/login:
+    post:
+      tags:
+      - authentication
+      summary: User sign in
+      description: Exchanges a password token for user credentials
+      operationId: authenticateAndSave
+      requestBody:
+        description: The user's credentials
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+        required: true
+      responses:
+        200:
+          description: user logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        401:
+          description: unauthorized
+          content: {}
+  /oauth/token:
+    post:
+      tags:
+      - authentication
+      summary: Get refresh token
+      description: Exchanges a refresh token
+      operationId: updateRefreshToken
+      requestBody:
+        description: The current refresh token
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshToken'
+        required: true
+      responses:
+        200:
+          description: user logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        401:
+          description: unauthorized
+          content: {}
+  /allowance:
+    get:
+      tags:
+      - bank
+      summary: Get daily allowance
+      description: Obtains the user's daily allowance
+      operationId: getAllowance
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: user is logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Allowance'
+        401:
+          description: unauthorized
+          content: {}
+  /banks/{blz}:
+    get:
+      tags:
+      - bank
+      summary: Find a bank
+      description: Lists banks by a given BLZ
+      operationId: getBankByBLZ
+      parameters:
+      - name: blz
+        in: path
+        description: The bank's BLZ
+        required: true
+        schema:
+          pattern: ^\d{8}$
+          type: string
+      responses:
+        200:
+          description: the list of banks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankList'
+  /bankConnections/import:
+    post:
+      tags:
+      - bank
+      summary: Import bank connections
+      description: Registers a bank connections
+      operationId: getWebFormId
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: the web form coordinates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormId'
+        401:
+          description: unauthorized
+          content: {}
+  /webForms/{webFormId}:
+    post:
+      tags:
+      - bank
+      summary: Fetch a web form
+      description: Fetches web form
+      operationId: fetchWebFormInfo
+      parameters:
+      - name: webFormId
+        in: path
+        description: The web form to fetch
+        required: true
+        schema:
+          type: number
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: the web form's body
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          description: unauthorized
+          content: {}
+components:
+  schemas:
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        isAutoUpdateEnabled:
+          type: boolean
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        allowance:
+          type: number
+        isAllowanceReady:
+          type: boolean
+          default: false
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        isAutoUpdateEnabled:
+          type: boolean
+        bankConnectionIds:
+          type: array
+          items:
+            type: integer
+    Credentials:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    Token:
+      type: object
+      properties:
+        token_type:
+          type: string
+        scope:
+          type: string
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: number
+    RefreshToken:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+    Allowance:
+      type: object
+      properties:
+        allowance:
+          type: number
+    FormId:
+      maxItems: 2
+      minItems: 2
+      type: array
+      items:
+        oneOf:
+          - type: object
+          - type: integer
+    Bank:
+      type: object
+      properties:
+        id:
+          type: "number"
+        name:
+          type: "string"
+        bic:
+          type: "string"
+        location:
+          type: "string"
+        isTestBank:
+          type: "boolean"
+    BankList:
+      type: object
+      properties:
+        banks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bank'
+    WebFormId:
+      type: object
+      properties:
+        location:
+          type: string
+        formId:
+          type: string
