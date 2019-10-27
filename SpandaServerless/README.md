@@ -41,12 +41,12 @@ The SAM CLI uses an Amazon S3 bucket to store your application's deployment arti
 sam-app$ aws s3 mb s3://BUCKET_NAME
 ```
 
-To prepare the application for deployment, use the `sam package` command.
+An s3 bucket and a stack are already created for Spanda development. To prepare the application for deployment, use the `sam package` command.
 
 ```bash
 sam-app$ sam package \
     --output-template-file packaged.yaml \
-    --s3-bucket BUCKET_NAME
+    --s3-bucket spanda-build-test
 ```
 
 The SAM CLI creates deployment packages, uploads them to the S3 bucket, and creates a new version of the template that refers to the artifacts in the bucket.
@@ -56,10 +56,10 @@ To deploy the application, use the `sam deploy` command.
 ```bash
 sam-app$ sam deploy \
     --template-file packaged.yaml \
-    --stack-name sam-app \
+    --stack-name sam-spanda-dev \
     --capabilities CAPABILITY_IAM \
-    --region eu-central-1 \
-    --parameter-overrides FinAPIClientSecret=<CLIENT_SECRET> FinAPIClientId=<CLIENT_ID> \
+    --region <REGION> \
+    --parameter-overrides FinAPIClientId=<CLIENT_ID> FinAPIClientSecret=<CLIENT_SECRET> \
     Stage=dev DatabaseUser=<USERNAME> DatabasePassword=<PASSWORD>
 ```
 
