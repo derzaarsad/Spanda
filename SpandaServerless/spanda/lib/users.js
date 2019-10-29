@@ -20,7 +20,7 @@ const createUser = (username, email, phone, isAutoUpdateEnabled) => {
     'email': email,
     'phone': phone,
     'isAutoUpdateEnabled': isAutoUpdateEnabled,
-    'bankConnectionIds': null
+    'bankConnectionIds': []
   }
 }
 
@@ -156,7 +156,7 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
       user.email,
       user.phone,
       user.isAutoUpdateEnabled,
-      user.bankConnectionIds
+      (user.bankConnectionIds.length === 0) ? null :  user.bankConnectionIds
     ];
   }
   return {
@@ -180,7 +180,7 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
       return pool.connect().then(client => {
         const properties = 'username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids';
         let text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES (%L)', userToSql(user));
-        
+
         return client.query(text).then(res => {
           client.release();
           return user;
