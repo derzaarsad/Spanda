@@ -60,7 +60,8 @@ sam-app$ sam deploy \
     --capabilities CAPABILITY_IAM \
     --region <REGION> \
     --parameter-overrides FinAPIClientId=<CLIENT_ID> FinAPIClientSecret=<CLIENT_SECRET> \
-    Stage=dev DatabaseUser=<USERNAME> DatabasePassword=<PASSWORD>
+    Stage=dev StorageBackend=POSTGRESQL UsersTableName=users BankConnectionsTableName=bankconnections \
+    DatabaseUser=<USERNAME> DatabasePassword=<PASSWORD>
 ```
 
 After deployment is complete you can run the following command to retrieve the API Gateway Endpoint URL:

@@ -26,6 +26,23 @@ const initializeDynamoDbBackend = env => {
   }
 }
 
+const initializePostgreSQLBackend = env => {
+  if((!env['PGUSER']) || (!env['PGPASSWORD'])) {
+    throw new Error("no credentials are provided for PostgreSQL storage");
+  }
+  const { Pool } = require('pg');
+  const format = require('pg-format');
+  const Users = require('./lib/users');
+  const BankConnections = require('./lib/bank-connections');
+
+  const pool = new Pool();
+
+  return {
+    users: Users.NewPostgreSQLRepository(pool, format, env['USERS_TABLE_NAME']),
+    connections: BankConnections.NewPostgreSQLRepository(pool, format, env['BANK_CONNECTIONS_TABLE_NAME'])
+  }
+}
+
 module.exports = (env) => {
   console.log('Configuring controllers from environment:')
   console.log(JSON.stringify(env))
@@ -36,10 +53,21 @@ module.exports = (env) => {
   const Authentication = require('./lib/authentication');
 
   let storageBackend
-  if (env['STORAGE_BACKEND'] === 'DYNAMODB') {
-    storageBackend = initializeDynamoDbBackend(env);
-  } else {
+  if(env['STORAGE_BACKEND'] === 'IN_MEMORY') {
     storageBackend = initializeInMemoryBackend();
+  } else {
+
+    if((!env['USERS_TABLE_NAME']) || (!env['BANK_CONNECTIONS_TABLE_NAME'])) {
+      throw new Error("not enough information for storage");
+    }
+
+    if (env['STORAGE_BACKEND'] === 'DYNAMODB') {
+      storageBackend = initializeDynamoDbBackend(env);
+    } else if(env['STORAGE_BACKEND'] === 'POSTGRESQL') {
+      storageBackend = initializePostgreSQLBackend(env);
+    } else {
+      throw new Error('unknown storage type');
+    }
   }
 
   const baseURL = env['FINAPI_URL'] || 'https://sandbox.finapi.io';

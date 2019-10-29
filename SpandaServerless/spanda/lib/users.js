@@ -144,3 +144,39 @@ exports.NewDynamoDbRepository = (client, tableName) => {
     }
   }
 }
+
+exports.NewPostgreSQLRepository = (pool, format, tableName) => {
+  return {
+    new: createUser,
+
+    findById: async (username) => {
+      console.log("before NewPostgreSQL")
+      return pool.connect().then(client => {
+        console.log("after NewPostgreSQL connect")
+        let text = 'SELECT * FROM ' + tableName + ' WHERE username = \'' + username + '\' LIMIT 1';
+        
+        return client.query(text).then(res => {
+          client.release();
+          return res.rows[0];
+        }).catch(err => {
+          client.release();
+          throw new Error(err.stack);
+        });
+      });
+    },
+
+    save: async (user) => {
+      let users = [];
+      users.push([user.username,Date.now(),user.allowance,user.isAllowanceReady,user.email,user.phone,user.isAutoUpdateEnabled,user.bankConnectionIds]);
+      const properties = 'username,creationDate,allowance,isAllowanceReady,email,phone,isAutoUpdateEnabled,bankConnectionIds';
+      let text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES %L returning id', users);
+      return client.query(text).then(res => {
+        client.release();
+        return user;
+      }).catch(err => {
+        client.release();
+        throw new Error(err.stack);
+      });
+    }
+  }
+}

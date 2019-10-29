@@ -125,3 +125,8 @@ exports.NewDynamoDbRepository = (client, tableName) => {
     }
   }
 }
+
+exports.NewPostgreSQLRepository = (pool, format, tableName) => {
+
+  return {}
+}

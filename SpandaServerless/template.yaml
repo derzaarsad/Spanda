@@ -53,9 +53,9 @@ Globals:
         PGPORT: "5432"
         PGUSER: !Ref DatabaseUser
         PGPASSWORD: !Ref DatabasePassword
-        # STORAGE_BACKEND: !Ref StorageBackend
-        # USERS_TABLE_NAME: !Ref UsersTableName
-        # BANK_CONNECTIONS_TABLE_NAME: !Ref BankConnectionsTableName
+        STORAGE_BACKEND: !Ref StorageBackend
+        USERS_TABLE_NAME: !Ref UsersTableName
+        BANK_CONNECTIONS_TABLE_NAME: !Ref BankConnectionsTableName
 
 Resources:
   IsUserAuthenticatedFunction:
