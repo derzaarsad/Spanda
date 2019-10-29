@@ -14,12 +14,13 @@ interface IUser extends mongoose.Document {
 const createUser = (username, email, phone, isAutoUpdateEnabled) => {
   return {
     'username': username,
+    'creationDate': new Date(),
     'allowance': 0,
     'isAllowanceReady': false,
     'email': email,
     'phone': phone,
     'isAutoUpdateEnabled': isAutoUpdateEnabled,
-    'bankConnectionIds': []
+    'bankConnectionIds': null
   }
 }
 
@@ -146,6 +147,18 @@ exports.NewDynamoDbRepository = (client, tableName) => {
 }
 
 exports.NewPostgreSQLRepository = (pool, format, tableName) => {
+  const userToSql = user => {
+    return [
+      user.username,
+      user.creationDate,
+      user.allowance,
+      user.isAllowanceReady,
+      user.email,
+      user.phone,
+      user.isAutoUpdateEnabled,
+      user.bankConnectionIds
+    ];
+  }
   return {
     new: createUser,
 
@@ -164,16 +177,17 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
     },
 
     save: async (user) => {
-      let users = [];
-      users.push([user.username,Date.now(),user.allowance,user.isAllowanceReady,user.email,user.phone,user.isAutoUpdateEnabled,user.bankConnectionIds]);
-      const properties = 'username,creationDate,allowance,isAllowanceReady,email,phone,isAutoUpdateEnabled,bankConnectionIds';
-      let text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES %L returning id', users);
-      return client.query(text).then(res => {
-        client.release();
-        return user;
-      }).catch(err => {
-        client.release();
-        throw new Error(err.stack);
+      return pool.connect().then(client => {
+        const properties = 'username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids';
+        let text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES (%L)', userToSql(user));
+        
+        return client.query(text).then(res => {
+          client.release();
+          return user;
+        }).catch(err => {
+          client.release();
+          throw new Error(err.stack);
+        });
       });
     }
   }
