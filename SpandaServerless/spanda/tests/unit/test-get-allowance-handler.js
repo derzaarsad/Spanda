@@ -72,8 +72,8 @@ describe('get allowance handler', function() {
     const result = await controller.getAllowance(event, context, logger, finapi, users)
 
     expect(result).to.be.an('object');
-    expect(result.statusCode).to.equal(404);
-    expect(JSON.parse(result.body).message).to.include('user not found');
+    expect(result.statusCode).to.equal(500);
+    expect(JSON.parse(result.body).message).to.include('error fetching allowance');
   })
 
   it('gets the user allowance', async function() {
