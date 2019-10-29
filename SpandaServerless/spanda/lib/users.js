@@ -150,14 +150,12 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
     new: createUser,
 
     findById: async (username) => {
-      console.log("before NewPostgreSQL")
       return pool.connect().then(client => {
-        console.log("after NewPostgreSQL connect")
         let text = 'SELECT * FROM ' + tableName + ' WHERE username = \'' + username + '\' LIMIT 1';
         
         return client.query(text).then(res => {
           client.release();
-          return res.rows[0];
+          return (res.rowCount === 1) ? res.rows[0] : undefined;
         }).catch(err => {
           client.release();
           throw new Error(err.stack);
