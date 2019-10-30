@@ -127,6 +127,45 @@ exports.NewDynamoDbRepository = (client, tableName) => {
 }
 
 exports.NewPostgreSQLRepository = (pool, format, tableName) => {
+  const bankconnectionToSql = bankConnection => {
+    return [
+      bankConnection.id,
+      bankConnection.bankId,
+      (bankConnection.bankAccountIds.length === 0) ? null :  bankConnection.bankAccountIds
+    ];
+  }
 
-  return {}
+  return {
+    new: createConnection,
+
+    findById: async (id) => {
+
+      return pool.connect().then(client => {
+        let text = 'SELECT * FROM ' + tableName + ' WHERE id = ' + id.toString() + ' LIMIT 1';
+        
+        return client.query(text).then(res => {
+          client.release();
+          return (res.rowCount === 1) ? res.rows[0] : undefined;
+        }).catch(err => {
+          client.release();
+          throw new Error(err.stack);
+        });
+      });
+    },
+
+    save: async (bankConnection) => {
+      return pool.connect().then(client => {
+        const properties = 'id,bankid,bankaccountids';
+        let text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES (%L)', bankconnectionToSql(bankConnection));
+
+        return client.query(text).then(res => {
+          client.release();
+          return user;
+        }).catch(err => {
+          client.release();
+          throw new Error(err.stack);
+        });
+      });
+    }
+  }
 }
