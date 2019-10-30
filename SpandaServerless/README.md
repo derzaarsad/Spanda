@@ -1,5 +1,7 @@
 # Spanda Serverless
 
+![](https://github.com/derzaarsad/Spanda/workflows/NodeJS%20AWS%20SAM%20Deploy/badge.svg)
+
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
 - spanda - Code for the application's Lambda function.
