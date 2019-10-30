@@ -20,7 +20,7 @@ on: ['push']
 # Set the Job #
 ###############
 jobs:
-  build:
+  buildInServerless:
     # Name the Job
     name: NodeJS AWS SAM Deploy
     # Set the agent to run on
