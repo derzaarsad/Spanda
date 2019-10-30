@@ -4,7 +4,7 @@
 ## Deploy GitHub Actions ##
 ###########################
 ###########################
-name: NodeJS AWS SAM Deploy
+name: Spanda CI
 
 #
 # Documentation:
@@ -44,3 +44,20 @@ jobs:
         env:
            AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
            AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+
+  buildInRepoServer:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: Run Tests
+      run: |
+        cd SpandaServerless/spanda
+        npm cit
+      env:
+        CI: true
