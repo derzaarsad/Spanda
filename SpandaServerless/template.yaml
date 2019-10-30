@@ -27,11 +27,11 @@ Parameters:
     Type: String
     Default: "IN_MEMORY"
   UsersTableName:
-    Description: The name of the users table (DynamoDB)
+    Description: The name of the users table
     Type: String
     Default: ""
   BankConnectionsTableName:
-    Description: The name of the bank connections table (DynamoDB)
+    Description: The name of the bank connections table
     Type: String
     Default: ""
 
