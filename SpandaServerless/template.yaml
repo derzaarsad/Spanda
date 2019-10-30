@@ -13,7 +13,7 @@ Parameters:
   Stage:
     Description: The deployment stage
     Type: String
-    Default: ""
+    Default: "dev"
   DatabaseUser:
     Description: Username of SQL database
     Type: String
