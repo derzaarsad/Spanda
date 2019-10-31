@@ -75,7 +75,7 @@ exports.getBankByBLZ = async (event, context) => {
 
 exports.getWebFormId = async (event, context) => {
   try {
-    return bankController.getWebformId(event, context, services.logger,
+    return bankController.getWebformId(event, context, logger,
       services.bankInterface)
   } catch (err) {
     logger.log('error', 'error importing bank connection', err)
@@ -85,7 +85,7 @@ exports.getWebFormId = async (event, context) => {
 
 exports.fetchWebFormInfo = async (event, context) => {
   try {
-    return bankController.fetchWebFormInfo(event, context, services.logger,
+    return bankController.fetchWebFormInfo(event, context, logger,
       services.bankInterface, services.users, services.connections)
   } catch (err) {
     logger.log('error', 'error fetching webform id', err)
@@ -95,7 +95,7 @@ exports.fetchWebFormInfo = async (event, context) => {
 
 exports.getAllowance = async (event, context) => {
   try {
-    return bankController.getAllowance(event, context, services.logger,
+    return bankController.getAllowance(event, context, logger,
       services.bankInterface, services.users)
   } catch (err) {
     logger.log('error', 'error fetching fetching allowance', err)
