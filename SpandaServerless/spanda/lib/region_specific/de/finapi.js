@@ -19,7 +19,7 @@ exports.NewClient = (http) => {
       const headers = response.headers
 
       return {
-        location: headers['Location'],
+        location: headers.location,
         formId: body.errors[0].message
       }
     });
