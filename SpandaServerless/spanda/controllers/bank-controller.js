@@ -66,7 +66,9 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
     return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
   }
 
-  return bankInterface.importConnection(authorization, event.body.bankId)
+  const body = JSON.parse(event.body);
+
+  return bankInterface.importConnection(authorization, body.bankId)
     .then(response => {
       user.activewebformid = response.formId;
       user.activewebformauth = crypto.createHmac('sha256', authorization) // this is only my variation to produce random hash
