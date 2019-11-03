@@ -83,6 +83,17 @@ exports.getWebFormId = async (event, context) => {
   }
 }
 
+exports.webFormCallback = async (event, context) => {
+  try {
+    // TODO: not finished!
+    console.log(event.pathParameters);
+    return lambdaUtil.CreateResponse(200, "the function is called!");
+  } catch (err) {
+    logger.log('error', 'error importing bank connection', err)
+    return lambdaUtil.CreateInternalErrorResponse(err)
+  }
+}
+
 exports.fetchWebFormInfo = async (event, context) => {
   try {
     return bankController.fetchWebFormInfo(event, context, logger,

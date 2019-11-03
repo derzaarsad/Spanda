@@ -240,6 +240,45 @@ paths:
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws_proxy"
+  /webForms/callback/{webFormAuth}:
+    post:
+      tags:
+      - bank
+      summary: Fetch a web form
+      description: Fetches web form
+      operationId: webFormCallback
+      parameters:
+      - name: webFormAuth
+        in: path
+        description: The web form auth from Spanda
+        required: true
+        schema:
+          type: number
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: the web form's body
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          description: unauthorized
+          content: {}
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WebFormCallbackFunction.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
   /webForms/{webFormId}:
     post:
       tags:

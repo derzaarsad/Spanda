@@ -154,6 +154,20 @@ Resources:
               Ref: RestApi
             Path: /bankConnections/import
             Method: post
+  WebFormCallbackFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: spanda/
+      Handler: api.webFormCallback
+      Runtime: nodejs10.x
+      Events:
+        PostBankId:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RestApi
+            Path: /webForms/callback/{webFormAuth}
+            Method: post
   FetchWebFormInfoFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -208,6 +222,9 @@ Outputs:
   GetWebFormIdFunction:
     Description: "Get Webform ID Function ARN"
     Value: !GetAtt GetWebFormIdFunction.Arn
+  WebFormCallbackFunction:
+    Description: "Callback for Webform Function ARN"
+    Value: !GetAtt WebFormCallbackFunction.Arn
   FetchWebFormInfoFunction:
     Description: "Fetch WebForm Info Function ARN"
     Value: !GetAtt FetchWebFormInfoFunction.Arn
