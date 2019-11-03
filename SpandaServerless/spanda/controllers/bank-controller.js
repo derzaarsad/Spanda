@@ -77,7 +77,7 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
       users.update(user);
 
       /*
-       * Client usage: {location}?callbackUrl={aws fetch gateway}?webFormAuth={webFormAuth}
+       * Client usage: {location}?callbackUrl={RestApi}/webForms/callback/{webFormAuth}
       */
       return lambdaUtil.CreateResponse(200, { location: response.location, webFormAuth: user.activewebformauth });
     })
