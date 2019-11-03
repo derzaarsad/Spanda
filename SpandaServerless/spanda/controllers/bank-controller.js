@@ -2,6 +2,7 @@
 
 const lambdaUtil = require('../lib/lambda-util.js');
 const blzPattern = /^\d{8}$/
+const crypto = require('crypto');
 
 const getUserInfo = async (logger, bankInterface, authorization) => {
   logger.log('info', 'authenticating user', { 'authorization': authorization })
@@ -44,15 +45,40 @@ exports.getBankByBLZ = async(event, context, logger, clientSecrets, authenticati
 // @Post('/bankConnections/import')
 // @Header('Authorization') authorization: string,
 // @BodyProp() bankId: number)
-exports.getWebformId = async(event, context, logger, bankInterface) => {
+exports.getWebformId = async(event, context, logger, bankInterface, users) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
     return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
   }
 
+  let user
+
+  try {
+    // Get user from authorization
+    let userInfo = await bankInterface.userInfo(authorization);
+    user = await users.findById(userInfo.id);
+    if(!user) {
+      throw new Error("user is not found in the database");
+    }
+  } catch (err) {
+    logger.log('error', 'error authenticating user', err)
+    return lambdaUtil.CreateErrorResponse(401, 'unauthorized')
+  }
+
   return bankInterface.importConnection(authorization, event.body.bankId)
-    .then(response => lambdaUtil.CreateResponse(200, response))
+    .then(response => {
+      user.activewebformid = response.formId;
+      user.activewebformauth = crypto.createHmac('sha256', authorization) // this is only my variation to produce random hash
+                   .update(response.formId.toString())
+                   .digest('hex');
+      users.update(user);
+
+      /*
+       * Client usage: {location}?callbackUrl={aws fetch gateway}?webFormAuth={webFormAuth}
+      */
+      return lambdaUtil.CreateResponse(200, { location: response.location, webFormAuth: user.activewebformauth });
+    })
     .catch(err => {
       logger.log('error', 'error importing connection', { 'cause': err })
       return lambdaUtil.CreateErrorResponse(500, 'could not import connection')

@@ -20,7 +20,9 @@ const createUser = (username, email, phone, isAutoUpdateEnabled) => {
     'email': email,
     'phone': phone,
     'isAutoUpdateEnabled': isAutoUpdateEnabled,
-    'bankConnectionIds': []
+    'bankConnectionIds': [],
+    'activeWebFormId': null,
+    'activeWebFormAuth': null
   }
 }
 
@@ -156,7 +158,9 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
       user.email,
       user.phone,
       user.isAutoUpdateEnabled,
-      (user.bankConnectionIds.length === 0) ? null :  user.bankConnectionIds
+      (user.bankConnectionIds.length === 0) ? null :  user.bankConnectionIds,
+      user.activeWebFormId,
+      user.activeWebFormAuth
     ];
   }
   return {
@@ -178,8 +182,33 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
 
     save: async (user) => {
       return pool.connect().then(client => {
-        const properties = 'username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids';
+        const properties = 'username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth';
         let text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES (%L)', userToSql(user));
+
+        return client.query(text).then(res => {
+          client.release();
+          return user;
+        }).catch(err => {
+          client.release();
+          throw new Error(err.stack);
+        });
+      });
+    },
+
+    update: async (user) => {
+      return pool.connect().then(client => {
+        let text = 'UPDATE ' + tableName + ' SET'
+        + ' username=\'' + user.username + '\''
+        + ',creationdate=\'' + user.creationdate.toISOString() + '\''
+        + ',allowance=' + user.allowance
+        + ',isallowanceready=' + user.isallowanceready
+        + ',email=\'' + user.email + '\''
+        + ',phone=\'' + user.phone + '\''
+        + ',isautoupdateenabled=' + user.isautoupdateenabled
+        + ',bankconnectionids=' + user.bankconnectionids
+        + ',activewebformid=' + user.activewebformid
+        + ',activewebformauth=' + ((user.activewebformauth) ? ('\'' + user.activewebformauth + '\'') : user.activewebformauth)
+        + ' WHERE username=\'' + user.username + '\''
 
         return client.query(text).then(res => {
           client.release();

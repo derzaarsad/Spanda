@@ -73,23 +73,7 @@ exports.NewClient = (http) => {
     },
 
     importConnection: async (authorization, bankId) => {
-      return requestWebForm(authorization, bankId).then(webFormId => {
-        const formId = webFormId.formId
-        const url = webFormId.location
-        const resource = '/api/v1/webForms/' + formId
-
-        const data = {}
-
-        const config = {
-          'baseURL': url,
-          'headers': {
-            'Authorization': authorization
-          }
-        }
-
-        return http.post(resource, data, config)
-          .then(response => [ response.data, formId ]);
-      })
+      return requestWebForm(authorization, bankId)
     }
   }
 }
