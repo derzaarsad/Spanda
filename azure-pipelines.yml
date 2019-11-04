@@ -52,4 +52,4 @@ steps:
   condition: succeededOrFailed()
   inputs:
     testRunner: JUnit
-    testResultsFiles: '**/TEST-RESULTS.xml'
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-results.xml'
