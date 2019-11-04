@@ -24,30 +24,6 @@ steps:
     npm test
   displayName: 'Run unit tests'
   continueOnError: true
-- script: |
-    cd SpandaServerless/spanda
-    ls
-  displayName: 'test output1'
-  continueOnError: true
-- script: |
-    cd SpandaServerless
-    ls
-  displayName: 'test output2'
-  continueOnError: true
-- script: |
-    ls
-  displayName: 'test output3'
-  continueOnError: true
-- script: |
-    cd SpandaServerless/spanda/tests/unit
-    ls
-  displayName: 'test output4'
-  continueOnError: true
-- script: |
-    cd SpandaServerless/spanda/tests
-    ls
-  displayName: 'test output5'
-  continueOnError: true
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
