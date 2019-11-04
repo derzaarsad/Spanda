@@ -25,7 +25,7 @@ steps:
   displayName: 'Run unit tests'
   continueOnError: true
 - task: PublishTestResults@2
-  displayName: 'Publish Test Results'
   condition: succeededOrFailed()
   inputs:
-    testResultsFiles: $(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-report.xml
+    testRunner: JUnit
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-results.xml'
