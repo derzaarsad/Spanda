@@ -19,7 +19,9 @@ steps:
     cd SpandaServerless/spanda
     npm ci
   displayName: 'npm install and build'
-- script: 'npm test'
+- script: |
+    cd SpandaServerless/spanda
+    npm test
   displayName: 'Run unit tests'
   continueOnError: true
 - task: PublishTestResults@2
