@@ -17,7 +17,15 @@ steps:
 
 - script: |
     cd SpandaServerless/spanda
-    npm cit
+    npm ci
   displayName: 'npm install and build'
-  env:
-    CI: true
+- script: |
+    cd SpandaServerless/spanda
+    npm test
+  displayName: 'Run unit tests'
+  continueOnError: true
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results'
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: $(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-report.xml
