@@ -14,7 +14,7 @@
     "winston": "^3.2.1"
   },
   "scripts": {
-    "test": "mocha tests/unit/"
+    "test": "mocha tests/unit/ --reporter mocha-junit-reporter"
   },
   "devDependencies": {
     "chai": "^4.2.0",
