@@ -28,4 +28,4 @@ steps:
   displayName: 'Publish Test Results'
   condition: succeededOrFailed()
   inputs:
-    testResultsFiles: $(System.DefaultWorkingDirectory)/test-report.xml
+    testResultsFiles: $(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-report.xml
