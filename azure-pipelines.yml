@@ -41,3 +41,7 @@ steps:
   inputs:
     testRunner: JUnit
     testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-results.xml'
+- script: |
+    cd SpandaServerless/spanda
+    sam build
+  displayName: 'build serverless application model'
