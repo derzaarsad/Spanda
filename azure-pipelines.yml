@@ -40,7 +40,12 @@ steps:
     echo "[default]" >> ~/.aws/credentials
     echo "aws_access_key_id = $(AWS_ACCESS_KEY)" >> ~/.aws/credentials
     echo "aws_secret_access_key = $(AWS_SECRET_KEY)" >> ~/.aws/credentials
-    aws configure list
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+    test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
+    test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+    test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
+    echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
+    brew --version
   displayName: 'Installing the AWS SAM CLI'
 - script: |
     cd SpandaServerless/spanda
