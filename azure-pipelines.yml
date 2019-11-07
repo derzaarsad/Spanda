@@ -46,9 +46,10 @@ steps:
     unzip awscli-bundle.zip
     sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
     cd SpandaServerless/spanda
+    mkdir ~/.aws
     touch ~/.aws/config
     echo "[default]" >> ~/.aws/config
-    echo "region = eu-central-1" >> ~/.aws/config
+    echo "region = $(AWS_REGION)" >> ~/.aws/config
     echo "output = json" >> ~/.aws/config
     cat ~/.aws/config
   displayName: 'build serverless application model'
