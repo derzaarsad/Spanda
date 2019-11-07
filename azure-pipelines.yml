@@ -50,7 +50,7 @@ steps:
     touch ~/.aws/config
     echo "[default]" >> ~/.aws/config
     regionText="region = "
-    regionText+=$(AWS_REGION)
+    regionText+="$AWS_REGION"
     echo "$regionText" >> ~/.aws/config
     echo "output = json" >> ~/.aws/config
     cat ~/.aws/config
