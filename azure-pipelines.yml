@@ -42,6 +42,9 @@ steps:
     testRunner: JUnit
     testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-results.xml'
 - script: |
+    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+    unzip awscli-bundle.zip
+    sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
     cd SpandaServerless/spanda
     sam build
   displayName: 'build serverless application model'
