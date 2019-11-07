@@ -5,6 +5,19 @@
 
 trigger:
 - master
+# specific path build
+pr:
+  branches:
+    include:
+    - master
+    - releases/*
+  paths:
+    include:
+    - '*'
+    exclude:
+    - README.md
+    - .github/*
+    - .gitignore
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -14,7 +27,6 @@ steps:
   inputs:
     versionSpec: '12.x'
   displayName: 'Install Node.js'
-
 - script: |
     cd SpandaServerless/spanda
     npm ci
