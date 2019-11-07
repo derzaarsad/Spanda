@@ -20,7 +20,7 @@ pr:
     - .gitignore
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-18.04'
 
 steps:
 - task: NodeTool@0
@@ -54,6 +54,7 @@ steps:
     cd SpandaServerless/spanda
     npm ci
   displayName: 'npm install and build'
+  continueOnError: false
 - script: |
     cd SpandaServerless/spanda
     npm test
@@ -64,3 +65,8 @@ steps:
   inputs:
     testRunner: JUnit
     testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-results.xml'
+- script: |
+    cd SpandaServerless/spanda
+    sam build
+  displayName: 'Build Serverless Application Model'
+  continueOnError: false
