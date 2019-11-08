@@ -69,6 +69,7 @@ steps:
 - script: |
     cd $(System.DefaultWorkingDirectory)/SpandaServerless
     cd /home/linuxbrew/.linuxbrew/bin
+    ls
     sam build
   displayName: 'Building Serverless Application Model'
   continueOnError: false
