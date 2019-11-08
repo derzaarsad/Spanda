@@ -63,8 +63,6 @@ steps:
     brew tap aws/tap
     brew install aws-sam-cli
     sam --version
-    cd $(System.DefaultWorkingDirectory)/SpandaServerless/spanda
-    sam build
   displayName: 'Installing the AWS SAM CLI'
   continueOnError: false
 - script: |
