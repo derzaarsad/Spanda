@@ -63,13 +63,10 @@ steps:
     brew tap aws/tap
     brew install aws-sam-cli
     sam --version
-    which sam
   displayName: 'Installing the AWS SAM CLI'
   continueOnError: false
 - script: |
     cd $(System.DefaultWorkingDirectory)/SpandaServerless
-    cd /home/linuxbrew/.linuxbrew/bin
-    ls
-    sam build
+    /home/linuxbrew/.linuxbrew/bin/sam build
   displayName: 'Building Serverless Application Model'
   continueOnError: false
