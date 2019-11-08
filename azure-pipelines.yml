@@ -67,3 +67,8 @@ steps:
     sam build
   displayName: 'Installing the AWS SAM CLI'
   continueOnError: false
+- script: |
+    cd $(System.DefaultWorkingDirectory)/SpandaServerless
+    sam build
+  displayName: 'Building Serverless Application Model'
+  continueOnError: false
