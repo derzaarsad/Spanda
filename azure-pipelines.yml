@@ -28,6 +28,21 @@ steps:
     versionSpec: '12.x'
   displayName: 'Install Node.js'
 - script: |
+    cd SpandaServerless/spanda
+    npm ci
+  displayName: 'npm install and build'
+  continueOnError: false
+- script: |
+    cd SpandaServerless/spanda
+    npm test
+  displayName: 'Run unit tests'
+  continueOnError: true
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-results.xml'
+- script: |
     curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
     unzip awscli-bundle.zip
     sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
@@ -48,25 +63,7 @@ steps:
     brew tap aws/tap
     brew install aws-sam-cli
     sam --version
-  displayName: 'Installing the AWS SAM CLI'
-  continueOnError: false
-- script: |
-    cd SpandaServerless/spanda
-    npm ci
-  displayName: 'npm install and build'
-  continueOnError: false
-- script: |
-    cd SpandaServerless/spanda
-    npm test
-  displayName: 'Run unit tests'
-  continueOnError: true
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testRunner: JUnit
-    testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-results.xml'
-- script: |
-    cd SpandaServerless/spanda
+    cd $(System.DefaultWorkingDirectory)/SpandaServerless/spanda
     sam build
-  displayName: 'Build Serverless Application Model'
+  displayName: 'Installing the AWS SAM CLI'
   continueOnError: false
