@@ -61,5 +61,5 @@ steps:
     /home/linuxbrew/.linuxbrew/bin/sam build
   displayName: 'Building Serverless Application Model'
   continueOnError: false
-- publish: $(System.DefaultWorkingDirectory)/SpandaServerless/.aws-sam/build
+- publish: $(System.DefaultWorkingDirectory)/SpandaServerless
   artifact: SamApp
