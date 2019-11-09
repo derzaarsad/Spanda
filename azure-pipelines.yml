@@ -4,13 +4,14 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
 trigger:
-- master
+  branches:
+    include:
+    - '*'
 # specific path build
 pr:
   branches:
     include:
     - master
-    - releases/*
   paths:
     include:
     - '*'
@@ -18,48 +19,48 @@ pr:
     - README.md
     - .github/*
     - .gitignore
-
-pool:
-  vmImage: 'ubuntu-18.04'
-
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '12.x'
-  displayName: 'Install Node.js'
-- script: |
-    cd SpandaServerless/spanda
-    npm ci
-  displayName: 'npm install and build'
-  continueOnError: false
-- script: |
-    cd SpandaServerless/spanda
-    npm test
-  displayName: 'Run unit tests'
-  continueOnError: true
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testRunner: JUnit
-    testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-results.xml'
-- script: |
-    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-    unzip awscli-bundle.zip
-    sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
-    test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
-    test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-    test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
-    echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
-    brew tap aws/tap
-    brew install aws-sam-cli
-    sam --version
-  displayName: 'Installing the AWS SAM CLI'
-  continueOnError: false
-- script: |
-    cd $(System.DefaultWorkingDirectory)/SpandaServerless
-    /home/linuxbrew/.linuxbrew/bin/sam build
-  displayName: 'Building Serverless Application Model'
-  continueOnError: false
-- publish: $(System.DefaultWorkingDirectory)/SpandaServerless/.aws-sam/build
-  artifact: SamApp
+jobs:
+- job: Build_Serverless
+  pool:
+    vmImage: 'ubuntu-18.04'
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '12.x'
+    displayName: 'Install Node.js'
+  - script: |
+      cd SpandaServerless/spanda
+      npm ci
+    displayName: 'npm install and build'
+    continueOnError: false
+  - script: |
+      cd SpandaServerless/spanda
+      npm test
+    displayName: 'Run unit tests'
+    continueOnError: true
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testRunner: JUnit
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-results.xml'
+  - script: |
+      curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+      unzip awscli-bundle.zip
+      sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+      sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+      test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
+      test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+      test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
+      echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
+      brew tap aws/tap
+      brew install aws-sam-cli
+      sam --version
+    displayName: 'Installing the AWS SAM CLI'
+    continueOnError: false
+  - script: |
+      cd $(System.DefaultWorkingDirectory)/SpandaServerless
+      /home/linuxbrew/.linuxbrew/bin/sam build
+    displayName: 'Building Serverless Application Model'
+    continueOnError: false
+  - publish: $(System.DefaultWorkingDirectory)/SpandaServerless/.aws-sam/build
+    artifact: SamApp
