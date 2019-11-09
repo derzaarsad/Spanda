@@ -64,11 +64,9 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Stage
-      DefinitionBody:
-        'Fn::Transform':
-          Name: 'AWS::Include'
-          Parameters:
-            Location: swagger.yaml
+      DefinitionUri:
+        Path: swagger.yml
+        Upload: false
 
   IsUserAuthenticatedFunction:
     Type: AWS::Serverless::Function
