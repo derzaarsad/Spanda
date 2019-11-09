@@ -33,9 +33,6 @@ jobs:
     displayName: 'install nativescript'
     continueOnError: false
   - bash: |
-      $ANDROID_HOME/tools/bin/sdkmanager --list
-    displayName: 'list already installed Android packages'
-  - bash: |
       echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install 'system-images;android-28;google_apis;x86'
     displayName: 'install Android image'
   - script: |
