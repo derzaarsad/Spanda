@@ -1,16 +1,16 @@
 import sys
 from subprocess import check_output
-changedFilesList = check_output(['git', 'diff', '--name-only']).split('\n')
-anyApp = any(item.startswith('SpandaApp/') for item in changedFilesList)
-anyServerless = any(item.startswith('SpandaServerless/') for item in changedFilesList)
+changedFilesList = check_output([b'git', b'diff', b'--name-only']).split(b'\n')
+anyApp = any(item.startswith(b'SpandaApp/') for item in changedFilesList)
+anyServerless = any(item.startswith(b'SpandaServerless/') for item in changedFilesList)
 
-retText = '##vso[task.setvariable variable=jobName;isOutput=true]'
+retText = b'##vso[task.setvariable variable=jobName;isOutput=true]'
 
 if anyApp == False:
-    print(retText + 'Serverless')
+    print(retText + b'Serverless')
     sys.exit(0)
 if anyServerless == False:
-    print(retText + 'App')
+    print(retText + b'App')
     sys.exit(0)
-print(retText + 'All')
+print(retText + b'All')
 sys.exit(0)
