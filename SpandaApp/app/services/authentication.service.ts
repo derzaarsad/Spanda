@@ -40,13 +40,13 @@ export class AuthenticationService {
         return [environment.backendUrl + "/oauth/login", { username: username, password: password }, { headers: headerOptions }];
     }
 
-    __setNewRefreshAndAccessToken__() : [string, any, any] {
+    __setNewRefreshAndAccessToken__(refreshToken: string) : [string, any, any] {
 
         let headerOptions = new HttpHeaders({
             "Content-Type": "application/json"
         });
 
-        return [environment.backendUrl + "/oauth/token", { refresh_token: this.storedUser.UserToken.RefreshToken }, { headers: headerOptions }];
+        return [environment.backendUrl + "/oauth/token", { refresh_token: refreshToken }, { headers: headerOptions }];
     }
 
     __isUserAuthenticated__(access_token: string, token_type: string) : [string, any] {
@@ -86,7 +86,7 @@ export class AuthenticationService {
     }
 
     setNewRefreshAndAccessToken() : Promise<boolean> {
-        let request = this.__setNewRefreshAndAccessToken__();
+        let request = this.__setNewRefreshAndAccessToken__(this.storedUser.UserToken.RefreshToken);
         return this.http.post(request[0],request[1],request[2]).toPromise()
         .then(res => {
             this.storedUser.UserToken = new Token(res["access_token"], res["refresh_token"], res["token_type"]);
