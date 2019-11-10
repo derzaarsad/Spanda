@@ -264,8 +264,13 @@ module.exports = env => {
             new webpack.DefinePlugin({
                 "global.TNS_WEBPACK": "true",
                 //"process": "global.process",
+
+                /*
+                 * environmentJson contains JSON string of the environment variable
+                 * use example: tns run android --env.environmentJson="{\"stage\":\"prototype\",\"backendUrl\":\"https://localhost:4000\"}"
+                 */
                 "process.env": {
-                    environment: (env && Object.prototype.hasOwnProperty.call(env, 'environment')) ? JSON.stringify(env.environment) : undefined
+                    environmentJson: (env && Object.prototype.hasOwnProperty.call(env, 'environmentJson')) ? JSON.stringify(env.environmentJson) : undefined
                 }
             }),
             // Remove all files from the out dir.

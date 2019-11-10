@@ -1,5 +1,3 @@
-import { environment as devEnvironment } from './environment.dev';
-import { environment as prodEnvironment } from './environment.prod';
 declare var process: any;
 
 export const environment = (() => {
@@ -8,18 +6,11 @@ export const environment = (() => {
   if (
     typeof process !== 'undefined' && process &&
     Object.prototype.hasOwnProperty.call(process, 'env') && process.env &&
-    Object.prototype.hasOwnProperty.call(process.env, 'environment') && process.env.environment
+    Object.prototype.hasOwnProperty.call(process.env, 'environmentJson') && process.env.environmentJson
   ) {
-    switch (process.env.environment) {
-      case 'prod':
-        envVars = prodEnvironment;
-        break;
-      // TODO: Add additional environment if required. 
-      default:
-        envVars = devEnvironment;
-    }
+    envVars = JSON.parse(process.env.environmentJson);
   } else {
-    envVars = devEnvironment;
+    throw new Error("No environment variable defined");
   }
 
   return envVars;
