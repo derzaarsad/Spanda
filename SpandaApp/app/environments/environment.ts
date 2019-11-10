@@ -1,3 +1,2 @@
-import { environment as devEnvironment } from './environment.dev';
-
-export const environment = devEnvironment;
+// placeholder, if environment.tns.ts is not used, for example at unit testing
+export const environment = undefined;
