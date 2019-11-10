@@ -26,12 +26,9 @@ jobs:
   steps:
     - bash: |
         clear
-        echo "This is job DetermineBuild."
         sleep 1
-        result=`python python/pythonScript1.py "hi"`
-        if [ "$result" == "Salaam" ]; then
-          echo "##vso[task.setvariable variable=jobName;isOutput=true]Serverless" #The variable doThing is set to true
-        fi
+        result=`python determineAzureJobs.py`
+        echo "$result"
       name: DetermineJobResult
 
 - job: Build_App
