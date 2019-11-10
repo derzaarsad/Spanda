@@ -9,13 +9,50 @@ export class BankService {
 
     constructor(private http: HttpClient, private authenticationService: AuthenticationService) { }
 
-    getBankByBLZ(blz: string) : Promise<Bank> {
+    __getBankByBLZ__(blz: string) : [string,any] {
 
         let headerOptions = new HttpHeaders({
             "Content-Type": "application/x-www-form-urlencoded"
         });
 
-        return this.http.get(this.authenticationService.getBackendUrl() + "/banks/" + blz, { headers: headerOptions }).toPromise()
+        return [this.authenticationService.getBackendUrl() + "/banks/" + blz, { headers: headerOptions }];
+    }
+
+    __getWebformIdAndToken__(bank: Bank): [string, any, any] {
+
+        let headerOptions = new HttpHeaders({
+            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
+            "Content-Type": "application/json"
+        });
+
+        return [this.authenticationService.getBackendUrl() + "/bankConnections/import", { bankId: bank.Id }, { headers: headerOptions }];
+    }
+
+    __fetchWebformInfo__(webId: string): [string, any] {
+
+        let headerOptions = new HttpHeaders({
+            "Username": this.authenticationService.getStoredUser().Username,
+            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
+            "Content-Type": "application/x-www-form-urlencoded"
+        });
+
+        return [this.authenticationService.getBackendUrl() + "/webForms/" + webId, { headers: headerOptions }];
+    }
+
+    __getAllowance__(): [string, any] {
+
+        let headerOptions = new HttpHeaders({
+            "Username": this.authenticationService.getStoredUser().Username,
+            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
+            "Content-Type": "application/x-www-form-urlencoded"
+        });
+
+        return [this.authenticationService.getBackendUrl() + "/allowance", { headers: headerOptions }];
+    }
+
+    getBankByBLZ(blz: string) : Promise<Bank> {
+        let request = this.__getBankByBLZ__(blz);
+        return this.http.get(request[0],request[1]).toPromise()
         .then(res => {
             // always take the first element, assumed blz is unique only to one bank
             let bank = new Bank();
@@ -38,13 +75,8 @@ export class BankService {
      * return [ Id , Access Token, Status ]
      */
     getWebformIdAndToken(bank: Bank): Promise<[string, string, string, string]> {
-
-        let headerOptions = new HttpHeaders({
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
-            "Content-Type": "application/json"
-        });
-
-        return this.http.post(this.authenticationService.getBackendUrl() + "/bankConnections/import", { bankId: bank.Id }, { headers: headerOptions }).toPromise()
+        let request = this.__getWebformIdAndToken__(bank);
+        return this.http.post(request[0],request[1],request[2]).toPromise()
         .then(res => {
             console.log("WebForm Valid");
             console.log(res[0]);
@@ -57,13 +89,8 @@ export class BankService {
     }
 
     fetchWebformInfo(webId: string): Promise<JSON> {
-        let headerOptions = new HttpHeaders({
-            "Username": this.authenticationService.getStoredUser().Username,
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
-            "Content-Type": "application/x-www-form-urlencoded"
-        });
-
-        return this.http.get(this.authenticationService.getBackendUrl() + "/webForms/" + webId, { headers: headerOptions }).toPromise()
+        let request = this.__fetchWebformInfo__(webId);
+        return this.http.get(request[0],request[1]).toPromise()
         .then(res => {
             // always take the first element, assumed blz is unique only to one bank
             let serviceResponseBody = res["serviceResponseBody"];
@@ -81,13 +108,8 @@ export class BankService {
     }
 
     getAllowance(): Promise<number> {
-        let headerOptions = new HttpHeaders({
-            "Username": this.authenticationService.getStoredUser().Username,
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
-            "Content-Type": "application/x-www-form-urlencoded"
-        });
-
-        return this.http.get(this.authenticationService.getBackendUrl() + "/allowance", { headers: headerOptions }).toPromise()
+        let request = this.__getAllowance__();
+        return this.http.get(request[0],request[1]).toPromise()
         .then(res => {
             return res["allowance"];
         })
