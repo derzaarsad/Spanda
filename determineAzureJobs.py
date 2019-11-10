@@ -1,6 +1,7 @@
 import sys
 from subprocess import check_output
-changedFilesList = check_output(['git', 'diff', '--name-only']).split(b'\n')
+currentBranch = check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).split(b'\n')
+changedFilesList = check_output(['git', 'diff', '--name-only', currentBranch[0], 'origin/master']).split(b'\n')
 anyApp = any(item.startswith(b'SpandaApp/') for item in changedFilesList)
 anyServerless = any(item.startswith(b'SpandaServerless/') for item in changedFilesList)
 
