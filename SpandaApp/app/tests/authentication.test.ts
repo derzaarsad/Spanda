@@ -1,5 +1,5 @@
 import { AuthenticationService } from '../services/authentication.service';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 describe('App Component Test',() => {
 
@@ -12,13 +12,28 @@ describe('App Component Test',() => {
 	})
 	
 	it('construct message authenticateAndSave to send via REST', async function() {
-		
-		const result = authenticationService.__authenticateAndSave__("testuser","password123");
+
+		let username = "testuser";
+		let password = "password123";
+
+		const result = authenticationService.__authenticateAndSave__(username,password);
 
 		expect(result.length).to.be.equal(3)
 		expect(result[0]).to.be.an('string')
 		expect(result[1]).to.be.an('object')
 		expect(result[2]).to.be.an('object')
+
+		expect(result[1].username).to.be.an('string')
+		expect(result[1].password).to.be.an('string')
+
+		expect(result[2].headers).to.be.an('object')
+
+		expect(result[0]).to.be.equal("onlyfortest/oauth/login")
+		expect(result[1].username).to.be.equal(username)
+		expect(result[1].password).to.be.equal(password)
+
+		expect(result[2].headers.has("Content-Type")).to.be.true
+		expect(result[2].headers.get("Content-Type")).to.be.equal("application/json")
 	})
 
 	it('construct message setNewRefreshAndAccessToken to send via REST', async function() {
