@@ -167,37 +167,26 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
     new: createUser,
 
     findById: async (username) => {
-      return pool.connect().then(client => {
-        let text = 'SELECT * FROM ' + tableName + ' WHERE username = \'' + username + '\' LIMIT 1';
-        
-        return client.query(text).then(res => {
-          client.release();
-          return (res.rowCount === 1) ? res.rows[0] : undefined;
-        }).catch(err => {
-          client.release();
-          throw new Error(err.stack);
-        });
-      });
+      const text = format('SELECT * FROM %L WHERE username = %L LIMIT 1', tableName, username);
+
+      const client = await pool.connect();
+
+      return client.query(text)
+        .then(res => (res.rowCount === 1) ? res.rows[0] : undefined)
+        .finally(() => client.release());
     },
 
     save: async (user) => {
-      return pool.connect().then(client => {
-        const properties = 'username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth';
-        let text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES (%L)', userToSql(user));
+      const properties = 'username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth';
+      const text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES (%L)', userToSql(user));
 
-        return client.query(text).then(res => {
-          client.release();
-          return user;
-        }).catch(err => {
-          client.release();
-          throw new Error(err.stack);
-        });
-      });
+      const client = await pool.connect();
+
+      return client.query(text).then(() => user).finally(() => client.release());
     },
 
     update: async (user) => {
-      return pool.connect().then(client => {
-        let text = 'UPDATE ' + tableName + ' SET'
+        const text = 'UPDATE ' + tableName + ' SET'
         + ' username=\'' + user.username + '\''
         + ',creationdate=\'' + user.creationdate.toISOString() + '\''
         + ',allowance=' + user.allowance
@@ -208,16 +197,11 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
         + ',bankconnectionids=' + user.bankconnectionids
         + ',activewebformid=' + user.activewebformid
         + ',activewebformauth=' + ((user.activewebformauth) ? ('\'' + user.activewebformauth + '\'') : user.activewebformauth)
-        + ' WHERE username=\'' + user.username + '\''
+        + ' WHERE username=\'' + user.username + '\'';
 
-        return client.query(text).then(res => {
-          client.release();
-          return user;
-        }).catch(err => {
-          client.release();
-          throw new Error(err.stack);
-        });
-      });
+      const client = await pool.connect();
+
+      return client.query(text).then(() => user).finally(() => client.release());
     }
   }
 }

@@ -131,7 +131,7 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
     return [
       bankConnection.id,
       bankConnection.bankId,
-      (bankConnection.bankAccountIds.length === 0) ? null :  bankConnection.bankAccountIds
+      (bankConnection.bankAccountIds.length === 0) ? null : bankConnection.bankAccountIds
     ];
   }
 
@@ -139,33 +139,22 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
     new: createConnection,
 
     findById: async (id) => {
+      const text = format('SELECT * FROM %L WHERE id = %L LIMIT 1', tableName, id.toString());
 
-      return pool.connect().then(client => {
-        let text = 'SELECT * FROM ' + tableName + ' WHERE id = ' + id.toString() + ' LIMIT 1';
-        
-        return client.query(text).then(res => {
-          client.release();
-          return (res.rowCount === 1) ? res.rows[0] : undefined;
-        }).catch(err => {
-          client.release();
-          throw new Error(err.stack);
-        });
-      });
+      const client = await pool.connect();
+
+      return client.query(text)
+        .then(res => (res.rowCount === 1) ? res.rows[0] : undefined)
+        .finally(() => client.release())
     },
 
     save: async (bankConnection) => {
-      return pool.connect().then(client => {
-        const properties = 'id,bankid,bankaccountids';
-        let text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES (%L)', bankconnectionToSql(bankConnection));
+      const properties = 'id,bankid,bankaccountids';
+      const text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES (%L)', bankconnectionToSql(bankConnection));
 
-        return client.query(text).then(res => {
-          client.release();
-          return user;
-        }).catch(err => {
-          client.release();
-          throw new Error(err.stack);
-        });
-      });
+      const client = await pool.connect();
+
+      return client.query(text).then(() => bankConnection).finally(() => client.release());
     }
   }
 }
