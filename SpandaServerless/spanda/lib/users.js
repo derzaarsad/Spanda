@@ -149,6 +149,8 @@ exports.NewDynamoDbRepository = (client, tableName) => {
 }
 
 exports.NewPostgreSQLRepository = (pool, format, tableName) => {
+  const schema = 'username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth';
+
   const userToSql = user => {
     return [
       user.username,
@@ -164,7 +166,11 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
     ];
   }
 
-  const findByIdQuery = (userName) => format('SELECT * FROM %I WHERE username = %L LIMIT 1', tableName, userName)
+  const findByIdQuery = (userName) => format('SELECT * FROM %I WHERE username = %L LIMIT 1', tableName, userName);
+
+  const saveQuery = (user) => format('INSERT INTO %I (%s) VALUES (%L)', tableName, schema, userToSql(user));
+
+  const updateQuery = (user) => format('UPDATE %I SET (%s) = (%L) WHERE %I = %L', tableName, schema, userToSql(user), 'username', user.username);
 
   return {
     new: createUser,
@@ -178,33 +184,19 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
     },
 
     save: async (user) => {
-      const properties = 'username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth';
-      const text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES (%L)', userToSql(user));
-
       const client = await pool.connect();
 
-      return client.query(text).then(() => user).finally(() => client.release());
+      return client.query(saveQuery(user)).then(() => user).finally(() => client.release());
     },
 
     update: async (user) => {
-        const text = 'UPDATE ' + tableName + ' SET'
-        + ' username=\'' + user.username + '\''
-        + ',creationdate=\'' + user.creationdate.toISOString() + '\''
-        + ',allowance=' + user.allowance
-        + ',isallowanceready=' + user.isallowanceready
-        + ',email=\'' + user.email + '\''
-        + ',phone=\'' + user.phone + '\''
-        + ',isautoupdateenabled=' + user.isautoupdateenabled
-        + ',bankconnectionids=' + user.bankconnectionids
-        + ',activewebformid=' + user.activewebformid
-        + ',activewebformauth=' + ((user.activewebformauth) ? ('\'' + user.activewebformauth + '\'') : user.activewebformauth)
-        + ' WHERE username=\'' + user.username + '\'';
-
       const client = await pool.connect();
 
-      return client.query(text).then(() => user).finally(() => client.release());
+      return client.query(updateQuery(user)).then(() => user).finally(() => client.release());
     },
 
-    findByIdQuery: findByIdQuery
+    findByIdQuery: findByIdQuery,
+    saveQuery: saveQuery,
+    updateQuery: updateQuery
   }
 }
