@@ -139,7 +139,7 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
     new: createConnection,
 
     findById: async (id) => {
-      const text = format('SELECT * FROM %L WHERE id = %L LIMIT 1', tableName, id.toString());
+      const text = format('SELECT * FROM %I WHERE id = %L LIMIT 1', tableName, id.toString());
 
       const client = await pool.connect();
 
@@ -150,7 +150,7 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
 
     save: async (bankConnection) => {
       const properties = 'id,bankid,bankaccountids';
-      const text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES (%L)', bankconnectionToSql(bankConnection));
+      const text = format('INSERT INTO %I' + tableName + '(' + properties + ') VALUES (%L)', bankconnectionToSql(bankConnection));
 
       const client = await pool.connect();
 

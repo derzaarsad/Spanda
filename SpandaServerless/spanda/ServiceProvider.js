@@ -32,6 +32,7 @@ const initializePostgreSQLBackend = env => {
   }
   const { Pool } = require('pg');
   const format = require('pg-format');
+
   const Users = require('./lib/users');
   const BankConnections = require('./lib/bank-connections');
 

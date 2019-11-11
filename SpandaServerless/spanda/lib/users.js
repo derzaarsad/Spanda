@@ -163,15 +163,16 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
       user.activeWebFormAuth
     ];
   }
+
+  const findByIdQuery = (userName) => format('SELECT * FROM %I WHERE username = %L LIMIT 1', tableName, userName)
+
   return {
     new: createUser,
 
     findById: async (username) => {
-      const text = format('SELECT * FROM %L WHERE username = %L LIMIT 1', tableName, username);
-
       const client = await pool.connect();
 
-      return client.query(text)
+      return client.query(findByIdQuery(username))
         .then(res => (res.rowCount === 1) ? res.rows[0] : undefined)
         .finally(() => client.release());
     },
@@ -202,6 +203,8 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
       const client = await pool.connect();
 
       return client.query(text).then(() => user).finally(() => client.release());
-    }
+    },
+
+    findByIdQuery: findByIdQuery
   }
 }
