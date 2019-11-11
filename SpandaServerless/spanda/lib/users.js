@@ -180,19 +180,23 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
 
       return client.query(findByIdQuery(username))
         .then(res => (res.rowCount === 1) ? res.rows[0] : undefined)
-        .finally(() => client.release());
+        .finally(() => { client.release() });
     },
 
     save: async (user) => {
       const client = await pool.connect();
 
-      return client.query(saveQuery(user)).then(() => user).finally(() => client.release());
+      return client.query(saveQuery(user))
+        .then(() => user)
+        .finally(() => { client.release() });
     },
 
     update: async (user) => {
       const client = await pool.connect();
 
-      return client.query(updateQuery(user)).then(() => user).finally(() => client.release());
+      return client.query(updateQuery(user))
+        .then(() => user)
+        .finally(() => { client.release() });
     },
 
     findByIdQuery: findByIdQuery,

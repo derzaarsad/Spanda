@@ -149,7 +149,7 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
 
       return client.query(findByIdQuery(id))
         .then(res => (res.rowCount === 1) ? res.rows[0] : undefined)
-        .finally(() => client.release())
+        .finally(() => { client.release() })
     },
 
     save: async (bankConnection) => {
@@ -157,7 +157,7 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
 
       return client.query(saveQuery(bankConnection))
         .then(() => bankConnection)
-        .finally(() => client.release());
+        .finally(() => { client.release() });
     },
 
     findByIdQuery: findByIdQuery,
