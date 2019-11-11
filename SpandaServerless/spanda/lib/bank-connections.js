@@ -127,6 +127,8 @@ exports.NewDynamoDbRepository = (client, tableName) => {
 }
 
 exports.NewPostgreSQLRepository = (pool, format, tableName) => {
+  const schema = 'id,bankid,bankaccountids';
+
   const bankconnectionToSql = bankConnection => {
     return [
       bankConnection.id,
@@ -135,26 +137,30 @@ exports.NewPostgreSQLRepository = (pool, format, tableName) => {
     ];
   }
 
+  const findByIdQuery = (id) => format('SELECT * FROM %I WHERE id = %L LIMIT 1', tableName, id.toString());
+
+  const saveQuery = (bankConnection) => format('INSERT INTO %I (%s) VALUES (%L)', tableName, schema, bankconnectionToSql(bankConnection));
+
   return {
     new: createConnection,
 
     findById: async (id) => {
-      const text = format('SELECT * FROM %I WHERE id = %L LIMIT 1', tableName, id.toString());
-
       const client = await pool.connect();
 
-      return client.query(text)
+      return client.query(findByIdQuery(id))
         .then(res => (res.rowCount === 1) ? res.rows[0] : undefined)
         .finally(() => client.release())
     },
 
     save: async (bankConnection) => {
-      const properties = 'id,bankid,bankaccountids';
-      const text = format('INSERT INTO %I' + tableName + '(' + properties + ') VALUES (%L)', bankconnectionToSql(bankConnection));
-
       const client = await pool.connect();
 
-      return client.query(text).then(() => bankConnection).finally(() => client.release());
-    }
+      return client.query(saveQuery(bankConnection))
+        .then(() => bankConnection)
+        .finally(() => client.release());
+    },
+
+    findByIdQuery: findByIdQuery,
+    saveQuery: saveQuery
   }
 }
