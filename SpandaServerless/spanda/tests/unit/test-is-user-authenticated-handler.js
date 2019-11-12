@@ -10,7 +10,9 @@ describe('isUserAuthenticated handler', function() {
   let logger
 
   beforeEach(function() {
-    logger = require('winston');
+    const winston = require('winston')
+    const VoidTransport  = require('./void-transport')
+    logger = winston.createLogger({ transports: [ new VoidTransport() ] })
   })
 
   it('verifies an authorized request', async function() {

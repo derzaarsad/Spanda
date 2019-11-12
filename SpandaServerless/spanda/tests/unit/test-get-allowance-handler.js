@@ -15,7 +15,8 @@ describe('get allowance handler', function() {
 
   beforeEach(function() {
     const winston = require('winston')
-    logger = winston.createLogger({ transports: [ new winston.transports.Console() ] })
+    const VoidTransport  = require('./void-transport')
+    logger = winston.createLogger({ transports: [ new VoidTransport() ] })
 
     users = Users.NewInMemoryRepository()
 
