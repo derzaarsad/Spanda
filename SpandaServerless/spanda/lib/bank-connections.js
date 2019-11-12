@@ -126,20 +126,16 @@ exports.NewDynamoDbRepository = (client, tableName) => {
   }
 }
 
-exports.NewPostgreSQLRepository = (pool, format, tableName) => {
-  const schema = 'id,bankid,bankaccountids';
-
-  const bankconnectionToSql = bankConnection => {
-    return [
-      bankConnection.id,
-      bankConnection.bankId,
-      (bankConnection.bankAccountIds.length === 0) ? null : bankConnection.bankAccountIds
-    ];
+exports.NewPostgreSQLRepository = (pool, format, schema) => {
+  const findByIdQuery = (id) => {
+    return format('SELECT * FROM %I WHERE id = %L LIMIT 1',
+      schema.tableName, id.toString());
   }
 
-  const findByIdQuery = (id) => format('SELECT * FROM %I WHERE id = %L LIMIT 1', tableName, id.toString());
-
-  const saveQuery = (bankConnection) => format('INSERT INTO %I (%s) VALUES (%L)', tableName, schema, bankconnectionToSql(bankConnection));
+  const saveQuery = (bankConnection) => {
+    return format('INSERT INTO %I (%s) VALUES (%L)',
+      schema.tableName, schema.attributes, schema.map(bankConnection));
+  }
 
   return {
     new: createConnection,

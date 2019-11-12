@@ -5,13 +5,15 @@ const chai = require('chai');
 const expect = chai.expect;
 
 const format = require('pg-format');
+const usersSchema = require('../../lib/schema/users');
+
 const Users = require('../../lib/users');
 
 describe('postgres users repository', function() {
   let users
 
   beforeEach(function() {
-    users = Users.NewPostgreSQLRepository(null, format, 'users');
+    users = Users.NewPostgreSQLRepository(null, format, usersSchema);
   })
 
   it('renders the find-by-id query', async function() {

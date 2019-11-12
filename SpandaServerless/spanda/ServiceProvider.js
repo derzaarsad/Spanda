@@ -36,11 +36,14 @@ const initializePostgreSQLBackend = env => {
   const Users = require('./lib/users');
   const BankConnections = require('./lib/bank-connections');
 
+  const usersSchema = require('./lib/schema/users');
+  const bankConnectionsSchema = require('./lib/schema/bank-connections');
+
   const pool = new Pool();
 
   return {
-    users: Users.NewPostgreSQLRepository(pool, format, env['USERS_TABLE_NAME']),
-    connections: BankConnections.NewPostgreSQLRepository(pool, format, env['BANK_CONNECTIONS_TABLE_NAME'])
+    users: Users.NewPostgreSQLRepository(pool, format, usersSchema),
+    connections: BankConnections.NewPostgreSQLRepository(pool, format, bankConnectionsSchema)
   }
 }
 

@@ -148,29 +148,21 @@ exports.NewDynamoDbRepository = (client, tableName) => {
   }
 }
 
-exports.NewPostgreSQLRepository = (pool, format, tableName) => {
-  const schema = 'username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth';
-
-  const userToSql = user => {
-    return [
-      user.username,
-      user.creationDate,
-      user.allowance,
-      user.isAllowanceReady,
-      user.email,
-      user.phone,
-      user.isAutoUpdateEnabled,
-      (user.bankConnectionIds.length === 0) ? null :  user.bankConnectionIds,
-      user.activeWebFormId,
-      user.activeWebFormAuth
-    ];
+exports.NewPostgreSQLRepository = (pool, format, schema) => {
+  const findByIdQuery = (userName) => {
+    return format('SELECT * FROM %I WHERE username = %L LIMIT 1',
+      schema.tableName, userName);
   }
 
-  const findByIdQuery = (userName) => format('SELECT * FROM %I WHERE username = %L LIMIT 1', tableName, userName);
+  const saveQuery = (user) => {
+    return format('INSERT INTO %I (%s) VALUES (%L)',
+      schema.tableName, schema.attributes, schema.map(user));
+  }
 
-  const saveQuery = (user) => format('INSERT INTO %I (%s) VALUES (%L)', tableName, schema, userToSql(user));
-
-  const updateQuery = (user) => format('UPDATE %I SET (%s) = (%L) WHERE %I = %L', tableName, schema, userToSql(user), 'username', user.username);
+  const updateQuery = (user) => {
+    return format('UPDATE %I SET (%s) = (%L) WHERE %I = %L',
+      schema.tableName, schema.attributes, schema.map(user), schema.columns.username, user.username);
+  }
 
   return {
     new: createUser,
