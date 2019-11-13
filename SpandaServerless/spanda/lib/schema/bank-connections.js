@@ -21,7 +21,7 @@ module.exports = {
     return [
       bankConnection.id,
       bankConnection.bankId,
-      (bankConnection.bankAccountIds.length === 0) ? null : bankConnection.bankAccountIds
+      (bankConnection.bankAccountIds.length === 0) ? null : "{" + bankConnection.bankAccountIds.join(',') + "}"
     ];
   }
 }
