@@ -8,7 +8,7 @@ const ClientSecrets = require('../../lib/client-secrets');
 
 const controller = require('../../controllers/authentication-controller');
 
-describe('register and save user handler', function() {
+describe('authenticate user handler', function() {
   let logger
   let clientSecrets
   let authentication
