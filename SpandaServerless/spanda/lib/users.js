@@ -155,13 +155,13 @@ exports.NewPostgreSQLRepository = (pool, format, schema) => {
   }
 
   const saveQuery = (user) => {
-    return format('INSERT INTO %I (%s) VALUES (%L)',
-      schema.tableName, schema.attributes, schema.map(user));
-  }
+    const tableName = schema.tableName;
+    const attributes = schema.attributes;
+    const columns = schema.columns;
+    const row = schema.map(user);
 
-  const updateQuery = (user) => {
-    return format('UPDATE %I SET (%s) = (%L) WHERE %I = %L',
-      schema.tableName, schema.attributes, schema.map(user), schema.columns.username, user.username);
+    return format('INSERT INTO %I (%s) VALUES (%L) ON CONFLICT (%I) DO UPDATE SET (%s) = (%L) WHERE %I.%I = %L',
+      tableName, attributes, row, columns.username, attributes, row, tableName, columns.username, user.username);
   }
 
   return {
@@ -183,16 +183,7 @@ exports.NewPostgreSQLRepository = (pool, format, schema) => {
         .finally(() => { client.release() });
     },
 
-    update: async (user) => {
-      const client = await pool.connect();
-
-      return client.query(updateQuery(user))
-        .then(() => user)
-        .finally(() => { client.release() });
-    },
-
     findByIdQuery: findByIdQuery,
     saveQuery: saveQuery,
-    updateQuery: updateQuery
   }
 }

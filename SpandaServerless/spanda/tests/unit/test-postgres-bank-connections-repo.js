@@ -27,7 +27,7 @@ describe('postgres bank connections repository', function() {
 
     const result = connections.saveQuery(connection);
     expect(result).to.be.a('string');
-    expect(result).to.equal("INSERT INTO bankconnections (id,bankid,bankaccountids) VALUES ('1','666',NULL)");
+    expect(result).to.equal("INSERT INTO bankconnections (id,bankid,bankaccountids) VALUES ('1','666',NULL) ON CONFLICT (id) DO UPDATE SET (id,bankid,bankaccountids) = ('1','666',NULL) WHERE bankconnections.id = '1'");
   })
 
   it('renders the save query with some account ids', async function() {
@@ -37,6 +37,6 @@ describe('postgres bank connections repository', function() {
 
     const result = connections.saveQuery(connection);
     expect(result).to.be.a('string');
-    expect(result).to.equal("INSERT INTO bankconnections (id,bankid,bankaccountids) VALUES ('2','69','{1,2}')");
+    expect(result).to.equal("INSERT INTO bankconnections (id,bankid,bankaccountids) VALUES ('2','69','{1,2}') ON CONFLICT (id) DO UPDATE SET (id,bankid,bankaccountids) = ('2','69','{1,2}') WHERE bankconnections.id = '2'");
   })
 })

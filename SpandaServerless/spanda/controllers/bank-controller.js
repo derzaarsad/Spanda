@@ -74,7 +74,7 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
       user.activewebformauth = crypto.createHmac('sha256', authorization) // this is only my variation to produce random hash
                    .update(response.formId.toString())
                    .digest('hex');
-      users.update(user);
+      users.save(user);
 
       /*
        * Client usage: {location}?callbackUrl={RestApi}/webForms/callback/{webFormAuth}

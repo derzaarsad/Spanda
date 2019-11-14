@@ -133,8 +133,13 @@ exports.NewPostgreSQLRepository = (pool, format, schema) => {
   }
 
   const saveQuery = (bankConnection) => {
-    return format('INSERT INTO %I (%s) VALUES (%L)',
-      schema.tableName, schema.attributes, schema.map(bankConnection));
+    const tableName = schema.tableName;
+    const row = schema.map(bankConnection);
+    const attributes = schema.attributes;
+    const columns = schema.columns;
+
+    return format('INSERT INTO %I (%s) VALUES (%L) ON CONFLICT (%I) DO UPDATE SET (%s) = (%L) WHERE %I.%I = %L',
+      tableName, attributes, row, columns.id, attributes, row, tableName, columns.id, bankConnection.id);
   }
 
   return {
