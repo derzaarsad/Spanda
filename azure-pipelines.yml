@@ -86,10 +86,15 @@ jobs:
     continueOnError: false
   - script: |
       cd SpandaServerless/
-      export AZURE_TEST_USER=$(AZURE_TEST_USER)
-      export AZURE_FINAPI_ACCESS_TOKEN=`python deleteUser.py $(FinAPIAdminId) $(FinAPIAdminSecret) $AZURE_TEST_USER`
-      echo "$AZURE_FINAPI_ACCESS_TOKEN"
-    displayName: 'delete test user'
+      export AZURE_TEST_USER_REGISTER=$(AZURE_TEST_USER_REGISTER)
+      result=`python deleteUser.py $(FinAPIAdminId) $(FinAPIAdminSecret) $AZURE_TEST_USER_REGISTER`
+      echo "$result"
+      export AZURE_TEST_USER_LOGIN=$(AZURE_TEST_USER_LOGIN)
+      result=`python deleteUser.py $(FinAPIAdminId) $(FinAPIAdminSecret) $AZURE_TEST_USER_LOGIN`
+      echo "$result"
+      result=`python registerUser.py $(FinAPIAdminId) $(FinAPIAdminSecret) $AZURE_TEST_USER_LOGIN`
+      echo "$result"
+    displayName: 'Delete test users'
     continueOnError: false
   - script: |
       cd SpandaServerless/spanda
