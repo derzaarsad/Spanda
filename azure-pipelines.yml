@@ -85,6 +85,13 @@ jobs:
     displayName: 'npm install and build'
     continueOnError: false
   - script: |
+      cd SpandaServerless/
+      export AZURE_TEST_USER=$(AZURE_TEST_USER)
+      export AZURE_FINAPI_ACCESS_TOKEN=`python deleteUser.py $(FinAPIAdminId) $(FinAPIAdminSecret) $AZURE_TEST_USER`
+      echo "$AZURE_FINAPI_ACCESS_TOKEN"
+    displayName: 'delete test user'
+    continueOnError: false
+  - script: |
       cd SpandaServerless/spanda
       npm test
     displayName: 'Run unit tests'
