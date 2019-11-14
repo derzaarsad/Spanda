@@ -40,7 +40,7 @@ module.exports = {
       user.email,
       user.phone,
       user.isAutoUpdateEnabled,
-      (user.bankConnectionIds.length === 0) ? null :  user.bankConnectionIds,
+      (user.bankConnectionIds.length === 0) ? null :  "{" + user.bankConnectionIds.join(',') + "}",
       user.activeWebFormId,
       user.activeWebFormAuth
     ];

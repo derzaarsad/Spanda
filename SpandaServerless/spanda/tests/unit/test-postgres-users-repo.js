@@ -31,6 +31,18 @@ describe('postgres users repository', function() {
     expect(result).to.equal("INSERT INTO users (username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) VALUES ('chapu','2019-11-11 19:31:50.379+00','0','f','chapu@mischung.net','+666 666 666','f',NULL,NULL,NULL)");
   })
 
+  it('renders the save query with non-empty account ids', async function() {
+    const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
+    user.creationDate = new Date('2019-11-11T19:31:50.379+00:00')
+    user.bankConnectionIds.push(1)
+    user.bankConnectionIds.push(2)
+    user.bankConnectionIds.push(3)
+
+    const result = users.saveQuery(user)
+    expect(result).to.be.a('string');
+    expect(result).to.equal("INSERT INTO users (username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) VALUES ('chapu','2019-11-11 19:31:50.379+00','0','f','chapu@mischung.net','+666 666 666','f','{1,2,3}',NULL,NULL)");
+  })
+
   it('renders the update query', async function() {
     const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
     user.creationDate = new Date('2019-11-11T19:31:50.379+00:00')
