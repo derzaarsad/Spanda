@@ -16,6 +16,8 @@ describe('register user handler', function() {
   let authentication
   let context
 
+  expect(process.env.AZURE_TEST_USER_REGISTER).to.exist;
+
   beforeEach(function() {
     const winston = require('winston')
     logger = winston.createLogger({ transports: [ new winston.transports.Console() ] })
