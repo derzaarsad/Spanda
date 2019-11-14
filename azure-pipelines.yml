@@ -92,7 +92,7 @@ jobs:
       export AZURE_TEST_USER_LOGIN=$(AZURE_TEST_USER_LOGIN)
       result=`python deleteUser.py $(FinAPIAdminId) $(FinAPIAdminSecret) $AZURE_TEST_USER_LOGIN`
       echo "$result"
-      result=`python registerUser.py $(FinAPIAdminId) $(FinAPIAdminSecret) $AZURE_TEST_USER_LOGIN`
+      result=`python registerUser.py $(FinAPIClientId) $(FinAPIClientSecret) $AZURE_TEST_USER_LOGIN`
       echo "$result"
     displayName: 'Delete test users'
     continueOnError: false
