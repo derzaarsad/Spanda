@@ -19,6 +19,9 @@ describe('authenticate user handler', function() {
   expect(process.env.FinAPIClientSecret).to.exist;
 
   beforeEach(function() {
+    testUsername = process.env.AZURE_TEST_USER_LOGIN;
+    testPassword = process.env.AZURE_TEST_USER_LOGIN;
+
     const winston = require('winston')
     logger = winston.createLogger({ transports: [ new winston.transports.Console() ] })
 
@@ -36,7 +39,7 @@ describe('authenticate user handler', function() {
 
   it('rejects requests with missing parameters', async function() {
     const event = {
-      body: JSON.stringify({'password': 'secret'})
+      body: JSON.stringify({'password': testPassword})
     }
 
     const result = await controller.authenticateAndSave(event, context, logger, clientSecrets, authentication)
@@ -47,7 +50,7 @@ describe('authenticate user handler', function() {
 
   it('rejects requests with failing authentication', async function() {
     const event = {
-      body: JSON.stringify({'username': 'user', 'password': 'secret'})
+      body: JSON.stringify({'username': testUsername, 'password': testPassword})
     }
 
     const failingAuthentication = {
@@ -64,7 +67,7 @@ describe('authenticate user handler', function() {
 
   it('obtains a password token', async function() {
     const event = {
-      body: JSON.stringify({'username': 'user', 'password': 'secret'})
+      body: JSON.stringify({'username': testUsername, 'password': testPassword})
     }
 
     const result = await controller.authenticateAndSave(event, context, logger, clientSecrets, authentication)

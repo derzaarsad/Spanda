@@ -5,17 +5,15 @@ const chai = require('chai');
 const expect = chai.expect;
 const forEach = require('mocha-each');
 
-const ClientSecrets = require('../../lib/client-secrets');
 const Users = require('../../lib/users');
-const Authentication = require('../../lib/authentication');
-const axios = require('axios');
 
 const controller = require('../../controllers/authentication-controller');
+
+const TestUtility = require('../test-utility');
 
 describe('register user handler', function() {
   let logger
   let users
-  let authAndClientSecrets;
   let context
   let testUsername
   let testPassword
@@ -28,30 +26,7 @@ describe('register user handler', function() {
   expect(process.env.FinAPIClientId).to.exist;
   expect(process.env.FinAPIClientSecret).to.exist;
 
-  // Create Authentications
-  let successfulAuthentication = {
-    getClientCredentialsToken: async () => {
-      return {
-        'auth': true
-      }
-    }
-  }
-
-  let finApiAuthentication = Authentication.Basic(axios.create({
-    baseURL: 'https://sandbox.finapi.io',
-    timeout: 3000,
-    headers: { 'Accept': 'application/json' },
-  }));
-
-  // Create ClientSecrets
-  let dummyClientSecrets = ClientSecrets.Resolved('client-id', 'client-secret')
-  let finApiClientSecrets = ClientSecrets.Resolved(process.env.FinAPIClientId, process.env.FinAPIClientSecret)
-
-  // Package Authentications and ClientSecrets
-  authAndClientSecrets = [
-    [successfulAuthentication,dummyClientSecrets],
-    [finApiAuthentication,finApiClientSecrets]
-  ];
+  let authAndClientSecrets = TestUtility.CreateAuthAndClientSecrets(process.env.FinAPIClientId,process.env.FinAPIClientSecret)
 
   beforeEach(function() {
     testUsername = process.env.AZURE_TEST_USER_REGISTER;
