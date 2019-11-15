@@ -15,7 +15,6 @@ describe('register user handler', function() {
   let users
   let clientSecrets
   let authentications;
-  let successfulAuthentication
   let context
   let testUsername
   let testPassword
@@ -40,7 +39,7 @@ describe('register user handler', function() {
     logger = winston.createLogger({ transports: [ new winston.transports.Console() ] })
 
     clientSecrets = ClientSecrets.Resolved('client-id', 'client-secret')
-    successfulAuthentication = {
+    let successfulAuthentication = {
       getClientCredentialsToken: async () => {
         return {
           'auth': true
@@ -55,7 +54,7 @@ describe('register user handler', function() {
   })
 
   forEach(authentications)
-  .it('rejects a request with missing attributes', (authentication) => {expect(authentication).to.exist;
+  .it('rejects a request with missing attributes', async (authentication) => {
     const user = { 'id': testUsername }
 
     const finapi = {}
@@ -65,14 +64,15 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, clientSecrets, successfulAuthentication, finapi, users)
+    const result = await controller.registerUser(event, context, logger, clientSecrets, authentication, finapi, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
     expect(JSON.parse(result.body).message).to.include('missing user property');
   })
 
-  it('rejects a request with invalid email', async function() {
+  forEach(authentications)
+  .it('rejects a request with invalid email', async (authentication) => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testInvalidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const finapi = {}
@@ -82,14 +82,15 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, clientSecrets, successfulAuthentication, finapi, users)
+    const result = await controller.registerUser(event, context, logger, clientSecrets, authentication, finapi, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
     expect(JSON.parse(result.body).message).to.include('invalid email');
   })
 
-  it('rejects a request with invalid phone', async function() {
+  forEach(authentications)
+  .it('rejects a request with invalid phone', async (authentication) => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testInvalidPhone, 'isAutoUpdateEnabled': true }
 
     const finapi = {}
@@ -99,14 +100,15 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, clientSecrets, successfulAuthentication, finapi, users)
+    const result = await controller.registerUser(event, context, logger, clientSecrets, authentication, finapi, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
     expect(JSON.parse(result.body).message).to.include('invalid phone');
   })
 
-  it('rejects a request failing authorization', async function() {
+  forEach(authentications)
+  .it('rejects a request failing authorization', async (authentication) => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const failingAuthentication = {
@@ -128,7 +130,8 @@ describe('register user handler', function() {
     expect(result.statusCode).to.equal(401);
   })
 
-  it('rejects a request with with existing user', async function() {
+  forEach(authentications)
+  .it('rejects a request with with existing user', async (authentication) => {
     users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
 
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
@@ -138,13 +141,14 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, clientSecrets, successfulAuthentication, finapi, users)
+    const result = await controller.registerUser(event, context, logger, clientSecrets, authentication, finapi, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(409);
   })
 
-  it('adds a new user to the repository', async function() {
+  forEach(authentications)
+  .it('adds a new user to the repository', async (authentication) => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const finapi = {
@@ -158,7 +162,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, clientSecrets, successfulAuthentication, finapi, users)
+    const result = await controller.registerUser(event, context, logger, clientSecrets, authentication, finapi, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(201, 'expected status code created');
