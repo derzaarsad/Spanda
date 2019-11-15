@@ -15,6 +15,8 @@ describe('authenticate user handler', function() {
   let context
 
   expect(process.env.AZURE_TEST_USER_LOGIN).to.exist;
+  expect(process.env.FinAPIClientId).to.exist;
+  expect(process.env.FinAPIClientSecret).to.exist;
 
   beforeEach(function() {
     const winston = require('winston')

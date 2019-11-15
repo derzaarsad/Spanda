@@ -15,10 +15,25 @@ describe('register user handler', function() {
   let clientSecrets
   let authentication
   let context
+  let testUsername
+  let testPassword
+  let testValidEmail
+  let testInvalidEmail
+  let testValidPhone
+  let testInvalidPhone
 
   expect(process.env.AZURE_TEST_USER_REGISTER).to.exist;
+  expect(process.env.FinAPIClientId).to.exist;
+  expect(process.env.FinAPIClientSecret).to.exist;
 
   beforeEach(function() {
+    testUsername = process.env.AZURE_TEST_USER_REGISTER;
+    testPassword = 'secret';
+    testValidEmail = 'chapu@mischung.net';
+    testInvalidEmail = 'chapu@chapu';
+    testValidPhone = '+66 66 6666';
+    testInvalidPhone = 'invalid';
+
     const winston = require('winston')
     logger = winston.createLogger({ transports: [ new winston.transports.Console() ] })
 
@@ -36,7 +51,7 @@ describe('register user handler', function() {
   })
 
   it('rejects a request with missing attributes', async function() {
-    const user = { 'id': 'chapu' }
+    const user = { 'id': testUsername }
 
     const finapi = {}
 
@@ -53,7 +68,7 @@ describe('register user handler', function() {
   })
 
   it('rejects a request with invalid email', async function() {
-    const user = { 'id': 'chapu', 'password': 'secret', 'email': 'chapu@chapu', 'phone': '+66 66 6666', 'isAutoUpdateEnabled': true }
+    const user = { 'id': testUsername, 'password': testPassword, 'email': testInvalidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const finapi = {}
 
@@ -70,7 +85,7 @@ describe('register user handler', function() {
   })
 
   it('rejects a request with invalid phone', async function() {
-    const user = { 'id': 'chapu', 'password': 'secret', 'email': 'chapu@chapucero.com', 'phone': 'invalid', 'isAutoUpdateEnabled': true }
+    const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testInvalidPhone, 'isAutoUpdateEnabled': true }
 
     const finapi = {}
 
@@ -87,7 +102,7 @@ describe('register user handler', function() {
   })
 
   it('rejects a request failing authorization', async function() {
-    const user = { 'id': 'chapu', 'password': 'secret', 'email': 'chapu@mischung.net', 'phone': '+66 66 6666', 'isAutoUpdateEnabled': true }
+    const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const failingAuthentication = {
       getClientCredentialsToken: async () => {
@@ -109,9 +124,9 @@ describe('register user handler', function() {
   })
 
   it('rejects a request with with existing user', async function() {
-    users.save(users.new('chapu', 'chapu@mischung.net', '666', false))
+    users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
 
-    const user = { 'id': 'chapu', 'password': 'secret', 'email': 'chapu@mischung.net', 'phone': '+66 66 6666', 'isAutoUpdateEnabled': true }
+    const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
     const finapi = {}
     const event = {
       'headers': {},
@@ -125,7 +140,7 @@ describe('register user handler', function() {
   })
 
   it('adds a new user to the repository', async function() {
-    const user = { 'id': 'chapu', 'password': 'secret', 'email': 'chapu@mischung.net', 'phone': '+66 66 6666', 'isAutoUpdateEnabled': true }
+    const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const finapi = {
       registerUser: async() => {
@@ -143,7 +158,7 @@ describe('register user handler', function() {
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(201, 'expected status code created');
 
-    const newUser = await users.findById('chapu')
+    const newUser = await users.findById(testUsername)
     expect(newUser, 'expected the user to have been persisted').to.be.ok
     expect(newUser).to.be.an('object');
   })
