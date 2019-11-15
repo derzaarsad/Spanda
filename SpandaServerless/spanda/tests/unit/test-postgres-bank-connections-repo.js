@@ -39,4 +39,10 @@ describe('postgres bank connections repository', function() {
     expect(result).to.be.a('string');
     expect(result).to.equal("INSERT INTO bankconnections (id,bankid,bankaccountids) VALUES ('2','69','{1,2}') ON CONFLICT (id) DO UPDATE SET (id,bankid,bankaccountids) = ('2','69','{1,2}') WHERE bankconnections.id = '2'");
   })
+
+  it('renders the delete all query', async function() {
+    const result = connections.deleteAllQuery;
+    expect(result).to.be.a('string');
+    expect(result).to.equal("DELETE FROM bankconnections");
+  })
 })

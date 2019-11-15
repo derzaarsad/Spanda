@@ -126,11 +126,13 @@ exports.NewDynamoDbRepository = (client, tableName) => {
   }
 }
 
-exports.NewPostgreSQLRepository = (pool, format, schema) => {
+exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
   const findByIdQuery = (id) => {
     return format('SELECT * FROM %I WHERE id = %L LIMIT 1',
       schema.tableName, id.toString());
   }
+
+  const deleteAllQuery = format('DELETE FROM %I', schema.tableName);
 
   const saveQuery = (bankConnection) => {
     const tableName = schema.tableName;
@@ -147,9 +149,13 @@ exports.NewPostgreSQLRepository = (pool, format, schema) => {
 
     findById: async (id) => {
       const client = await pool.connect();
+      const params = {
+        text: findByIdQuery(id),
+        rowMode: 'array',
+        types: types
+      }
 
-      return client.query(findByIdQuery(id))
-        .then(res => (res.rowCount === 1) ? res.rows[0] : undefined)
+      return client.query(params).then(res => (res.rowCount > 0) ? schema.asObject(res.rows[0]) : null)
         .finally(() => { client.release() })
     },
 
@@ -161,7 +167,16 @@ exports.NewPostgreSQLRepository = (pool, format, schema) => {
         .finally(() => { client.release() });
     },
 
+    deleteAll: async () => {
+      const client = await pool.connect();
+
+      return client.query(deleteAllQuery)
+        .then(res => res)
+        .finally(() => { client.release() });
+    },
+
     findByIdQuery: findByIdQuery,
-    saveQuery: saveQuery
+    saveQuery: saveQuery,
+    deleteAllQuery: deleteAllQuery
   }
 }

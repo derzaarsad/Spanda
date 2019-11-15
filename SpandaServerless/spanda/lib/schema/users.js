@@ -21,10 +21,10 @@ const asObject = row => {
     'isAllowanceReady': row[3],
     'email': row[4],
     'phone': row[5],
-    'isAutoupdateEnabled': row[6],
-    'bankConnectionIds': row[7],
-    'activeWebformId': row[8],
-    'activeWebformAuth': row[9]
+    'isAutoUpdateEnabled': row[6],
+    'bankConnectionIds': row[7] ? row[7] : [],
+    'activeWebFormId': row[8],
+    'activeWebFormAuth': row[9]
   }
 }
 
