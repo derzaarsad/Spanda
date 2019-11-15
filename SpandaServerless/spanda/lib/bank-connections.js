@@ -155,7 +155,8 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
         types: types
       }
 
-      return client.query(params).then(res => (res.rowCount > 0) ? schema.asObject(res.rows[0]) : null)
+      return client.query(params)
+        .then(res => (res.rowCount > 0) ? schema.asObject(res.rows[0]) : null)
         .finally(() => { client.release() })
     },
 

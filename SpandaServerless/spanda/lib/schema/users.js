@@ -22,7 +22,7 @@ const asObject = row => {
     'email': row[4],
     'phone': row[5],
     'isAutoUpdateEnabled': row[6],
-    'bankConnectionIds': row[7] ? row[7] : [],
+    'bankConnectionIds': (row[7]) ? row[7] : [],
     'activeWebFormId': row[8],
     'activeWebFormAuth': row[9]
   }

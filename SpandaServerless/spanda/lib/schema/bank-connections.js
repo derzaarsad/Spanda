@@ -10,7 +10,7 @@ const asObject = row => {
   return {
     'id': row[0],
     'bankId': row[1],
-    'bankAccountIds': row[2],
+    'bankAccountIds': (row[2]) ? row[2] : [],
   }
 }
 
