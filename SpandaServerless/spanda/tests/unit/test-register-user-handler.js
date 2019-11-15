@@ -3,6 +3,7 @@
 /* eslint-env node, mocha */
 const chai = require('chai');
 const expect = chai.expect;
+const forEach = require('mocha-each');
 
 const ClientSecrets = require('../../lib/client-secrets');
 const Users = require('../../lib/users');
@@ -13,6 +14,7 @@ describe('register user handler', function() {
   let logger
   let users
   let clientSecrets
+  let authentications;
   let successfulAuthentication
   let context
   let testUsername
@@ -46,11 +48,14 @@ describe('register user handler', function() {
       }
     }
 
+    authentications = [successfulAuthentication]
+
     users = Users.NewInMemoryRepository()
     context = {}
   })
 
-  it('rejects a request with missing attributes', async function() {
+  forEach(authentications)
+  .it('rejects a request with missing attributes', (authentication) => {expect(authentication).to.exist;
     const user = { 'id': testUsername }
 
     const finapi = {}
