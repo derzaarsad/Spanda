@@ -13,6 +13,8 @@ describe('authenticate user handler', function() {
   let clientSecrets
   let authentication
   let context
+  let testUsername
+  let testPassword
 
   expect(process.env.AZURE_TEST_USER_LOGIN).to.exist;
   expect(process.env.FinAPIClientId).to.exist;
