@@ -27,6 +27,15 @@ describe('register user handler', function() {
   expect(process.env.FinAPIClientId).to.exist;
   expect(process.env.FinAPIClientSecret).to.exist;
 
+  let successfulAuthentication = {
+    getClientCredentialsToken: async () => {
+      return {
+        'auth': true
+      }
+    }
+  }
+  authentications = [successfulAuthentication]
+
   beforeEach(function() {
     testUsername = process.env.AZURE_TEST_USER_REGISTER;
     testPassword = 'secret';
@@ -39,15 +48,6 @@ describe('register user handler', function() {
     logger = winston.createLogger({ transports: [ new winston.transports.Console() ] })
 
     clientSecrets = ClientSecrets.Resolved('client-id', 'client-secret')
-    let successfulAuthentication = {
-      getClientCredentialsToken: async () => {
-        return {
-          'auth': true
-        }
-      }
-    }
-
-    authentications = [successfulAuthentication]
 
     users = Users.NewInMemoryRepository()
     context = {}
