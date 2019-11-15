@@ -7,6 +7,8 @@ const forEach = require('mocha-each');
 
 const ClientSecrets = require('../../lib/client-secrets');
 const Users = require('../../lib/users');
+const Authentication = require('../../lib/authentication');
+const axios = require('axios');
 
 const controller = require('../../controllers/authentication-controller');
 
@@ -34,7 +36,13 @@ describe('register user handler', function() {
       }
     }
   }
-  authentications = [successfulAuthentication]
+
+  let finApiAuthentication = Authentication.Basic(axios.create({
+    baseURL: 'https://sandbox.finapi.io',
+    timeout: 3000,
+    headers: { 'Accept': 'application/json' },
+  }));
+  authentications = [successfulAuthentication,finApiAuthentication];
 
   beforeEach(function() {
     testUsername = process.env.AZURE_TEST_USER_REGISTER;
