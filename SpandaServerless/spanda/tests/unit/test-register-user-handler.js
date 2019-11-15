@@ -15,8 +15,7 @@ const controller = require('../../controllers/authentication-controller');
 describe('register user handler', function() {
   let logger
   let users
-  let clientSecrets
-  let authentications;
+  let authAndClientSecrets;
   let context
   let testUsername
   let testPassword
@@ -29,6 +28,7 @@ describe('register user handler', function() {
   expect(process.env.FinAPIClientId).to.exist;
   expect(process.env.FinAPIClientSecret).to.exist;
 
+  // Create Authentications
   let successfulAuthentication = {
     getClientCredentialsToken: async () => {
       return {
@@ -42,7 +42,16 @@ describe('register user handler', function() {
     timeout: 3000,
     headers: { 'Accept': 'application/json' },
   }));
-  authentications = [successfulAuthentication,finApiAuthentication];
+
+  // Create ClientSecrets
+  let dummyClientSecrets = ClientSecrets.Resolved('client-id', 'client-secret')
+  let finApiClientSecrets = ClientSecrets.Resolved(process.env.FinAPIClientId, process.env.FinAPIClientSecret)
+
+  // Package Authentications and ClientSecrets
+  authAndClientSecrets = [
+    [successfulAuthentication,dummyClientSecrets],
+    [finApiAuthentication,finApiClientSecrets]
+  ];
 
   beforeEach(function() {
     testUsername = process.env.AZURE_TEST_USER_REGISTER;
@@ -55,14 +64,12 @@ describe('register user handler', function() {
     const winston = require('winston')
     logger = winston.createLogger({ transports: [ new winston.transports.Console() ] })
 
-    clientSecrets = ClientSecrets.Resolved('client-id', 'client-secret')
-
     users = Users.NewInMemoryRepository()
     context = {}
   })
 
-  forEach(authentications)
-  .it('rejects a request with missing attributes', async (authentication) => {
+  forEach(authAndClientSecrets)
+  .it('rejects a request with missing attributes', async (authentication,clientSecrets) => {
     const user = { 'id': testUsername }
 
     const finapi = {}
@@ -79,8 +86,8 @@ describe('register user handler', function() {
     expect(JSON.parse(result.body).message).to.include('missing user property');
   })
 
-  forEach(authentications)
-  .it('rejects a request with invalid email', async (authentication) => {
+  forEach(authAndClientSecrets)
+  .it('rejects a request with invalid email', async (authentication,clientSecrets) => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testInvalidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const finapi = {}
@@ -97,8 +104,8 @@ describe('register user handler', function() {
     expect(JSON.parse(result.body).message).to.include('invalid email');
   })
 
-  forEach(authentications)
-  .it('rejects a request with invalid phone', async (authentication) => {
+  forEach(authAndClientSecrets)
+  .it('rejects a request with invalid phone', async (authentication,clientSecrets) => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testInvalidPhone, 'isAutoUpdateEnabled': true }
 
     const finapi = {}
@@ -115,8 +122,8 @@ describe('register user handler', function() {
     expect(JSON.parse(result.body).message).to.include('invalid phone');
   })
 
-  forEach(authentications)
-  .it('rejects a request failing authorization', async (authentication) => {
+  forEach(authAndClientSecrets)
+  .it('rejects a request failing authorization', async (authentication,clientSecrets) => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const failingAuthentication = {
@@ -138,8 +145,8 @@ describe('register user handler', function() {
     expect(result.statusCode).to.equal(401);
   })
 
-  forEach(authentications)
-  .it('rejects a request with with existing user', async (authentication) => {
+  forEach(authAndClientSecrets)
+  .it('rejects a request with with existing user', async (authentication,clientSecrets) => {
     users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
 
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
@@ -155,8 +162,8 @@ describe('register user handler', function() {
     expect(result.statusCode).to.equal(409);
   })
 
-  forEach(authentications)
-  .it('adds a new user to the repository', async (authentication) => {
+  forEach(authAndClientSecrets)
+  .it('adds a new user to the repository', async (authentication,clientSecrets) => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const finapi = {
