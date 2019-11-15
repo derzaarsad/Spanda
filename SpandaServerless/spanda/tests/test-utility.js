@@ -21,20 +21,26 @@ exports.CreateAuthAndClientSecrets = (clientId,clientSecret) => {
     }
   }
 
-  let finApiAuthentication = Authentication.Basic(axios.create({
+  const httpClient = axios.create({
     baseURL: 'https://sandbox.finapi.io',
     timeout: 3000,
     headers: { 'Accept': 'application/json' },
-  }));
+  });
+
+  let finApiAuthentication = Authentication.Basic(httpClient);
 
   // Create ClientSecrets
   let dummyClientSecrets = ClientSecrets.Resolved('client-id', 'client-secret')
   let finApiClientSecrets = ClientSecrets.Resolved(clientId, clientSecret)
 
+  // Create bank interface
+  let dummyBankInterface = {};
+  let finapiBankInterface = require('../lib/bankInterface')(httpClient);
+
   // Package Authentications and ClientSecrets
   let authAndClientSecrets = [
-    [successfulAuthentication,dummyClientSecrets],
-    [finApiAuthentication,finApiClientSecrets]
+    [successfulAuthentication,dummyClientSecrets,dummyBankInterface],
+    [finApiAuthentication,finApiClientSecrets,finapiBankInterface]
   ];
 
   return authAndClientSecrets;

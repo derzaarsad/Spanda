@@ -30,7 +30,7 @@ describe('authenticate user handler', function() {
   })
 
   forEach(authAndClientSecrets)
-  .it('rejects requests with missing parameters', async (authentication,clientSecrets) => {
+  .it('rejects requests with missing parameters', async (authentication,clientSecrets,bankInterface) => {
     const event = {
       body: JSON.stringify({'password': testPassword})
     }
@@ -42,7 +42,7 @@ describe('authenticate user handler', function() {
   })
 
   forEach(authAndClientSecrets)
-  .it('rejects requests with failing authentication', async (authentication,clientSecrets) => {
+  .it('rejects requests with failing authentication', async (authentication,clientSecrets,bankInterface) => {
     const event = {
       body: JSON.stringify({'username': testUsername, 'password': testPassword})
     }
@@ -60,7 +60,7 @@ describe('authenticate user handler', function() {
   })
 
   forEach(authAndClientSecrets)
-  .it('obtains a password token', async (authentication,clientSecrets) => {
+  .it('obtains a password token', async (authentication,clientSecrets,bankInterface) => {
     const event = {
       body: JSON.stringify({'username': testUsername, 'password': testPassword})
     }
