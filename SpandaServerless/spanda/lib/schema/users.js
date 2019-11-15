@@ -13,25 +13,29 @@ const attributes = [
   'activewebformauth'
 ];
 
+const asObject = row => {
+  return {
+    'username': row[0],
+    'creationDate': row[1],
+    'allowance': row[2],
+    'isAllowanceReady': row[3],
+    'email': row[4],
+    'phone': row[5],
+    'isAutoupdateEnabled': row[6],
+    'bankConnectionIds': row[7],
+    'activeWebformId': row[8],
+    'activeWebformAuth': row[9]
+  }
+}
+
 module.exports = {
   tableName: 'users',
 
   attributes: attributes.join(','),
 
-  columns: {
-    'username': attributes[0],
-    'creationDate': attributes[1],
-    'allowance': attributes[2],
-    'isAllowanceReady': attributes[3],
-    'email': attributes[4],
-    'phone': attributes[5],
-    'isAutoupdateEnabled': attributes[6],
-    'bankConnectionIds': attributes[7],
-    'activeWebformId': attributes[8],
-    'activeWebformAuth': attributes[9]
-  },
+  columns: asObject(attributes),
 
-  map: user => {
+  asRow: user => {
     return [
       user.username,
       user.creationDate,
@@ -44,5 +48,9 @@ module.exports = {
       user.activeWebFormId,
       user.activeWebFormAuth
     ];
+  },
+
+  asObject: row => {
+    return asObject(row);
   }
 }

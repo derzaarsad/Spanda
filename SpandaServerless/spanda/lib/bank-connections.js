@@ -134,7 +134,7 @@ exports.NewPostgreSQLRepository = (pool, format, schema) => {
 
   const saveQuery = (bankConnection) => {
     const tableName = schema.tableName;
-    const row = schema.map(bankConnection);
+    const row = schema.asRow(bankConnection);
     const attributes = schema.attributes;
     const columns = schema.columns;
 

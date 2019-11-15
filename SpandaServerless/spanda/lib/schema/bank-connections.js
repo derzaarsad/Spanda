@@ -6,23 +6,31 @@ const attributes = [
   'bankaccountids',
 ];
 
+const asObject = row => {
+  return {
+    'id': row[0],
+    'bankId': row[1],
+    'bankAccountIds': row[2],
+  }
+}
+
 module.exports = {
   tableName: 'bankconnections',
 
   attributes: attributes.join(','),
 
-  columns: {
-    'id': attributes[0],
-    'bankId': attributes[1],
-    'bankAccountIds': attributes[2],
-  },
+  columns: asObject(attributes),
 
-  map: bankConnection => {
+  asRow: bankConnection => {
     return [
       bankConnection.id,
       bankConnection.bankId,
       (bankConnection.bankAccountIds.length === 0) ? null : "{" + bankConnection.bankAccountIds.join(',') + "}"
     ];
+  },
+
+  asObject: row => {
+    return asObject(row)
   }
 }
 
