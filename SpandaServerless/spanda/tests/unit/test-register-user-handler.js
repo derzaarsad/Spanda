@@ -13,7 +13,7 @@ describe('register user handler', function() {
   let logger
   let users
   let clientSecrets
-  let authentication
+  let successfulAuthentication
   let context
   let testUsername
   let testPassword
@@ -38,7 +38,7 @@ describe('register user handler', function() {
     logger = winston.createLogger({ transports: [ new winston.transports.Console() ] })
 
     clientSecrets = ClientSecrets.Resolved('client-id', 'client-secret')
-    authentication = {
+    successfulAuthentication = {
       getClientCredentialsToken: async () => {
         return {
           'auth': true
@@ -60,7 +60,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, clientSecrets, authentication, finapi, users)
+    const result = await controller.registerUser(event, context, logger, clientSecrets, successfulAuthentication, finapi, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
@@ -77,7 +77,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, clientSecrets, authentication, finapi, users)
+    const result = await controller.registerUser(event, context, logger, clientSecrets, successfulAuthentication, finapi, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
@@ -94,7 +94,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, clientSecrets, authentication, finapi, users)
+    const result = await controller.registerUser(event, context, logger, clientSecrets, successfulAuthentication, finapi, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
@@ -133,7 +133,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, clientSecrets, authentication, finapi, users)
+    const result = await controller.registerUser(event, context, logger, clientSecrets, successfulAuthentication, finapi, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(409);
@@ -153,7 +153,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, clientSecrets, authentication, finapi, users)
+    const result = await controller.registerUser(event, context, logger, clientSecrets, successfulAuthentication, finapi, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(201, 'expected status code created');
