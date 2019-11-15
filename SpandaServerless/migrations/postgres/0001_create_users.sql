@@ -1,7 +1,7 @@
 CREATE TABLE users
 (
     username text COLLATE pg_catalog."default" NOT NULL,
-    creationdate timestamp without time zone NOT NULL,
+    creationdate timestamp with time zone NOT NULL,
     allowance numeric,
     isallowanceready boolean NOT NULL,
     email text COLLATE pg_catalog."default",
