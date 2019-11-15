@@ -9,9 +9,15 @@ exports.CreateAuthAndClientSecrets = (clientId,clientSecret) => {
   // Create Authentications
   let successfulAuthentication = {
     getClientCredentialsToken: async () => {
-      return {
-        'auth': true
-      }
+        return {
+            'auth': true
+        }
+    },
+
+    getPasswordToken: async () => {
+        return {
+            'access_token': "yyz"
+        }
     }
   }
 

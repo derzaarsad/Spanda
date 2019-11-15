@@ -69,6 +69,6 @@ describe('authenticate user handler', function() {
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(200)
-    expect(JSON.parse(result.body).auth).to.equal(true)
+    expect(JSON.parse(result.body).access_token).to.exist;
   })
 })
