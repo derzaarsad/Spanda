@@ -4,12 +4,10 @@
 const chai = require('chai');
 const expect = chai.expect;
 const forEach = require('mocha-each');
+const controller = require('../../controllers/authentication-controller');
+const TestUtility = require('../test-utility');
 
 const Users = require('../../lib/users');
-
-const controller = require('../../controllers/authentication-controller');
-
-const TestUtility = require('../test-utility');
 
 describe('register user handler', function() {
   let logger

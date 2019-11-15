@@ -3,15 +3,12 @@
 /* eslint-env node, mocha */
 const chai = require('chai');
 const expect = chai.expect;
-
-const ClientSecrets = require('../../lib/client-secrets');
-
+const forEach = require('mocha-each');
 const controller = require('../../controllers/authentication-controller');
+const TestUtility = require('../test-utility');
 
 describe('authenticate user handler', function() {
   let logger
-  let clientSecrets
-  let authentication
   let context
   let testUsername
   let testPassword
@@ -20,6 +17,8 @@ describe('authenticate user handler', function() {
   expect(process.env.FinAPIClientId).to.exist;
   expect(process.env.FinAPIClientSecret).to.exist;
 
+  let authAndClientSecrets = TestUtility.CreateAuthAndClientSecrets(process.env.FinAPIClientId,process.env.FinAPIClientSecret)
+
   beforeEach(function() {
     testUsername = process.env.AZURE_TEST_USER_LOGIN;
     testPassword = process.env.AZURE_TEST_USER_LOGIN;
@@ -27,19 +26,11 @@ describe('authenticate user handler', function() {
     const winston = require('winston')
     logger = winston.createLogger({ transports: [ new winston.transports.Console() ] })
 
-    clientSecrets = ClientSecrets.Resolved('client-id', 'client-secret')
-    authentication = {
-      getPasswordToken: async () => {
-        return {
-          'auth': true
-        }
-      }
-    }
-
     context = {}
   })
 
-  it('rejects requests with missing parameters', async function() {
+  forEach(authAndClientSecrets)
+  .it('rejects requests with missing parameters', async (authentication,clientSecrets) => {
     const event = {
       body: JSON.stringify({'password': testPassword})
     }
@@ -50,7 +41,8 @@ describe('authenticate user handler', function() {
     expect(result.statusCode).to.equal(400)
   })
 
-  it('rejects requests with failing authentication', async function() {
+  forEach(authAndClientSecrets)
+  .it('rejects requests with failing authentication', async (authentication,clientSecrets) => {
     const event = {
       body: JSON.stringify({'username': testUsername, 'password': testPassword})
     }
@@ -67,7 +59,8 @@ describe('authenticate user handler', function() {
     expect(result.statusCode).to.equal(401)
   })
 
-  it('obtains a password token', async function() {
+  forEach(authAndClientSecrets)
+  .it('obtains a password token', async (authentication,clientSecrets) => {
     const event = {
       body: JSON.stringify({'username': testUsername, 'password': testPassword})
     }
