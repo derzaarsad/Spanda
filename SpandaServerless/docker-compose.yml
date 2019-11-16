@@ -12,7 +12,7 @@ services:
       PGPASSWORD: ""
       PGDATABASE: "postgres"
     volumes:
-      - ./reports/:/app/reports
+      - ./reports:/app/reports
     tty: true
     command: sh -c "/wait && npm run-script integtest"
 

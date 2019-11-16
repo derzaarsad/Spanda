@@ -102,11 +102,13 @@ jobs:
     displayName: 'npm install and build'
     continueOnError: false
   - script: |
-      cd SpandaServerless/spanda
+      cd SpandaServerless
+      mkdir reports
+      cd spanda
       npm test
+      mv reports/*.xml ../reports
       cd ..
       docker-compose build && docker-compose up --abort-on-container-exit
-      ls reports
     displayName: 'Run tests'
     continueOnError: true
   - task: PublishTestResults@2
