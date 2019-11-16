@@ -7,7 +7,7 @@ const ClientSecrets = require('../lib/client-secrets');
 exports.CreateUnittestInterfaces = () => {
 
   // Create Authentications
-  let successfulAuthentication = {
+  let authentication = {
     getClientCredentialsToken: async () => {
         return {
             'access_token': "yyz",
@@ -24,17 +24,20 @@ exports.CreateUnittestInterfaces = () => {
   }
 
   // Create ClientSecrets
-  let dummyClientSecrets = ClientSecrets.Resolved('client-id', 'client-secret')
+  let clientSecrets = ClientSecrets.Resolved('client-id', 'client-secret')
 
   // Create bank interface
-  let dummyBankInterface = {
+  let bankInterface = {
     registerUser: async (authorization, user) => {
         return {}
       }
   };
 
-  // Package Authentications and ClientSecrets
-  return [successfulAuthentication,dummyClientSecrets,dummyBankInterface];
+  return {
+    authentication,
+    clientSecrets,
+    bankInterface
+  };
 };
 
 exports.CreateFinApitestInterfaces = (clientId,clientSecret) => {
@@ -46,14 +49,17 @@ exports.CreateFinApitestInterfaces = (clientId,clientSecret) => {
     headers: { 'Accept': 'application/json' },
   });
 
-  let finApiAuthentication = Authentication.Basic(httpClient);
+  let authentication = Authentication.Basic(httpClient);
 
   // Create ClientSecrets
-  let finApiClientSecrets = ClientSecrets.Resolved(clientId, clientSecret)
+  let clientSecrets = ClientSecrets.Resolved(clientId, clientSecret)
 
   // Create bank interface
-  let finapiBankInterface = require('../lib/bankInterface')(httpClient);
+  let bankInterface = require('../lib/bankInterface')(httpClient);
 
-  // Package Authentications and ClientSecrets
-  return [finApiAuthentication,finApiClientSecrets,finapiBankInterface];
+  return {
+    authentication,
+    clientSecrets,
+    bankInterface
+  };
 };

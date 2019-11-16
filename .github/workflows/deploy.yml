@@ -20,35 +20,8 @@ on: ['push']
 # Set the Job #
 ###############
 jobs:
-  buildInServerless:
-    # Name the Job
-    name: NodeJS AWS SAM Deploy
-    # Set the agent to run on
+  build:
     runs-on: ubuntu-latest
-
-    ##################
-    # Load all steps #
-    ##################
-    steps:
-      ##########################
-      # Checkout the code base #
-      ##########################
-      - name: Checkout Code
-        uses: actions/checkout@master
-
-      #############################
-      # Run NodeJS AWS SAM Deploy #
-      #############################
-      - name: NodeJS AWS SAM Deploy
-        uses: docker://admiralawkbar/aws-nodejs:latest
-        env:
-           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
-
-  buildInRepoServer:
-
-    runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v1
     - name: Setup Node
@@ -61,3 +34,4 @@ jobs:
         npm cit
       env:
         CI: true
+

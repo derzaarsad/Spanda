@@ -30,16 +30,22 @@ const initializePostgreSQLBackend = env => {
   if((!env['PGUSER']) || (!env['PGPASSWORD'])) {
     throw new Error("no credentials are provided for PostgreSQL storage");
   }
-  const { Pool } = require('pg');
+
+  const Pool = require('pg').Pool;
   const format = require('pg-format');
+  const types = require('../../lib/schema/types');
+
   const Users = require('./lib/users');
   const BankConnections = require('./lib/bank-connections');
+
+  const usersSchema = require('./lib/schema/users');
+  const bankConnectionsSchema = require('./lib/schema/bank-connections');
 
   const pool = new Pool();
 
   return {
-    users: Users.NewPostgreSQLRepository(pool, format, env['USERS_TABLE_NAME']),
-    connections: BankConnections.NewPostgreSQLRepository(pool, format, env['BANK_CONNECTIONS_TABLE_NAME'])
+    users: Users.NewPostgreSQLRepository(pool, format, usersSchema, types),
+    connections: BankConnections.NewPostgreSQLRepository(pool, format, bankConnectionsSchema, types)
   }
 }
 

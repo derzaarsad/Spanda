@@ -13,16 +13,14 @@ describe('authenticate user handler', function() {
   let testPassword
 
   let authAndClientSecrets = TestUtility.CreateUnittestInterfaces();
-  let authentication = authAndClientSecrets[0];
-  let clientSecrets = authAndClientSecrets[1];
-  let bankInterface = authAndClientSecrets[2];
 
   beforeEach(function() {
-    testUsername = process.env.AZURE_TEST_USER_LOGIN;
-    testPassword = process.env.AZURE_TEST_USER_LOGIN;
+    testUsername = 'chapu';
+    testPassword = 'secret';
 
     const winston = require('winston')
-    logger = winston.createLogger({ transports: [ new winston.transports.Console() ] })
+    const VoidTransport  = require('./void-transport')
+    logger = winston.createLogger({ transports: [ new VoidTransport() ] })
 
     context = {}
   })
@@ -32,7 +30,7 @@ describe('authenticate user handler', function() {
       body: JSON.stringify({'password': testPassword})
     }
 
-    const result = await controller.authenticateAndSave(event, context, logger, clientSecrets, authentication)
+    const result = await controller.authenticateAndSave(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(400)
@@ -49,7 +47,7 @@ describe('authenticate user handler', function() {
       }
     }
 
-    const result = await controller.authenticateAndSave(event, context, logger, clientSecrets, failingAuthentication)
+    const result = await controller.authenticateAndSave(event, context, logger, authAndClientSecrets.clientSecrets, failingAuthentication)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(401)
@@ -60,7 +58,7 @@ describe('authenticate user handler', function() {
       body: JSON.stringify({'username': testUsername, 'password': testPassword})
     }
 
-    const result = await controller.authenticateAndSave(event, context, logger, clientSecrets, authentication)
+    const result = await controller.authenticateAndSave(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(200)

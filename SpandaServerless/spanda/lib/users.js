@@ -9,6 +9,8 @@ interface IUser extends mongoose.Document {
     phone: string;
     isAutoUpdateEnabled: boolean;
     bankConnectionIds: [number];
+    activeWebFormId: number;
+    activeWebFormAuth: string;
 }
 */
 const createUser = (username, email, phone, isAutoUpdateEnabled) => {
@@ -39,6 +41,10 @@ exports.NewInMemoryRepository = () => {
     save: async (user) => {
       repository[user.username] = user
       return user
+    },
+
+    deleteAll: async () => {
+      Object.keys(repository).forEach(function(key) { delete repository[key] })
     }
   }
 }
@@ -148,76 +154,58 @@ exports.NewDynamoDbRepository = (client, tableName) => {
   }
 }
 
-exports.NewPostgreSQLRepository = (pool, format, tableName) => {
-  const userToSql = user => {
-    return [
-      user.username,
-      user.creationDate,
-      user.allowance,
-      user.isAllowanceReady,
-      user.email,
-      user.phone,
-      user.isAutoUpdateEnabled,
-      (user.bankConnectionIds.length === 0) ? null :  user.bankConnectionIds,
-      user.activeWebFormId,
-      user.activeWebFormAuth
-    ];
+exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
+  const findByIdQuery = (userName) => {
+    return format('SELECT * FROM %I WHERE username = %L LIMIT 1',
+      schema.tableName, userName);
   }
+
+  const deleteAllQuery = format('DELETE FROM %I', schema.tableName);
+
+  const saveQuery = (user) => {
+    const tableName = schema.tableName;
+    const attributes = schema.attributes;
+    const columns = schema.columns;
+    const row = schema.asRow(user);
+
+    return format('INSERT INTO %I (%s) VALUES (%L) ON CONFLICT (%I) DO UPDATE SET (%s) = (%L) WHERE %I.%I = %L',
+      tableName, attributes, row, columns.username, attributes, row, tableName, columns.username, user.username);
+  }
+
   return {
     new: createUser,
 
     findById: async (username) => {
-      return pool.connect().then(client => {
-        let text = 'SELECT * FROM ' + tableName + ' WHERE username = \'' + username + '\' LIMIT 1';
-        
-        return client.query(text).then(res => {
-          client.release();
-          return (res.rowCount === 1) ? res.rows[0] : undefined;
-        }).catch(err => {
-          client.release();
-          throw new Error(err.stack);
-        });
-      });
+      const client = await pool.connect();
+      const params = {
+        text: findByIdQuery(username),
+        rowMode: 'array',
+        types: types
+      }
+
+      return client.query(params)
+        .then(res => (res.rowCount > 0) ? schema.asObject(res.rows[0]) : null)
+        .finally(() => { client.release() });
     },
 
     save: async (user) => {
-      return pool.connect().then(client => {
-        const properties = 'username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth';
-        let text = format('INSERT INTO ' + tableName + '(' + properties + ') VALUES (%L)', userToSql(user));
+      const client = await pool.connect();
 
-        return client.query(text).then(res => {
-          client.release();
-          return user;
-        }).catch(err => {
-          client.release();
-          throw new Error(err.stack);
-        });
-      });
+      return client.query(saveQuery(user))
+        .then(() => user)
+        .finally(() => { client.release() });
     },
 
-    update: async (user) => {
-      return pool.connect().then(client => {
-        let text = 'UPDATE ' + tableName + ' SET'
-        + ' username=\'' + user.username + '\''
-        + ',creationdate=\'' + user.creationdate.toISOString() + '\''
-        + ',allowance=' + user.allowance
-        + ',isallowanceready=' + user.isallowanceready
-        + ',email=\'' + user.email + '\''
-        + ',phone=\'' + user.phone + '\''
-        + ',isautoupdateenabled=' + user.isautoupdateenabled
-        + ',bankconnectionids=' + user.bankconnectionids
-        + ',activewebformid=' + user.activewebformid
-        + ',activewebformauth=' + ((user.activewebformauth) ? ('\'' + user.activewebformauth + '\'') : user.activewebformauth)
-        + ' WHERE username=\'' + user.username + '\''
+    deleteAll: async () => {
+      const client = await pool.connect();
 
-        return client.query(text).then(res => {
-          client.release();
-          return user;
-        }).catch(err => {
-          client.release();
-          throw new Error(err.stack);
-        });
-      });
-    }
+      return client.query(deleteAllQuery)
+        .then(res => res)
+        .finally(() => { client.release() });
+    },
+
+    findByIdQuery: findByIdQuery,
+    saveQuery: saveQuery,
+    deleteAllQuery: deleteAllQuery
   }
 }

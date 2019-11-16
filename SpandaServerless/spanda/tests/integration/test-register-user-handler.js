@@ -19,10 +19,14 @@ describe('register user handler', function() {
   let testValidPhone
   let testInvalidPhone
 
-  let authAndClientSecrets = TestUtility.CreateUnittestInterfaces();
+  expect(process.env.AZURE_TEST_USER_REGISTER).to.exist;
+  expect(process.env.FinAPIClientId).to.exist;
+  expect(process.env.FinAPIClientSecret).to.exist;
+
+  let authAndClientSecrets = TestUtility.CreateFinApitestInterfaces(process.env.FinAPIClientId,process.env.FinAPIClientSecret);
 
   beforeEach(function() {
-    testUsername = 'chapu';
+    testUsername = process.env.AZURE_TEST_USER_REGISTER;
     testPassword = 'secret';
     testValidEmail = 'chapu@mischung.net';
     testInvalidEmail = 'chapu@chapu';
