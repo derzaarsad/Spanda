@@ -67,7 +67,13 @@ jobs:
       tns platform add android
       tns test android --justlaunch
     displayName: 'Run unit test'
-    continueOnError: false
+    continueOnError: true
+  - task: PublishTestResults@2
+    displayName: 'Publish test results'
+    condition: succeededOrFailed()
+    inputs:
+      testRunner: JUnit
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaApp/reports/**/*.xml'
 
 - job: Build_Serverless
   dependsOn: DetermineJob
