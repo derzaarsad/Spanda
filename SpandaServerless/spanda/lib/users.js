@@ -9,6 +9,8 @@ interface IUser extends mongoose.Document {
     phone: string;
     isAutoUpdateEnabled: boolean;
     bankConnectionIds: [number];
+    activeWebFormId: number;
+    activeWebFormAuth: string;
 }
 */
 const createUser = (username, email, phone, isAutoUpdateEnabled) => {
