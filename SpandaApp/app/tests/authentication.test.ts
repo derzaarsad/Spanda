@@ -78,13 +78,26 @@ describe('App Component Test',() => {
 
 	it('construct message register to send via REST', async function() {
 		
-		// TODO
-		const result = authenticationService.__register__("testuser@testdomain.com","password123");
+		let username = "testuser@testdomain.com";
+		let password = "password123";
+		const result = authenticationService.__register__(username,password);
 
 		expect(result.length).to.be.equal(3)
 		expect(result[0]).to.be.an('string')
 		expect(result[1]).to.be.an('object')
 		expect(result[2]).to.be.an('object')
+
+		expect(result[1].id).to.be.an('string')
+		expect(result[1].password).to.be.an('string')
+
+		expect(result[2].headers).to.be.an('object')
+
+		expect(result[0]).to.be.equal("onlyfortest/users")
+		expect(result[1].id).to.be.equal(username)
+		expect(result[1].password).to.be.equal(password)
+
+		expect(result[2].headers.has("Content-Type")).to.be.true
+		expect(result[2].headers.get("Content-Type")).to.be.equal("application/json")
 	})
 
 });
