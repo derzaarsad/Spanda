@@ -48,4 +48,18 @@ describe('postgres users repository', function() {
     const result = await users.findById('chapu')
     expect(result).to.eql(user)
   })
+
+  it('overwrites the properties of an existing user on save', async function() {
+    const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
+    user.creationDate = new Date('2019-11-11T19:31:50.379+00:00')
+    user.bankConnectionIds.push(1)
+
+    const modifiedUser = await users.save(user)
+    modifiedUser.isAutoUpdateEnabled = true
+    modifiedUser.bankConnectionIds = [2, 3]
+    await users.save(modifiedUser)
+
+    const result = await users.findById('chapu')
+    expect(result).to.eql(modifiedUser)
+  })
 })

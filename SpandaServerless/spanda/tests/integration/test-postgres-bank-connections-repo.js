@@ -45,5 +45,18 @@ describe('postgres bank connections repository', function() {
     const result = await connections.findById(2);
     expect(result).to.eql(connection);
   })
+
+  it('overwrites an existing bank connection on save', async function() {
+    const connection = connections.new(2, 69);
+    connection.bankAccountIds.push(1);
+
+    const modifiedConnection = await connections.save(connection);
+    modifiedConnection.bankId = 666
+    modifiedConnection.bankAccountIds = [2, 3]
+    await connections.save(modifiedConnection)
+
+    const result = await connections.findById(2);
+    expect(result).to.eql(modifiedConnection);
+  })
 })
 
