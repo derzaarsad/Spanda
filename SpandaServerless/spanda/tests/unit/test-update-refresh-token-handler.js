@@ -16,7 +16,7 @@ describe('get refresh token handler', function() {
 
   beforeEach(function() {
     const winston = require('winston')
-    const VoidTransport  = require('./void-transport')
+    const VoidTransport  = require('../void-transport')
     logger = winston.createLogger({ transports: [ new VoidTransport() ] })
 
     clientSecrets = ClientSecrets.Resolved('client-id', 'client-secret')

@@ -34,7 +34,7 @@ describe('register user handler', function() {
     testInvalidPhone = 'invalid';
 
     const winston = require('winston')
-    const VoidTransport  = require('./void-transport')
+    const VoidTransport  = require('../void-transport')
     logger = winston.createLogger({ transports: [ new VoidTransport() ] })
 
     users = Users.NewInMemoryRepository()

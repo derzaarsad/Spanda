@@ -19,7 +19,7 @@ describe('authenticate user handler', function() {
     testPassword = 'secret';
 
     const winston = require('winston')
-    const VoidTransport  = require('./void-transport')
+    const VoidTransport  = require('../void-transport')
     logger = winston.createLogger({ transports: [ new VoidTransport() ] })
 
     context = {}
