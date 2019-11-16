@@ -13,6 +13,8 @@ services:
       PGDATABASE: "postgres"
     volumes:
       - ./reports:/app/reports
+    env_file:
+      - ./integration-test.env
     tty: true
     command: sh -c "/wait && npm run-script integtest"
 
