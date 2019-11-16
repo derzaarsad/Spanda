@@ -119,6 +119,11 @@ jobs:
       echo -e "AZURE_TEST_USER_LOGIN=$(AZURE_TEST_USER_LOGIN)" >> ./integration-test.env
       echo -e "FinAPIClientId=$(FinAPIClientId)" >> ./integration-test.env
       echo -e "FinAPIClientSecret=$(FinAPIClientSecret)" >> ./integration-test.env
+      echo -e "WAIT_HOSTS=database:5432" >> ./integration-test.env
+      echo -e "PGHOST=database" >> ./integration-test.env
+      echo -e "PGUSER=postgres" >> ./integration-test.env
+      echo -e "PGPASSWORD=" >> ./integration-test.env
+      echo -e "PGDATABASE=postgres" >> ./integration-test.env
       echo "Start Integration Test"
       docker-compose build && docker-compose up --abort-on-container-exit
     displayName: 'Run tests'
