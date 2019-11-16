@@ -67,19 +67,21 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
   }
 
   const body = JSON.parse(event.body);
+  const response = bankInterface.importConnection(authorization, body.bankId);
 
-  return bankInterface.importConnection(authorization, body.bankId)
-    .then(response => {
-      user.activewebformid = response.formId;
-      user.activewebformauth = crypto.createHmac('sha256', authorization) // this is only my variation to produce random hash
-                   .update(response.formId.toString())
-                   .digest('hex');
-      users.update(user);
+  // this is only my variation to produce a random hash
+  const secret = crypto.createHmac('sha256', authorization)
+    .update(response.formId.toString())
+    .digest('hex');
 
+  user.activeWebFormId = response.formId;
+  user.activeWebFormAuth = secret;
+
+  return users.save(user).then(() => {
       /*
        * Client usage: {location}?callbackUrl={RestApi}/webForms/callback/{webFormAuth}
       */
-      return lambdaUtil.CreateResponse(200, { location: response.location, webFormAuth: user.activewebformauth });
+      return lambdaUtil.CreateResponse(200, { location: response.location, webFormAuth: user.activeWebFormAuth });
     })
     .catch(err => {
       logger.log('error', 'error importing connection', { 'cause': err })
