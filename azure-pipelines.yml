@@ -109,6 +109,7 @@ jobs:
   - script: |
       cd SpandaServerless
       docker-compose build && docker-compose up --abort-on-container-exit
+      ls reports
     displayName: 'Run integration tests'
     continueOnError: true
   - task: PublishTestResults@2
