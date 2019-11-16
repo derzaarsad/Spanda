@@ -15,7 +15,7 @@
     "winston": "^3.2.1"
   },
   "scripts": {
-    "test": "mocha tests/unit/ --reporter mocha-junit-reporter",
+    "test": "mocha tests/unit/ --reporter mocha-junit-reporter --reporter-options mochaFile=./test-results-1.xml",
     "integtest": "mocha tests/integration"
   },
   "devDependencies": {
