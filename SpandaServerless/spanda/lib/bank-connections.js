@@ -29,6 +29,10 @@ exports.NewInMemoryRepository = () => {
     save: async (bankConnection) => {
       repository[bankConnection.id] = bankConnection
       return bankConnection
+    },
+
+    deleteAll: async () => {
+      Object.keys(repository).forEach(function(key) { delete repository[key] })
     }
   }
 }
