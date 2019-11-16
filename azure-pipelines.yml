@@ -80,6 +80,21 @@ jobs:
       versionSpec: '12.x'
     displayName: 'Install Node.js'
   - script: |
+      echo "Installing Docker"
+      apt-get install apt-transport-https ca-certificates curl software-properties-common
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+      add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+      apt-get update
+      apt-get -y install docker-ce
+      systemctl status docker
+      usermod -aG docker ${USER}
+      echo "Installing docker-compose"
+      curl -L https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+      chmod +x /usr/local/bin/docker-compose
+      docker-compose --version
+    displayName: 'Install docker and docker-compose'
+    continueOnError: true
+  - script: |
       cd SpandaServerless/spanda
       npm ci
     displayName: 'npm install and build'
@@ -89,11 +104,17 @@ jobs:
       npm test
     displayName: 'Run unit tests'
     continueOnError: true
+  - script: |
+      cd ..
+      docker-compose build && docker-compose docker-compose up --abort-on-container-exit
+    displayName: 'Run integration tests'
+    continueOnError: true
   - task: PublishTestResults@2
+    displayName: 'Publish test results'
     condition: succeededOrFailed()
     inputs:
       testRunner: JUnit
-      testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/spanda/test-results.xml'
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/reports/*.xml'
   - script: |
       curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
       unzip awscli-bundle.zip
