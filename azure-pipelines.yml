@@ -107,7 +107,8 @@ jobs:
     displayName: 'Run unit tests'
     continueOnError: true
   - script: |
-      cd ..
+      pwd
+      cd SpandaServerless
       docker-compose build && docker-compose docker-compose up --abort-on-container-exit
     displayName: 'Run integration tests'
     continueOnError: true
