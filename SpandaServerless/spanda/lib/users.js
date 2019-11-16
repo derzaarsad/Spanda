@@ -41,6 +41,10 @@ exports.NewInMemoryRepository = () => {
     save: async (user) => {
       repository[user.username] = user
       return user
+    },
+
+    deleteAll: async () => {
+      Object.keys(repository).forEach(function(key) { delete repository[key] })
     }
   }
 }
