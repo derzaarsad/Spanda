@@ -95,7 +95,7 @@ jobs:
       sudo chmod +x /usr/local/bin/docker-compose
       docker-compose --version
     displayName: 'Install docker and docker-compose'
-    continueOnError: true
+    continueOnError: false
   - script: |
       cd SpandaServerless/spanda
       npm ci
@@ -104,13 +104,10 @@ jobs:
   - script: |
       cd SpandaServerless/spanda
       npm test
-    displayName: 'Run unit tests'
-    continueOnError: true
-  - script: |
-      cd SpandaServerless
+      cd ..
       docker-compose build && docker-compose up --abort-on-container-exit
       ls reports
-    displayName: 'Run integration tests'
+    displayName: 'Run tests'
     continueOnError: true
   - task: PublishTestResults@2
     displayName: 'Publish test results'
