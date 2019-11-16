@@ -81,16 +81,18 @@ jobs:
     displayName: 'Install Node.js'
   - script: |
       echo "Installing Docker"
-      apt-get install apt-transport-https ca-certificates curl software-properties-common
-      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-      add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-      apt-get update
-      apt-get -y install docker-ce
-      systemctl status docker
-      usermod -aG docker ${USER}
+      sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+      sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+      sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+      sudo apt-get update
+      sudo apt-get -y install docker-ce
+      sudo systemctl status docker
+      sudo usermod -aG docker ${USER}
+      su - ${USER}
+      id -nG
       echo "Installing docker-compose"
-      curl -L https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-      chmod +x /usr/local/bin/docker-compose
+      sudo curl -L https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+      sudo chmod +x /usr/local/bin/docker-compose
       docker-compose --version
     displayName: 'Install docker and docker-compose'
     continueOnError: true
