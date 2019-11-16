@@ -3,7 +3,6 @@
 /* eslint-env node, mocha */
 const chai = require('chai');
 const expect = chai.expect;
-const forEach = require('mocha-each');
 const controller = require('../../controllers/authentication-controller');
 const TestUtility = require('../test-utility');
 
@@ -13,11 +12,10 @@ describe('authenticate user handler', function() {
   let testUsername
   let testPassword
 
-  expect(process.env.AZURE_TEST_USER_LOGIN).to.exist;
-  expect(process.env.FinAPIClientId).to.exist;
-  expect(process.env.FinAPIClientSecret).to.exist;
-
-  let authAndClientSecrets = TestUtility.CreateAuthAndClientSecrets(process.env.FinAPIClientId,process.env.FinAPIClientSecret)
+  let authAndClientSecrets = TestUtility.CreateUnittestInterfaces();
+  let authentication = authAndClientSecrets[0];
+  let clientSecrets = authAndClientSecrets[1];
+  let bankInterface = authAndClientSecrets[2];
 
   beforeEach(function() {
     testUsername = process.env.AZURE_TEST_USER_LOGIN;
@@ -29,8 +27,7 @@ describe('authenticate user handler', function() {
     context = {}
   })
 
-  forEach(authAndClientSecrets)
-  .it('rejects requests with missing parameters', async (authentication,clientSecrets,bankInterface) => {
+  it('rejects requests with missing parameters', async () => {
     const event = {
       body: JSON.stringify({'password': testPassword})
     }
@@ -41,8 +38,7 @@ describe('authenticate user handler', function() {
     expect(result.statusCode).to.equal(400)
   })
 
-  forEach(authAndClientSecrets)
-  .it('rejects requests with failing authentication', async (authentication,clientSecrets,bankInterface) => {
+  it('rejects requests with failing authentication', async () => {
     const event = {
       body: JSON.stringify({'username': testUsername, 'password': testPassword})
     }
@@ -59,8 +55,7 @@ describe('authenticate user handler', function() {
     expect(result.statusCode).to.equal(401)
   })
 
-  forEach(authAndClientSecrets)
-  .it('obtains a password token', async (authentication,clientSecrets,bankInterface) => {
+  it('obtains a password token', async () => {
     const event = {
       body: JSON.stringify({'username': testUsername, 'password': testPassword})
     }

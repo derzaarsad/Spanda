@@ -3,7 +3,6 @@
 /* eslint-env node, mocha */
 const chai = require('chai');
 const expect = chai.expect;
-const forEach = require('mocha-each');
 const controller = require('../../controllers/authentication-controller');
 const TestUtility = require('../test-utility');
 
@@ -20,11 +19,10 @@ describe('register user handler', function() {
   let testValidPhone
   let testInvalidPhone
 
-  expect(process.env.AZURE_TEST_USER_REGISTER).to.exist;
-  expect(process.env.FinAPIClientId).to.exist;
-  expect(process.env.FinAPIClientSecret).to.exist;
-
-  let authAndClientSecrets = TestUtility.CreateAuthAndClientSecrets(process.env.FinAPIClientId,process.env.FinAPIClientSecret)
+  let authAndClientSecrets = TestUtility.CreateUnittestInterfaces();
+  let authentication = authAndClientSecrets[0];
+  let clientSecrets = authAndClientSecrets[1];
+  let bankInterface = authAndClientSecrets[2];
 
   beforeEach(function() {
     testUsername = process.env.AZURE_TEST_USER_REGISTER;
@@ -41,8 +39,7 @@ describe('register user handler', function() {
     context = {}
   })
 
-  forEach(authAndClientSecrets)
-  .it('rejects a request with missing attributes', async (authentication,clientSecrets,bankInterface) => {
+  it('rejects a request with missing attributes', async () => {
     const user = { 'id': testUsername }
 
     const event = {
@@ -57,8 +54,7 @@ describe('register user handler', function() {
     expect(JSON.parse(result.body).message).to.include('missing user property');
   })
 
-  forEach(authAndClientSecrets)
-  .it('rejects a request with invalid email', async (authentication,clientSecrets,bankInterface) => {
+  it('rejects a request with invalid email', async () => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testInvalidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const event = {
@@ -73,8 +69,7 @@ describe('register user handler', function() {
     expect(JSON.parse(result.body).message).to.include('invalid email');
   })
 
-  forEach(authAndClientSecrets)
-  .it('rejects a request with invalid phone', async (authentication,clientSecrets,bankInterface) => {
+  it('rejects a request with invalid phone', async () => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testInvalidPhone, 'isAutoUpdateEnabled': true }
 
     const event = {
@@ -89,8 +84,7 @@ describe('register user handler', function() {
     expect(JSON.parse(result.body).message).to.include('invalid phone');
   })
 
-  forEach(authAndClientSecrets)
-  .it('rejects a request failing authorization', async (authentication,clientSecrets,bankInterface) => {
+  it('rejects a request failing authorization', async () => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const failingAuthentication = {
@@ -110,8 +104,7 @@ describe('register user handler', function() {
     expect(result.statusCode).to.equal(401);
   })
 
-  forEach(authAndClientSecrets)
-  .it('rejects a request with with existing user', async (authentication,clientSecrets,bankInterface) => {
+  it('rejects a request with with existing user', async () => {
     users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
 
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
@@ -126,8 +119,7 @@ describe('register user handler', function() {
     expect(result.statusCode).to.equal(409);
   })
 
-  forEach(authAndClientSecrets)
-  .it('adds a new user to the repository', async (authentication,clientSecrets,bankInterface) => {
+  it('adds a new user to the repository', async () => {
     const user = { 'id': testUsername, 'password': testPassword, 'email': testValidEmail, 'phone': testValidPhone, 'isAutoUpdateEnabled': true }
 
     const event = {
