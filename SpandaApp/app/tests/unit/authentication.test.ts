@@ -1,4 +1,4 @@
-import { AuthenticationService } from '../services/authentication.service';
+import { AuthenticationService } from '../../services/authentication.service';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 describe('App Component Test',() => {
