@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { IAuthentication } from "../services/authentication.service";
 import { User } from "../models/user.model";
 import { environment } from "../environments/environment";
+import { Token } from "~/models/token.model";
 
 @Injectable()
 export class DummyAuthenticationService implements IAuthentication {
@@ -15,7 +16,9 @@ export class DummyAuthenticationService implements IAuthentication {
     }
 
     getStoredUser(): User {
-        return undefined;
+        let user = new User();
+        user.UserToken = new Token("12345678","","bearer");
+        return user;
     }
 
     authenticateAndSave(username: string, password: string) : Promise<boolean> {
