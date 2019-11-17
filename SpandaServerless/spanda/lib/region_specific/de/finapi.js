@@ -74,6 +74,41 @@ exports.NewClient = (http) => {
 
     importConnection: async (authorization, bankId) => {
       return requestWebForm(authorization, bankId)
+    },
+
+    getNotificationRule: async (authorization, ruleId) => {
+      const resource = '/api/v1/notificationRules/' + ruleId;
+
+      const config = {
+        'headers': {
+          'Authorization': authorization,
+          'Content-Type': 'application/json'
+        }
+      }
+
+      return http.get(resource, config).then(response => response.data)
+    },
+
+    registerNewTransactionsNotificationRule: async (authorization, ruleHandle, accountIds, includeDetails) => {
+      const resource = '/api/v1/notificationRules';
+
+      const config = {
+        'headers': {
+          'Authorization': authorization,
+          'Content-Type': 'application/json'
+        }
+      }
+
+      const rule = {
+        "triggerEvent": "NEW_ACCOUNT_BALANCE",
+        "params": {
+          "accountIds": accountIds.join(',')
+        },
+        "callbackHandle": ruleHandle,
+        "includeDetails": includeDetails
+      }
+
+      return http.post(resource, rule, config).then(response => response.data);
     }
   }
 }
