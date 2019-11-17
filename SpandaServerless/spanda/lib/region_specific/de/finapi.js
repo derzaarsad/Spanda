@@ -76,6 +76,19 @@ exports.NewClient = (http) => {
       return requestWebForm(authorization, bankId)
     },
 
+    editClientConfiguration: async (authorization, clientConfiguration) => {
+      const resource = '/api/v1/clientConfiguration';
+
+      const config = {
+        'headers': {
+          'Authorization': authorization,
+          'Content-Type': 'application/json'
+        }
+      }
+
+      return http.patch(resource, clientConfiguration, config).then(response => response.data);
+    },
+
     getNotificationRule: async (authorization, ruleId) => {
       const resource = '/api/v1/notificationRules/' + ruleId;
 
