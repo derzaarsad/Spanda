@@ -1,8 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Inject } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
 import { NavigationOptions } from "nativescript-angular/router/ns-location-strategy";
 import { Page } from "tns-core-modules/ui/page";
-import { AuthenticationService } from "~/services/authentication.service";
+import { IAuthentication,AUTH_SERVICE_IMPL } from "~/services/authentication.service";
 import { BankService } from "~/services/bank.service"
 
 @Component({
@@ -17,7 +17,7 @@ export class AllowanceComponent implements OnInit {
     constructor(
         private routerExtensions: RouterExtensions,
         private page: Page,
-        private authenticationService: AuthenticationService,
+        @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication,
         private bankService: BankService) {
     }
 

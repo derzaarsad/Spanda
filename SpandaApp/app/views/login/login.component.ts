@@ -1,9 +1,9 @@
 // TODO
-import { Component, ElementRef, ViewChild } from "@angular/core";
+import { Component, ElementRef, ViewChild, Inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { alert, prompt } from "tns-core-modules/ui/dialogs";
 import { Page } from "tns-core-modules/ui/page";
-import { AuthenticationService } from "~/services/authentication.service";
+import { IAuthentication, AUTH_SERVICE_IMPL } from "~/services/authentication.service";
 
 @Component({
     selector: "login",
@@ -18,7 +18,7 @@ export class LoginComponent {
     @ViewChild("password", {static: false}) password: ElementRef;
     @ViewChild("confirmPassword", {static: false}) confirmPassword: ElementRef;
 
-    constructor(private page: Page, private router: Router, private authenticationService: AuthenticationService) {
+    constructor(private page: Page, private router: Router, @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) {
         this.page.actionBarHidden = true;
 
         if(this.authenticationService.isStoredUserAvailable()) {
