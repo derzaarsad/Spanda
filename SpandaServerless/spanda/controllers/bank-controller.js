@@ -71,7 +71,7 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
 
   // this is only my variation to produce a random hash
   const secret = crypto.createHmac('sha256', authorization)
-    .update(response.formId.toString())
+    .update(response.formId)
     .digest('hex');
 
   user.activeWebFormId = response.formId;
