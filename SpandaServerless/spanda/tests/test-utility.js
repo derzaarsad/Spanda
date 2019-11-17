@@ -28,9 +28,23 @@ exports.CreateUnittestInterfaces = () => {
 
   // Create bank interface
   let bankInterface = {
-    registerUser: async (authorization, user) => {
-        return {}
+    userInfo: async (authorization) => {
+      return {
+        'id': 'chapu'
       }
+    },
+
+    registerUser: async (authorization, user) => {
+      return {}
+    },
+    
+    importConnection: async (authorization, bankId) => {
+      return {
+        // example from 
+        'location': 'testlocation',
+        'formId': '2934'
+      }
+    }
   };
 
   return {
