@@ -79,8 +79,8 @@ export class BankService {
         return this.http.post(request[0],request[1],request[2]).toPromise()
         .then(res => {
             console.log("WebForm Valid");
-            console.log(res[0]);
-            return [res[0]["id"], res[0]["token"], res[0]["status"], res[1]];
+            console.log(res);
+            return res["location"] + "?callbackUrl=" + this.authenticationService.getBackendUrl() + "/webForms/callback/" + res["webFormAuth"];
         }, err => {
             console.log("WebForm Invalid");
             console.log(err);
