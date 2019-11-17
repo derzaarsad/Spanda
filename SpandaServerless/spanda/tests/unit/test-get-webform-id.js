@@ -34,6 +34,23 @@ describe('get webform id', function() {
     context = {}
   })
 
+  it('rejects requests with failing authentication', async () => {
+    users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
+
+    const event = {
+      'headers': {
+        'Content-Type': 'application/json'
+      },
+
+      'body': JSON.stringify({ 'bankId': 123545 })
+    }
+
+    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users)
+
+    expect(result).to.be.an('object')
+    expect(result.statusCode).to.equal(401)
+  })
+
   it('return webform location', async function() {
     users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
 
