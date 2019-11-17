@@ -2,7 +2,6 @@
 
 const lambdaUtil = require('../lib/lambda-util.js');
 const blzPattern = /^\d{8}$/
-const crypto = require('crypto');
 
 const getUserInfo = async (logger, bankInterface, authorization) => {
   logger.log('info', 'authenticating user', { 'authorization': authorization })
@@ -69,13 +68,12 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
   const body = JSON.parse(event.body);
   const response = await bankInterface.importConnection(authorization, body.bankId);
 
-  // this is only my variation to produce a random hash
-  const secret = crypto.createHmac('sha256', authorization)
-    .update(response.formId)
-    .digest('hex');
+  const secret = lambdaUtil.EncryptText(authorization);
+
+  // TODO: save secret.iv in the database for decryption
 
   user.activeWebFormId = response.formId;
-  user.activeWebFormAuth = secret;
+  user.activeWebFormAuth = secret.encryptedData;
 
   return users.save(user).then(() => {
       /*
