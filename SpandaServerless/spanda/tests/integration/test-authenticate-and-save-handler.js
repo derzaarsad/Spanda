@@ -12,11 +12,15 @@ describe('authenticate user handler', function() {
   let testUsername
   let testPassword
 
-  let authAndClientSecrets = TestUtility.CreateUnittestInterfaces();
+  expect(process.env.AZURE_TEST_USER_LOGIN).to.exist;
+  expect(process.env.FinAPIClientId).to.exist;
+  expect(process.env.FinAPIClientSecret).to.exist;
+
+  let authAndClientSecrets = TestUtility.CreateFinApitestInterfaces(process.env.FinAPIClientId,process.env.FinAPIClientSecret);
 
   beforeEach(function() {
-    testUsername = 'chapu';
-    testPassword = 'secret';
+    testUsername = process.env.AZURE_TEST_USER_LOGIN;
+    testPassword = process.env.AZURE_TEST_USER_LOGIN;
 
     const winston = require('winston')
     const VoidTransport  = require('../void-transport')

@@ -31,13 +31,46 @@ export class AuthenticationService {
         return this.storedUser;
     }
 
-    authenticateAndSave(username: string, password: string) : Promise<boolean> {
+    __authenticateAndSave__(username: string, password: string) : [string, any, any] {
 
         let headerOptions = new HttpHeaders({
             "Content-Type": "application/json"
         });
 
-        return this.http.post(environment.backendUrl + "/oauth/login", { username: username, password: password }, { headers: headerOptions }).toPromise()
+        return [environment.backendUrl + "/oauth/login", { username: username, password: password }, { headers: headerOptions }];
+    }
+
+    __setNewRefreshAndAccessToken__(refreshToken: string) : [string, any, any] {
+
+        let headerOptions = new HttpHeaders({
+            "Content-Type": "application/json"
+        });
+
+        return [environment.backendUrl + "/oauth/token", { refresh_token: refreshToken }, { headers: headerOptions }];
+    }
+
+    __isUserAuthenticated__(access_token: string, token_type: string) : [string, any] {
+
+        let headerOptions = new HttpHeaders({
+            "Authorization": token_type + " " + access_token,
+            "Content-Type": "application/json"
+         });
+
+         return [environment.backendUrl + "/users", { headers: headerOptions }];
+    }
+
+    __register__(username: string, password: string) : [string, any, any] {
+
+        let headerOptions = new HttpHeaders({
+            "Content-Type": "application/json"
+        });
+
+        return [environment.backendUrl + "/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, { headers: headerOptions }];
+    }
+
+    authenticateAndSave(username: string, password: string) : Promise<boolean> {
+        let request = this.__authenticateAndSave__(username,password);
+        return this.http.post(request[0],request[1],request[2]).toPromise()
         .then(res => {
             if(!this.storedUser) {
                 this.storedUser = new User();
@@ -53,12 +86,8 @@ export class AuthenticationService {
     }
 
     setNewRefreshAndAccessToken() : Promise<boolean> {
-
-        let headerOptions = new HttpHeaders({
-            "Content-Type": "application/json"
-        });
-
-        return this.http.post(environment.backendUrl + "/oauth/token", { refresh_token: this.storedUser.UserToken.RefreshToken }, { headers: headerOptions }).toPromise()
+        let request = this.__setNewRefreshAndAccessToken__(this.storedUser.UserToken.RefreshToken);
+        return this.http.post(request[0],request[1],request[2]).toPromise()
         .then(res => {
             this.storedUser.UserToken = new Token(res["access_token"], res["refresh_token"], res["token_type"]);
             let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
@@ -73,13 +102,8 @@ export class AuthenticationService {
     }
 
     isUserAuthenticated(access_token: string, token_type: string) : Promise<boolean> {
-
-        let headerOptions = new HttpHeaders({
-            "Authorization": token_type + " " + access_token,
-            "Content-Type": "application/x-www-form-urlencoded"
-         });
-
-        return this.http.get(environment.backendUrl + "/users", { headers: headerOptions }).toPromise()
+        let request = this.__isUserAuthenticated__(access_token, token_type);
+        return this.http.get(request[0],request[1]).toPromise()
         .then(res => {
             console.log("user is authenticated!");
             console.log(res);
@@ -96,19 +120,15 @@ export class AuthenticationService {
     }
 
     register(username: string, password: string) : Promise<boolean> {
+        let request = this.__register__(username, password);
+        return this.http.post(request[0],request[1],request[2]).toPromise()
+        .then(res => {
+            
+            console.log("registration successful");
+            console.log(res);
 
-            let headerOptions = new HttpHeaders({
-                "Content-Type": "application/json"
-            });
-
-            return this.http.post(environment.backendUrl + "/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, { headers: headerOptions }).toPromise()
-            .then(res => {
-
-                console.log("registration successful");
-                console.log(res);
-
-                return true;
-            });
+            return true;
+        });
     }
 
     resetPassword(textSTr: string) : any {

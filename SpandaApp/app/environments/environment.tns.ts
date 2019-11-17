@@ -10,7 +10,8 @@ export const environment = (() => {
   ) {
     envVars = JSON.parse(process.env.environmentJson);
   } else {
-    throw new Error("No environment variable defined");
+    // a dummy value is filled for test
+    envVars = JSON.parse("{\"backendUrl\":\"onlyfortest\"}");
   }
 
   return envVars;

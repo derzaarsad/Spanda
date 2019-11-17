@@ -1,6 +1,7 @@
 # Spanda
 
 [![Build Status](https://dev.azure.com/dinodime/Spanda/_apis/build/status/derzaarsad.Spanda?branchName=master)](https://dev.azure.com/dinodime/Spanda/_build/latest?definitionId=1&branchName=master)
+[![Board Status](https://dev.azure.com/dinodime/b3c96a9a-f93a-4c09-a26b-825e5a3e7cbb/2e6fa13b-a05c-44b7-8f1a-40af07e1e510/_apis/work/boardbadge/c1c68657-e25f-4472-bf2b-0bfd3f02752e)](https://dev.azure.com/dinodime/b3c96a9a-f93a-4c09-a26b-825e5a3e7cbb/_boards/board/t/2e6fa13b-a05c-44b7-8f1a-40af07e1e510/Microsoft.RequirementCategory/)
 
 This app shows your budget allowance for every single day. The allowance is automatically adjusted according to your income / expense behaviour.
 

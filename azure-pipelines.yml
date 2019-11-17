@@ -67,7 +67,13 @@ jobs:
       tns platform add android
       tns test android --justlaunch
     displayName: 'Run unit test'
-    continueOnError: false
+    continueOnError: true
+  - task: PublishTestResults@2
+    displayName: 'Publish test results'
+    condition: succeededOrFailed()
+    inputs:
+      testRunner: JUnit
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaApp/reports/**/*.xml'
 
 - job: Build_Serverless
   dependsOn: DetermineJob
@@ -105,9 +111,26 @@ jobs:
       cd SpandaServerless
       mkdir reports
       cd spanda
+      echo "Start Unit Test"
       npm test
       mv reports/*.xml ../reports
       cd ..
+      result=`python deleteUser.py $(FinAPIAdminId) $(FinAPIAdminSecret) $(AZURE_TEST_USER_REGISTER)`
+      echo "$result"
+      result=`python deleteUser.py $(FinAPIAdminId) $(FinAPIAdminSecret) $(AZURE_TEST_USER_LOGIN)`
+      echo "$result"
+      result=`python registerUser.py $(FinAPIClientId) $(FinAPIClientSecret) $(AZURE_TEST_USER_LOGIN)`
+      echo "created user $result"
+      echo -e "AZURE_TEST_USER_REGISTER=$(AZURE_TEST_USER_REGISTER)" >> ./integration-test.env
+      echo -e "AZURE_TEST_USER_LOGIN=$(AZURE_TEST_USER_LOGIN)" >> ./integration-test.env
+      echo -e "FinAPIClientId=$(FinAPIClientId)" >> ./integration-test.env
+      echo -e "FinAPIClientSecret=$(FinAPIClientSecret)" >> ./integration-test.env
+      echo -e "WAIT_HOSTS=database:5432" >> ./integration-test.env
+      echo -e "PGHOST=database" >> ./integration-test.env
+      echo -e "PGUSER=postgres" >> ./integration-test.env
+      echo -e "PGPASSWORD=" >> ./integration-test.env
+      echo -e "PGDATABASE=postgres" >> ./integration-test.env
+      echo "Start Integration Test"
       docker-compose build && docker-compose up --abort-on-container-exit
     displayName: 'Run tests'
     continueOnError: true
