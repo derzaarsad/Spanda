@@ -63,7 +63,7 @@ describe('lambda util', function() {
 
   it('encryption and decryption', async function() {
 
-    let someString = '64aaddc201e87f11425be34ce019833f9c175472a52c3d168f5a3231a7680df9';
+    let someString = '708578 64aaddc201e87f11425be34ce019833f9c175472a52c3d168f5a3231a7680df9';
     let encryptedText = lambdaUtil.EncryptText(someString);
     let decryptedText = lambdaUtil.DecryptText(encryptedText);
 
