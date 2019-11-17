@@ -67,7 +67,7 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
   }
 
   const body = JSON.parse(event.body);
-  const response = bankInterface.importConnection(authorization, body.bankId);
+  const response = await bankInterface.importConnection(authorization, body.bankId);
 
   // this is only my variation to produce a random hash
   const secret = crypto.createHmac('sha256', authorization)
