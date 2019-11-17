@@ -68,6 +68,34 @@ describe('get webform id', function() {
     expect(result.statusCode).to.equal(401)
   })
 
+  it('rejects requests because user save failed', async () => {
+    const failingUsers = {
+      findById: async (id) => {
+        return {
+          'username': testUsername
+        }
+      },
+
+      save: async (user) => {
+        throw 'nada'
+      }
+    }
+
+    const event = {
+      'headers': {
+        'Authorization': 'bearer 12345678',
+        'Content-Type': 'application/json'
+      },
+
+      'body': JSON.stringify({ 'bankId': 123545 })
+    }
+
+    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, failingUsers)
+
+    expect(result).to.be.an('object')
+    expect(result.statusCode).to.equal(500)
+  })
+
   it('return webform location', async function() {
     users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
 
