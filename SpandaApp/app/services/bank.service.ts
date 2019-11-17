@@ -1,13 +1,13 @@
-import { Injectable } from "@angular/core";
+import { Injectable, Inject } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Bank } from "~/models/bank.model";
-import { AuthenticationService } from "~/services/authentication.service";
+import { IAuthentication, AUTH_SERVICE_IMPL } from "~/services/authentication.service";
 import { Token } from "~/models/token.model";
 
 @Injectable()
 export class BankService {
 
-    constructor(private http: HttpClient, private authenticationService: AuthenticationService) { }
+    constructor(private http: HttpClient, @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) { }
 
     __getBankByBLZ__(blz: string) : [string,any] {
 

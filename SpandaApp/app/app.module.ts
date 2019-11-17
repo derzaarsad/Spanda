@@ -9,13 +9,13 @@ import { NativeScriptHttpClientModule } from "nativescript-angular/http-client";
 import { AppComponent } from "./app.component";
 import { HomeComponent } from "./views/home/home.component";
 
-import { AuthenticationService } from "./services/authentication.service";
+import { AuthenticationService, AUTH_SERVICE_IMPL } from "./services/authentication.service";
 import { BankService } from "./services/bank.service";
 
 @NgModule({
   providers: [
     authProviders,
-    AuthenticationService,
+    { provide: AUTH_SERVICE_IMPL,  useClass:   AuthenticationService },
     BankService
   ],
   declarations: [
