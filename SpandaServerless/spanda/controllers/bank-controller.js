@@ -68,18 +68,16 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
   const body = JSON.parse(event.body);
   const response = await bankInterface.importConnection(authorization, body.bankId);
 
-  const secret = lambdaUtil.EncryptText(authorization);
-
-  // TODO: save secret.iv in the database for decryption
+  const secret = lambdaUtil.EncryptText(response.formId + " " + authorization);
 
   user.activeWebFormId = response.formId;
-  user.activeWebFormAuth = secret.encryptedData;
+  user.activeWebFormAuth = secret.iv;
 
   return users.save(user).then(() => {
       /*
        * Client usage: {location}?callbackUrl={RestApi}/webForms/callback/{webFormAuth}
       */
-      return lambdaUtil.CreateResponse(200, { location: response.location, webFormAuth: user.activeWebFormAuth });
+      return lambdaUtil.CreateResponse(200, { location: response.location, webFormAuth: secret.encryptedData });
     })
     .catch(err => {
       logger.log('error', 'error importing connection', { 'cause': err })
