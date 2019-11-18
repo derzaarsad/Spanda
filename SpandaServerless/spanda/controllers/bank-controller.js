@@ -68,7 +68,7 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
   const body = JSON.parse(event.body);
   const response = await bankInterface.importConnection(authorization, body.bankId);
 
-  const secret = lambdaUtil.EncryptText(response.formId + " " + authorization);
+  const secret = lambdaUtil.EncryptText(authorization);
 
   user.activeWebFormId = response.formId;
   user.activeWebFormAuth = secret.iv;
@@ -77,7 +77,7 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
       /*
        * Client usage: {location}?callbackUrl={RestApi}/webForms/callback/{webFormAuth}
       */
-      return lambdaUtil.CreateResponse(200, { location: response.location, webFormAuth: secret.encryptedData });
+      return lambdaUtil.CreateResponse(200, { location: response.location, webFormAuth: response.formId + "-" + secret.encryptedData });
     })
     .catch(err => {
       logger.log('error', 'error importing connection', { 'cause': err })
@@ -89,6 +89,11 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
 // @Param('webId') webId
 // @Header('Authorization') authorization: string
 exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, connections) => {
+
+  if (!event.pathParameters.webFormAuth) {
+    return lambdaUtil.CreateInternalErrorResponse('no webFormAuth');
+  }
+
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
