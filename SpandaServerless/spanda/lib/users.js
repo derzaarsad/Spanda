@@ -161,7 +161,7 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
   }
 
   const findByWebFormQuery = (activeWebFormAuth) => {
-    return format('SELECT * FROM %I WHERE activewebformauth = %L LIMIT 1',
+    return format('SELECT * FROM %I WHERE activewebformid = %L LIMIT 1',
       schema.tableName, activeWebFormAuth);
   }
 
