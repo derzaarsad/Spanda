@@ -97,7 +97,7 @@ exports.webFormCallback = async (event, context) => {
 exports.fetchWebFormInfo = async (event, context) => {
   try {
     return bankController.fetchWebFormInfo(event, context, logger,
-      services.bankInterface, services.users, services.connections)
+      services.bankInterface, services.users, services.connections, services.encryptions)
   } catch (err) {
     logger.log('error', 'error fetching webform id', err)
     return lambdaUtil.CreateInternalErrorResponse(err)

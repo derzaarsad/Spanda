@@ -88,7 +88,7 @@ exports.getWebformId = async(event, context, logger, bankInterface, users, encry
 // @Get('/webForms/{webFormId}')
 // @Param('webId') webId
 // @Header('Authorization') authorization: string
-exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, connections) => {
+exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, connections, encryptions) => {
 
   if (!event.pathParameters.webFormAuth) {
     return lambdaUtil.CreateInternalErrorResponse('no webFormAuth');
