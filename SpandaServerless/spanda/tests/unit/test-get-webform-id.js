@@ -117,6 +117,7 @@ describe('get webform id', function() {
 
     expect(JSON.parse(result.body).location).to.equal('testlocation');
     expect(JSON.parse(result.body).webFormAuth.split("-").length).to.equal(2);
+    expect(JSON.parse(result.body).webFormAuth.split("-")[0]).to.equal('2934');
     expect(JSON.parse(result.body).webFormAuth.split("-")[1]).to.not.equal(event.headers.Authorization);
   })
 
