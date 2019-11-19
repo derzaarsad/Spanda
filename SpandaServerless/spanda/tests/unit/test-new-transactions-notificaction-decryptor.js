@@ -8,7 +8,7 @@ const chai = require('chai');
 const expect = chai.expect;
 
 describe('new notifications decryptor', function() {
-  it('decrypts a ciphertext encrypted by self', async function() {
+  it('decrypts a notification encrypted by self', async function() {
     const key = '8deec885781c421794ceda8af70a5e63';
     const decryptor = Decryptor.new(key)
 
