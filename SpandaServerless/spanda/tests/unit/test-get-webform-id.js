@@ -119,6 +119,11 @@ describe('get webform id', function() {
     expect(JSON.parse(result.body).webFormAuth.split("-").length).to.equal(2);
     expect(JSON.parse(result.body).webFormAuth.split("-")[0]).to.equal('2934');
     expect(JSON.parse(result.body).webFormAuth.split("-")[1]).to.not.equal(event.headers.Authorization);
+
+    // this test proves whether the right data is written to database
+    let user = await users.findByWebForm(2934);
+    expect(JSON.parse(result.body).webFormAuth.split("-")[0]).to.equal(user.activeWebFormId);
+    expect(JSON.parse(result.body).webFormAuth.split("-")[1]).to.not.equal(user.activeWebFormAuth);
   })
 
 })
