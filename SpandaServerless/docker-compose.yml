@@ -10,7 +10,7 @@ services:
     env_file:
       - ./integration-test.env
     tty: true
-    command: sh -c "/wait && npm run-script integtest"
+    command: sh -c "/wait && npm run-script integtest -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integration-tests.xml"
 
   database:
     image: postgres:12
