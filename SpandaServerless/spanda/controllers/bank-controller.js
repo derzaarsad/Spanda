@@ -44,7 +44,7 @@ exports.getBankByBLZ = async(event, context, logger, clientSecrets, authenticati
 // @Post('/bankConnections/import')
 // @Header('Authorization') authorization: string,
 // @BodyProp() bankId: number)
-exports.getWebformId = async(event, context, logger, bankInterface, users) => {
+exports.getWebformId = async(event, context, logger, bankInterface, users, encryptions) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
@@ -68,7 +68,7 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
   const body = JSON.parse(event.body);
   const response = await bankInterface.importConnection(authorization, body.bankId);
 
-  const secret = lambdaUtil.EncryptText(authorization);
+  const secret = encryptions.EncryptText(authorization);
 
   user.activeWebFormId = response.formId;
   user.activeWebFormAuth = secret.iv;

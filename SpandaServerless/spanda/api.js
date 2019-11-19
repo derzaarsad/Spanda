@@ -76,7 +76,7 @@ exports.getBankByBLZ = async (event, context) => {
 exports.getWebFormId = async (event, context) => {
   try {
     return bankController.getWebformId(event, context, logger,
-      services.bankInterface, services.users)
+      services.bankInterface, services.users, services.encryptions)
   } catch (err) {
     logger.log('error', 'error importing bank connection', err)
     return lambdaUtil.CreateInternalErrorResponse(err)

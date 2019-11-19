@@ -19,6 +19,7 @@ describe('get webform id', function() {
   let testValidPhone
 
   let authAndClientSecrets = TestUtility.CreateUnittestInterfaces();
+  let encryptions
 
   beforeEach(function() {
     testUsername = 'chapu';
@@ -30,6 +31,7 @@ describe('get webform id', function() {
     logger = winston.createLogger({ transports: [ new VoidTransport() ] })
 
     users = Users.NewInMemoryRepository()
+    encryptions = require('../../lib/encryptions')
 
     context = {}
   })
@@ -45,7 +47,7 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 123545 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users)
+    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users, encryptions)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(401)
@@ -62,7 +64,7 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 123545 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users)
+    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users, encryptions)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(401)
@@ -90,7 +92,7 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 123545 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, failingUsers)
+    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, failingUsers, encryptions)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(500)
@@ -108,7 +110,7 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 123545 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users)
+    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(200);
@@ -123,7 +125,8 @@ describe('get webform id', function() {
     // this test proves whether the right data is written to database
     let user = await users.findByWebForm(2934);
     expect(JSON.parse(result.body).webFormAuth.split("-")[0]).to.equal(user.activeWebFormId);
-    expect(JSON.parse(result.body).webFormAuth.split("-")[1]).to.not.equal(user.activeWebFormAuth);
+    let res = encryptions.DecryptText({ iv: user.activeWebFormAuth, encryptedData: JSON.parse(result.body).webFormAuth.split("-")[1] })
+    expect(res).to.equal(event.headers.Authorization);
   })
 
 })

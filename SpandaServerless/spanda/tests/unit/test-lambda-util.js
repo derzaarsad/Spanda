@@ -60,18 +60,5 @@ describe('lambda util', function() {
 
     expect(lambdaUtil.HasMissingProperty(body, ['id', 'email', 'cred', 'rad'])).to.equal('email')
   })
-
-  it('encryption and decryption', async function() {
-
-    let someString = '708578 64aaddc201e87f11425be34ce019833f9c175472a52c3d168f5a3231a7680df9';
-    let encryptedText = lambdaUtil.EncryptText(someString);
-    let decryptedText = lambdaUtil.DecryptText(encryptedText);
-
-    expect(encryptedText).to.be.an('object');
-    expect(encryptedText.iv).to.be.an('string');
-    expect(encryptedText.encryptedData).to.be.an('string');
-    expect(encryptedText).to.not.equal(someString);
-    expect(decryptedText).to.equal(someString);
-  })
 });
 
