@@ -38,6 +38,16 @@ exports.NewInMemoryRepository = () => {
       return repository[username]
     },
 
+    findByWebForm: async (activeWebFormId) => {
+      let found
+      Object.keys(repository).forEach(function(key) {
+        if(repository[key].activeWebFormId == activeWebFormId) {
+          found = repository[key];
+        }
+      })
+      return found
+    },
+
     save: async (user) => {
       repository[user.username] = user
       return user
@@ -193,10 +203,10 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
         .finally(() => { client.release() });
     },
 
-    findByWebForm: async (activeWebFormAuth) => {
+    findByWebForm: async (activeWebFormId) => {
       const client = await pool.connect();
       const params = {
-        text: findByWebFormQuery(activeWebFormAuth),
+        text: findByWebFormQuery(activeWebFormId),
         rowMode: 'array',
         types: types
       }
