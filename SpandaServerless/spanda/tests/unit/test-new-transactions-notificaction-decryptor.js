@@ -7,7 +7,24 @@ const chai = require('chai');
 
 const expect = chai.expect;
 
-describe('new notifications decryptor', function() {
+describe('notification transformations', function() {
+  it('returns the same payload when using pass', async function() {
+    const payload = {
+      "notificationRuleId": 1,
+      "triggerEvent": "NEW_TRANSACTIONS",
+      "callbackHandle": "new-transactions"
+    }
+
+    const expected = {
+      "notificationRuleId": 1,
+      "triggerEvent": "NEW_TRANSACTIONS",
+      "callbackHandle": "new-transactions"
+    }
+
+    const decoder = Decoder.Pass();
+    expect(decoder.map(payload)).to.eql(expected);
+  })
+
   it('decrypts a notification encrypted by self', async function() {
     const key = '8deec885781c421794ceda8af70a5e63';
     const decryptor = Decryptor.new(key)
