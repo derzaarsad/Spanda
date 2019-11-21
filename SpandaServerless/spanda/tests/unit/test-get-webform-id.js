@@ -119,14 +119,17 @@ describe('get webform id', function() {
 
     expect(JSON.parse(result.body).location).to.equal('testlocation');
     expect(JSON.parse(result.body).webFormAuth.split("-").length).to.equal(2);
-    expect(JSON.parse(result.body).webFormAuth.split("-")[0]).to.equal('2934');
-    expect(JSON.parse(result.body).webFormAuth.split("-")[1]).to.not.equal(event.headers.Authorization);
+
+    let formId = JSON.parse(result.body).webFormAuth.split("-")[0];
+    let encryptedAuth = JSON.parse(result.body).webFormAuth.split("-")[1];
+
+    expect(formId).to.equal('2934');
+    expect(encryptedAuth).to.not.equal(event.headers.Authorization);
 
     // this test proves whether the right data is written to database
     let user = await users.findByWebForm(2934);
-    expect(JSON.parse(result.body).webFormAuth.split("-")[0]).to.equal(user.activeWebFormId);
-    let res = encryptions.DecryptText({ iv: user.activeWebFormAuth, encryptedData: JSON.parse(result.body).webFormAuth.split("-")[1] })
-    expect(res).to.equal(event.headers.Authorization);
+    expect(formId).to.equal(user.activeWebFormId);
+    expect(encryptions.DecryptText({ iv: user.activeWebFormAuth, encryptedData: encryptedAuth })).to.equal(event.headers.Authorization);
   })
 
 })
