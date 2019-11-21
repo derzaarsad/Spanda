@@ -119,7 +119,8 @@ describe('fetch webform info handler', function() {
   })
 
   it('adds a connection to the user', async function() {
-    const encrypted = encryptions.EncryptText("bearer 5jkntkzt5nj53zi99754563nb3b64zb");
+    let access_token = 'bearer 5jkntkzt5nj53zi99754563nb3b64zb';
+    const encrypted = encryptions.EncryptText(access_token);
     const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
     user.activeWebFormId = 2934;
     user.activeWebFormAuth = encrypted.iv;
@@ -127,7 +128,10 @@ describe('fetch webform info handler', function() {
 
     const finapi = {
 
-      fetchWebForm: async () => {
+      fetchWebForm: async (authorization, formId) => {
+        if(authorization !== access_token) {
+          return {}
+        }
         return {
           serviceResponseBody: {
             'id': 1,
