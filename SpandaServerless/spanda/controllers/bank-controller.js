@@ -94,31 +94,16 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
     return lambdaUtil.CreateInternalErrorResponse('no webFormAuth');
   }
 
-  const authorization = lambdaUtil.hasAuthorization(event.headers)
+  let splitted = event.pathParameters.webFormAuth.split("-");
+  let webId = splitted[0];
 
-  if (!authorization) {
-    return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
-  }
-
-  const webId = event.pathParameters['webFormId']
-  if (!webId) {
-    return lambdaUtil.CreateErrorResponse(400, 'no webform id given');
-  }
-
-  let userInfo
-  try {
-    userInfo = await getUserInfo(logger, bankInterface, authorization)
-  } catch(error) {
-    logger.log('error', 'invalid token', { 'authorization': authorization })
-    return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
-  }
-
-  const username = userInfo.id
-  const user = await users.findById(username)
+  const user = await users.findByWebForm(webId)
   if (!user) {
-    logger.log('error', 'no user found for username ' + username)
-    return lambdaUtil.CreateInternalErrorResponse('could not fetch web form');
+    logger.log('error', 'no user found for webId ' + webId)
+    return lambdaUtil.CreateInternalErrorResponse('no user found');
   }
+
+  const authorization = encryptions.DecryptText({ iv: user.activeWebFormAuth, encryptedData: splitted[1] })
 
   let webForm
   try {
@@ -129,6 +114,11 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
   }
 
   const body = webForm.serviceResponseBody
+  if (!body) {
+    logger.log('error', 'empty body')
+    return lambdaUtil.CreateInternalErrorResponse('empty body');
+  }
+
   const bankConnection = connections.new(body.id, body.bankId)
   bankConnection.bankAccountIds = body.accountIds
 
