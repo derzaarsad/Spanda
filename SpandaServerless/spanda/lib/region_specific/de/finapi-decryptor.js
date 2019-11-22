@@ -11,7 +11,7 @@ const AesUtil = function (keySize, iterationCount) {
 };
 
 AesUtil.prototype.generateKey = function (dataDecryptionKey) {
-  var salt = dataDecryptionKey;
+  const salt = dataDecryptionKey;
   return CryptoJS.PBKDF2(
     dataDecryptionKey,
     CryptoJS.enc.Hex.parse(salt),
@@ -22,9 +22,9 @@ AesUtil.prototype.generateKey = function (dataDecryptionKey) {
 };
 
 AesUtil.prototype.encrypt = function (dataDecryptionKey, plainText) {
-  var key = this.generateKey(dataDecryptionKey);
-  var initialVector = dataDecryptionKey;
-  var encrypted = CryptoJS.AES.encrypt(
+  const key = this.generateKey(dataDecryptionKey);
+  const initialVector = dataDecryptionKey;
+  const encrypted = CryptoJS.AES.encrypt(
     plainText,
     key,
     {
@@ -34,12 +34,12 @@ AesUtil.prototype.encrypt = function (dataDecryptionKey, plainText) {
 };
 
 AesUtil.prototype.decrypt = function (dataDecryptionKey, cipherText) {
-  var key = this.generateKey(dataDecryptionKey);
-  var cipherParams = CryptoJS.lib.CipherParams.create({
+  const key = this.generateKey(dataDecryptionKey);
+  const cipherParams = CryptoJS.lib.CipherParams.create({
     ciphertext: CryptoJS.enc.Base64.parse(cipherText)
   });
-  var initialVector = dataDecryptionKey;
-  var decrypted = CryptoJS.AES.decrypt(
+  const initialVector = dataDecryptionKey;
+  const decrypted = CryptoJS.AES.decrypt(
     cipherParams,
     key,
     {
@@ -48,7 +48,7 @@ AesUtil.prototype.decrypt = function (dataDecryptionKey, cipherText) {
   return decrypted.toString(CryptoJS.enc.Utf8);
 };
 
-const create = (aesUtil, decryptionKey) => {
+const prepareDecryptor = (aesUtil, decryptionKey) => {
   return {
     encrypt: (plainText) => aesUtil.encrypt(decryptionKey, plainText),
     decrypt: (cipherText) => aesUtil.decrypt(decryptionKey, cipherText)
@@ -56,9 +56,11 @@ const create = (aesUtil, decryptionKey) => {
 }
 
 module.exports = {
-  new: (decryptionKey) => {
-    const aesUtil = new AesUtil(DEFAULT_KEY_SIZE, DEFAULT_ITERATION_COUNT);
-    return create(aesUtil, decryptionKey);
+  new: (decryptionKey, keySize, iterationCount) => {
+    const decryptorKeySize = keySize || DEFAULT_KEY_SIZE;
+    const decryptorIterationCount = iterationCount || DEFAULT_ITERATION_COUNT;
+    const aesUtil = new AesUtil(decryptorKeySize, decryptorIterationCount);
+    return prepareDecryptor(aesUtil, decryptionKey);
   }
 }
 
