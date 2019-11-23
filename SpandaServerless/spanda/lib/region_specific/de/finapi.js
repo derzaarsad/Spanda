@@ -122,6 +122,19 @@ exports.NewClient = (http) => {
       }
 
       return http.post(resource, rule, config).then(response => response.data);
+    },
+
+    deleteNotificationRule: async (authorization, ruleId) => {
+      const resource = '/api/v1/notificationRules/' + ruleId;
+
+      const config = {
+        'headers': {
+          'Authorization': authorization,
+          'Content-Type': 'application/json'
+        }
+      }
+
+      return http.delete(resource, config).then(response => response.data);
     }
   }
 }
