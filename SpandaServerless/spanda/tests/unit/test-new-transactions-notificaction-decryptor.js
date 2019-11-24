@@ -1,7 +1,7 @@
 'use strict';
 /* eslint-env node, mocha */
 
-const Decryptor = require('../../lib/region_specific/de/finapi-decryptor.js');
+const Crypto = require('../../lib/region_specific/de/finapi-crypto.js');
 const Decoder = require('../../lib/notification-decoder.js');
 const chai = require('chai');
 
@@ -27,7 +27,7 @@ describe('notification transformations', function() {
 
   it('decrypts a notification encrypted by self', async function() {
     const key = '8deec885781c421794ceda8af70a5e63';
-    const decryptor = Decryptor.new(key)
+    const crypto = Crypto.new(key);
 
     const payload = {
       "notificationRuleId": 1,
@@ -36,13 +36,13 @@ describe('notification transformations', function() {
       "newTransactions": [
         {
           "accountId": 1,
-          "accountName": decryptor.encrypt("accountName1"),
-          "accountNumber": decryptor.encrypt("accountNumber1"),
-          "accountIban": decryptor.encrypt("accountIban1"),
+          "accountName": crypto.encrypt("accountName1"),
+          "accountNumber": crypto.encrypt("accountNumber1"),
+          "accountIban": crypto.encrypt("accountIban1"),
           "bankName": "bankName1",
-          "bankConnectionName": decryptor.encrypt("bankConnectionName1"),
+          "bankConnectionName": crypto.encrypt("bankConnectionName1"),
           "newTransactionsCount": 1,
-          "details": decryptor.encrypt(JSON.stringify({
+          "details": crypto.encrypt(JSON.stringify({
             "transactionDetails": [
               {
                 "id": 1,
@@ -58,13 +58,13 @@ describe('notification transformations', function() {
         },
         {
           "accountId": 2,
-          "accountName": decryptor.encrypt("accountName2"),
-          "accountNumber": decryptor.encrypt("accountNumber2"),
+          "accountName": crypto.encrypt("accountName2"),
+          "accountNumber": crypto.encrypt("accountNumber2"),
           "bankName": "bankName2",
-          "bankConnectionName": decryptor.encrypt("bankConnectionName2"),
+          "bankConnectionName": crypto.encrypt("bankConnectionName2"),
           "newTransactionsCount": 2,
           "accountIban": null,
-          "details": decryptor.encrypt(JSON.stringify({
+          "details": crypto.encrypt(JSON.stringify({
             "transactionDetails": [
               {
                 "id": 1,
@@ -90,10 +90,10 @@ describe('notification transformations', function() {
         {
           "accountId": 3,
           "accountIban": undefined,
-          "accountName": decryptor.encrypt("accountName3"),
-          "accountNumber": decryptor.encrypt("accountNumber3"),
+          "accountName": crypto.encrypt("accountName3"),
+          "accountNumber": crypto.encrypt("accountNumber3"),
           "bankName": "bankName3",
-          "bankConnectionName": decryptor.encrypt("bankConnectionName3"),
+          "bankConnectionName": crypto.encrypt("bankConnectionName3"),
           "newTransactionsCount": 1000
         }
       ]
@@ -169,7 +169,7 @@ describe('notification transformations', function() {
       ]
     }
 
-    const decoder = Decoder.DecryptNewTransactions(decryptor)
+    const decoder = Decoder.DecryptNewTransactions(crypto);
     expect(decoder.map(payload)).to.eql(expected);
   })
 });

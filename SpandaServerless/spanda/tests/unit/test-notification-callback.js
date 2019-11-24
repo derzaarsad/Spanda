@@ -1,7 +1,7 @@
 'use strict';
 /* eslint-env node, mocha */
 
-const Decryptor = require('../../lib/region_specific/de/finapi-decryptor.js');
+const Crypto = require('../../lib/region_specific/de/finapi-crypto.js');
 const Decoder = require('../../lib/notification-decoder.js');
 const Callback = require('../../lib/notification-callback.js');
 
@@ -35,7 +35,7 @@ describe('collector notification callback', function() {
 
   it('applies the decoder on each received notification', async function() {
     const key = '8deec885781c421794ceda8af70a5e63';
-    const decryptor = Decryptor.new(key);
+    const crypto = Crypto.new(key);
 
     const payload = {
       "notificationRuleId": 1,
@@ -44,13 +44,13 @@ describe('collector notification callback', function() {
       "newTransactions": [
         {
           "accountId": 1,
-          "accountName": decryptor.encrypt("accountName1"),
-          "accountNumber": decryptor.encrypt("accountNumber1"),
-          "accountIban": decryptor.encrypt("accountIban1"),
+          "accountName": crypto.encrypt("accountName1"),
+          "accountNumber": crypto.encrypt("accountNumber1"),
+          "accountIban": crypto.encrypt("accountIban1"),
           "bankName": "bankName1",
-          "bankConnectionName": decryptor.encrypt("bankConnectionName1"),
+          "bankConnectionName": crypto.encrypt("bankConnectionName1"),
           "newTransactionsCount": 1,
-          "details": decryptor.encrypt(JSON.stringify({
+          "details": crypto.encrypt(JSON.stringify({
             "transactionDetails": [
               {
                 "id": 1,
@@ -100,7 +100,7 @@ describe('collector notification callback', function() {
     ]
 
 
-    const decoder = Decoder.DecryptNewTransactions(decryptor);
+    const decoder = Decoder.DecryptNewTransactions(crypto);
 
     const callback = Callback.NewAccumulator(decoder);
     await callback.accept(payload);
