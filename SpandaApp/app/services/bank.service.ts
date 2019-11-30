@@ -28,17 +28,6 @@ export class BankService {
         return [this.authenticationService.getBackendUrl() + "/bankConnections/import", { bankId: bank.Id }, { headers: headerOptions }];
     }
 
-    __fetchWebformInfo__(webId: string): [string, any] {
-
-        let headerOptions = new HttpHeaders({
-            "Username": this.authenticationService.getStoredUser().Username,
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
-            "Content-Type": "application/x-www-form-urlencoded"
-        });
-
-        return [this.authenticationService.getBackendUrl() + "/webForms/" + webId, { headers: headerOptions }];
-    }
-
     __getAllowance__(): [string, any] {
 
         let headerOptions = new HttpHeaders({
@@ -83,25 +72,6 @@ export class BankService {
             return res["location"] + "?callbackUrl=" + this.authenticationService.getBackendUrl() + "/webForms/callback/" + res["webFormAuth"];
         }, err => {
             console.log("WebForm Invalid");
-            console.log(err);
-            return undefined;
-        });
-    }
-
-    fetchWebformInfo(webId: string): Promise<JSON> {
-        let request = this.__fetchWebformInfo__(webId);
-        return this.http.get(request[0],request[1]).toPromise()
-        .then(res => {
-            // always take the first element, assumed blz is unique only to one bank
-            let serviceResponseBody = res["serviceResponseBody"];
-            if (serviceResponseBody === undefined) {
-                throw "serviceResponseBody undefined!";
-            }
-
-            return JSON.parse(serviceResponseBody);
-        })
-        .catch((err) => {
-            console.log("Fetching webform failed!");
             console.log(err);
             return undefined;
         });
