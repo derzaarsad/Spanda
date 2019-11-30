@@ -127,8 +127,10 @@ jobs:
       echo "created user $result"
       accessToken=`python loginUser.py $(FinAPIClientId) $(FinAPIClientSecret) $(AZURE_TEST_USER_FETCHWEBFORM) $(AZURE_TEST_USER_FETCHWEBFORM)`
       echo "get access token $accessToken"
-      webformUrl=`python getWebformUrl.py $accessToken`
-      echo "get access token $webformUrl"
+      webformId=`python getWebformId.py $accessToken`
+      echo "get webform id $webformId"
+      webformUrl=`python getWebformUrl.py $accessToken $webformId`
+      echo "get webform url $webformUrl"
       echo -e "AZURE_TEST_USER_REGISTER=$(AZURE_TEST_USER_REGISTER)" >> ./integration-test.env
       echo -e "AZURE_TEST_USER_LOGIN=$(AZURE_TEST_USER_LOGIN)" >> ./integration-test.env
       echo -e "FinAPIClientId=$(FinAPIClientId)" >> ./integration-test.env
