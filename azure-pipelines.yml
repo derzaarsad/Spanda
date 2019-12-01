@@ -108,6 +108,7 @@ jobs:
     displayName: 'npm install and build'
     continueOnError: false
   - script: |
+      pip install selenium
       cd SpandaServerless
       mkdir reports
       cd spanda
