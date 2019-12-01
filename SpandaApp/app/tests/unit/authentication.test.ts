@@ -2,6 +2,7 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 describe('App Component Test',() => {
+	this.timeout(10000); // App needs time.
 
 	let httpClient;
 	let authenticationService;
