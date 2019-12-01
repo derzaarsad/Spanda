@@ -108,11 +108,14 @@ jobs:
     displayName: 'npm install and build'
     continueOnError: false
   - script: |
+      mkdir $(System.DefaultWorkingDirectory)/3rdparty
+      export PATH=$PATH:$(System.DefaultWorkingDirectory)/3rdparty
+    displayName: 'adding 3rdparty directory'
+    continueOnError: false
+  - script: |
       pip install selenium
       wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
-      tar -zxf geckodriver-v0.26.0-linux64.tar.gz
-      chmod +x geckodriver
-      cp -v geckodriver /usr/bin
+      tar -zxf geckodriver-v0.26.0-linux64.tar.gz -C $(System.DefaultWorkingDirectory)/3rdparty
       geckodriver --version
       cd SpandaServerless
       mkdir reports
