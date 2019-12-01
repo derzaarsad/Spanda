@@ -113,11 +113,12 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
     return lambdaUtil.CreateInternalErrorResponse('could not fetch web form');
   }
 
-  const body = webForm.serviceResponseBody
-  if (!body) {
+  if (!webForm.serviceResponseBody) {
     logger.log('error', 'empty body')
     return lambdaUtil.CreateInternalErrorResponse('empty body');
   }
+
+  const body = JSON.parse(webForm.serviceResponseBody)
 
   const bankConnection = connections.new(body.id, body.bankId)
   bankConnection.bankAccountIds = body.accountIds

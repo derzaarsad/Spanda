@@ -133,11 +133,7 @@ describe('fetch webform info handler', function() {
           return {}
         }
         return {
-          serviceResponseBody: {
-            'id': 1,
-            'bankId': 2,
-            'accountIds': [ 3, 4, 5 ]
-          }
+          serviceResponseBody: '{ "id": 1, "bankId": 2, "accountIds": [ 3, 4, 5 ] }'
         }
       }
     }
