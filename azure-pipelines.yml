@@ -110,7 +110,9 @@ jobs:
   - script: |
       pip install selenium
       wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
-      tar -zxf geckodriver-v0.26.0-linux64.tar.gz -C /usr/bin
+      tar -zxf geckodriver-v0.26.0-linux64.tar.gz
+      chmod +x geckodriver-v0.26.0-linux64/geckodriver
+      cp -v geckodriver-v0.26.0-linux64/geckodriver /usr/bin
       geckodriver --version
       cd SpandaServerless
       mkdir reports
