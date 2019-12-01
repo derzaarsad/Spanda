@@ -2,7 +2,6 @@ import { AuthenticationService } from '../../services/authentication.service';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 describe('App Component Test',() => {
-	this.timeout(10000); // App needs time.
 
 	let httpClient;
 	let authenticationService;
@@ -13,6 +12,7 @@ describe('App Component Test',() => {
 	})
 	
 	it('construct message authenticateAndSave to send via REST', async function() {
+		this.timeout(10000); // App needs time.
 
 		let username = "testuser";
 		let password = "password123";
@@ -38,6 +38,7 @@ describe('App Component Test',() => {
 	})
 
 	it('construct message setNewRefreshAndAccessToken to send via REST', async function() {
+		this.timeout(10000); // App needs time.
 		
 		let refresh_token = "xjVi11pfcO8v6FoNpRjNwzI0MCc7g3dFekrXkGSk1oxIrw_6jUhq2WtCjbGG6NLObUDfnpYHtMFpKplgVJBFZxFO3DF8_YvnbfQaOxf6V7d4gl7lT4LDfsyPkgL4YGeu";
 		const result = authenticationService.__setNewRefreshAndAccessToken__(refresh_token);
@@ -59,6 +60,7 @@ describe('App Component Test',() => {
 	})
 
 	it('construct message isUserAuthenticated to send via REST', async function() {
+		this.timeout(10000); // App needs time.
 		
 		let access_token = "o1cIunYA1BgmkkNn8OQE4p4_bxNP8ztNgAs6NBVuHFvHa4saLZBE0A0R1ACvMyXrxomcMhgWo8zPUq992xjctxw5RVMAfrZpyPje1AYtYH35ipQbXVCSgfJKgtPeamBM";
 		const result = authenticationService.__isUserAuthenticated__(access_token,"bearer");
@@ -78,6 +80,7 @@ describe('App Component Test',() => {
 	})
 
 	it('construct message register to send via REST', async function() {
+		this.timeout(10000); // App needs time.
 		
 		let username = "testuser@testdomain.com";
 		let password = "password123";
