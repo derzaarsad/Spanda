@@ -109,6 +109,9 @@ jobs:
     continueOnError: false
   - script: |
       pip install selenium
+      wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
+      tar -zxf geckodriver-v0.26.0-linux64.tar.gz -C /usr/bin
+      geckodriver --version
       cd SpandaServerless
       mkdir reports
       cd spanda
