@@ -110,17 +110,9 @@ jobs:
   - script: |
       pip install selenium
       mkdir $(System.DefaultWorkingDirectory)/3rdparty
-      export PATH=$PATH:$(System.DefaultWorkingDirectory)/3rdparty
       wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
       tar -zxf geckodriver-v0.26.0-linux64.tar.gz -C $(System.DefaultWorkingDirectory)/3rdparty
-      geckodriver --version
       cd SpandaServerless
-      mkdir reports
-      cd spanda
-      echo "Start Unit Test"
-      npm test
-      mv reports/*.xml ../reports
-      cd ..
       result=`python deleteUsers.py $(FinAPIAdminId) $(FinAPIAdminSecret) $(AZURE_TEST_USER_REGISTER) $(AZURE_TEST_USER_LOGIN) $(AZURE_TEST_USER_FETCHWEBFORM)`
       echo "$result"
       result=`python registerUsers.py $(FinAPIClientId) $(FinAPIClientSecret) $(AZURE_TEST_USER_LOGIN) $(AZURE_TEST_USER_FETCHWEBFORM)`
@@ -141,6 +133,18 @@ jobs:
       echo -e "PGUSER=postgres" >> ./integration-test.env
       echo -e "PGPASSWORD=" >> ./integration-test.env
       echo -e "PGDATABASE=postgres" >> ./integration-test.env
+    displayName: 'integration test preparation'
+    continueOnError: false
+  - script: |
+      export PATH=$PATH:$(System.DefaultWorkingDirectory)/3rdparty
+      geckodriver --version
+      cd SpandaServerless
+      mkdir reports
+      cd spanda
+      echo "Start Unit Test"
+      npm test
+      mv reports/*.xml ../reports
+      cd ..
       echo "Start Integration Test"
       docker-compose build && docker-compose up --abort-on-container-exit
     displayName: 'Run tests'
