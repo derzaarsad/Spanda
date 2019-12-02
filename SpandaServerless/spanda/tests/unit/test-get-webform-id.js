@@ -18,7 +18,7 @@ describe('get webform id', function() {
   let testValidEmail
   let testValidPhone
 
-  let authAndClientSecrets = TestUtility.CreateUnittestInterfaces();
+  let dummyInterfaces = TestUtility.CreateUnittestInterfaces();
   let encryptions
 
   beforeEach(function() {
@@ -47,7 +47,7 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 123545 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users, encryptions)
+    const result = await controller.getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(401)
@@ -64,7 +64,7 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 123545 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users, encryptions)
+    const result = await controller.getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(401)
@@ -92,7 +92,7 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 123545 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, failingUsers, encryptions)
+    const result = await controller.getWebformId(event, context, logger, dummyInterfaces.bankInterface, failingUsers, encryptions)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(500)
@@ -110,7 +110,7 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 123545 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users, encryptions)
+    const result = await controller.getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(200);

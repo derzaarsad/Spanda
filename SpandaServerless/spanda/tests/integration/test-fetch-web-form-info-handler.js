@@ -25,7 +25,7 @@ describe('fetch webform info handler', function() {
   expect(process.env.WEBFORM_ID).to.exist;
   expect(process.env.ACCESS_TOKEN).to.exist;
 
-  let authAndClientSecrets = TestUtility.CreateFinApitestInterfaces(process.env.FinAPIClientId,process.env.FinAPIClientSecret);
+  let dummyInterfaces = TestUtility.CreateFinApitestInterfaces(process.env.FinAPIClientId,process.env.FinAPIClientSecret);
 
   beforeEach(function() {
     const winston = require('winston')
@@ -56,7 +56,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, authAndClientSecrets.bankInterface, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, dummyInterfaces.bankInterface, users, connections, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(500);
@@ -77,7 +77,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, authAndClientSecrets.bankInterface, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, dummyInterfaces.bankInterface, users, connections, encryptions)
     expect(result.statusCode).to.equal(200);
     expect(result).to.be.an('object');
 
