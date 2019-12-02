@@ -37,7 +37,7 @@ describe('get webform id', function() {
   })
 
   it('rejects requests with failing authentication', async () => {
-    users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
+    await users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
 
     const event = {
       'headers': {
@@ -99,7 +99,7 @@ describe('get webform id', function() {
   })
 
   it('return webform location', async function() {
-    users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
+    await users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
 
     const event = {
       'headers': {

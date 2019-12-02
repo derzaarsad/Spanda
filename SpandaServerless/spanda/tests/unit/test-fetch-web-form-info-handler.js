@@ -67,7 +67,7 @@ describe('fetch webform info handler', function() {
     const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
     user.activeWebFormId = 2934;
     user.activeWebFormAuth = encrypted.iv;
-    users.save(user)
+    await users.save(user)
 
     const finapi = {
       fetchWebForm: async (authorization, formId) => {
@@ -95,7 +95,7 @@ describe('fetch webform info handler', function() {
     const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
     user.activeWebFormId = 2934;
     user.activeWebFormAuth = encrypted.iv;
-    users.save(user)
+    await users.save(user)
 
     const finapi = {
       fetchWebForm: async (authorization, formId) => {
@@ -124,7 +124,7 @@ describe('fetch webform info handler', function() {
     const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
     user.activeWebFormId = 2934;
     user.activeWebFormAuth = encrypted.iv;
-    users.save(user)
+    await users.save(user)
 
     const finapi = {
 
