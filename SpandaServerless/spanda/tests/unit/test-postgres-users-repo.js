@@ -22,6 +22,12 @@ describe('postgres users repository', function() {
     expect(result).to.equal("SELECT * FROM users WHERE username = 'chapu' LIMIT 1");
   })
 
+  it('renders the find-by-webform query', async function() {
+    const result = await users.findByWebFormQuery('64aaddc201e87f11425be34ce019833f9c175472a52c3d168f5a3231a7680df9')
+    expect(result).to.be.a('string');
+    expect(result).to.equal("SELECT * FROM users WHERE activewebformid = '64aaddc201e87f11425be34ce019833f9c175472a52c3d168f5a3231a7680df9' LIMIT 1");
+  })
+
   it('renders the save query', async function() {
     const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
     user.creationDate = new Date('2019-11-11T19:31:50.379+00:00')

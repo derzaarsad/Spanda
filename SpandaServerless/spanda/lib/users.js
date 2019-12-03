@@ -38,6 +38,16 @@ exports.NewInMemoryRepository = () => {
       return repository[username]
     },
 
+    findByWebForm: async (activeWebFormId) => {
+      let found
+      Object.keys(repository).forEach(function(key) {
+        if(repository[key].activeWebFormId == activeWebFormId) {
+          found = repository[key];
+        }
+      })
+      return found
+    },
+
     save: async (user) => {
       repository[user.username] = user
       return user
@@ -160,6 +170,11 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
       schema.tableName, userName);
   }
 
+  const findByWebFormQuery = (activeWebFormAuth) => {
+    return format('SELECT * FROM %I WHERE activewebformid = %L LIMIT 1',
+      schema.tableName, activeWebFormAuth);
+  }
+
   const deleteAllQuery = format('DELETE FROM %I', schema.tableName);
 
   const saveQuery = (user) => {
@@ -188,6 +203,19 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
         .finally(() => { client.release() });
     },
 
+    findByWebForm: async (activeWebFormId) => {
+      const client = await pool.connect();
+      const params = {
+        text: findByWebFormQuery(activeWebFormId),
+        rowMode: 'array',
+        types: types
+      }
+
+      return client.query(params)
+        .then(res => (res.rowCount > 0) ? schema.asObject(res.rows[0]) : null)
+        .finally(() => { client.release() });
+    },
+
     save: async (user) => {
       const client = await pool.connect();
 
@@ -205,6 +233,7 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
     },
 
     findByIdQuery: findByIdQuery,
+    findByWebFormQuery: findByWebFormQuery,
     saveQuery: saveQuery,
     deleteAllQuery: deleteAllQuery
   }

@@ -94,6 +94,7 @@ module.exports = (env) => {
     'authentication': authentication,
     'bankInterface': require('./lib/bankInterface')(httpClient),
     'users': storageBackend.users,
-    'connections': storageBackend.connections
+    'connections': storageBackend.connections,
+    'encryptions': require('./lib/encryptions')
   };
 };

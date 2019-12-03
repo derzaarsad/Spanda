@@ -12,7 +12,7 @@ describe('authenticate user handler', function() {
   let testUsername
   let testPassword
 
-  let authAndClientSecrets = TestUtility.CreateUnittestInterfaces();
+  let dummyInterfaces = TestUtility.CreateUnittestInterfaces();
 
   beforeEach(function() {
     testUsername = 'chapu';
@@ -30,7 +30,7 @@ describe('authenticate user handler', function() {
       body: JSON.stringify({'password': testPassword})
     }
 
-    const result = await controller.authenticateAndSave(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication)
+    const result = await controller.authenticateAndSave(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(400)
@@ -47,7 +47,7 @@ describe('authenticate user handler', function() {
       }
     }
 
-    const result = await controller.authenticateAndSave(event, context, logger, authAndClientSecrets.clientSecrets, failingAuthentication)
+    const result = await controller.authenticateAndSave(event, context, logger, dummyInterfaces.clientSecrets, failingAuthentication)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(401)
@@ -58,7 +58,7 @@ describe('authenticate user handler', function() {
       body: JSON.stringify({'username': testUsername, 'password': testPassword})
     }
 
-    const result = await controller.authenticateAndSave(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication)
+    const result = await controller.authenticateAndSave(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(200)

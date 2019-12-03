@@ -24,8 +24,6 @@ export class SearchBankComponent implements OnInit {
     private webViewSrc: string = "";
     private invalidUrl = "https://invalidurl";
 
-    private webId: string = "";
-
     @ViewChild("myWebView", { read: ElementRef, static: false }) webViewRef: ElementRef;
     @ViewChild("labelResult", { read: ElementRef, static: false }) labelResultRef: ElementRef;
 
@@ -47,14 +45,7 @@ export class SearchBankComponent implements OnInit {
         webview.on(WebView.loadFinishedEvent, (args: LoadEventData) => {
             if(args.error && (args.url !== undefined) && (args.url.startsWith(this.invalidUrl))) {
                 // This is a workaround until I get a better solution
-
-                // fetch the info from webform
-                this.bankService.fetchWebformInfo(this.webId).then((res) => {
-                    console.log(res);
-                    this.routerExtensions.navigate(["allowance"]);
-                }).catch((err) => {
-                    this.routerExtensions.navigate(["allowance"]);
-                });
+                this.routerExtensions.navigate(["allowance"]);
             }
 
             let message;
@@ -93,8 +84,7 @@ export class SearchBankComponent implements OnInit {
 
     private onAddAccount() {
         this.bankService.getWebformIdAndToken(this.bank).then((res) => {
-            this.webId = res[0];
-            this.webViewSrc = res[3] + "/webForm/" + res[1] + "?redirectUrl=" + this.invalidUrl;
+            this.webViewSrc = res + "&redirectUrl=" + this.invalidUrl;
             console.log(res[0]);
             console.log(res[1]);
             console.log(res[2]);

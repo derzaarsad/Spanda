@@ -2,7 +2,6 @@
 
 const lambdaUtil = require('../lib/lambda-util.js');
 const blzPattern = /^\d{8}$/
-const crypto = require('crypto');
 
 const getUserInfo = async (logger, bankInterface, authorization) => {
   logger.log('info', 'authenticating user', { 'authorization': authorization })
@@ -45,7 +44,7 @@ exports.getBankByBLZ = async(event, context, logger, clientSecrets, authenticati
 // @Post('/bankConnections/import')
 // @Header('Authorization') authorization: string,
 // @BodyProp() bankId: number)
-exports.getWebformId = async(event, context, logger, bankInterface, users) => {
+exports.getWebformId = async(event, context, logger, bankInterface, users, encryptions) => {
   const authorization = lambdaUtil.hasAuthorization(event.headers)
 
   if (!authorization) {
@@ -67,21 +66,18 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
   }
 
   const body = JSON.parse(event.body);
-  const response = bankInterface.importConnection(authorization, body.bankId);
+  const response = await bankInterface.importConnection(authorization, body.bankId);
 
-  // this is only my variation to produce a random hash
-  const secret = crypto.createHmac('sha256', authorization)
-    .update(response.formId.toString())
-    .digest('hex');
+  const secret = encryptions.EncryptText(authorization);
 
   user.activeWebFormId = response.formId;
-  user.activeWebFormAuth = secret;
+  user.activeWebFormAuth = secret.iv;
 
   return users.save(user).then(() => {
       /*
        * Client usage: {location}?callbackUrl={RestApi}/webForms/callback/{webFormAuth}
       */
-      return lambdaUtil.CreateResponse(200, { location: response.location, webFormAuth: user.activeWebFormAuth });
+      return lambdaUtil.CreateResponse(200, { location: response.location, webFormAuth: response.formId + "-" + secret.encryptedData });
     })
     .catch(err => {
       logger.log('error', 'error importing connection', { 'cause': err })
@@ -92,32 +88,22 @@ exports.getWebformId = async(event, context, logger, bankInterface, users) => {
 // @Get('/webForms/{webFormId}')
 // @Param('webId') webId
 // @Header('Authorization') authorization: string
-exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, connections) => {
-  const authorization = lambdaUtil.hasAuthorization(event.headers)
+exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, connections, encryptions) => {
 
-  if (!authorization) {
-    return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
+  if (!event.pathParameters.webFormAuth) {
+    return lambdaUtil.CreateInternalErrorResponse('no webFormAuth');
   }
 
-  const webId = event.pathParameters['webFormId']
-  if (!webId) {
-    return lambdaUtil.CreateErrorResponse(400, 'no webform id given');
-  }
+  let splitted = event.pathParameters.webFormAuth.split("-");
+  let webId = splitted[0];
 
-  let userInfo
-  try {
-    userInfo = await getUserInfo(logger, bankInterface, authorization)
-  } catch(error) {
-    logger.log('error', 'invalid token', { 'authorization': authorization })
-    return lambdaUtil.CreateErrorResponse(401, 'unauthorized');
-  }
-
-  const username = userInfo.id
-  const user = await users.findById(username)
+  const user = await users.findByWebForm(webId)
   if (!user) {
-    logger.log('error', 'no user found for username ' + username)
-    return lambdaUtil.CreateInternalErrorResponse('could not fetch web form');
+    logger.log('error', 'no user found for webId ' + webId)
+    return lambdaUtil.CreateInternalErrorResponse('no user found');
   }
+
+  const authorization = encryptions.DecryptText({ iv: user.activeWebFormAuth, encryptedData: splitted[1] })
 
   let webForm
   try {
@@ -127,7 +113,13 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
     return lambdaUtil.CreateInternalErrorResponse('could not fetch web form');
   }
 
-  const body = webForm.serviceResponseBody
+  if (!webForm.serviceResponseBody) {
+    logger.log('error', 'empty body')
+    return lambdaUtil.CreateInternalErrorResponse('empty body');
+  }
+
+  const body = JSON.parse(webForm.serviceResponseBody)
+
   const bankConnection = connections.new(body.id, body.bankId)
   bankConnection.bankAccountIds = body.accountIds
 

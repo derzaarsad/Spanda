@@ -8,6 +8,7 @@ const Users = require('../../lib/users');
 const BankConnections = require('../../lib/bank-connections');
 
 const controller = require('../../controllers/bank-controller');
+const encryptions = require('../../lib/encryptions');
 
 describe('fetch webform info handler', function() {
   let logger
@@ -26,110 +27,126 @@ describe('fetch webform info handler', function() {
     context = {}
   })
 
-  it('rejects a request with missing authorization', async function() {
+  it('rejects a request with missing webFormAuth', async function() {
     const finapi = {}
 
     const event = {
       'headers': {
+      },
+      'pathParameters': {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
 
     expect(result).to.be.an('object');
-    expect(result.statusCode).to.equal(401);
-    expect(JSON.parse(result.body).message).to.include('unauthorized');
+    expect(result.statusCode).to.equal(500);
+    expect(JSON.parse(result.body).message).to.include('no webFormAuth');
   })
 
-  it('rejects a request with wrong authorization', async function() {
+  it('rejects a request with no user found', async function() {
+    const finapi = {}
+
+    const event = {
+      'headers': {
+      },
+      'pathParameters': {
+        'webFormAuth': '2934-5jkntkzt5nj53zi9975'
+      }
+    }
+
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+
+    expect(result).to.be.an('object');
+    expect(result.statusCode).to.equal(500);
+    expect(JSON.parse(result.body).message).to.include('no user found');
+  })
+
+  it('rejects a request with could not fetch web form', async function() {
+    const encrypted = encryptions.EncryptText("bearer 5jkntkzt5nj53zi99754563nb3b64zb");
+    const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
+    user.activeWebFormId = 2934;
+    user.activeWebFormAuth = encrypted.iv;
+    await users.save(user)
+
     const finapi = {
-      userInfo: async () => {
+      fetchWebForm: async (authorization, formId) => {
         throw 'nada'
       }
     }
 
     const event = {
       'headers': {
-      }
-    }
-
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
-
-    expect(result).to.be.an('object');
-    expect(result.statusCode).to.equal(401);
-    expect(JSON.parse(result.body).message).to.include('unauthorized');
-  })
-
-  it('rejects a request with no webform id', async function() {
-    const finapi = {}
-
-    const event = {
-      'headers': {
-        'Authorization': 'authorized'
       },
       'pathParameters': {
+        'webFormAuth': '2934-' + encrypted.encryptedData
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
-
-    expect(result).to.be.an('object');
-    expect(result.statusCode).to.equal(400);
-    expect(JSON.parse(result.body).message).to.include('no webform id given');
-  })
-
-  it('rejects a request referring to a missing user', async function() {
-    const finapi = {
-      userInfo: async () => {
-        return { 'id': 'chapu' }
-      }
-    }
-
-    const event = {
-      'headers': {
-        'Authorization': 'authorized'
-      },
-      'pathParameters': {
-        'webFormId': '5'
-      }
-    }
-
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(500);
-    expect(JSON.parse(result.body).message).to.include('could not fetch');
+    expect(JSON.parse(result.body).message).to.include('could not fetch web form');
+  })
+
+  it('rejects a request because of empty body', async function() {
+    const encrypted = encryptions.EncryptText("bearer 5jkntkzt5nj53zi99754563nb3b64zb");
+    const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
+    user.activeWebFormId = 2934;
+    user.activeWebFormAuth = encrypted.iv;
+    await users.save(user)
+
+    const finapi = {
+      fetchWebForm: async (authorization, formId) => {
+        return {}
+      }
+    }
+
+    const event = {
+      'headers': {
+      },
+      'pathParameters': {
+        'webFormAuth': '2934-' + encrypted.encryptedData
+      }
+    }
+
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+
+    expect(result).to.be.an('object');
+    expect(result.statusCode).to.equal(500);
+    expect(JSON.parse(result.body).message).to.include('empty body');
   })
 
   it('adds a connection to the user', async function() {
-    users.save(users.new('chapu', 'chapu@mischung.net', '666', false))
+    let access_token = 'bearer 5jkntkzt5nj53zi99754563nb3b64zb';
+    const encrypted = encryptions.EncryptText(access_token);
+    const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
+    user.activeWebFormId = 2934;
+    user.activeWebFormAuth = encrypted.iv;
+    await users.save(user)
 
     const finapi = {
-      userInfo: async () => {
-        return { 'id': 'chapu' }
-      },
 
-      fetchWebForm: async () => {
+      fetchWebForm: async (authorization, formId) => {
+        if(authorization !== access_token) {
+          return {}
+        }
         return {
-          serviceResponseBody: {
-            'id': 1,
-            'bankId': 2,
-            'accountIds': [ 3, 4, 5 ]
-          }
+          serviceResponseBody: '{ "id": 1, "bankId": 2, "accountIds": [ 3, 4, 5 ] }'
         }
       }
     }
 
     const event = {
       'headers': {
-        'Authorization': 'authorized'
       },
       'pathParameters': {
-        'webFormId': '69'
+        'webFormAuth': '2934-' + encrypted.encryptedData
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
     expect(result.statusCode).to.equal(200);
     expect(result).to.be.an('object');
 
@@ -139,9 +156,9 @@ describe('fetch webform info handler', function() {
     expect(responseBody.id).to.equal(1, 'the bank connection id differs from the given one')
     expect(responseBody.bankId).to.equal(2, 'the bank id differs from the given one')
 
-    const user = await users.findById('chapu')
-    expect(user, 'no user found for the given username').to.be.ok
-    expect(user.bankConnectionIds).to.include(1, 'the connection ids were not updated')
+    const user_ = await users.findById('chapu')
+    expect(user_, 'no user found for the given username').to.be.ok
+    expect(user_.bankConnectionIds).to.include(1, 'the connection ids were not updated')
 
     const connection = await connections.findById(1)
     expect(connection, 'the connection was not created').to.be.ok

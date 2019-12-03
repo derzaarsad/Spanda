@@ -1,13 +1,32 @@
-import { Injectable } from "@angular/core";
+import { Injectable, InjectionToken } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Token } from "~/models/token.model";
 import * as appSettings from "tns-core-modules/application-settings";
 import { User } from "~/models/user.model";
 import { JsonConvert } from "json2typescript";
 import { environment } from "~/environments/environment";
+export const AUTH_SERVICE_IMPL = new InjectionToken<IAuthentication>('authServiceImpl');
+
+/*
+ * This interface is implemented for Inversion of Control in the unit tests
+ */
+export interface IAuthentication {
+    //define the API
+    getBackendUrl(): string;
+    isStoredUserAvailable(): boolean;
+    getStoredUser(): User;
+    authenticateAndSave(username: string, password: string) : Promise<boolean>;
+    setNewRefreshAndAccessToken() : Promise<boolean>;
+    isUserAuthenticated(access_token: string, token_type: string) : Promise<boolean>;
+    removeAllUserAuthentication(): void;
+    register(username: string, password: string) : Promise<boolean>;
+
+    resetPassword(textSTr: string) : any;
+}
+    
 
 @Injectable()
-export class AuthenticationService {
+export class AuthenticationService implements IAuthentication {
     private storedUser: User;
     private jsonConvert: JsonConvert;
 

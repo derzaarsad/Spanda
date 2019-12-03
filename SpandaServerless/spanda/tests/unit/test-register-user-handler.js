@@ -19,7 +19,7 @@ describe('register user handler', function() {
   let testValidPhone
   let testInvalidPhone
 
-  let authAndClientSecrets = TestUtility.CreateUnittestInterfaces();
+  let dummyInterfaces = TestUtility.CreateUnittestInterfaces();
 
   beforeEach(function() {
     testUsername = 'chapu';
@@ -45,7 +45,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
@@ -60,7 +60,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
@@ -75,7 +75,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
@@ -96,7 +96,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, failingAuthentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, failingAuthentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(401);
@@ -111,7 +111,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(409);
@@ -125,7 +125,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(201, 'expected status code created');

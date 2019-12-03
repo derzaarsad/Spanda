@@ -1,13 +1,13 @@
-import { Injectable } from "@angular/core";
+import { Injectable, Inject } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Bank } from "~/models/bank.model";
-import { AuthenticationService } from "~/services/authentication.service";
+import { IAuthentication, AUTH_SERVICE_IMPL } from "~/services/authentication.service";
 import { Token } from "~/models/token.model";
 
 @Injectable()
 export class BankService {
 
-    constructor(private http: HttpClient, private authenticationService: AuthenticationService) { }
+    constructor(private http: HttpClient, @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) { }
 
     __getBankByBLZ__(blz: string) : [string,any] {
 
@@ -26,17 +26,6 @@ export class BankService {
         });
 
         return [this.authenticationService.getBackendUrl() + "/bankConnections/import", { bankId: bank.Id }, { headers: headerOptions }];
-    }
-
-    __fetchWebformInfo__(webId: string): [string, any] {
-
-        let headerOptions = new HttpHeaders({
-            "Username": this.authenticationService.getStoredUser().Username,
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
-            "Content-Type": "application/x-www-form-urlencoded"
-        });
-
-        return [this.authenticationService.getBackendUrl() + "/webForms/" + webId, { headers: headerOptions }];
     }
 
     __getAllowance__(): [string, any] {
@@ -79,29 +68,10 @@ export class BankService {
         return this.http.post(request[0],request[1],request[2]).toPromise()
         .then(res => {
             console.log("WebForm Valid");
-            console.log(res[0]);
-            return [res[0]["id"], res[0]["token"], res[0]["status"], res[1]];
+            console.log(res);
+            return res["location"] + "?callbackUrl=" + this.authenticationService.getBackendUrl() + "/webForms/callback/" + res["webFormAuth"];
         }, err => {
             console.log("WebForm Invalid");
-            console.log(err);
-            return undefined;
-        });
-    }
-
-    fetchWebformInfo(webId: string): Promise<JSON> {
-        let request = this.__fetchWebformInfo__(webId);
-        return this.http.get(request[0],request[1]).toPromise()
-        .then(res => {
-            // always take the first element, assumed blz is unique only to one bank
-            let serviceResponseBody = res["serviceResponseBody"];
-            if (serviceResponseBody === undefined) {
-                throw "serviceResponseBody undefined!";
-            }
-
-            return JSON.parse(serviceResponseBody);
-        })
-        .catch((err) => {
-            console.log("Fetching webform failed!");
             console.log(err);
             return undefined;
         });
