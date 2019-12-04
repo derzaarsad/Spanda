@@ -54,8 +54,8 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
     const attributes = schema.attributes;
     const columns = schema.columns;
 
-    return format('INSERT INTO %I (%s) VALUES (%L) ON CONFLICT (%I) DO UPDATE SET (%s) = (%L) WHERE %I.%I = %L',
-      tableName, attributes, row, columns.id, attributes, row, tableName, columns.id, transaction.id);
+    return format('INSERT INTO %I (%s) VALUES (%L)',
+      tableName, attributes, row);
   }
 
   return {

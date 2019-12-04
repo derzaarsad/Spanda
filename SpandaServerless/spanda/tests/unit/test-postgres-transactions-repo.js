@@ -27,7 +27,7 @@ describe('postgres transactions repository', function() {
 
     const result = transactions.saveQuery(transaction);
     expect(result).to.be.a('string');
-    expect(result).to.equal("INSERT INTO transactions (id,accountid,amount,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES ('209864836','995070','-89.81','2019-11-11 19:31:50.379+00',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank') ON CONFLICT (id) DO UPDATE SET (id,accountid,amount,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) = ('209864836','995070','-89.81','2019-11-11 19:31:50.379+00',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank') WHERE transactions.id = '209864836'");
+    expect(result).to.equal("INSERT INTO transactions (id,accountid,amount,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES ('209864836','995070','-89.81','2019-11-11 19:31:50.379+00',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank')");
   })
 
   it('renders the delete all query', async function() {
