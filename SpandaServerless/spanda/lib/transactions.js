@@ -58,6 +58,15 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
       tableName, attributes, row);
   }
 
+  const saveJsonArrayQuery = (transactions) => {
+    const tableName = schema.tableName;
+    const attributes = schema.attributes;
+    const columns = schema.columns;
+
+    return format('INSERT INTO %I (%s) SELECT * FROM json_populate_recordset(null::%I, %L)',
+      tableName, attributes, tableName, JSON.stringify(transactions));
+  }
+
   return {
     new: createTransaction,
 
@@ -82,6 +91,14 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
         .finally(() => { client.release() });
     },
 
+    saveJsonArray: async (transactions) => {
+      const client = await pool.connect();
+
+      return client.query(saveJsonArrayQuery(transactions))
+        .then(() => transactions)
+        .finally(() => { client.release() });
+    },
+
     deleteAll: async () => {
       const client = await pool.connect();
 
@@ -92,6 +109,7 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
 
     findByIdQuery: findByIdQuery,
     saveQuery: saveQuery,
+    saveJsonArrayQuery: saveJsonArrayQuery,
     deleteAllQuery: deleteAllQuery
   }
 }

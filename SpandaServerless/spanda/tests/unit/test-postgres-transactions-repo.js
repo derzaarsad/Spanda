@@ -35,4 +35,15 @@ describe('postgres transactions repository', function() {
     expect(result).to.be.a('string');
     expect(result).to.equal("DELETE FROM transactions");
   })
+
+  it('renders json array', async function() {
+    let transactionsData = [
+      {id:1112,accountid:2,amount:-89.871,bookingdate:'2018-01-01T00:00:00.000Z',purpose:' RE. 745259',counterpartname:'TueV Bayern',counterpartaccountnumber:'611105',counterpartiban:'DE13700800000061110500',counterpartblz:'70080000',counterpartbic:'DRESDEFF700',counterpartbankname:'Commerzbank vormals Dresdner Bank'},
+      {id:2233,accountid:2,amount:-99.81,bookingdate:'2018-01-01T00:00:00.000Z',purpose:' RE. 745259',counterpartname:'TueV Bayern',counterpartaccountnumber:'611105',counterpartiban:'DE13700800000061110500',counterpartblz:'70080000',counterpartbic:'DRESDEFF700',counterpartbankname:'Commerzbank vormals Dresdner Bank'}
+    ];
+
+    const result = transactions.saveJsonArrayQuery(transactionsData);
+    expect(result).to.be.a('string');
+    expect(result).to.equal("INSERT INTO transactions (id,accountid,amount,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) SELECT * FROM json_populate_recordset(null::transactions, '[{\"id\":1112,\"accountid\":2,\"amount\":-89.871,\"bookingdate\":\"2018-01-01T00:00:00.000Z\",\"purpose\":\" RE. 745259\",\"counterpartname\":\"TueV Bayern\",\"counterpartaccountnumber\":\"611105\",\"counterpartiban\":\"DE13700800000061110500\",\"counterpartblz\":\"70080000\",\"counterpartbic\":\"DRESDEFF700\",\"counterpartbankname\":\"Commerzbank vormals Dresdner Bank\"},{\"id\":2233,\"accountid\":2,\"amount\":-99.81,\"bookingdate\":\"2018-01-01T00:00:00.000Z\",\"purpose\":\" RE. 745259\",\"counterpartname\":\"TueV Bayern\",\"counterpartaccountnumber\":\"611105\",\"counterpartiban\":\"DE13700800000061110500\",\"counterpartblz\":\"70080000\",\"counterpartbic\":\"DRESDEFF700\",\"counterpartbankname\":\"Commerzbank vormals Dresdner Bank\"}]\')");
+  })
 })
