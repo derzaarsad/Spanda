@@ -9,6 +9,7 @@
   "dependencies": {
     "aws-sdk": "^2.542.0",
     "axios": "^0.19.0",
+    "chai-as-promised": "^7.1.1",
     "mocha-each": "^2.0.1",
     "pg": "^7.12.1",
     "pg-format": "^1.0.4",

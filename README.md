@@ -16,6 +16,7 @@ List of features to be added:
 8. Investment Robo Advisor
 9. Two Part Tariff calculation
 10. Ability to program a financial consultant
+11. Investation prediction marketplace
 
 ## Getting Started
 

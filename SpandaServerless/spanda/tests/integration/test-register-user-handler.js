@@ -23,7 +23,7 @@ describe('register user handler', function() {
   expect(process.env.FinAPIClientId).to.exist;
   expect(process.env.FinAPIClientSecret).to.exist;
 
-  let authAndClientSecrets = TestUtility.CreateFinApitestInterfaces(process.env.FinAPIClientId,process.env.FinAPIClientSecret);
+  let dummyInterfaces = TestUtility.CreateFinApitestInterfaces(process.env.FinAPIClientId,process.env.FinAPIClientSecret);
 
   beforeEach(function() {
     testUsername = process.env.AZURE_TEST_USER_REGISTER;
@@ -49,7 +49,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
@@ -64,7 +64,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
@@ -79,7 +79,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(400);
@@ -100,7 +100,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, failingAuthentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, failingAuthentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(401);
@@ -115,7 +115,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(409);
@@ -129,7 +129,7 @@ describe('register user handler', function() {
       'body': JSON.stringify(user)
     }
 
-    const result = await controller.registerUser(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication, authAndClientSecrets.bankInterface, users)
+    const result = await controller.registerUser(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication, dummyInterfaces.bankInterface, users)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(201, 'expected status code created');
