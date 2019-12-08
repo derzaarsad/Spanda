@@ -29,9 +29,20 @@ exports.NewInMemoryRepository = () => {
       return repository[id]
     },
 
+    findByAccountId: async (accountId) => {
+      return Object.keys(repository).filter(function(key) { return repository[key].accountid == accountId; }).map(function(key) {
+        return repository[key];
+      });
+    },
+
     save: async (transaction) => {
       repository[transaction.id] = transaction
       return transaction
+    },
+
+    saveJsonArray: async (transactions) => {
+      transactions.forEach(transaction => repository[transaction.id] = transaction)
+      return transactions
     },
 
     deleteAll: async () => {
