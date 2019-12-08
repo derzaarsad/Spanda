@@ -25,7 +25,7 @@ exports.NewClient = (http) => {
     });
   }
 
-  const getTransactionPerPage = async (authorization, accountId, page, bankPerPage) => {
+  const getTransactionPerPage = async (authorization, accountIds, page, bankPerPage) => {
     const params = {
       headers: {
         'Authorization': authorization,
@@ -33,7 +33,15 @@ exports.NewClient = (http) => {
       }
     }
 
-    return http.get("/api/v1/transactions?view=bankView&accountIds=" + accountId + "&direction=all&includeChildCategories=true&page=" + page.toString() + "&perPage=" + bankPerPage.toString() + "&order=finapiBookingDate%2Casc", params)
+    let accountIdText = ""
+    for (let i = 0; i < accountIds.length; ++i) {
+      accountIdText += accountIds[i].toString()
+      if(i != (accountIds.length - 1)) {
+        accountIdText += "%2C"
+      }
+    }
+
+    return http.get("/api/v1/transactions?view=bankView&accountIds=" + accountIdText + "&direction=all&includeChildCategories=true&page=" + page.toString() + "&perPage=" + bankPerPage.toString() + "&order=finapiBookingDate%2Casc", params)
     .then(response => response.data);
   }
 
@@ -88,13 +96,13 @@ exports.NewClient = (http) => {
       return requestWebForm(authorization, bankId)
     },
 
-    getAllTransactions: async (authorization, accountId) => {
+    getAllTransactions: async (authorization, accountIds) => {
       const bankPerPage = 400;
-      const firstPageResponseJson = await getTransactionPerPage(authorization, accountId, 1, bankPerPage);
+      const firstPageResponseJson = await getTransactionPerPage(authorization, accountIds, 1, bankPerPage);
       let transactions = firstPageResponseJson.transactions;
 
       for (var i = 2; i <= firstPageResponseJson.paging.pageCount; ++i) {
-        const pageResponseJson = await getTransactionPerPage(authorization, accountId, i, bankPerPage);
+        const pageResponseJson = await getTransactionPerPage(authorization, accountIds, i, bankPerPage);
         transactions = transactions.concat(pageResponseJson.transactions)
       }
 
