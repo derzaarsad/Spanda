@@ -22,8 +22,8 @@ describe('fetch webform info handler', function() {
   
   expect(process.env.FinAPIClientId).to.exist;
   expect(process.env.FinAPIClientSecret).to.exist;
-  expect(process.env.WEBFORM_ID).to.exist;
-  expect(process.env.ACCESS_TOKEN).to.exist;
+  expect(process.env.WEBFORM_ID_FOR_FETCH).to.exist;
+  expect(process.env.ACCESS_TOKEN_FOR_FETCH).to.exist;
 
   let dummyInterfaces = TestUtility.CreateFinApitestInterfaces(process.env.FinAPIClientId,process.env.FinAPIClientSecret);
 
@@ -37,11 +37,11 @@ describe('fetch webform info handler', function() {
 
     context = {}
 
-    encrypted = encryptions.EncryptText("bearer " + process.env.ACCESS_TOKEN);
+    encrypted = encryptions.EncryptText("bearer " + process.env.ACCESS_TOKEN_FOR_FETCH);
   })
 
   it('rejects a request with could not fetch web form', async function() {
-    const rejectedWebId = parseInt(process.env.WEBFORM_ID) + '111'
+    const rejectedWebId = parseInt(process.env.WEBFORM_ID_FOR_FETCH) + '111'
 
     const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
     user.activeWebFormId = rejectedWebId;
@@ -65,7 +65,7 @@ describe('fetch webform info handler', function() {
 
   it('adds a connection to the user', async function() {
     const user = users.new('chapu', 'chapu@mischung.net', '+666 666 666', false)
-    user.activeWebFormId = parseInt(process.env.WEBFORM_ID);
+    user.activeWebFormId = parseInt(process.env.WEBFORM_ID_FOR_FETCH);
     user.activeWebFormAuth = encrypted.iv;
     users.save(user)
 
@@ -73,7 +73,7 @@ describe('fetch webform info handler', function() {
       'headers': {
       },
       'pathParameters': {
-        'webFormAuth': process.env.WEBFORM_ID + '-' + encrypted.encryptedData
+        'webFormAuth': process.env.WEBFORM_ID_FOR_FETCH + '-' + encrypted.encryptedData
       }
     }
 
