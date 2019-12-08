@@ -6,6 +6,7 @@ const expect = chai.expect;
 
 const Users = require('../../lib/users');
 const BankConnections = require('../../lib/bank-connections');
+const Transactions = require('../../lib/transactions');
 
 const controller = require('../../controllers/bank-controller');
 const encryptions = require('../../lib/encryptions');
@@ -14,6 +15,7 @@ describe('fetch webform info handler', function() {
   let logger
   let users
   let connections
+  let transactions
   let context
 
   beforeEach(function() {
@@ -23,6 +25,7 @@ describe('fetch webform info handler', function() {
 
     users = Users.NewInMemoryRepository()
     connections = BankConnections.NewInMemoryRepository()
+    transactions = Transactions.NewInMemoryRepository()
 
     context = {}
   })
@@ -37,7 +40,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, transactions, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(500);
@@ -55,7 +58,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, transactions, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(500);
@@ -83,7 +86,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, transactions, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(500);
@@ -111,7 +114,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, transactions, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(500);
@@ -146,7 +149,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, transactions, encryptions)
     expect(result.statusCode).to.equal(200);
     expect(result).to.be.an('object');
 

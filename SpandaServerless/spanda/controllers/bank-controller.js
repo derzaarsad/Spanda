@@ -54,8 +54,7 @@ exports.getWebformId = async(event, context, logger, bankInterface, users, encry
   let user
 
   try {
-    // Get user from authorization
-    let userInfo = await bankInterface.userInfo(authorization);
+    let userInfo = await getUserInfo(logger, bankInterface, authorization)
     user = await users.findById(userInfo.id);
     if(!user) {
       throw new Error("user is not found in the database");
@@ -88,7 +87,7 @@ exports.getWebformId = async(event, context, logger, bankInterface, users, encry
 // @Get('/webForms/{webFormId}')
 // @Param('webId') webId
 // @Header('Authorization') authorization: string
-exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, connections, encryptions) => {
+exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, connections, transactions, encryptions) => {
 
   if (!event.pathParameters.webFormAuth) {
     return lambdaUtil.CreateInternalErrorResponse('no webFormAuth');
@@ -119,6 +118,12 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
   }
 
   const body = JSON.parse(webForm.serviceResponseBody)
+  if(!body.accountIds || body.accountIds.length == 0) {
+    logger.log('error', 'no accountIds available')
+    return lambdaUtil.CreateInternalErrorResponse('no accountIds available');
+  }
+
+  const transactionsData = await bankInterface.getAllTransactions(authorization,body.accountIds);
 
   const bankConnection = connections.new(body.id, body.bankId)
   bankConnection.bankAccountIds = body.accountIds
@@ -126,7 +131,7 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
   user.bankConnectionIds.push(body.id)
 
   // TODO: rollback on failure
-  return Promise.all([users.save(user), connections.save(bankConnection)])
+  return Promise.all([users.save(user), connections.save(bankConnection), transactions.saveJsonArray(transactionsData)])
     .then(() => lambdaUtil.CreateResponse(200, body))
     .catch(err => {
       logger.log('error', 'error persisting bank connection data', { 'cause': err })
