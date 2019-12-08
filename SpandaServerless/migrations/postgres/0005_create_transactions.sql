@@ -11,5 +11,5 @@ CREATE TABLE transactions
     counterpartblz text COLLATE pg_catalog."default",
     counterpartbic text COLLATE pg_catalog."default",
     counterpartbankname text COLLATE pg_catalog."default",
-    CONSTRAINT transactions_pkey PRIMARY KEY (id)
+    CONSTRAINT transactions_pkey PRIMARY KEY (id,accountid)
 )
