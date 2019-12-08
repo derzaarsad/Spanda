@@ -27,7 +27,7 @@ describe('get webform id', function() {
   expect(process.env.FinAPIClientId).to.exist;
   expect(process.env.FinAPIClientSecret).to.exist;
 
-  let authAndClientSecrets = TestUtility.CreateFinApitestInterfaces(process.env.FinAPIClientId,process.env.FinAPIClientSecret);
+  let dummyInterfaces = TestUtility.CreateFinApitestInterfaces(process.env.FinAPIClientId,process.env.FinAPIClientSecret);
   let encryptions
 
   beforeEach(function() {
@@ -57,14 +57,14 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 277672 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users, encryptions)
+    const result = await controller.getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(401)
   })
 
   it('rejects requests because user is not available', async () => {
-    const authorization = await authAndClientSecrets.authentication.getPasswordToken(authAndClientSecrets.clientSecrets, testUsername, testPassword);
+    const authorization = await dummyInterfaces.authentication.getPasswordToken(dummyInterfaces.clientSecrets, testUsername, testPassword);
 
     const event = {
       'headers': {
@@ -75,14 +75,14 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 277672 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users, encryptions)
+    const result = await controller.getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(401)
   })
 
   it('rejects requests because user save failed', async () => {
-    const authorization = await authAndClientSecrets.authentication.getPasswordToken(authAndClientSecrets.clientSecrets, testUsername, testPassword);
+    const authorization = await dummyInterfaces.authentication.getPasswordToken(dummyInterfaces.clientSecrets, testUsername, testPassword);
 
     const failingUsers = {
       findById: async (id) => {
@@ -105,7 +105,7 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 277672 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, failingUsers, encryptions)
+    const result = await controller.getWebformId(event, context, logger, dummyInterfaces.bankInterface, failingUsers, encryptions)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(500)
@@ -113,7 +113,7 @@ describe('get webform id', function() {
 
   it('return webform location', async function() {
     users.save(users.new(testUsername, testValidEmail, testValidPhone, false))
-    const authorization = await authAndClientSecrets.authentication.getPasswordToken(authAndClientSecrets.clientSecrets, testUsername, testPassword);
+    const authorization = await dummyInterfaces.authentication.getPasswordToken(dummyInterfaces.clientSecrets, testUsername, testPassword);
 
     const event = {
       'headers': {
@@ -124,7 +124,7 @@ describe('get webform id', function() {
       'body': JSON.stringify({ 'bankId': 277672 })
     }
 
-    const result = await controller.getWebformId(event, context, logger, authAndClientSecrets.bankInterface, users, encryptions)
+    const result = await controller.getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(200);

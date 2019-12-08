@@ -16,7 +16,7 @@ describe('authenticate user handler', function() {
   expect(process.env.FinAPIClientId).to.exist;
   expect(process.env.FinAPIClientSecret).to.exist;
 
-  let authAndClientSecrets = TestUtility.CreateFinApitestInterfaces(process.env.FinAPIClientId,process.env.FinAPIClientSecret);
+  let dummyInterfaces = TestUtility.CreateFinApitestInterfaces(process.env.FinAPIClientId,process.env.FinAPIClientSecret);
 
   beforeEach(function() {
     testUsername = process.env.AZURE_TEST_USER_LOGIN;
@@ -34,7 +34,7 @@ describe('authenticate user handler', function() {
       body: JSON.stringify({'password': testPassword})
     }
 
-    const result = await controller.authenticateAndSave(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication)
+    const result = await controller.authenticateAndSave(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(400)
@@ -51,7 +51,7 @@ describe('authenticate user handler', function() {
       }
     }
 
-    const result = await controller.authenticateAndSave(event, context, logger, authAndClientSecrets.clientSecrets, failingAuthentication)
+    const result = await controller.authenticateAndSave(event, context, logger, dummyInterfaces.clientSecrets, failingAuthentication)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(401)
@@ -62,7 +62,7 @@ describe('authenticate user handler', function() {
       body: JSON.stringify({'username': testUsername, 'password': testPassword})
     }
 
-    const result = await controller.authenticateAndSave(event, context, logger, authAndClientSecrets.clientSecrets, authAndClientSecrets.authentication)
+    const result = await controller.authenticateAndSave(event, context, logger, dummyInterfaces.clientSecrets, dummyInterfaces.authentication)
 
     expect(result).to.be.an('object')
     expect(result.statusCode).to.equal(200)
