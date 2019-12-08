@@ -141,10 +141,6 @@ jobs:
       echo -e "PGDATABASE=postgres" >> ./integration-test.env
     displayName: 'integration test preparation'
     continueOnError: false
-  - task: Delay@1
-    displayName: 'Necessary delay for preparation'
-    inputs:
-      delayForMinutes: '1' 
   - script: |
       cd SpandaServerless
       mkdir reports
