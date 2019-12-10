@@ -99,11 +99,6 @@ exports.NewClient = (http) => {
     },
 
     getAllTransactions: async (authorization, accountIds) => {
-
-      if(!accountIds || accountIds.length == 0) {
-        return undefined;
-      }
-
       const bankPerPage = 400;
       const firstPageResponseJson = await getTransactionPerPage(authorization, accountIds, 1, bankPerPage);
       let transactions = firstPageResponseJson.transactions;
