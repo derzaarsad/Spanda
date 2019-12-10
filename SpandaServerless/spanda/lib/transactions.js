@@ -29,8 +29,8 @@ exports.NewInMemoryRepository = () => {
       return repository[id]
     },
 
-    findByAccountId: async (accountId) => {
-      return Object.keys(repository).filter(function(key) { return repository[key].accountId == accountId; }).map(function(key) {
+    findByAccountIds: async (accountIds) => {
+      return Object.keys(repository).filter(function(key) { return accountIds.includes(repository[key].accountId); }).map(function(key) {
         return repository[key];
       });
     },
@@ -70,9 +70,9 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
       schema.tableName, id.toString());
   }
 
-  const findByAccountIdQuery = (accountId) => {
-    return format('SELECT * FROM %I WHERE accountid = %L',
-      schema.tableName, accountId.toString());
+  const findByAccountIdsQuery = (accountIds) => {
+    return format('SELECT * FROM %I WHERE accountid in (%L)',
+      schema.tableName, accountIds);
   }
 
   const deleteAllQuery = format('DELETE FROM %I', schema.tableName);
@@ -112,10 +112,10 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
         .finally(() => { client.release() })
     },
 
-    findByAccountId: async (accountId) => {
+    findByAccountIds: async (accountIds) => {
       const client = await pool.connect();
       const params = {
-        text: findByAccountIdQuery(accountId),
+        text: findByAccountIdsQuery(accountIds),
         rowMode: 'array',
         types: types
       }
@@ -150,6 +150,7 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
     },
 
     findByIdQuery: findByIdQuery,
+    findByAccountIdsQuery: findByAccountIdsQuery,
     saveQuery: saveQuery,
     saveArrayQuery: saveArrayQuery,
     deleteAllQuery: deleteAllQuery

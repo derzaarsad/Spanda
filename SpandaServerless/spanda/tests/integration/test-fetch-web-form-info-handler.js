@@ -100,7 +100,7 @@ describe('fetch webform info handler', function() {
     expect(connection, 'the connection was not created').to.be.ok
     expect(connection.bankAccountIds[0]).to.be.an('number', 'expected the bankAccountIds element to be a number');
 
-    const transactions_ = await transactions.findByAccountId(connection.bankAccountIds[0])
+    const transactions_ = await transactions.findByAccountIds(connection.bankAccountIds)
     expect(transactions_).to.exist;
     expect(transactions_.length).to.not.equal(0);
     expect(transactions_[0].id).to.exist;

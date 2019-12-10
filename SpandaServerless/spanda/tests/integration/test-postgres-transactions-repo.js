@@ -57,7 +57,8 @@ describe('postgres transactions repository', function() {
   it('save multiple transactions with different id', async function() {
     let transactionsData = [
       [1112,2,-89.871,'2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank'],
-      [2233,2,-99.81,'2018-01-02T01:02:03.000Z',' RE. 745459','TueV Bayern','611605','DE13700800001061110500','70080070','DREEDEFF700','Commerzbank vormals Dresdner Bank']
+      [2233,2,-99.81,'2018-01-02T01:02:03.000Z',' RE. 745459','TueV Bayern','611605','DE13700800001061110500','70080070','DREEDEFF700','Commerzbank vormals Dresdner Bank'],
+      [4112,5,-89.871,'2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank']
     ];
 
     await transactions.saveArray(transactionsData);
@@ -74,11 +75,17 @@ describe('postgres transactions repository', function() {
     expect(result.counterPartBic).to.equal(transactionsData[1][9])
     expect(result.counterPartBankName).to.equal(transactionsData[1][10])
 
-    const results = await transactions.findByAccountId(2);
-    expect(results[0].id).to.equal(transactionsData[0][0]);
-    expect(results[1].id).to.equal(transactionsData[1][0]);
-    expect(results[0].accountId).to.equal(2);
-    expect(results[1].accountId).to.equal(2);
+    const results = await transactions.findByAccountIds([2]);
+    expect(results.length).to.equal(2);
+
+    const results2 = await transactions.findByAccountIds([2,5]);
+    expect(results2.length).to.equal(3);
+    expect(results2[0].id).to.equal(transactionsData[0][0]);
+    expect(results2[1].id).to.equal(transactionsData[1][0]);
+    expect(results2[2].id).to.equal(transactionsData[2][0]);
+    expect(results2[0].accountId).to.equal(2);
+    expect(results2[1].accountId).to.equal(2);
+    expect(results2[2].accountId).to.equal(5);
   })
 
   it('save multiple transactions with different account id', async function() {
