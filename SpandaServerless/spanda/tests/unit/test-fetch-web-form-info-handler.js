@@ -6,6 +6,7 @@ const expect = chai.expect;
 
 const Users = require('../../lib/users');
 const BankConnections = require('../../lib/bank-connections');
+const Transactions = require('../../lib/transactions');
 
 const controller = require('../../controllers/bank-controller');
 const encryptions = require('../../lib/encryptions');
@@ -14,6 +15,7 @@ describe('fetch webform info handler', function() {
   let logger
   let users
   let connections
+  let transactions
   let context
 
   beforeEach(function() {
@@ -23,6 +25,7 @@ describe('fetch webform info handler', function() {
 
     users = Users.NewInMemoryRepository()
     connections = BankConnections.NewInMemoryRepository()
+    transactions = Transactions.NewInMemoryRepository()
 
     context = {}
   })
@@ -37,7 +40,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, transactions, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(500);
@@ -55,7 +58,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, transactions, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(500);
@@ -83,7 +86,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, transactions, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(500);
@@ -111,7 +114,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, transactions, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(500);
@@ -135,6 +138,16 @@ describe('fetch webform info handler', function() {
         return {
           serviceResponseBody: '{ "id": 1, "bankId": 2, "accountIds": [ 3, 4, 5 ] }'
         }
+      },
+
+      getAllTransactions: async (authorization, accountIds) => {
+  
+        // map the finapi json into database columns
+        transactions = [
+            [1112,3,-89.871,'2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank']
+          ];
+  
+        return transactions;
       }
     }
 
@@ -146,7 +159,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, finapi, users, connections, transactions, encryptions)
     expect(result.statusCode).to.equal(200);
     expect(result).to.be.an('object');
 
