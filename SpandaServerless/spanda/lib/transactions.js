@@ -29,9 +29,33 @@ exports.NewInMemoryRepository = () => {
       return repository[id]
     },
 
+    findByAccountIds: async (accountIds) => {
+      return Object.keys(repository).filter(function(key) { return accountIds.includes(repository[key].accountId); }).map(function(key) {
+        return repository[key];
+      });
+    },
+
     save: async (transaction) => {
       repository[transaction.id] = transaction
       return transaction
+    },
+
+    saveArray: async (transactions) => {
+      transactions.forEach(transaction => repository[transaction[0]] = createTransaction(
+        transaction[0],
+        transaction[1],
+        transaction[2],
+        transaction[3],
+        transaction[4],
+        transaction[5],
+        transaction[6],
+        transaction[7],
+        transaction[8],
+        transaction[9],
+        transaction[10],
+        transaction[11]
+      ))
+      return transactions
     },
 
     deleteAll: async () => {
@@ -46,6 +70,11 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
       schema.tableName, id.toString());
   }
 
+  const findByAccountIdsQuery = (accountIds) => {
+    return format('SELECT * FROM %I WHERE accountid in (%L)',
+      schema.tableName, accountIds);
+  }
+
   const deleteAllQuery = format('DELETE FROM %I', schema.tableName);
 
   const saveQuery = (transaction) => {
@@ -58,13 +87,13 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
       tableName, attributes, row);
   }
 
-  const saveJsonArrayQuery = (transactions) => {
+  const saveArrayQuery = (transactions) => {
     const tableName = schema.tableName;
     const attributes = schema.attributes;
     const columns = schema.columns;
 
-    return format('INSERT INTO %I (%s) SELECT * FROM json_populate_recordset(null::%I, %L)',
-      tableName, attributes, tableName, JSON.stringify(transactions));
+    return format('INSERT INTO %I (%s) VALUES %L',
+      tableName, attributes, transactions);
   }
 
   return {
@@ -83,6 +112,19 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
         .finally(() => { client.release() })
     },
 
+    findByAccountIds: async (accountIds) => {
+      const client = await pool.connect();
+      const params = {
+        text: findByAccountIdsQuery(accountIds),
+        rowMode: 'array',
+        types: types
+      }
+
+      return client.query(params)
+        .then(res => (res.rowCount > 0) ? res.rows.map(function(row) { return schema.asObject(row); }) : null)
+        .finally(() => { client.release() })
+    },
+
     save: async (transaction) => {
       const client = await pool.connect();
 
@@ -91,10 +133,10 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
         .finally(() => { client.release() });
     },
 
-    saveJsonArray: async (transactions) => {
+    saveArray: async (transactions) => {
       const client = await pool.connect();
 
-      return client.query(saveJsonArrayQuery(transactions))
+      return client.query(saveArrayQuery(transactions))
         .then(() => transactions)
         .finally(() => { client.release() });
     },
@@ -108,8 +150,9 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
     },
 
     findByIdQuery: findByIdQuery,
+    findByAccountIdsQuery: findByAccountIdsQuery,
     saveQuery: saveQuery,
-    saveJsonArrayQuery: saveJsonArrayQuery,
+    saveArrayQuery: saveArrayQuery,
     deleteAllQuery: deleteAllQuery
   }
 }

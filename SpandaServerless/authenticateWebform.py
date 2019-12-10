@@ -1,4 +1,5 @@
 import sys
+import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,5 +17,9 @@ try:
     elem = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.ID, "exitWithoutRedirect"))
     )
+    print("credentials submitted")
 finally:
     driver.quit()
+    print("quit webform")
+time.sleep(1)
+sys.exit(0)

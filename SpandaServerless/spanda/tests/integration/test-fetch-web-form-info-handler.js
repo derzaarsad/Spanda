@@ -7,6 +7,7 @@ const TestUtility = require('../test-utility');
 
 const Users = require('../../lib/users');
 const BankConnections = require('../../lib/bank-connections');
+const Transactions = require('../../lib/transactions')
 
 const controller = require('../../controllers/bank-controller');
 const encryptions = require('../../lib/encryptions');
@@ -17,6 +18,7 @@ describe('fetch webform info handler', function() {
   let logger
   let users
   let connections
+  let transactions
   let context
   let encrypted
   
@@ -34,6 +36,7 @@ describe('fetch webform info handler', function() {
 
     users = Users.NewInMemoryRepository()
     connections = BankConnections.NewInMemoryRepository()
+    transactions = Transactions.NewInMemoryRepository()
 
     context = {}
 
@@ -56,7 +59,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, dummyInterfaces.bankInterface, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, dummyInterfaces.bankInterface, users, connections, transactions, encryptions)
 
     expect(result).to.be.an('object');
     expect(result.statusCode).to.equal(500);
@@ -77,7 +80,7 @@ describe('fetch webform info handler', function() {
       }
     }
 
-    const result = await controller.fetchWebFormInfo(event, context, logger, dummyInterfaces.bankInterface, users, connections, encryptions)
+    const result = await controller.fetchWebFormInfo(event, context, logger, dummyInterfaces.bankInterface, users, connections, transactions, encryptions)
     expect(result.statusCode).to.equal(200);
     expect(result).to.be.an('object');
 
@@ -96,5 +99,12 @@ describe('fetch webform info handler', function() {
     const connection = await connections.findById(bankConnectionId)
     expect(connection, 'the connection was not created').to.be.ok
     expect(connection.bankAccountIds[0]).to.be.an('number', 'expected the bankAccountIds element to be a number');
+
+    const transactions_ = await transactions.findByAccountIds(connection.bankAccountIds)
+    expect(transactions_).to.exist;
+    expect(transactions_.length).to.not.equal(0);
+    expect(transactions_[0].id).to.exist;
+    expect(transactions_[0].accountId).to.equal(connection.bankAccountIds[0]);
+    expect(transactions_[0].amount).to.exist;
   })
 })

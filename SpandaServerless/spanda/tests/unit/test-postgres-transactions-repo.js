@@ -42,8 +42,14 @@ describe('postgres transactions repository', function() {
       {id:2233,accountid:2,amount:-99.81,bookingdate:'2018-01-01T00:00:00.000Z',purpose:' RE. 745259',counterpartname:'TueV Bayern',counterpartaccountnumber:'611105',counterpartiban:'DE13700800000061110500',counterpartblz:'70080000',counterpartbic:'DRESDEFF700',counterpartbankname:'Commerzbank vormals Dresdner Bank'}
     ];
 
-    const result = transactions.saveJsonArrayQuery(transactionsData);
+    const result = transactions.saveArrayQuery(transactionsData);
     expect(result).to.be.a('string');
-    expect(result).to.equal("INSERT INTO transactions (id,accountid,amount,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) SELECT * FROM json_populate_recordset(null::transactions, '[{\"id\":1112,\"accountid\":2,\"amount\":-89.871,\"bookingdate\":\"2018-01-01T00:00:00.000Z\",\"purpose\":\" RE. 745259\",\"counterpartname\":\"TueV Bayern\",\"counterpartaccountnumber\":\"611105\",\"counterpartiban\":\"DE13700800000061110500\",\"counterpartblz\":\"70080000\",\"counterpartbic\":\"DRESDEFF700\",\"counterpartbankname\":\"Commerzbank vormals Dresdner Bank\"},{\"id\":2233,\"accountid\":2,\"amount\":-99.81,\"bookingdate\":\"2018-01-01T00:00:00.000Z\",\"purpose\":\" RE. 745259\",\"counterpartname\":\"TueV Bayern\",\"counterpartaccountnumber\":\"611105\",\"counterpartiban\":\"DE13700800000061110500\",\"counterpartblz\":\"70080000\",\"counterpartbic\":\"DRESDEFF700\",\"counterpartbankname\":\"Commerzbank vormals Dresdner Bank\"}]\')");
+    expect(result).to.equal("INSERT INTO transactions (id,accountid,amount,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES '{\"id\":1112,\"accountid\":2,\"amount\":-89.871,\"bookingdate\":\"2018-01-01T00:00:00.000Z\",\"purpose\":\" RE. 745259\",\"counterpartname\":\"TueV Bayern\",\"counterpartaccountnumber\":\"611105\",\"counterpartiban\":\"DE13700800000061110500\",\"counterpartblz\":\"70080000\",\"counterpartbic\":\"DRESDEFF700\",\"counterpartbankname\":\"Commerzbank vormals Dresdner Bank\"}'::jsonb,'{\"id\":2233,\"accountid\":2,\"amount\":-99.81,\"bookingdate\":\"2018-01-01T00:00:00.000Z\",\"purpose\":\" RE. 745259\",\"counterpartname\":\"TueV Bayern\",\"counterpartaccountnumber\":\"611105\",\"counterpartiban\":\"DE13700800000061110500\",\"counterpartblz\":\"70080000\",\"counterpartbic\":\"DRESDEFF700\",\"counterpartbankname\":\"Commerzbank vormals Dresdner Bank\"}'::jsonb");
+  })
+
+  it('renders the find-by-account-id query', async function() {
+    const result = transactions.findByAccountIdsQuery([2,5]);
+    expect(result).to.be.a('string');
+    expect(result).to.equal("SELECT * FROM transactions WHERE accountid in ('2','5')");
   })
 })
