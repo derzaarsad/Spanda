@@ -70,6 +70,11 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
       schema.tableName, id.toString());
   }
 
+  const findByAccountIdQuery = (accountId) => {
+    return format('SELECT * FROM %I WHERE accountid = %L',
+      schema.tableName, accountId.toString());
+  }
+
   const deleteAllQuery = format('DELETE FROM %I', schema.tableName);
 
   const saveQuery = (transaction) => {
@@ -104,6 +109,19 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
 
       return client.query(params)
         .then(res => (res.rowCount > 0) ? schema.asObject(res.rows[0]) : null)
+        .finally(() => { client.release() })
+    },
+
+    findByAccountId: async (accountId) => {
+      const client = await pool.connect();
+      const params = {
+        text: findByAccountIdQuery(accountId),
+        rowMode: 'array',
+        types: types
+      }
+
+      return client.query(params)
+        .then(res => (res.rowCount > 0) ? res.rows.map(function(row) { return schema.asObject(row); }) : null)
         .finally(() => { client.release() })
     },
 

@@ -73,6 +73,12 @@ describe('postgres transactions repository', function() {
     expect(result.counterPartBlz).to.equal(transactionsData[1][8])
     expect(result.counterPartBic).to.equal(transactionsData[1][9])
     expect(result.counterPartBankName).to.equal(transactionsData[1][10])
+
+    const results = await transactions.findByAccountId(2);
+    expect(results[0].id).to.equal(transactionsData[0][0]);
+    expect(results[1].id).to.equal(transactionsData[1][0]);
+    expect(results[0].accountId).to.equal(2);
+    expect(results[1].accountId).to.equal(2);
   })
 
   it('save multiple transactions with different account id', async function() {
