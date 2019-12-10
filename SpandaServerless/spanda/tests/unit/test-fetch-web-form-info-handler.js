@@ -138,6 +138,16 @@ describe('fetch webform info handler', function() {
         return {
           serviceResponseBody: '{ "id": 1, "bankId": 2, "accountIds": [ 3, 4, 5 ] }'
         }
+      },
+
+      getAllTransactions: async (authorization, accountIds) => {
+  
+        // map the finapi json into database columns
+        transactions = [
+            [1112,3,-89.871,'2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank']
+          ];
+  
+        return transactions;
       }
     }
 

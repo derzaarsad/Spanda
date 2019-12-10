@@ -108,19 +108,19 @@ exports.NewClient = (http) => {
 
       // map the finapi json into database columns
       transactions = transactions.map(function(transaction) {
-        return {
-          "id": transaction.id,
-          "accountid": transaction.accountId,
-          "amount": transaction.amount,
-          "bookingdate": transaction.finapiBookingDate.replace(" ","T") + "Z",
-          "purpose": transaction.purpose,
-          "counterpartname": transaction.counterpartName,
-          "counterpartaccountnumber": transaction.counterpartAccountNumber,
-          "counterpartiban": transaction.counterpartIban,
-          "counterpartblz": transaction.counterpartBlz,
-          "counterpartbic": transaction.counterpartBic,
-          "counterpartbankname": transaction.counterpartBankName
-        };
+        return [
+          transaction.id,
+          transaction.accountId,
+          transaction.amount,
+          transaction.finapiBookingDate.replace(" ","T") + "Z",
+          transaction.purpose,
+          transaction.counterpartName,
+          transaction.counterpartAccountNumber,
+          transaction.counterpartIban,
+          transaction.counterpartBlz,
+          transaction.counterpartBic,
+          transaction.counterpartBankName
+        ];
       });
 
       return transactions;

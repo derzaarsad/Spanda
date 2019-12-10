@@ -131,7 +131,7 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
   user.bankConnectionIds.push(body.id)
 
   // TODO: rollback on failure
-  return Promise.all([users.save(user), connections.save(bankConnection), transactions.saveJsonArray(transactionsData)])
+  return Promise.all([users.save(user), connections.save(bankConnection), transactions.saveArray(transactionsData)])
     .then(() => lambdaUtil.CreateResponse(200, body))
     .catch(err => {
       logger.log('error', 'error persisting bank connection data', { 'cause': err })
