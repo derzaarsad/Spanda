@@ -1,4 +1,5 @@
 'use strict'
+const querystring = require('querystring');
 
 exports.NewClient = (http) => {
   const requestWebForm = async (authorization, bankId) => {
@@ -33,16 +34,17 @@ exports.NewClient = (http) => {
       }
     }
 
-    let accountIdText = ""
-    for (let i = 0; i < accountIds.length; ++i) {
-      accountIdText += accountIds[i].toString()
-      if(i != (accountIds.length - 1)) {
-        accountIdText += "%2C"
-      }
+    const query = {
+      view: 'bankView',
+      accountIds: accountIds.join('%2C'),
+      direction: 'all',
+      includeChildCategories: 'true',
+      page: page.toString(),
+      perPage: bankPerPage.toString(),
+      order: 'finapiBookingDate,asc'
     }
 
-    return http.get("/api/v1/transactions?view=bankView&accountIds=" + accountIdText + "&direction=all&includeChildCategories=true&page=" + page.toString() + "&perPage=" + bankPerPage.toString() + "&order=finapiBookingDate%2Casc", params)
-    .then(response => response.data);
+    return http.get("/api/v1/transactions?"+ querystring.stringify(query), params).then(response => response.data);
   }
 
   return {
