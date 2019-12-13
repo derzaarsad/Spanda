@@ -2,6 +2,21 @@
 
 /*
  * This module defines the callbac handler interface for components receiving push notifications.
+ *
+ * type CallbackSuccess = {
+ *   kind: 'success'
+ * }
+ *
+ * type CallbackFailure = {
+ *   kind: 'failure',
+ *   error: any
+ * }
+ *
+ * type CallbackStatus = CallbackSuccess | CallbackFailure
+ *
+ * type NotificationCallback = {
+ *   accept: async(notification) => CallbackStatus
+ * }
  */
 
 /*
@@ -31,16 +46,22 @@ exports.NewSNSPublisher = (decoder, ruleHandles, sns, topicArn, logger) => {
       const validated = validateNotification(notification);
 
       if (!validated) {
-        return undefined;
+        return {
+          kind: 'failure',
+          error: 'received an invalid notification ' + JSON.stringify(notification)
+        }
       }
 
       const ruleHandle = await ruleHandles.findById(validated.callbackHandle);
 
       if (!ruleHandle) {
-        return undefined;
+        return {
+          kind: 'failure',
+          error: 'no rule handle found for the callback handle'
+        }
       }
 
-      return validated;
+      return { kind: 'success' }
     }
   }
 }
@@ -59,7 +80,8 @@ exports.NewAccumulator = (decoder) => {
 
       const decoded = decoder.map(notification);
       notifications.push(decoded);
-      return decoded;
+
+      return { kind: 'success' };
     },
 
     notifications: notifications,

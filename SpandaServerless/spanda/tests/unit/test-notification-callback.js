@@ -28,8 +28,9 @@ describe('collector notification callback', function() {
     ]
 
     const callback = Callback.NewAccumulator(Decoder.Pass());
-    await callback.accept(payload);
+    const status = await callback.accept(payload);
 
+    expect(status).to.eql({kind: 'success'});
     expect(callback.notifications).to.eql(expected);
   })
 
@@ -103,7 +104,9 @@ describe('collector notification callback', function() {
     const decoder = Decoder.DecryptNewTransactions(crypto);
 
     const callback = Callback.NewAccumulator(decoder);
-    await callback.accept(payload);
+    const status = await callback.accept(payload);
+
+    expect(status).to.eql({kind: 'success'});
     expect(callback.notifications).to.eql(expected);
   })
 })
