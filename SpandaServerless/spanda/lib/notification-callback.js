@@ -1,7 +1,7 @@
 'use strict'
 
 /*
- * This module defines the callbac handler interface for components receiving push notifications.
+ * This module defines the callback handler interface for components receiving push notifications.
  *
  * type CallbackSuccess = {
  *   kind: 'success'
@@ -41,6 +41,23 @@ exports.NewSNSPublisher = (decoder, ruleHandles, sns, topicArn, logger) => {
     }
   }
 
+  const messageAttributes = (ruleHandle) => {
+    return {
+      finApiId: {
+        DataType: "Number",
+        StringValue: ruleHandle.finApiId.toString()
+      },
+      userId: {
+        DataType: "Number",
+        StringValue: ruleHandle.userId.toString()
+      },
+      type: {
+        DataType: "String",
+        StringValue: ruleHandle.type
+      }
+    }
+  }
+
   return {
     accept: async (notification) => {
       const validated = validateNotification(notification);
@@ -61,7 +78,31 @@ exports.NewSNSPublisher = (decoder, ruleHandles, sns, topicArn, logger) => {
         }
       }
 
-      return { kind: 'success' }
+      const params = {
+        TopicArn: topicArn,
+        MessageStructure: 'json',
+        Message: JSON.stringify(validated),
+        ...messageAttributes(ruleHandle)
+      }
+
+      return new Promise((resolve, reject) => {
+        sns.publish(params, function(err) {
+          if (err) {
+            logger.log('error', 'could not publish notification', { 'cause': err } );
+
+            reject({
+              kind: 'failure',
+              error: err
+            });
+          } else {
+            logger.log('info', 'notification forwarded successfully');
+
+            resolve({
+              kind: 'success'
+            });
+          }
+        });
+      });
     }
   }
 }

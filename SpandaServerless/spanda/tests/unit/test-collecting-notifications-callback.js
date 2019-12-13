@@ -100,7 +100,6 @@ describe('collector notification callback', function() {
       }
     ]
 
-
     const decoder = Decoder.DecryptNewTransactions(crypto);
 
     const callback = Callback.NewAccumulator(decoder);
