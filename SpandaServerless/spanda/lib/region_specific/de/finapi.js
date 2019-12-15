@@ -113,7 +113,7 @@ exports.NewClient = (http) => {
       }
 
       const rule = {
-        "triggerEvent": "NEW_ACCOUNT_BALANCE",
+        "triggerEvent": "NEW_TRANSACTIONS",
         "params": {
           "accountIds": accountIds.join(',')
         },
