@@ -1,4 +1,4 @@
-import { AesCrypto } from "../lib/aes-crypto";
+import AesCrypto from "../lib/aes-crypto";
 
 test("decrypt a ciphertext encrypted by self", () => {
   const key = "8deec885781c421794ceda8af70a5e63";

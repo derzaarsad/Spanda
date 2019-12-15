@@ -45,7 +45,7 @@ export class DynamoDBRuleHandleRepository implements RuleHandleRepository {
     return {
       id: data["id"]["S"]!,
       finApiId: parseInt(data["finApiId"]["N"]!),
-      userId: parseInt(data["userId"]["N"]!),
+      userId: data["userId"]["S"]!,
       type: data["type"]["S"]!,
       args: data["args"] ? JSON.parse(data["type"]["S"]!) : undefined
     };

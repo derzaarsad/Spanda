@@ -141,8 +141,8 @@ export class NewTransactionsSNSPublisher
         StringValue: ruleHandle.finApiId.toString()
       },
       userId: {
-        DataType: "Number",
-        StringValue: ruleHandle.userId.toString()
+        DataType: "String",
+        StringValue: ruleHandle.userId
       },
       type: {
         DataType: "String",

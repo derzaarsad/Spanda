@@ -7,7 +7,7 @@ export default class UUIDRuleHandleFactory implements RuleHandleFactory {
     this.uuid = uuid;
   }
 
-  create(finApiId: number, userId: number, type: string, args?: any): RuleHandle {
+  create(finApiId: number, userId: string, type: string, args?: any): RuleHandle {
     const id = this.uuid();
 
     return {

@@ -1,5 +1,5 @@
 import RuleHandle from "./rule-handle";
 
 export default interface RuleHandleFactory {
-  create(finApiId: number, userId: number, type: string, args?: any): RuleHandle;
+  create(finApiId: number, userId: string, type: string, args?: any): RuleHandle;
 }

@@ -1,7 +1,7 @@
 type RuleHandle = {
   id: string;
   finApiId: number;
-  userId: number;
+  userId: string;
   type: string;
   args: any | undefined;
 };
