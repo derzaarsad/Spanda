@@ -55,6 +55,22 @@ module.exports = {
 
   asObject: row => {
     return asObject(row)
+  },
+
+  mapObject: rowObject => {
+    return {
+      'id': rowObject[attributes[0]],
+      'accountId': rowObject[attributes[1]],
+      'amount': rowObject[attributes[2]],
+      'bookingDate': rowObject[attributes[3]],
+      'purpose': rowObject[attributes[4]],
+      'counterPartName': rowObject[attributes[5]],
+      'counterPartAccountNumber': rowObject[attributes[6]],
+      'counterPartIban': rowObject[attributes[7]],
+      'counterPartBlz': rowObject[attributes[8]],
+      'counterPartBic': rowObject[attributes[9]],
+      'counterPartBankName': rowObject[attributes[10]]
+    }
   }
 }
 

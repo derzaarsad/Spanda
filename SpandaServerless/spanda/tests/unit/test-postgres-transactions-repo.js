@@ -52,4 +52,10 @@ describe('postgres transactions repository', function() {
     expect(result).to.be.a('string');
     expect(result).to.equal("SELECT * FROM transactions WHERE accountid in ('2','5')");
   })
+
+  it('renders the group-by-column query', async function() {
+    const result = transactions.groupByColumnQuery(7);
+    expect(result).to.be.a('string');
+    expect(result).to.equal("SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM transactions WHERE counterpartiban=b.counterpartiban) t ) rw FROM transactions b WHERE counterpartiban IS NOT NULL GROUP BY counterpartiban");
+  })
 })
