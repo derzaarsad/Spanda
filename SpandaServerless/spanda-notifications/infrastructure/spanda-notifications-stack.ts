@@ -23,6 +23,8 @@ export class SpandaNotificationsStack extends cdk.Stack {
       handler: "callback.handler"
     });
 
+    topic.grantPublish(fn);
+
     new apigw.LambdaRestApi(this, "Endpoint", {
       handler: fn
     });
