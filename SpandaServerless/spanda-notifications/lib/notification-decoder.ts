@@ -1,6 +1,6 @@
 import { Notification } from "./finapi-notifications";
 
-/*
+/**
  * This module defines the decoder interface, which is responsible for transforming an incoming
  * notification to a target representation.
  */

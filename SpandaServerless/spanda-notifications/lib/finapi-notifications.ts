@@ -13,6 +13,10 @@ export type TransactionDetail = {
   isAdjustingEntry: boolean;
 };
 
+export type TransactionDetails = {
+  transactionDetails: Array<TransactionDetail>;
+};
+
 export type NewTransactions = {
   accountId: number;
   accountName: string;
@@ -28,15 +32,15 @@ export type EncryptedNewTransactions = NewTransactions & {
 };
 
 export type DecryptedNewTransactions = NewTransactions & {
-  details: Array<TransactionDetail> | undefined;
+  details: TransactionDetails | undefined;
 };
 
-export type EncryptedTransactionsNotification = Notification & {
+export type EncryptedNewTransactionsNotification = Notification & {
   triggerEvent: "NEW_TRANSACTIONS";
   newTransactions: Array<EncryptedNewTransactions>;
 };
 
-export type DecryptedTransactionsNotification = Notification & {
+export type DecryptedNewTransactionsNotification = Notification & {
   triggerEvent: "NEW_TRANSACTIONS";
   newTransactions: Array<DecryptedNewTransactions>;
 };

@@ -1,7 +1,7 @@
 import Crypto from "./crypto";
 import { AesUtil } from "./js/aes-util";
 
-export class AesCrypto implements Crypto {
+export default class AesCrypto implements Crypto {
   private aesUtil: AesUtil;
   private decryptionKey: string;
 

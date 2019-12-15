@@ -1,10 +1,11 @@
 import {
   Notification,
   EncryptedNewTransactions,
-  DecryptedTransactionsNotification,
-  EncryptedTransactionsNotification,
+  DecryptedNewTransactionsNotification,
+  EncryptedNewTransactionsNotification,
   TransactionDetail,
-  DecryptedNewTransactions
+  DecryptedNewTransactions,
+  TransactionDetails
 } from "./finapi-notifications";
 import Crypto from "./crypto";
 import NotificationDecoder from "./notification-decoder";
@@ -24,14 +25,17 @@ export class Pass<I extends Notification> implements NotificationDecoder<I, I> {
  */
 export class NewTransactionsDecryptor
   implements
-    NotificationDecoder<EncryptedTransactionsNotification, DecryptedTransactionsNotification> {
+    NotificationDecoder<
+      EncryptedNewTransactionsNotification,
+      DecryptedNewTransactionsNotification
+    > {
   private crypto: Crypto;
 
   constructor(crypto: Crypto) {
     this.crypto = crypto;
   }
 
-  map(notification: EncryptedTransactionsNotification): DecryptedTransactionsNotification {
+  map(notification: EncryptedNewTransactionsNotification): DecryptedNewTransactionsNotification {
     return {
       notificationRuleId: notification.notificationRuleId,
       triggerEvent: notification.triggerEvent,
@@ -55,8 +59,8 @@ export class NewTransactionsDecryptor
     };
   }
 
-  private mapTransactionDetails(encryptedDetail: string): Array<TransactionDetail> {
+  private mapTransactionDetails(encryptedDetail: string): TransactionDetails {
     const decryptedDetail = this.crypto.decrypt(encryptedDetail);
-    return JSON.parse(decryptedDetail) as Array<TransactionDetail>;
+    return JSON.parse(decryptedDetail) as TransactionDetails;
   }
 }
