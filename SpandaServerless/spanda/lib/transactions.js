@@ -75,6 +75,12 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
       schema.tableName, accountIds);
   }
 
+  const groupByColumnQuery = (attributesIndex) => {
+    const attribute = schema.attributes.split(',')[attributesIndex]
+    return format('SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM %I WHERE %I=b.%I) t ) rw FROM %I b WHERE %I IS NOT NULL GROUP BY %I',
+      schema.tableName, attribute, attribute, schema.tableName, attribute, attribute);
+  }
+
   const deleteAllQuery = format('DELETE FROM %I', schema.tableName);
 
   const saveQuery = (transaction) => {
@@ -125,6 +131,19 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
         .finally(() => { client.release() })
     },
 
+    groupByIban: async () => {
+      const client = await pool.connect();
+      const params = {
+        text: groupByColumnQuery(7),
+        rowMode: 'array',
+        types: types
+      }
+
+      return client.query(params)
+        .then(res => (res.rowCount > 0) ? res.rows.map(function(row) { return row[0].map(function(element) { return schema.mapObject(element); }); }) : null)
+        .finally(() => { client.release() })
+    },
+
     save: async (transaction) => {
       const client = await pool.connect();
 
@@ -151,6 +170,7 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
 
     findByIdQuery: findByIdQuery,
     findByAccountIdsQuery: findByAccountIdsQuery,
+    groupByColumnQuery: groupByColumnQuery,
     saveQuery: saveQuery,
     saveArrayQuery: saveArrayQuery,
     deleteAllQuery: deleteAllQuery

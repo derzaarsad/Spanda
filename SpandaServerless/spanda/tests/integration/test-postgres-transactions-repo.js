@@ -124,5 +124,26 @@ describe('postgres transactions repository', function() {
     expect(await transactions.findById(transactionsData[1][0])).to.not.exist
     expect(await transactions.findById(transactionsData[2][0])).to.not.exist
   })
+
+  it('group by iban column', async function() {
+    let transactionsData = [
+      [1112,2,-89.871,'2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','AU13700807001061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank'],
+      [1112,3,-99.81,'2018-01-02T00:00:00.000Z',' RE. 745459','TueV Bayern','611605','AU13700807001061110500','70080070','DREEDEFF700','Commerzbank vormals Dresdner Bank'],
+      [4112,4,-64.81,'2018-01-03T00:00:00.000Z',' RE. 735459','TueV Bayern','631605','DE13700800000061110500','71080070','DREEUEFF700','Commerzbank vormals Dresdner Bank'],
+      [4112,5,-69.81,'2018-01-03T00:00:00.000Z',' RE. 735459','TueV Bayern','631605','DE13700800000061110500','71080070','DREEUEFF700','Commerzbank vormals Dresdner Bank']
+    ];
+
+    await transactions.saveArray(transactionsData);
+    const transactionsGroup = await transactions.groupByIban();
+    expect(transactionsGroup.length).to.equal(2);
+    expect(transactionsGroup[0][0].accountId).to.equal(2);
+    expect(transactionsGroup[0][0].counterPartIban).to.equal('AU13700807001061110500');
+    expect(transactionsGroup[0][1].accountId).to.equal(3);
+    expect(transactionsGroup[0][1].counterPartIban).to.equal('AU13700807001061110500');
+    expect(transactionsGroup[1][0].accountId).to.equal(4);
+    expect(transactionsGroup[1][0].counterPartIban).to.equal('DE13700800000061110500');
+    expect(transactionsGroup[1][1].accountId).to.equal(5);
+    expect(transactionsGroup[1][1].counterPartIban).to.equal('DE13700800000061110500');
+  })
 })
 
