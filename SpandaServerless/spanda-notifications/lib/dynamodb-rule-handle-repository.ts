@@ -37,7 +37,7 @@ export class DynamoDBRuleHandleRepository implements RuleHandleRepository {
       Item: this.encodeRule(ruleHandle)
     };
 
-    const _ = await this.client.putItem(params).promise();
+    await this.client.putItem(params).promise();
     return ruleHandle;
   }
 

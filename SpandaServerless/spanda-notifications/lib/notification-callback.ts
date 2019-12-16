@@ -1,4 +1,4 @@
-/*
+/**
  * This module defines the callback handler interface for components receiving push notifications.
  */
 import {

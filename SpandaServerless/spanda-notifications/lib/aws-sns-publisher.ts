@@ -28,7 +28,7 @@ export default class AWSSNSPublisher implements SNSPublisher {
     return this.sns
       .publish(params)
       .promise()
-      .then((_: SNS.PublishResponse) => {
+      .then(() => {
         const status: PublishSuccess = {
           kind: "success"
         };

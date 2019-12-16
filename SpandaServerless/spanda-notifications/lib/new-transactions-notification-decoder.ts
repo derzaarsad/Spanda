@@ -3,7 +3,6 @@ import {
   EncryptedNewTransactions,
   DecryptedNewTransactionsNotification,
   EncryptedNewTransactionsNotification,
-  TransactionDetail,
   DecryptedNewTransactions,
   TransactionDetails
 } from "./finapi-notifications";
