@@ -31,22 +31,15 @@ export interface NotificationCallback<N extends Notification> {
 /**
  * Publishes new transactions on an SNS topic.
  */
-export class NewTransactionsSNSPublisher
-  implements NotificationCallback<EncryptedNewTransactionsNotification> {
-  private decoder: NotificationDecoder<
-    EncryptedNewTransactionsNotification,
-    DecryptedNewTransactionsNotification
-  >;
+export class NewTransactionsSNSPublisher implements NotificationCallback<EncryptedNewTransactionsNotification> {
+  private decoder: NotificationDecoder<EncryptedNewTransactionsNotification, DecryptedNewTransactionsNotification>;
   private logger: winston.Logger;
   private ruleHandles: RuleHandleRepository;
   private sns: SNSPublisher;
   private topicArn: string;
 
   constructor(
-    decoder: NotificationDecoder<
-      EncryptedNewTransactionsNotification,
-      DecryptedNewTransactionsNotification
-    >,
+    decoder: NotificationDecoder<EncryptedNewTransactionsNotification, DecryptedNewTransactionsNotification>,
     ruleHandles: RuleHandleRepository,
     sns: SNSPublisher,
     topicArn: string,
@@ -170,7 +163,7 @@ export class Accumulator<N extends Notification, O> implements NotificationCallb
     return Promise.resolve({ kind: "success" });
   }
 
-  clear() {
+  clear(): void {
     this.notifications = [];
   }
 }

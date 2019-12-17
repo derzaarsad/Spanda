@@ -9,13 +9,12 @@ export class SpandaNotificationsStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const queue = new sqs.Queue(this, "SpandaNotificationsQueue", {
+    const notifcationsQueue = new sqs.Queue(this, "SpandaNotificationsQueue", {
       visibilityTimeout: cdk.Duration.seconds(300)
     });
 
-    const topic = new sns.Topic(this, "SpandaNotificationsTopic");
-
-    topic.addSubscription(new subs.SqsSubscription(queue));
+    const notificationsTopic = new sns.Topic(this, "SpandaNotificationsTopic");
+    notificationsTopic.addSubscription(new subs.SqsSubscription(notifcationsQueue));
 
     const fn = new lambda.Function(this, "CallbackHandler", {
       runtime: lambda.Runtime.NODEJS_12_X,
@@ -23,7 +22,7 @@ export class SpandaNotificationsStack extends cdk.Stack {
       handler: "callback.handler"
     });
 
-    topic.grantPublish(fn);
+    notificationsTopic.grantPublish(fn);
 
     new apigw.LambdaRestApi(this, "Endpoint", {
       handler: fn
