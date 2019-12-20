@@ -1,5 +1,5 @@
 import Crypto from "./crypto";
-import { AesUtil } from "./js/aes-util";
+import { AesUtil } from "./aes-util";
 
 export default class AesCrypto implements Crypto {
   private aesUtil: AesUtil;
