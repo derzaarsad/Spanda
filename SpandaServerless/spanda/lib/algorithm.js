@@ -5,8 +5,8 @@ const stringSimilarity = require('string-similarity');
 const getScoreMean = (compareArray, transactionData) => {
     var out = 0.0;
     for(var i = 0; i < compareArray.length; ++i) {
-        const firstNumber = Math.abs(transactionData.amount);
-        const secondNumber = Math.abs(compareArray[i].amount);
+        const firstNumber = transactionData.absAmount;
+        const secondNumber = compareArray[i].absAmount;
         const similarityScore = stringSimilarity.compareTwoStrings(transactionData.purpose.toLowerCase(),compareArray[i].purpose.toLowerCase()); // dice's text similarity
         const distanceScore = Math.abs((firstNumber-secondNumber)/Math.min(firstNumber, secondNumber)); // euclidian distance
         out += feedForward(similarityScore, distanceScore, 4.594172805675617, -5.033493053166643, -0.7529925377726954); // network trained 13.12.2019

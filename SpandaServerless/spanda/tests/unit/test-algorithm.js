@@ -14,67 +14,83 @@ describe('algorithm', function() {
   it('Get recurrent transaction', async () => {
       const transactionsData = [
           {
-            'amount': -575,
+            'absAmount': 575,
+            'isExpense': true,
             'purpose': 'miete Januar'
           },
           {
-            'amount': -25.6,
+            'absAmount': 25.6,
+            'isExpense': true,
             'purpose': 'Strom Januar'
           },
           {
-            'amount': -575,
+            'absAmount': 575,
+            'isExpense': true,
             'purpose': 'miete Februar'
           },
           {
-            'amount': -25.6,
+            'absAmount': 25.6,
+            'isExpense': true,
             'purpose': 'Strom Februar'
           },
           {
-            'amount': -575,
+            'absAmount': 575,
+            'isExpense': true,
             'purpose': 'miete März'
           },
           {
-            'amount': -25.6,
+            'absAmount': 25.6,
+            'isExpense': true,
             'purpose': 'Strom März'
           },
           {
-            'amount': -575,
+            'absAmount': 575,
+            'isExpense': true,
             'purpose': 'miete April'
           },
           {
-            'amount': -25.6,
+            'absAmount': 25.6,
+            'isExpense': true,
             'purpose': 'Strom April'
           },
           {
-            'amount': -575,
+            'absAmount': 575,
+            'isExpense': true,
             'purpose': 'miete Mai'
           },
           {
-            'amount': -25.6,
+            'absAmount': 25.6,
+            'isExpense': true,
             'purpose': 'Strom Mai'
           },
           {
-            'amount': -575,
+            'absAmount': 575,
+            'isExpense': true,
             'purpose': 'miete Juni'
           },
           {
-            'amount': -25.6,
+            'absAmount': 25.6,
+            'isExpense': true,
             'purpose': 'Strom Juni'
           },
           {
-            'amount': -575,
+            'absAmount': 575,
+            'isExpense': true,
             'purpose': 'miete Juli'
           },
           {
-            'amount': -25.6,
+            'absAmount': 25.6,
+            'isExpense': true,
             'purpose': 'Strom Juli'
           },
           {
-            'amount': -575,
+            'absAmount': 575,
+            'isExpense': true,
             'purpose': 'miete August'
           },
           {
-            'amount': -25.6,
+            'absAmount': 25.6,
+            'isExpense': true,
             'purpose': 'Strom August'
           }
       ]
@@ -83,23 +99,23 @@ describe('algorithm', function() {
       expect(result[0].length).to.equal(8)
       expect(result[1].length).to.equal(8)
 
-      expect(result[0][0].amount).to.equal(-575)
-      expect(result[0][1].amount).to.equal(-575)
-      expect(result[0][2].amount).to.equal(-575)
-      expect(result[0][3].amount).to.equal(-575)
-      expect(result[0][4].amount).to.equal(-575)
-      expect(result[0][5].amount).to.equal(-575)
-      expect(result[0][6].amount).to.equal(-575)
-      expect(result[0][7].amount).to.equal(-575)
+      expect(result[0][0].absAmount).to.equal(575)
+      expect(result[0][1].absAmount).to.equal(575)
+      expect(result[0][2].absAmount).to.equal(575)
+      expect(result[0][3].absAmount).to.equal(575)
+      expect(result[0][4].absAmount).to.equal(575)
+      expect(result[0][5].absAmount).to.equal(575)
+      expect(result[0][6].absAmount).to.equal(575)
+      expect(result[0][7].absAmount).to.equal(575)
 
-      expect(result[1][0].amount).to.equal(-25.6)
-      expect(result[1][1].amount).to.equal(-25.6)
-      expect(result[1][2].amount).to.equal(-25.6)
-      expect(result[1][3].amount).to.equal(-25.6)
-      expect(result[1][4].amount).to.equal(-25.6)
-      expect(result[1][5].amount).to.equal(-25.6)
-      expect(result[1][6].amount).to.equal(-25.6)
-      expect(result[1][7].amount).to.equal(-25.6)
+      expect(result[1][0].absAmount).to.equal(25.6)
+      expect(result[1][1].absAmount).to.equal(25.6)
+      expect(result[1][2].absAmount).to.equal(25.6)
+      expect(result[1][3].absAmount).to.equal(25.6)
+      expect(result[1][4].absAmount).to.equal(25.6)
+      expect(result[1][5].absAmount).to.equal(25.6)
+      expect(result[1][6].absAmount).to.equal(25.6)
+      expect(result[1][7].absAmount).to.equal(25.6)
   })
 
 })
