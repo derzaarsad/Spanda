@@ -2,7 +2,8 @@ CREATE TABLE transactions
 (
     id integer NOT NULL DEFAULT nextval('transactions_id_seq'::regclass),
     accountid integer NOT NULL DEFAULT nextval('transactions_accountId_seq'::regclass),
-    amount numeric NOT NULL,
+    absamount numeric NOT NULL,
+    isexpense boolean NOT NULL,
     bookingdate timestamp with time zone NOT NULL,
     purpose text COLLATE pg_catalog."default",
     counterpartname text COLLATE pg_catalog."default",

@@ -27,7 +27,7 @@ describe('postgres transactions repository', function() {
 
     const result = transactions.saveQuery(transaction);
     expect(result).to.be.a('string');
-    expect(result).to.equal("INSERT INTO transactions (id,accountid,amount,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES ('209864836','995070','-89.81','2019-11-11 19:31:50.379+00',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank')");
+    expect(result).to.equal("INSERT INTO transactions (id,accountid,absamount,isexpense,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES ('209864836','995070','89.81','t','2019-11-11 19:31:50.379+00',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank')");
   })
 
   it('renders the delete all query', async function() {
@@ -36,15 +36,15 @@ describe('postgres transactions repository', function() {
     expect(result).to.equal("DELETE FROM transactions");
   })
 
-  it('renders json array', async function() {
+  it('renders save array', async function() {
     let transactionsData = [
-      {id:1112,accountid:2,amount:-89.871,bookingdate:'2018-01-01T00:00:00.000Z',purpose:' RE. 745259',counterpartname:'TueV Bayern',counterpartaccountnumber:'611105',counterpartiban:'DE13700800000061110500',counterpartblz:'70080000',counterpartbic:'DRESDEFF700',counterpartbankname:'Commerzbank vormals Dresdner Bank'},
-      {id:2233,accountid:2,amount:-99.81,bookingdate:'2018-01-01T00:00:00.000Z',purpose:' RE. 745259',counterpartname:'TueV Bayern',counterpartaccountnumber:'611105',counterpartiban:'DE13700800000061110500',counterpartblz:'70080000',counterpartbic:'DRESDEFF700',counterpartbankname:'Commerzbank vormals Dresdner Bank'}
+      transactions.new(1112, 2, -89.871, new Date('2018-01-01T00:00:00.000Z'), ' RE. 745259', 'TueV Bayern', '611105', 'DE13700800000061110500', '70080000', 'DRESDEFF700', 'Commerzbank vormals Dresdner Bank'),
+      transactions.new(2233, 2, 99.81, new Date('2018-01-01T00:00:00.000Z'), ' RE. 745259', 'TueV Bayern', '611105', 'DE13700800000061110500', '70080000', 'DRESDEFF700', 'Commerzbank vormals Dresdner Bank')
     ];
 
     const result = transactions.saveArrayQuery(transactionsData);
     expect(result).to.be.a('string');
-    expect(result).to.equal("INSERT INTO transactions (id,accountid,amount,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES '{\"id\":1112,\"accountid\":2,\"amount\":-89.871,\"bookingdate\":\"2018-01-01T00:00:00.000Z\",\"purpose\":\" RE. 745259\",\"counterpartname\":\"TueV Bayern\",\"counterpartaccountnumber\":\"611105\",\"counterpartiban\":\"DE13700800000061110500\",\"counterpartblz\":\"70080000\",\"counterpartbic\":\"DRESDEFF700\",\"counterpartbankname\":\"Commerzbank vormals Dresdner Bank\"}'::jsonb,'{\"id\":2233,\"accountid\":2,\"amount\":-99.81,\"bookingdate\":\"2018-01-01T00:00:00.000Z\",\"purpose\":\" RE. 745259\",\"counterpartname\":\"TueV Bayern\",\"counterpartaccountnumber\":\"611105\",\"counterpartiban\":\"DE13700800000061110500\",\"counterpartblz\":\"70080000\",\"counterpartbic\":\"DRESDEFF700\",\"counterpartbankname\":\"Commerzbank vormals Dresdner Bank\"}'::jsonb");
+    expect(result).to.equal("INSERT INTO transactions (id,accountid,absamount,isexpense,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES ('1112', '2', '89.871', 't', '2018-01-01 00:00:00.000+00', ' RE. 745259', 'TueV Bayern', '611105', 'DE13700800000061110500', '70080000', 'DRESDEFF700', 'Commerzbank vormals Dresdner Bank'), ('2233', '2', '99.81', 'f', '2018-01-01 00:00:00.000+00', ' RE. 745259', 'TueV Bayern', '611105', 'DE13700800000061110500', '70080000', 'DRESDEFF700', 'Commerzbank vormals Dresdner Bank')")
   })
 
   it('renders the find-by-account-id query', async function() {
@@ -54,7 +54,7 @@ describe('postgres transactions repository', function() {
   })
 
   it('renders the group-by-column query', async function() {
-    const result = transactions.groupByColumnQuery(7);
+    const result = transactions.groupByColumnQuery(8);
     expect(result).to.be.a('string');
     expect(result).to.equal("SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM transactions WHERE counterpartiban=b.counterpartiban) t ) rw FROM transactions b WHERE counterpartiban IS NOT NULL GROUP BY counterpartiban");
   })
