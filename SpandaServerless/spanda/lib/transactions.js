@@ -7,7 +7,8 @@ const createTransaction = (
   return {
     'id': id,
     'accountId': accountId,
-    'amount': amount,
+    'absAmount': Math.abs(amount),
+    'isExpense': (amount < 0) ? true : false,
     'bookingDate': bookingDate,
     'purpose': purpose,
     'counterPartName': counterPartName,
@@ -41,20 +42,7 @@ exports.NewInMemoryRepository = () => {
     },
 
     saveArray: async (transactions) => {
-      transactions.forEach(transaction => repository[transaction[0]] = createTransaction(
-        transaction[0],
-        transaction[1],
-        transaction[2],
-        transaction[3],
-        transaction[4],
-        transaction[5],
-        transaction[6],
-        transaction[7],
-        transaction[8],
-        transaction[9],
-        transaction[10],
-        transaction[11]
-      ))
+      transactions.forEach(transaction => repository[transaction.id] = transaction);
       return transactions
     },
 
@@ -95,11 +83,12 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
 
   const saveArrayQuery = (transactions) => {
     const tableName = schema.tableName;
+    const rows = schema.asRows(transactions);
     const attributes = schema.attributes;
     const columns = schema.columns;
 
     return format('INSERT INTO %I (%s) VALUES %L',
-      tableName, attributes, transactions);
+      tableName, attributes, rows);
   }
 
   return {
@@ -134,7 +123,7 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
     groupByIban: async () => {
       const client = await pool.connect();
       const params = {
-        text: groupByColumnQuery(7),
+        text: groupByColumnQuery(8),
         rowMode: 'array',
         types: types
       }

@@ -108,23 +108,6 @@ exports.NewClient = (http) => {
         transactions = transactions.concat(pageResponseJson.transactions)
       }
 
-      // map the finapi json into database columns
-      transactions = transactions.map(function(transaction) {
-        return [
-          transaction.id,
-          transaction.accountId,
-          transaction.amount,
-          transaction.finapiBookingDate.replace(" ","T") + "Z",
-          transaction.purpose,
-          transaction.counterpartName,
-          transaction.counterpartAccountNumber,
-          transaction.counterpartIban,
-          transaction.counterpartBlz,
-          transaction.counterpartBic,
-          transaction.counterpartBankName
-        ];
-      });
-
       return transactions;
     }
   }

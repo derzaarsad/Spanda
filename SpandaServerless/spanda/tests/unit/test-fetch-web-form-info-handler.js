@@ -144,7 +144,19 @@ describe('fetch webform info handler', function() {
   
         // map the finapi json into database columns
         transactions = [
-            [1112,3,-89.871,'2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank']
+            {
+              'id': 1112,
+              'accountId': 3,
+              'finapiBookingDate': '2018-01-01 00:00:00.000',
+              'amount': -89.871,
+              'purpose': ' RE. 745259',
+              'counterpartName': 'TueV Bayern',
+              'counterpartAccountNumber': '611105',
+              'counterpartIban': 'DE13700800000061110500',
+              'counterpartBlz': '70080000',
+              'counterpartBic': 'DRESDEFF700',
+              'counterpartBankName': 'Commerzbank vormals Dresdner Bank'
+            }
           ];
   
         return transactions;

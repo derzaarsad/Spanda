@@ -105,6 +105,6 @@ describe('fetch webform info handler', function() {
     expect(transactions_.length).to.not.equal(0);
     expect(transactions_[0].id).to.exist;
     expect(transactions_[0].accountId).to.equal(connection.bankAccountIds[0]);
-    expect(transactions_[0].amount).to.exist;
+    expect(transactions_[0].absAmount).to.exist;
   })
 })

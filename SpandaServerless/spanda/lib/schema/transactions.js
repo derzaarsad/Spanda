@@ -3,7 +3,8 @@
 const attributes = [
   'id',
   'accountid',
-  'amount',
+  'absamount',
+  'isexpense',
   'bookingdate',
   'purpose',
   'counterpartname',
@@ -18,15 +19,16 @@ const asObject = row => {
   return {
     'id': row[0],
     'accountId': row[1],
-    'amount': row[2],
-    'bookingDate': row[3],
-    'purpose': row[4],
-    'counterPartName': row[5],
-    'counterPartAccountNumber': row[6],
-    'counterPartIban': row[7],
-    'counterPartBlz': row[8],
-    'counterPartBic': row[9],
-    'counterPartBankName': row[10]
+    'absAmount': row[2],
+    'isExpense': row[3],
+    'bookingDate': row[4],
+    'purpose': row[5],
+    'counterPartName': row[6],
+    'counterPartAccountNumber': row[7],
+    'counterPartIban': row[8],
+    'counterPartBlz': row[9],
+    'counterPartBic': row[10],
+    'counterPartBankName': row[11]
   }
 }
 
@@ -41,7 +43,8 @@ module.exports = {
     return [
       transaction.id,
       transaction.accountId,
-      transaction.amount,
+      transaction.absAmount,
+      transaction.isExpense,
       transaction.bookingDate,
       transaction.purpose,
       transaction.counterPartName,
@@ -53,6 +56,25 @@ module.exports = {
     ];
   },
 
+  asRows: transactions => {
+    return transactions.map(function(transaction) {
+      return [
+        transaction.id,
+        transaction.accountId,
+        transaction.absAmount,
+        transaction.isExpense,
+        transaction.bookingDate,
+        transaction.purpose,
+        transaction.counterPartName,
+        transaction.counterPartAccountNumber,
+        transaction.counterPartIban,
+        transaction.counterPartBlz,
+        transaction.counterPartBic,
+        transaction.counterPartBankName
+      ];
+    });
+  },
+
   asObject: row => {
     return asObject(row)
   },
@@ -61,15 +83,16 @@ module.exports = {
     return {
       'id': rowObject[attributes[0]],
       'accountId': rowObject[attributes[1]],
-      'amount': rowObject[attributes[2]],
-      'bookingDate': rowObject[attributes[3]],
-      'purpose': rowObject[attributes[4]],
-      'counterPartName': rowObject[attributes[5]],
-      'counterPartAccountNumber': rowObject[attributes[6]],
-      'counterPartIban': rowObject[attributes[7]],
-      'counterPartBlz': rowObject[attributes[8]],
-      'counterPartBic': rowObject[attributes[9]],
-      'counterPartBankName': rowObject[attributes[10]]
+      'absAmount': rowObject[attributes[2]],
+      'isExpense': rowObject[attributes[3]],
+      'bookingDate': rowObject[attributes[4]],
+      'purpose': rowObject[attributes[5]],
+      'counterPartName': rowObject[attributes[6]],
+      'counterPartAccountNumber': rowObject[attributes[7]],
+      'counterPartIban': rowObject[attributes[8]],
+      'counterPartBlz': rowObject[attributes[9]],
+      'counterPartBic': rowObject[attributes[10]],
+      'counterPartBankName': rowObject[attributes[11]]
     }
   }
 }
