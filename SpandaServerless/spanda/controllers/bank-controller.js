@@ -123,7 +123,24 @@ exports.fetchWebFormInfo = async(event, context, logger, bankInterface, users, c
     return lambdaUtil.CreateInternalErrorResponse('no accountIds available');
   }
 
-  const transactionsData = await bankInterface.getAllTransactions(authorization,body.accountIds);
+  const transactionsDataBankSpecific = await bankInterface.getAllTransactions(authorization,body.accountIds);
+
+  // map the finapi json format into database json format
+  const transactionsData = transactionsDataBankSpecific.map(function(transaction) {
+    return transactions.new(
+      transaction.id,
+      transaction.accountId,
+      transaction.amount,
+      new Date(transaction.finapiBookingDate.replace(" ","T") + "Z"),
+      transaction.purpose,
+      transaction.counterpartName,
+      transaction.counterpartAccountNumber,
+      transaction.counterpartIban,
+      transaction.counterpartBlz,
+      transaction.counterpartBic,
+      transaction.counterpartBankName
+    );
+  });
 
   const bankConnection = connections.new(body.id, body.bankId)
   bankConnection.bankAccountIds = body.accountIds

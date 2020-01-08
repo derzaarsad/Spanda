@@ -56,33 +56,34 @@ describe('postgres transactions repository', function() {
 
   it('save multiple transactions with different id', async function() {
     let transactionsData = [
-      [1112,2,-89.871,'2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank'],
-      [2233,2,-99.81,'2018-01-02T01:02:03.000Z',' RE. 745459','TueV Bayern','611605','DE13700800001061110500','70080070','DREEDEFF700','Commerzbank vormals Dresdner Bank'],
-      [4112,5,-89.871,'2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank']
+      transactions.new(1112, 2, -89.871, new Date('2018-01-01T00:00:00.000Z'), ' RE. 745259', 'TueV Bayern', '611105', 'DE13700800000061110500', '70080000', 'DRESDEFF700', 'Commerzbank vormals Dresdner Bank'),
+      transactions.new(2233, 2, -99.81, new Date('2018-01-02T01:02:03.000Z'), ' RE. 745459', 'TueV Bayern', '611605', 'DE13700800001061110500', '70080070', 'DREEDEFF700', 'Commerzbank vormals Dresdner Bank'),
+      transactions.new(4112, 5, -89.871, new Date('2018-01-01T00:00:00.000Z'), ' RE. 745259', 'TueV Bayern', '611105', 'DE13700800000061110500', '70080000', 'DRESDEFF700', 'Commerzbank vormals Dresdner Bank')
     ];
 
     await transactions.saveArray(transactionsData);
-    const result = await transactions.findById(transactionsData[1][0]);
-    expect(result.id).to.equal(transactionsData[1][0])
-    expect(result.accountId).to.equal(transactionsData[1][1])
-    expect(result.amount).to.equal(transactionsData[1][2])
-    expect(result.bookingDate.getTime()).to.equal(new Date(transactionsData[1][3]).getTime())
-    expect(result.purpose).to.equal(transactionsData[1][4])
-    expect(result.counterPartName).to.equal(transactionsData[1][5])
-    expect(result.counterPartAccountNumber).to.equal(transactionsData[1][6])
-    expect(result.counterPartIban).to.equal(transactionsData[1][7])
-    expect(result.counterPartBlz).to.equal(transactionsData[1][8])
-    expect(result.counterPartBic).to.equal(transactionsData[1][9])
-    expect(result.counterPartBankName).to.equal(transactionsData[1][10])
+    const result = await transactions.findById(transactionsData[1].id);
+    expect(result.id).to.equal(transactionsData[1].id)
+    expect(result.accountId).to.equal(transactionsData[1].accountId)
+    expect(result.absAmount).to.equal(transactionsData[1].absAmount)
+    expect(result.isExpense).to.equal(transactionsData[1].isExpense)
+    expect(result.bookingDate.getTime()).to.equal(transactionsData[1].bookingDate.getTime())
+    expect(result.purpose).to.equal(transactionsData[1].purpose)
+    expect(result.counterPartName).to.equal(transactionsData[1].counterPartName)
+    expect(result.counterPartAccountNumber).to.equal(transactionsData[1].counterPartAccountNumber)
+    expect(result.counterPartIban).to.equal(transactionsData[1].counterPartIban)
+    expect(result.counterPartBlz).to.equal(transactionsData[1].counterPartBlz)
+    expect(result.counterPartBic).to.equal(transactionsData[1].counterPartBic)
+    expect(result.counterPartBankName).to.equal(transactionsData[1].counterPartBankName)
 
     const results = await transactions.findByAccountIds([2]);
     expect(results.length).to.equal(2);
 
     const results2 = await transactions.findByAccountIds([2,5]);
     expect(results2.length).to.equal(3);
-    expect(results2[0].id).to.equal(transactionsData[0][0]);
-    expect(results2[1].id).to.equal(transactionsData[1][0]);
-    expect(results2[2].id).to.equal(transactionsData[2][0]);
+    expect(results2[0].id).to.equal(transactionsData[0].id);
+    expect(results2[1].id).to.equal(transactionsData[1].id);
+    expect(results2[2].id).to.equal(transactionsData[2].id);
     expect(results2[0].accountId).to.equal(2);
     expect(results2[1].accountId).to.equal(2);
     expect(results2[2].accountId).to.equal(5);
@@ -90,23 +91,24 @@ describe('postgres transactions repository', function() {
 
   it('save multiple transactions with different account id', async function() {
     let transactionsData = [
-      [1112,5,-89.871,'2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank'],
-      [1112,2,-99.81,'2018-01-02T00:00:00.000Z',' RE. 745459','TueV Bayern','611605','DE13700800001061110500','70080070','DREEDEFF700','Commerzbank vormals Dresdner Bank']
+      transactions.new(1112, 5, -89.871, new Date('2018-01-01T00:00:00.000Z'), ' RE. 745259', 'TueV Bayern', '611105', 'DE13700800000061110500', '70080000', 'DRESDEFF700', 'Commerzbank vormals Dresdner Bank'),
+      transactions.new(1112, 2, -99.81, new Date('2018-01-02T00:00:00.000Z'), ' RE. 745459', 'TueV Bayern', '611605', 'DE13700800001061110500', '70080070', 'DREEDEFF700', 'Commerzbank vormals Dresdner Bank')
     ];
 
     await transactions.saveArray(transactionsData);
-    const result = await transactions.findById(transactionsData[0][0]); // on purpose to put index zero
-    expect(result.id).to.equal(transactionsData[1][0])
-    expect(result.accountId).to.equal(transactionsData[1][1])
-    expect(result.amount).to.equal(transactionsData[1][2])
-    expect(result.bookingDate.getTime()).to.equal(new Date(transactionsData[1][3]).getTime())
-    expect(result.purpose).to.equal(transactionsData[1][4])
-    expect(result.counterPartName).to.equal(transactionsData[1][5])
-    expect(result.counterPartAccountNumber).to.equal(transactionsData[1][6])
-    expect(result.counterPartIban).to.equal(transactionsData[1][7])
-    expect(result.counterPartBlz).to.equal(transactionsData[1][8])
-    expect(result.counterPartBic).to.equal(transactionsData[1][9])
-    expect(result.counterPartBankName).to.equal(transactionsData[1][10])
+    const result = await transactions.findById(transactionsData[0].id); // on purpose to put index zero
+    expect(result.id).to.equal(transactionsData[1].id)
+    expect(result.accountId).to.equal(transactionsData[1].accountId)
+    expect(result.absAmount).to.equal(transactionsData[1].absAmount)
+    expect(result.isExpense).to.equal(transactionsData[1].isExpense)
+    expect(result.bookingDate.getTime()).to.equal(new Date(transactionsData[1].bookingDate).getTime())
+    expect(result.purpose).to.equal(transactionsData[1].purpose)
+    expect(result.counterPartName).to.equal(transactionsData[1].counterPartName)
+    expect(result.counterPartAccountNumber).to.equal(transactionsData[1].counterPartAccountNumber)
+    expect(result.counterPartIban).to.equal(transactionsData[1].counterPartIban)
+    expect(result.counterPartBlz).to.equal(transactionsData[1].counterPartBlz)
+    expect(result.counterPartBic).to.equal(transactionsData[1].counterPartBic)
+    expect(result.counterPartBankName).to.equal(transactionsData[1].counterPartBankName)
   })
 
   it('save multiple transactions with same id and account id', async function() {
@@ -114,15 +116,36 @@ describe('postgres transactions repository', function() {
      * If save fails, everything is not saved
      */
     let transactionsData = [
-      [1112,2,-89.871,'2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank'],
-      [1112,2,-99.81,'2018-01-02T00:00:00.000Z',' RE. 745459','TueV Bayern','611605','DE13700800001061110500','70080070','DREEDEFF700','Commerzbank vormals Dresdner Bank'],
-      [4112,4,-69.81,'2018-01-03T00:00:00.000Z',' RE. 735459','TueV Bayern','631605','DE13700807001061110500','71080070','DREEUEFF700','Commerzbank vormals Dresdner Bank']
+      transactions.new(1112, 2, -89.871, new Date('2018-01-01T00:00:00.000Z'), ' RE. 745259', 'TueV Bayern', '611105', 'DE13700800000061110500', '70080000', 'DRESDEFF700', 'Commerzbank vormals Dresdner Bank'),
+      transactions.new(1112, 2, -99.81, new Date('2018-01-02T00:00:00.000Z'), ' RE. 745459', 'TueV Bayern', '611605', 'DE13700800001061110500', '70080070', 'DREEDEFF700', 'Commerzbank vormals Dresdner Bank'),
+      transactions.new(4112, 4, -69.81, new Date('2018-01-03T00:00:00.000Z'), ' RE. 735459', 'TueV Bayern', '631605', 'DE13700807001061110500', '71080070', 'DREEUEFF700', 'Commerzbank vormals Dresdner Bank')
     ];
 
     await expect(transactions.saveArray(transactionsData)).to.eventually.be.rejectedWith('duplicate key value violates unique constraint "transactions_pkey"');
-    expect(await transactions.findById(transactionsData[0][0])).to.not.exist
-    expect(await transactions.findById(transactionsData[1][0])).to.not.exist
-    expect(await transactions.findById(transactionsData[2][0])).to.not.exist
+    expect(await transactions.findById(transactionsData[0].id)).to.not.exist
+    expect(await transactions.findById(transactionsData[1].id)).to.not.exist
+    expect(await transactions.findById(transactionsData[2].id)).to.not.exist
+  })
+
+  it('group by iban column', async function() {
+    let transactionsData = [
+      transactions.new(1112,2,-89.871,new Date('2018-01-01T00:00:00.000Z'),' RE. 745259','TueV Bayern','611105','AU13700807001061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank'),
+      transactions.new(1112,3,-99.81,new Date('2018-01-02T00:00:00.000Z'),' RE. 745459','TueV Bayern','611605','AU13700807001061110500','70080070','DREEDEFF700','Commerzbank vormals Dresdner Bank'),
+      transactions.new(4112,4,-64.81,new Date('2018-01-03T00:00:00.000Z'),' RE. 735459','TueV Bayern','631605','DE13700800000061110500','71080070','DREEUEFF700','Commerzbank vormals Dresdner Bank'),
+      transactions.new(4112,5,-69.81,new Date('2018-01-03T00:00:00.000Z'),' RE. 735459','TueV Bayern','631605','DE13700800000061110500','71080070','DREEUEFF700','Commerzbank vormals Dresdner Bank')
+    ];
+
+    await transactions.saveArray(transactionsData);
+    const transactionsGroup = await transactions.groupByIban();
+    expect(transactionsGroup.length).to.equal(2);
+    expect(transactionsGroup[0][0].accountId).to.equal(2);
+    expect(transactionsGroup[0][0].counterPartIban).to.equal('AU13700807001061110500');
+    expect(transactionsGroup[0][1].accountId).to.equal(3);
+    expect(transactionsGroup[0][1].counterPartIban).to.equal('AU13700807001061110500');
+    expect(transactionsGroup[1][0].accountId).to.equal(4);
+    expect(transactionsGroup[1][0].counterPartIban).to.equal('DE13700800000061110500');
+    expect(transactionsGroup[1][1].accountId).to.equal(5);
+    expect(transactionsGroup[1][1].counterPartIban).to.equal('DE13700800000061110500');
   })
 })
 

@@ -7,7 +7,8 @@ const createTransaction = (
   return {
     'id': id,
     'accountId': accountId,
-    'amount': amount,
+    'absAmount': Math.abs(amount),
+    'isExpense': (amount < 0) ? true : false,
     'bookingDate': bookingDate,
     'purpose': purpose,
     'counterPartName': counterPartName,
@@ -41,20 +42,7 @@ exports.NewInMemoryRepository = () => {
     },
 
     saveArray: async (transactions) => {
-      transactions.forEach(transaction => repository[transaction[0]] = createTransaction(
-        transaction[0],
-        transaction[1],
-        transaction[2],
-        transaction[3],
-        transaction[4],
-        transaction[5],
-        transaction[6],
-        transaction[7],
-        transaction[8],
-        transaction[9],
-        transaction[10],
-        transaction[11]
-      ))
+      transactions.forEach(transaction => repository[transaction.id] = transaction);
       return transactions
     },
 
@@ -75,6 +63,12 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
       schema.tableName, accountIds);
   }
 
+  const groupByColumnQuery = (attributesIndex) => {
+    const attribute = schema.attributes.split(',')[attributesIndex]
+    return format('SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM %I WHERE %I=b.%I) t ) rw FROM %I b WHERE %I IS NOT NULL GROUP BY %I',
+      schema.tableName, attribute, attribute, schema.tableName, attribute, attribute);
+  }
+
   const deleteAllQuery = format('DELETE FROM %I', schema.tableName);
 
   const saveQuery = (transaction) => {
@@ -89,11 +83,12 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
 
   const saveArrayQuery = (transactions) => {
     const tableName = schema.tableName;
+    const rows = schema.asRows(transactions);
     const attributes = schema.attributes;
     const columns = schema.columns;
 
     return format('INSERT INTO %I (%s) VALUES %L',
-      tableName, attributes, transactions);
+      tableName, attributes, rows);
   }
 
   return {
@@ -125,6 +120,19 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
         .finally(() => { client.release() })
     },
 
+    groupByIban: async () => {
+      const client = await pool.connect();
+      const params = {
+        text: groupByColumnQuery(8),
+        rowMode: 'array',
+        types: types
+      }
+
+      return client.query(params)
+        .then(res => (res.rowCount > 0) ? res.rows.map(function(row) { return row[0].map(function(element) { return schema.mapObject(element); }); }) : null)
+        .finally(() => { client.release() })
+    },
+
     save: async (transaction) => {
       const client = await pool.connect();
 
@@ -151,6 +159,7 @@ exports.NewPostgreSQLRepository = (pool, format, schema, types) => {
 
     findByIdQuery: findByIdQuery,
     findByAccountIdsQuery: findByAccountIdsQuery,
+    groupByColumnQuery: groupByColumnQuery,
     saveQuery: saveQuery,
     saveArrayQuery: saveArrayQuery,
     deleteAllQuery: deleteAllQuery
