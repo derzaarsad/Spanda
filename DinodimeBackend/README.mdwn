@@ -1,0 +1,63 @@
+# Dynodime CDK Demo
+
+This repository demonstrates the setup of a TypeScript 'monorepo' for Dynodime. It contains a subset of the DynoDime code ported to TypeScript (handling of notifications on new transactions), and a small AWS deployment driven by the Amazon CDK. The repository aims work out a way to organize code in a modular manner and integrate the CDK into the deployment workflow.
+
+## Repository Organization
+
+The project layout is organized according to the conventions of [lerna][1] and is powered by [Yarn Workspaces][2]. Each module is defined in a "package", which is a standard node module, i.e. it can export an API and has its own dependencies. Because modules are logically isolated, but can dependend on each other, the project requires a tool, which can link modules in such a way that module dependencies are provided in the scope of modules that need them. This interlinking is provided by Yarn Workspaces.
+
+The repository contains the following modules:
+
+- _dynodime-lib_: common classes that are intended to be used as building blocks. This includes the finAPI client, the finAPI data model, controllers that are used in the lambdas, etc.
+- _dynodime-lambda_: lambda handlers. The reason why they are extracted in a different module is that this code should be packaged later by webpack and/or rollup, in order to minify the deployment to AWS.
+- _dynodime-infrastructure_: infrastructure as code implemented with [Amazon CDK][3].
+- _dynodime-notifications-integtest_: an integration test running against the deployed environment.
+
+TypeScript code is compiled incrementally by leveraging [project references][4]. The module dependencies are represented by the `references` array in each `tsconfig*.json` file.
+
+## Deployed Stacks
+
+The CDK app deploys:
+
+- the Mobile App API
+- a DynamoDB table containing notification subscriptions
+- an API gateway with a single method receiving the notification events from finAPI
+- a lambda handler that puts the received notifications on a topic
+- a queue subscribed to the topic that stores the notifications for further processing
+
+Refer to the diagram below for a different perspective. Nodes connected via dashed lines are not part of this project.
+
+![The notifications stack](documentation/infrastructure.png)
+
+## Requirements
+
+You need to explicitly install the Yarn and the Amazon CDK binaries.
+
+## Development Workflow
+
+Immediately after checkout, you need to do `yarn install`. This downloads all project dependencies and links the dependend modules together.
+
+The project contains a "solution file" that builds everything with a single command: `yarn run build`. You can view the JavaScript output in the `out` directory of each module. While developing, it makes more sense to be performing the build continuously with the "watch" script: `yarn run watch`.
+
+All unit tests from the project can be run by issuing `yarn workspace dynodime-lib run test`.
+
+Lambda deployment packages are created by [webpack][5]. To package the handler, do `yarn workspace dynodime-lambda run package` from the project root.
+
+The deployment can also be triggered directly from the project root, e.g.:
+
+```
+yarn workspace dynodime-infrastructure run cdk bootstrap
+yarn workspace dynodime-infrastructure run cdk list
+yarn workspace dynodime-infrastructure run cdk diff
+yarn workspace dynodime-infrastructure run cdk deploy
+```
+
+The lines above correspond to a typical sequence of commands you would use when working with the CDK.
+
+## TODO
+
+[1]: https://lerna.js.org/
+[2]: https://yarnpkg.com/lang/en/docs/workspaces/
+[3]: https://docs.aws.amazon.com/cdk/
+[4]: https://www.typescriptlang.org/docs/handbook/project-references.html
+[5]: https://webpack.js.org/

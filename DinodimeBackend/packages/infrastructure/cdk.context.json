@@ -1,0 +1,4 @@
+{
+  "@aws-cdk/core:enableStackNameDuplicates": "true",
+  "decryptionKey": "covfefe"
+}
