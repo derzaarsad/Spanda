@@ -36,7 +36,7 @@ export class User {
 
 export namespace Users {
   export interface UsersRepository extends Repository<string, User> {
-    findByWebForm(activeWebFormId: number): Promise<User | null>;
+    findByWebForm(activeWebFormAuth: string): Promise<User | null>;
   }
 
   export class InMemoryRepository implements UsersRepository {
@@ -51,10 +51,10 @@ export namespace Users {
       return candidate ? candidate : null;
     }
 
-    async findByWebForm(activeWebFormId: number) {
+    async findByWebForm(activeWebFormAuth: string) {
       for (let key in this.repository) {
         const currentUser = this.repository[key];
-        if (currentUser.activeWebFormId == activeWebFormId) {
+        if (currentUser.activeWebFormAuth == activeWebFormAuth) {
           return currentUser;
         }
       }
@@ -114,7 +114,7 @@ export namespace Users {
         .then(() => user);
     }
 
-    async findByWebForm(activeWebFormId: number): Promise<User | null> {
+    async findByWebForm(activeWebFormAuth: string): Promise<User | null> {
       throw new Error("Method not implemented.");
     }
 
@@ -192,7 +192,7 @@ export namespace Users {
       );
     }
 
-    findByWebFormQuery(activeWebFormAuth: number) {
+    findByWebFormQuery(activeWebFormAuth: string) {
       return this.format(
         "SELECT * FROM %I WHERE activewebformid = %L LIMIT 1",
         this.schema.tableName,
@@ -235,9 +235,9 @@ export namespace Users {
       );
     }
 
-    async findByWebForm(activeWebFormId: number) {
+    async findByWebForm(activeWebFormAuth: string) {
       const params = {
-        text: this.findByWebFormQuery(activeWebFormId),
+        text: this.findByWebFormQuery(activeWebFormAuth),
         rowMode: "array"
       };
 
