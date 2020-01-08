@@ -4,7 +4,8 @@ import { Schema } from "./schema";
 const attributes = [
   "id",
   "accountid",
-  "amount",
+  "absamount",
+  "isexpense",
   "bookingdate",
   "purpose",
   "counterpartname",
@@ -19,15 +20,16 @@ const asObject = (row: Array<any>) => {
   return {
     id: row[0],
     accountId: row[1],
-    amount: row[2],
-    bookingDate: row[3],
-    purpose: row[4],
-    counterPartName: row[5],
-    counterPartAccountNumber: row[6],
-    counterPartIban: row[7],
-    counterPartBlz: row[8],
-    counterPartBic: row[9],
-    counterPartBankName: row[10]
+    absAmount: row[2],
+    isExpense: row[3],
+    bookingDate: row[4],
+    purpose: row[5],
+    counterPartName: row[6],
+    counterPartAccountNumber: row[7],
+    counterPartIban: row[8],
+    counterPartBlz: row[9],
+    counterPartBic: row[10],
+    counterPartBankName: row[11]
   };
 };
 
@@ -46,7 +48,8 @@ export class TransactionsSchema implements Schema<Transaction> {
     return [
       transaction.id,
       transaction.accountId,
-      transaction.amount,
+      transaction.absAmount,
+      transaction.isExpense,
       transaction.bookingDate.toISOString(),
       transaction.purpose,
       transaction.counterPartName,

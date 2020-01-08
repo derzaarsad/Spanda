@@ -28,8 +28,9 @@ describe("postgres transactions repository", function() {
     const transaction: Transaction = {
       id: 209864836,
       accountId: 995070,
-      amount: -89.81,
-      bookingDate: new Date("2019-11-11T19:31:50+02:00"),
+      absAmount: 89.81,
+      isExpense: true,
+      bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
       purpose: " RE. 745259",
       counterPartName: "TueV Bayern",
       counterPartAccountNumber: "611105",
@@ -42,7 +43,7 @@ describe("postgres transactions repository", function() {
     const result = transactions.saveQuery(transaction);
     expect(result).to.be.a("string");
     expect(result).to.equal(
-      "INSERT INTO transactions (id,accountid,amount,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES ('209864836','995070','-89.81','2019-11-11T17:31:50.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank')"
+      "INSERT INTO transactions (id,accountid,absamount,isexpense,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES ('209864836','995070','89.81','t','2019-11-11T19:31:50.379Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank')"
     );
   });
 
@@ -57,7 +58,8 @@ describe("postgres transactions repository", function() {
       {
         id: 1112,
         accountId: 2,
-        amount: -89.871,
+        absAmount: 89.871,
+        isExpense: true,
         bookingDate: new Date("2018-01-01T00:00:00.000Z"),
         purpose: " RE. 745259",
         counterPartName: "TueV Bayern",
@@ -70,7 +72,8 @@ describe("postgres transactions repository", function() {
       {
         id: 2233,
         accountId: 2,
-        amount: -99.81,
+        absAmount: 99.81,
+        isExpense: false,
         bookingDate: new Date("2018-01-01T00:00:00.000Z"),
         purpose: " RE. 745259",
         counterPartName: "TueV Bayern",
@@ -85,7 +88,7 @@ describe("postgres transactions repository", function() {
     const result = transactions.saveArrayQuery(transactionsData);
     expect(result).to.be.a("string");
     expect(result).to.equal(
-      "INSERT INTO transactions (id,accountid,amount,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES ('1112','2','-89.871','2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank'), ('2233','2','-99.81','2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank')"
+      "INSERT INTO transactions (id,accountid,absamount,isexpense,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES ('1112','2','89.871','true','2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank'), ('2233','2','99.81','false','2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank')"
     );
   });
 
@@ -93,5 +96,11 @@ describe("postgres transactions repository", function() {
     const result = transactions.findByAccountIdsQuery([2, 5]);
     expect(result).to.be.a("string");
     expect(result).to.equal("SELECT * FROM transactions WHERE accountid in ('2','5')");
+  });
+
+  it("renders the group-by-column query", async function() {
+    const result = transactions.groupByColumnQuery(8);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM transactions WHERE counterpartiban=b.counterpartiban) t ) rw FROM transactions b WHERE counterpartiban IS NOT NULL GROUP BY counterpartiban");
   });
 });

@@ -5,7 +5,8 @@ import { Pool } from "pg";
 export type Transaction = {
   id: number;
   accountId: number;
-  amount: number;
+  absAmount: number;
+  isExpense: boolean;
   bookingDate: Date;
   purpose: string | undefined;
   counterPartName: string | undefined;
@@ -107,6 +108,16 @@ export namespace Transactions {
       return this.doQuery(params).then(res => res.rows.map(row => this.schema.asObject(row)));
     }
 
+    async groupByIban(): Promise<Transaction[]> {
+      const params = {
+        text: this.groupByColumnQuery(8),
+        rowMode: "array"
+      }
+
+      return this.doQuery(params)
+        .then(res => res.rows.map(row => row[0].map((element: any) => this.schema.asObject(element))));
+    }
+
     async saveArray(transactions: Transaction[]): Promise<Transaction[]> {
       const params = {
         text: this.saveArrayQuery(transactions)
@@ -128,6 +139,19 @@ export namespace Transactions {
         "SELECT * FROM %I WHERE accountid in (%L)",
         this.schema.tableName,
         accountIds
+      );
+    }
+
+    groupByColumnQuery(attributesIndex: number) {
+      const attribute = this.schema.attributes.split(',')[attributesIndex]
+      return this.format(
+        "SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM %I WHERE %I=b.%I) t ) rw FROM %I b WHERE %I IS NOT NULL GROUP BY %I",
+        this.schema.tableName,
+        attribute,
+        attribute,
+        this.schema.tableName,
+        attribute,
+        attribute
       );
     }
 
