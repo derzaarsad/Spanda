@@ -1,7 +1,7 @@
 import { APIGatewayProxyResult } from "aws-lambda";
 import { Token } from "dynodime-lib";
 
-export const HasAuthorization = (header: any) => {
+export const HasAuthorization = (header: any): string => {
   return header["authorization"] || header["Authorization"];
 };
 
@@ -39,6 +39,6 @@ export const HasMissingProperty = (obj: any, properties: string[]): string | nul
   return null;
 };
 
-export const CreateAuthHeader = (credentials: Token) => {
+export const CreateAuthHeader = (credentials: Token): string => {
   return credentials.token_type + " " + credentials.access_token;
 };

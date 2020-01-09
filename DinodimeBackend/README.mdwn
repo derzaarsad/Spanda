@@ -39,7 +39,7 @@ Immediately after checkout, you need to do `yarn install`. This downloads all pr
 
 The project contains a "solution file" that builds everything with a single command: `yarn run build`. You can view the JavaScript output in the `out` directory of each module. While developing, it makes more sense to be performing the build continuously with the "watch" script: `yarn run watch`.
 
-All unit tests from the project can be run by issuing `yarn workspace dynodime-lib run test`.
+All unit tests from a module can be run by issuing `yarn workspace dynodime-<module_name> run test`.
 
 Lambda deployment packages are created by [webpack][5]. To package the handler, do `yarn workspace dynodime-lambda run package` from the project root.
 
