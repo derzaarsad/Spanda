@@ -154,7 +154,7 @@ export const fetchWebFormInfo = async (
   }
 
   let splitted = pathParameters.webFormAuth.split("-");
-  let webId = parseInt(splitted[0]);
+  let webId = splitted[0];
 
   const user = await users.findByWebForm(webId);
   if (user === null || user.activeWebFormAuth === null) {

@@ -31,7 +31,7 @@ export class FinAPI {
     return this.http.post("/api/v1/users", user, config).then(response => response.data);
   }
 
-  async fetchWebForm(authorization: string, formId: number) {
+  async fetchWebForm(authorization: string, formId: string) {
     const req = {
       headers: {
         Authorization: authorization
