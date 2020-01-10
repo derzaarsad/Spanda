@@ -88,7 +88,6 @@ export class FinAPI {
       transactions = transactions.concat(pageResponseJson.transactions);
     }
 
-    // map the finapi json into database columns
     return transactions;
   }
 

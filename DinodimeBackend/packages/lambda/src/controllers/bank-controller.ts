@@ -8,7 +8,7 @@ import {
   CreateInternalErrorResponse
 } from "../lambda-util";
 
-import { Authentication, Encryptions, Token, Transactions } from "dynodime-lib";
+import { Authentication, Encryptions, Token, Transactions, TransactionsSchema } from "dynodime-lib";
 import { BankConnection, BankConnections } from "dynodime-lib";
 import { User, Users } from "dynodime-lib";
 import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dynodime-lib";
@@ -186,7 +186,23 @@ export const fetchWebFormInfo = async (
     return CreateInternalErrorResponse("no accountIds available");
   }
 
-  const transactionsData = await bankInterface.getAllTransactions(authorization, body.accountIds);
+  const transactionsDataBankSpecific = await bankInterface.getAllTransactions(authorization, body.accountIds);
+
+  // map the finapi json format into database json format
+  let transactionsSchema: TransactionsSchema;
+  const transactionsData = transactionsDataBankSpecific.map(transaction => transactionsSchema.asObject([
+      transaction.id,
+      transaction.accountId,
+      transaction.amount,
+      new Date(transaction.finapiBookingDate.replace(" ","T") + "Z"),
+      transaction.purpose,
+      transaction.counterpartName,
+      transaction.counterpartAccountNumber,
+      transaction.counterpartIban,
+      transaction.counterpartBlz,
+      transaction.counterpartBic,
+      transaction.counterpartBankName
+  ]));
 
   const bankConnection = new BankConnection(body.id, body.bankId);
   bankConnection.bankAccountIds = body.accountIds;
