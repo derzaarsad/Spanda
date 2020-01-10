@@ -3,7 +3,6 @@ import { Model } from "./model";
 
 import { AxiosInstance, AxiosRequestConfig } from "axios";
 import { WebFormHandle } from "./finapi-webform-handle";
-import { Transaction as OwnTransaction } from "../../transactions";
 
 export class FinAPI {
   private http: AxiosInstance;
@@ -70,7 +69,7 @@ export class FinAPI {
     authorization: string,
     accountIds: number[],
     bankPerPage: number = 400
-  ): Promise<OwnTransaction[]> {
+  ): Promise<Model.FinAPITransaction[]> {
     const firstPageResponseJson = await this.getTransactionPerPage(
       authorization,
       accountIds,
@@ -90,21 +89,7 @@ export class FinAPI {
     }
 
     // map the finapi json into database columns
-    return transactions.map(transaction => {
-      return {
-        id: transaction.id,
-        accountId: transaction.accountId,
-        amount: transaction.amount,
-        bookingDate: new Date(transaction.finapiBookingDate.replace(" ", "T") + "Z"),
-        purpose: transaction.purpose,
-        counterPartName: transaction.counterpartName,
-        counterPartAccountNumber: transaction.counterpartAccountNumber,
-        counterPartIban: transaction.counterpartIban,
-        counterPartBlz: transaction.counterpartBlz,
-        counterPartBic: transaction.counterpartBic,
-        counterPartBankName: transaction.counterpartBankName
-      };
-    });
+    return transactions;
   }
 
   private async requestWebForm(authorization: string, bankId: number): Promise<WebFormHandle> {

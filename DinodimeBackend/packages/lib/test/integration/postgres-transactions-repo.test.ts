@@ -31,7 +31,8 @@ describe("postgres transactions repository", function() {
     const transaction = {
       id: 209864836,
       accountId: 995070,
-      amount: -89.81,
+      absAmount: 89.81,
+      isExpense: true,
       bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
       purpose: " RE. 745259",
       counterPartName: "TueV Bayern",
@@ -51,7 +52,8 @@ describe("postgres transactions repository", function() {
     const firstTransaction = {
       id: 1,
       accountId: 1,
-      amount: -89.81,
+      absAmount: 89.81,
+      isExpense: true,
       bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
       purpose: " RE. 745259",
       counterPartName: "TueV Bayern",
@@ -66,7 +68,8 @@ describe("postgres transactions repository", function() {
     const secondTransaction = {
       id: 1,
       accountId: 2,
-      amount: -89.81,
+      absAmount: 89.81,
+      isExpense: true,
       bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
       purpose: " RE. 745259",
       counterPartName: "TueV Bayern",
@@ -81,7 +84,8 @@ describe("postgres transactions repository", function() {
     const thirdTransaction = {
       id: 2,
       accountId: 1,
-      amount: -89.81,
+      absAmount: 89.81,
+      isExpense: true,
       bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
       purpose: " RE. 745259",
       counterPartName: "TueV Bayern",
@@ -96,7 +100,8 @@ describe("postgres transactions repository", function() {
     const fourthTransaction = {
       id: 1,
       accountId: 1,
-      amount: -89.81,
+      absAmount: 89.81,
+      isExpense: true,
       bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
       purpose: " RE. 745259",
       counterPartName: "TueV Bayern",
@@ -116,7 +121,8 @@ describe("postgres transactions repository", function() {
       {
         id: 1112,
         accountId: 2,
-        amount: -89.871,
+        absAmount: 89.871,
+        isExpense: true,
         bookingDate: new Date("2018-01-01T00:00:00.000Z"),
         purpose: " RE. 745259",
         counterPartName: "TueV Bayern",
@@ -129,7 +135,8 @@ describe("postgres transactions repository", function() {
       {
         id: 2233,
         accountId: 2,
-        amount: -99.81,
+        absAmount: 99.81,
+        isExpense: true,
         bookingDate: new Date("2018-01-02T01:02:03.000Z"),
         purpose: " RE. 745459",
         counterPartName: "TueV Bayern",
@@ -142,7 +149,8 @@ describe("postgres transactions repository", function() {
       {
         id: 4112,
         accountId: 5,
-        amount: -89.871,
+        absAmount: 89.871,
+        isExpense: true,
         bookingDate: new Date("2018-01-01T00:00:00.000Z"),
         purpose: " RE. 745259",
         counterPartName: "TueV Bayern",
@@ -159,7 +167,8 @@ describe("postgres transactions repository", function() {
     expect(result).to.be.not.null;
     expect(result!.id).to.equal(transactionsData[1].id);
     expect(result!.accountId).to.equal(transactionsData[1].accountId);
-    expect(result!.amount).to.equal(transactionsData[1].amount);
+    expect(result!.absAmount).to.equal(transactionsData[1].absAmount);
+    expect(result!.isExpense).to.equal(transactionsData[1].isExpense);
     expect(result!.bookingDate.getTime()).to.equal(
       new Date(transactionsData[1].bookingDate).getTime()
     );
@@ -189,7 +198,8 @@ describe("postgres transactions repository", function() {
       {
         id: 1112,
         accountId: 5,
-        amount: -89.871,
+        absAmount: 89.871,
+        isExpense: true,
         bookingDate: new Date("2018-01-01T00:00:00.000Z"),
         purpose: " RE. 745259",
         counterPartName: "TueV Bayern",
@@ -202,7 +212,8 @@ describe("postgres transactions repository", function() {
       {
         id: 1112,
         accountId: 2,
-        amount: -99.81,
+        absAmount: 99.81,
+        isExpense: true,
         bookingDate: new Date("2018-01-02T00:00:00.000Z"),
         purpose: " RE. 745459",
         counterPartName: "TueV Bayern",
@@ -219,7 +230,8 @@ describe("postgres transactions repository", function() {
     expect(result).to.be.not.null;
     expect(result!.id).to.equal(transactionsData[1].id);
     expect(result!.accountId).to.equal(transactionsData[1].accountId);
-    expect(result!.amount).to.equal(transactionsData[1].amount);
+    expect(result!.absAmount).to.equal(transactionsData[1].absAmount);
+    expect(result!.isExpense).to.equal(transactionsData[1].isExpense);
     expect(result!.bookingDate.getTime()).to.equal(
       new Date(transactionsData[1].bookingDate).getTime()
     );
@@ -240,7 +252,8 @@ describe("postgres transactions repository", function() {
       {
         id: 1112,
         accountId: 2,
-        amount: -89.871,
+        absAmount: 89.871,
+        isExpense: true,
         bookingDate: new Date("2018-01-01T00:00:00.000Z"),
         purpose: " RE. 745259",
         counterPartName: "TueV Bayern",
@@ -253,7 +266,8 @@ describe("postgres transactions repository", function() {
       {
         id: 1112,
         accountId: 2,
-        amount: -99.81,
+        absAmount: 99.81,
+        isExpense: true,
         bookingDate: new Date("2018-01-02T00:00:00.000Z"),
         purpose: " RE. 745459",
         counterPartName: "TueV Bayern",
@@ -266,7 +280,8 @@ describe("postgres transactions repository", function() {
       {
         id: 4112,
         accountId: 4,
-        amount: -69.81,
+        absAmount: 69.81,
+        isExpense: true,
         bookingDate: new Date("2018-01-03T00:00:00.000Z"),
         purpose: " RE. 735459",
         counterPartName: "TueV Bayern",
