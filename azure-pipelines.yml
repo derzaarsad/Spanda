@@ -174,9 +174,10 @@ jobs:
     displayName: 'Installing the AWS SAM CLI'
     continueOnError: false
   - script: |
-      cd $(System.DefaultWorkingDirectory)/SpandaServerless
-      /home/linuxbrew/.linuxbrew/bin/sam build
+      cd $(System.DefaultWorkingDirectory)/DinodimeBackend
+      yarn install
+      yarn run build
     displayName: 'Building Serverless Application Model'
     continueOnError: false
-  - publish: $(System.DefaultWorkingDirectory)/SpandaServerless
+  - publish: $(System.DefaultWorkingDirectory)/DinodimeBackend
     artifact: SamApp
