@@ -154,11 +154,11 @@ export const fetchWebFormInfo = async (
   }
 
   let splitted = pathParameters.webFormAuth.split("-");
-  let webId = splitted[0];
+  let webFormAuth = splitted[0];
 
-  const user = await users.findByWebForm(webId);
+  const user = await users.findByWebFormAuth(webFormAuth);
   if (user === null || user.activeWebFormAuth === null) {
-    logger.log("error", "no user found for webId " + webId);
+    logger.log("error", "no user found for webFormAuth " + webFormAuth);
     return CreateInternalErrorResponse("no user found");
   }
 
@@ -169,9 +169,9 @@ export const fetchWebFormInfo = async (
 
   let webForm: { serviceResponseBody: string };
   try {
-    webForm = await bankInterface.fetchWebForm(authorization, webId);
+    webForm = await bankInterface.fetchWebForm(authorization, webFormAuth);
   } catch (err) {
-    logger.log("error", "could not fetch web form with id " + webId);
+    logger.log("error", "could not fetch web form with webFormAuth " + webFormAuth);
     return CreateInternalErrorResponse("could not fetch web form");
   }
 
