@@ -143,6 +143,8 @@ jobs:
     continueOnError: false
   - script: |
       cd $(System.DefaultWorkingDirectory)/DinodimeBackend
+      npm install --save-dev webpack@4.41.5
+      npm install --save-dev webpack-cli
       yarn workspace dynodime-lambda run package
     displayName: 'Package Lambda'
     continueOnError: false
