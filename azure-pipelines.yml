@@ -143,8 +143,7 @@ jobs:
     continueOnError: false
   - script: |
       cd $(System.DefaultWorkingDirectory)/DinodimeBackend
-      npm install --save-dev webpack@4.41.5
-      npm install --save-dev webpack-cli
+      yarn install
       yarn workspace dynodime-lambda run package
     displayName: 'Package Lambda'
     continueOnError: false
@@ -171,7 +170,6 @@ jobs:
       testResultsFiles: '$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/*.xml'
   - script: |
       cd $(System.DefaultWorkingDirectory)/DinodimeBackend
-      yarn install
       yarn run build
     displayName: 'Building Serverless Application Model'
     continueOnError: false
