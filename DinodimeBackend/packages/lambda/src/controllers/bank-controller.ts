@@ -171,7 +171,7 @@ export const fetchWebFormInfo = async (
   try {
     webForm = await bankInterface.fetchWebForm(authorization, webId);
   } catch (err) {
-    logger.log("error", "could not fetch web form with id " + webId);
+    logger.log("error", "could not fetch web form with webFormAuth " + webId);
     return CreateInternalErrorResponse("could not fetch web form");
   }
 
