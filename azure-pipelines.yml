@@ -142,6 +142,11 @@ jobs:
     displayName: 'integration test preparation'
     continueOnError: false
   - script: |
+      cd $(System.DefaultWorkingDirectory)/DinodimeBackend
+      yarn workspace dynodime-lambda run package
+    displayName: 'Package Lambda'
+    continueOnError: false
+  - script: |
       cd SpandaServerless
       mkdir reports
       cd spanda
@@ -177,7 +182,6 @@ jobs:
       cd $(System.DefaultWorkingDirectory)/DinodimeBackend
       yarn install
       yarn run build
-      yarn workspace dynodime-lambda run package
     displayName: 'Building Serverless Application Model'
     continueOnError: false
   - publish: $(System.DefaultWorkingDirectory)/DinodimeBackend
