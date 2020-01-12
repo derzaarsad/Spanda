@@ -147,13 +147,16 @@ jobs:
     displayName: 'Package Lambda'
     continueOnError: false
   - script: |
-      cd SpandaServerless
+      cd $(System.DefaultWorkingDirectory)/DinodimeBackend
       mkdir reports
-      cd spanda
       echo "Start Unit Test"
-      npm test
-      mv reports/*.xml ../reports
-      cd ..
+      yarn workspace dynodime-infrastructure run test
+      yarn workspace dynodime-lambda run test
+      yarn workspace dynodime-lib run test
+      mv $(System.DefaultWorkingDirectory)/DinodimeBackend/packages/infrastructure/reports/*.xml $(System.DefaultWorkingDirectory)/DinodimeBackend/reports
+      mv $(System.DefaultWorkingDirectory)/DinodimeBackend/packages/lambda/reports/*.xml $(System.DefaultWorkingDirectory)/DinodimeBackend/reports
+      mv $(System.DefaultWorkingDirectory)/DinodimeBackend/packages/lib/reports/*.xml $(System.DefaultWorkingDirectory)/DinodimeBackend/reports
+      cd $(System.DefaultWorkingDirectory)/SpandaServerless
       echo "Start Integration Test"
       docker-compose build && docker-compose up --abort-on-container-exit
     displayName: 'Run tests'
@@ -163,21 +166,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       testRunner: JUnit
-      testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/reports/*.xml'
-  - script: |
-      curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-      unzip awscli-bundle.zip
-      sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-      sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
-      test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
-      test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-      test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
-      echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
-      brew tap aws/tap
-      brew install aws-sam-cli
-      sam --version
-    displayName: 'Installing the AWS SAM CLI'
-    continueOnError: false
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/*.xml'
   - script: |
       cd $(System.DefaultWorkingDirectory)/DinodimeBackend
       yarn install
