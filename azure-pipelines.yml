@@ -143,6 +143,7 @@ jobs:
     continueOnError: false
   - script: |
       cd $(System.DefaultWorkingDirectory)/DinodimeBackend
+      npm install webpack webpack-cli --save-dev
       yarn install
       yarn workspace dynodime-lambda run package
     displayName: 'Package Lambda'
@@ -171,7 +172,7 @@ jobs:
   - script: |
       cd $(System.DefaultWorkingDirectory)/DinodimeBackend
       yarn run build
-    displayName: 'Building Serverless Application Model'
+    displayName: 'Building CDK Application'
     continueOnError: false
   - publish: $(System.DefaultWorkingDirectory)/DinodimeBackend
     artifact: SamApp
