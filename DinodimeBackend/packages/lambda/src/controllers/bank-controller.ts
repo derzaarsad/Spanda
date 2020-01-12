@@ -154,9 +154,9 @@ export const fetchWebFormInfo = async (
   }
 
   let splitted = pathParameters.webFormAuth.split("-");
-  let webId = splitted[0];
+  let webId = parseInt(splitted[0]);
 
-  const user = await users.findByWebForm(webId);
+  const user = await users.findByWebFormId(webId);
   if (user === null || user.activeWebFormAuth === null) {
     logger.log("error", "no user found for webId " + webId);
     return CreateInternalErrorResponse("no user found");
@@ -189,11 +189,13 @@ export const fetchWebFormInfo = async (
   const transactionsDataBankSpecific = await bankInterface.getAllTransactions(authorization, body.accountIds);
 
   // map the finapi json format into database json format
-  let transactionsSchema: TransactionsSchema;
+  let transactionsSchema = new TransactionsSchema;
+  console.log(transactionsSchema)
   const transactionsData = transactionsDataBankSpecific.map(transaction => transactionsSchema.asObject([
       transaction.id,
       transaction.accountId,
-      transaction.amount,
+      Math.abs(transaction.amount),
+      (transaction.amount < 0) ? true : false,
       new Date(transaction.finapiBookingDate.replace(" ","T") + "Z"),
       transaction.purpose,
       transaction.counterpartName,

@@ -20,9 +20,9 @@ describe("postgres users repository", function() {
   });
 
   it("renders the find-by-webform query", async function() {
-    const result = users.findByWebFormQuery("64aaddc201e87f11425be34ce019833f9c175472a52c3d168f5a3231a7680df9");
+    const result = users.findByWebFormIdQuery(2934);
     expect(result).to.be.a("string");
-    expect(result).to.equal("SELECT * FROM users WHERE activewebformid = '64aaddc201e87f11425be34ce019833f9c175472a52c3d168f5a3231a7680df9' LIMIT 1");
+    expect(result).to.equal("SELECT * FROM users WHERE activewebformid = '2934' LIMIT 1");
   });
 
   it("renders the save query", async function() {
