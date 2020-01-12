@@ -151,7 +151,7 @@ describe("get webform id", function() {
     expect(encryptedAuth).to.not.equal(event.headers.Authorization);
 
     // this test proves whether the right data is written to database
-    let user = await users.findByWebFormAuth("2934");
+    let user = await users.findByWebFormId(2934);
     expect(user).to.be.ok;
     expect(formId).to.equal(user!.activeWebFormId!);
     expect(

@@ -157,9 +157,9 @@ export const fetchWebFormInfo = async (
   let webFormId = parseInt(tokens[0]);
   let userSecret = tokens[1];
 
-  const user = await users.findByWebFormAuth(userSecret);
-  if (user === null || user.activeWebFormAuth === null) {
-    logger.log("error", "no user found for webFormAuth " + userSecret);
+  const user = await users.findByWebFormId(webFormId);
+  if (user === null || user.activeWebFormId === null || user.activeWebFormAuth === null) {
+    logger.log("error", "no user found for webId " + webFormId);
     return CreateInternalErrorResponse("no user found");
   }
 
@@ -172,7 +172,7 @@ export const fetchWebFormInfo = async (
   try {
     webForm = await bankInterface.fetchWebForm(authorization, webFormId);
   } catch (err) {
-    logger.log("error", "could not fetch web form with webFormAuth " + webFormId);
+    logger.log("error", "could not fetch web form with web form id " + webFormId);
     return CreateInternalErrorResponse("could not fetch web form");
   }
 

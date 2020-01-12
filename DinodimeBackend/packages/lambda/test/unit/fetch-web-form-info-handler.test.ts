@@ -174,7 +174,7 @@ describe("fetch webform info handler", function() {
             id: 1112,
             accountId: 3,
             amount: -89.871,
-            bookingDate: new Date("2018-01-01T00:00:00.000Z"),
+            finapiBookingDate: "2018-01-01 00:00:00.000",
             purpose: " RE. 745259",
             counterPartName: "TueV Bayern",
             counterPartAccountNumber: "611105",
