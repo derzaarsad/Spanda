@@ -54,7 +54,7 @@ export namespace Users {
     async findByWebFormAuth(activeWebFormAuth: string) {
       for (let key in this.repository) {
         const currentUser = this.repository[key];
-        if (currentUser.activeWebFormAuth == activeWebFormAuth) {
+        if (currentUser.activeWebFormAuth === activeWebFormAuth) {
           return currentUser;
         }
       }
