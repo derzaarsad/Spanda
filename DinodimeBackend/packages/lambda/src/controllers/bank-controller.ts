@@ -8,7 +8,7 @@ import {
   CreateInternalErrorResponse
 } from "../lambda-util";
 
-import { Authentication, Encryptions, Token, Transactions, TransactionsSchema } from "dynodime-lib";
+import { Authentication, Encryptions, Transactions } from "dynodime-lib";
 import { BankConnection, BankConnections } from "dynodime-lib";
 import { User, Users } from "dynodime-lib";
 import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dynodime-lib";
@@ -23,7 +23,7 @@ const getUserInfo = async (
   logger: winston.Logger,
   bankInterface: FinAPI,
   authorization: string
-) => {
+): Promise<FinAPIModel.User> => {
   logger.log("info", "authenticating user", { authorization: authorization });
   return bankInterface.userInfo(authorization);
 };
@@ -153,25 +153,26 @@ export const fetchWebFormInfo = async (
     return CreateInternalErrorResponse("no webFormAuth");
   }
 
-  let splitted = pathParameters.webFormAuth.split("-");
-  let webFormAuth = splitted[0];
+  let tokens = pathParameters.webFormAuth.split("-");
+  let webFormId = parseInt(tokens[0]);
+  let userSecret = tokens[1];
 
-  const user = await users.findByWebFormAuth(webFormAuth);
+  const user = await users.findByWebFormAuth(userSecret);
   if (user === null || user.activeWebFormAuth === null) {
-    logger.log("error", "no user found for webFormAuth " + webFormAuth);
+    logger.log("error", "no user found for webFormAuth " + userSecret);
     return CreateInternalErrorResponse("no user found");
   }
 
   const authorization = encryptions.DecryptText({
     iv: user.activeWebFormAuth,
-    cipherText: splitted[1]
+    cipherText: userSecret
   });
 
   let webForm: { serviceResponseBody: string };
   try {
-    webForm = await bankInterface.fetchWebForm(authorization, webFormAuth);
+    webForm = await bankInterface.fetchWebForm(authorization, webFormId);
   } catch (err) {
-    logger.log("error", "could not fetch web form with webFormAuth " + webFormAuth);
+    logger.log("error", "could not fetch web form with webFormAuth " + webFormId);
     return CreateInternalErrorResponse("could not fetch web form");
   }
 
@@ -186,23 +187,14 @@ export const fetchWebFormInfo = async (
     return CreateInternalErrorResponse("no accountIds available");
   }
 
-  const transactionsDataBankSpecific = await bankInterface.getAllTransactions(authorization, body.accountIds);
+  const transactionsDataBankSpecific = await bankInterface.getAllTransactions(
+    authorization,
+    body.accountIds
+  );
 
-  // map the finapi json format into database json format
-  let transactionsSchema: TransactionsSchema;
-  const transactionsData = transactionsDataBankSpecific.map(transaction => transactionsSchema.asObject([
-      transaction.id,
-      transaction.accountId,
-      transaction.amount,
-      new Date(transaction.finapiBookingDate.replace(" ","T") + "Z"),
-      transaction.purpose,
-      transaction.counterpartName,
-      transaction.counterpartAccountNumber,
-      transaction.counterpartIban,
-      transaction.counterpartBlz,
-      transaction.counterpartBic,
-      transaction.counterpartBankName
-  ]));
+  const transactionsData = transactionsDataBankSpecific.map(transaction =>
+    Transactions.fromFinAPI(transaction)
+  );
 
   const bankConnection = new BankConnection(body.id, body.bankId);
   bankConnection.bankAccountIds = body.accountIds;
