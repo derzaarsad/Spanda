@@ -177,6 +177,7 @@ jobs:
       cd $(System.DefaultWorkingDirectory)/DinodimeBackend
       yarn install
       yarn run build
+      yarn workspace dynodime-lambda run package
     displayName: 'Building Serverless Application Model'
     continueOnError: false
   - publish: $(System.DefaultWorkingDirectory)/DinodimeBackend
