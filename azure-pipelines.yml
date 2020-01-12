@@ -179,6 +179,7 @@ jobs:
       yarn run build
       yarn workspace dynodime-lambda run package
       npm install --save aws-cdk
+      npx npm-check-updates -u
     displayName: 'Building Serverless Application Model'
     continueOnError: false
   - publish: $(System.DefaultWorkingDirectory)/DinodimeBackend
