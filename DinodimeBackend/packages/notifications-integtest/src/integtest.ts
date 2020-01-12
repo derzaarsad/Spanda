@@ -20,7 +20,7 @@ import { NewTransactionsEncryptor } from "dynodime-lib";
 import { UUIDRuleHandleFactory } from "dynodime-lib";
 import { RuleHandle } from "dynodime-lib";
 
-AWS.config.update({ region: "us-east-1" });
+AWS.config.update({ region: process.env.CDK_DEPLOY_REGION });
 
 const env = process.env;
 const endpointURL = env["ENDPOINT_URL"] as string;
