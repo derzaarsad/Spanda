@@ -146,7 +146,7 @@ jobs:
       yarn install
       yarn run build
       yarn workspace dynodime-lambda run package
-    displayName: 'Package Lambda'
+    displayName: 'Building CDK Application'
     continueOnError: false
   - script: |
       cd $(System.DefaultWorkingDirectory)/DinodimeBackend
@@ -169,10 +169,5 @@ jobs:
     inputs:
       testRunner: JUnit
       testResultsFiles: '$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/*.xml'
-  - script: |
-      cd $(System.DefaultWorkingDirectory)/DinodimeBackend
-      
-    displayName: 'Building CDK Application'
-    continueOnError: false
   - publish: $(System.DefaultWorkingDirectory)/DinodimeBackend
     artifact: SamApp
