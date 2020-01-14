@@ -1,7 +1,7 @@
 import { Repository, PostgresRepository } from "./repository";
 import { Schema } from "./schema/schema";
 import { Pool } from "pg";
-import { Model } from "./region-specific/de/model";
+import { Model as FinAPIModel } from "./region-specific/de/model";
 
 export type Transaction = {
   id: number;
@@ -24,7 +24,7 @@ export namespace Transactions {
    * @param tx a finAPI Transaction representation.
    */
   // TODO: Time conversion is imprecise
-  export const fromFinAPI = (tx: Model.FinAPITransaction) => {
+  export const fromFinAPI = (tx: FinAPIModel.Transaction) => {
     return {
       id: tx.id,
       accountId: tx.accountId,
