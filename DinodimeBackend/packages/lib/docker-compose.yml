@@ -5,12 +5,8 @@ services:
     build:
       context: ../../
       dockerfile: ./packages/lib/Dockerfile
-    environment:
-      - WAIT_HOSTS=database:5432
-      - PGHOST=database
-      - PGUSER=postgres
-      - PGPASSWORD=""
-      - PGDATABASE=postgres
+    env_file:
+      - ../../integration-test.env
     volumes:
       - ../../reports:/app/packages/lib/reports
     command: sh -c "/wait && cd packages/lib && npm run-script integtest -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integtests-lib.xml"
