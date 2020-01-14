@@ -1,0 +1,21 @@
+version: "3.4"
+
+services:
+  app:
+    build:
+      context: ../../
+      dockerfile: ./packages/lib/Dockerfile
+    environment:
+      - WAIT_HOSTS=database:5432
+      - PGHOST=database
+      - PGUSER=postgres
+      - PGPASSWORD=""
+      - PGDATABASE=postgres
+    volumes:
+      - ../../reports:/app/packages/lib/reports
+    command: sh -c "/wait && cd packages/lib && npm run-script integtest -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integtests-lib.xml"
+
+  database:
+    image: postgres:12
+    volumes:
+      - ../../migrations/postgres:/docker-entrypoint-initdb.d

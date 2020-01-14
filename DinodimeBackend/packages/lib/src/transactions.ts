@@ -107,7 +107,8 @@ export namespace Transactions {
     async findById(id: number): Promise<Transaction | null> {
       const params = {
         text: this.findByIdQuery(id),
-        rowMode: "array"
+        rowMode: "array",
+        types: this.types
       };
 
       return this.doQuery(params).then(res =>
@@ -125,7 +126,8 @@ export namespace Transactions {
     async findByAccountIds(accountIds: number[]): Promise<Transaction[]> {
       const params = {
         text: this.findByAccountIdsQuery(accountIds),
-        rowMode: "array"
+        rowMode: "array",
+        types: this.types
       };
 
       return this.doQuery(params).then(res => res.rows.map(row => this.schema.asObject(row)));
