@@ -33,14 +33,14 @@ describe("get webform id", function() {
   expect(process.env.FinAPIClientSecret).to.exist;
 
   let dummyInterfaces = CreateFinApiTestInterfaces(
-    process.env.FinAPIClientId,
-    process.env.FinAPIClientSecret
+    process.env.FinAPIClientId!,
+    process.env.FinAPIClientSecret!
   );
   let encryptions: Encryptions;
 
   beforeEach(function() {
-    testUsername = process.env.AZURE_TEST_USER_LOGIN;
-    testPassword = process.env.AZURE_TEST_USER_LOGIN;
+    testUsername = process.env.AZURE_TEST_USER_LOGIN!;
+    testPassword = process.env.AZURE_TEST_USER_LOGIN!;
     testValidEmail = "chapu@chapu.com";
     testValidPhone = "+66 6666";
 
@@ -190,8 +190,8 @@ describe("get webform id", function() {
     //expect(JSON.parse(result.body).location).to.equal('testlocation');
     expect(JSON.parse(result.body).webFormAuth.split("-").length).to.equal(2);
 
-    let formId = JSON.parse(result.body).webFormAuth.split("-")[0];
-    let encryptedAuth = JSON.parse(result.body).webFormAuth.split("-")[1];
+    let formId = parseInt(JSON.parse(result.body).webFormAuth.split("-")[0]);
+    let encryptedAuth = JSON.parse(result.body).webFormAuth.split("-")[1] as string;
 
     //expect(formId).to.equal('2934');
     expect(encryptedAuth).to.not.equal(event.headers.Authorization);
@@ -200,7 +200,7 @@ describe("get webform id", function() {
     let user = await users.findByWebFormId(formId);
     //expect(formId).to.equal(user.activeWebFormId);
     expect(
-      encryptions.DecryptText({ iv: user.activeWebFormAuth, cipherText: encryptedAuth })
+      encryptions.DecryptText({ iv: user!.activeWebFormAuth!, cipherText: encryptedAuth })
     ).to.equal(event.headers.Authorization);
   });
 });

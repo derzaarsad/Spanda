@@ -19,13 +19,13 @@ describe("authenticate user handler", function() {
   expect(process.env.FinAPIClientSecret).to.exist;
 
   let dummyInterfaces = CreateFinApiTestInterfaces(
-    process.env.FinAPIClientId,
-    process.env.FinAPIClientSecret
+    process.env.FinAPIClientId!,
+    process.env.FinAPIClientSecret!
   );
 
   beforeEach(function() {
-    testUsername = process.env.AZURE_TEST_USER_LOGIN;
-    testPassword = process.env.AZURE_TEST_USER_LOGIN;
+    testUsername = process.env.AZURE_TEST_USER_LOGIN!;
+    testPassword = process.env.AZURE_TEST_USER_LOGIN!;
 
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 

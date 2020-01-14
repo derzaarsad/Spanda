@@ -33,8 +33,8 @@ describe("fetch webform info handler", function() {
   expect(process.env.ACCESS_TOKEN_FOR_FETCH).to.exist;
 
   let dummyInterfaces = CreateFinApiTestInterfaces(
-    process.env.FinAPIClientId,
-    process.env.FinAPIClientSecret
+    process.env.FinAPIClientId!,
+    process.env.FinAPIClientSecret!
   );
 
   beforeEach(function() {
@@ -46,11 +46,11 @@ describe("fetch webform info handler", function() {
 
     context = {} as Context;
     encryptions = new CallbackCrypto();
-    encrypted = encryptions.EncryptText("bearer " + process.env.ACCESS_TOKEN_FOR_FETCH);
+    encrypted = encryptions.EncryptText("bearer " + process.env.ACCESS_TOKEN_FOR_FETCH!);
   });
 
   it("rejects a request with could not fetch web form", async function() {
-    const rejectedWebId = parseInt(process.env.WEBFORM_ID_FOR_FETCH + "111");
+    const rejectedWebId = parseInt(process.env.WEBFORM_ID_FOR_FETCH! + "111");
 
     const user = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
     user.activeWebFormId = rejectedWebId;
@@ -82,14 +82,14 @@ describe("fetch webform info handler", function() {
 
   it("adds a connection to the user", async function() {
     const user = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
-    user.activeWebFormId = parseInt(process.env.WEBFORM_ID_FOR_FETCH);
+    user.activeWebFormId = parseInt(process.env.WEBFORM_ID_FOR_FETCH!);
     user.activeWebFormAuth = encrypted.iv;
     users.save(user);
 
     const event = ({
       headers: {},
       pathParameters: {
-        webFormAuth: process.env.WEBFORM_ID_FOR_FETCH + "-" + encrypted.cipherText
+        webFormAuth: process.env.WEBFORM_ID_FOR_FETCH! + "-" + encrypted.cipherText
       }
     } as unknown) as APIGatewayProxyEvent;
 
@@ -116,23 +116,23 @@ describe("fetch webform info handler", function() {
 
     const user_ = await users.findById("chapu");
     expect(user_, "no user found for the given username").to.be.ok;
-    expect(user_.bankConnectionIds).to.include(
+    expect(user_!.bankConnectionIds).to.include(
       bankConnectionId,
       "the connection ids were not updated"
     );
 
     const connection = await connections.findById(bankConnectionId);
     expect(connection, "the connection was not created").to.be.ok;
-    expect(connection.bankAccountIds[0]).to.be.an(
+    expect(connection!.bankAccountIds[0]).to.be.an(
       "number",
       "expected the bankAccountIds element to be a number"
     );
 
-    const transactions_ = await transactions.findByAccountIds(connection.bankAccountIds);
+    const transactions_ = await transactions.findByAccountIds(connection!.bankAccountIds);
     expect(transactions_).to.exist;
-    expect(transactions_.length).to.not.equal(0);
+    expect(transactions_.length).to.be.not.empty;
     expect(transactions_[0].id).to.exist;
-    expect(transactions_[0].accountId).to.equal(connection.bankAccountIds[0]);
+    expect(transactions_[0].accountId).to.equal(connection!.bankAccountIds[0]);
     expect(transactions_[0].absAmount).to.exist;
   });
 });

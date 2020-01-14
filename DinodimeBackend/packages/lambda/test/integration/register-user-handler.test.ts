@@ -23,12 +23,12 @@ describe("register user handler", function() {
   expect(process.env.FinAPIClientSecret).to.exist;
 
   let dummyInterfaces = CreateFinApiTestInterfaces(
-    process.env.FinAPIClientId,
-    process.env.FinAPIClientSecret
+    process.env.FinAPIClientId!,
+    process.env.FinAPIClientSecret!
   );
 
   beforeEach(function() {
-    testUsername = process.env.AZURE_TEST_USER_REGISTER;
+    testUsername = process.env.AZURE_TEST_USER_REGISTER!;
     testPassword = "secret";
     testValidEmail = "chapu@mischung.net";
     testInvalidEmail = "chapu@chapu";
