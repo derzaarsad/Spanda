@@ -156,12 +156,12 @@ jobs:
           cd $(System.DefaultWorkingDirectory)/DinodimeBackend
           mkdir reports
           echo "Start Tests"
-          yarn workspace dynodime-lib run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/unit-tests-lib.xml
-          yarn workspace dynodime-lambda run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/unit-tests-lambda.xml
-          yarn workspace dynodime-infrastructure run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/unit-tests-infrastructure.xml
-          docker-compose --build --abort-on-container-exit -f packages/lib/docker-compose.yml
-          docker-compose --build --abort-on-container-exit -f packages/lambda/docker-compose.yml
-          ./run-notificatios-integtest.sh --  --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integtest-notifications-infra.xml
+          yarn workspace dynodime-lib run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-lib.xml
+          yarn workspace dynodime-lambda run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-lambda.xml
+          yarn workspace dynodime-infrastructure run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-infrastructure.xml
+          docker-compose --build --abort-on-container-exit -f packages/lib/docker-compose.yml up
+          docker-compose --build --abort-on-container-exit -f packages/lambda/docker-compose.yml up
+          ./run-notifications-integtest.sh -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integtest-notifications-infra.xml
           cd $(System.DefaultWorkingDirectory)/SpandaServerless
           echo "Start Integration Test"
           docker-compose build && docker-compose up --abort-on-container-exit
