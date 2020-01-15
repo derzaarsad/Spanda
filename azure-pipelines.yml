@@ -159,9 +159,9 @@ jobs:
           yarn workspace dynodime-lib run test --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-lib.xml
           yarn workspace dynodime-lambda run test --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-lambda.xml
           yarn workspace dynodime-infrastructure run test --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-infrastructure.xml
-          docker-compose -f packages/lib/docker-compose.yml --build --abort-on-container-exit up
-          docker-compose -f packages/lambda/docker-compose.yml --build --abort-on-container-exit up
-          ./run-notifications-integtest.sh -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integtest-notifications-infra.xml
+          docker-compose -f packages/lib/docker-compose.yml build && docker-compose -f packages/lib/docker-compose.yml up --abort-on-container-exit 
+          docker-compose -f packages/lambda/docker-compose.yml build && docker-compose -f packages/lambda/docker-compose.yml up --abort-on-container-exit 
+          bash run-notifications-integtest.sh --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/integtest-notifications-infra.xml
           cd $(System.DefaultWorkingDirectory)/SpandaServerless
           echo "Start Integration Test"
           docker-compose build && docker-compose up --abort-on-container-exit
