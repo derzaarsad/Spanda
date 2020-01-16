@@ -15,7 +15,12 @@ export { ClientSecretsProvider, Resolved, FromSSM } from "./client-secrets";
 
 export { Authentication, Basic, Token } from "./authentication";
 
-export { RuleHandle, RuleHandleFactory, UUIDRuleHandleFactory } from "./rule-handle";
+export {
+  RuleHandle,
+  RuleHandleFactory,
+  BasicRuleHandleFactory,
+  UUIDRuleHandleFactory
+} from "./rule-handle";
 
 export { RuleHandleRepository, DynamoDBRuleHandleRepository } from "./rule-handle-repository";
 
