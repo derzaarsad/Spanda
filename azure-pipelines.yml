@@ -158,10 +158,13 @@ jobs:
       mv $(System.DefaultWorkingDirectory)/DinodimeBackend/packages/infrastructure/reports/*.xml $(System.DefaultWorkingDirectory)/DinodimeBackend/reports
       mv $(System.DefaultWorkingDirectory)/DinodimeBackend/packages/lambda/reports/*.xml $(System.DefaultWorkingDirectory)/DinodimeBackend/reports
       mv $(System.DefaultWorkingDirectory)/DinodimeBackend/packages/lib/reports/*.xml $(System.DefaultWorkingDirectory)/DinodimeBackend/reports
-      cd $(System.DefaultWorkingDirectory)/SpandaServerless
+    displayName: 'Run unit tests'
+    continueOnError: true
+  - script: |
       echo "Start Integration Test"
+      cd $(System.DefaultWorkingDirectory)/SpandaServerless
       docker-compose build && docker-compose up --abort-on-container-exit
-    displayName: 'Run tests'
+    displayName: 'Run integration tests'
     continueOnError: true
   - task: PublishTestResults@2
     displayName: 'Publish test results'
