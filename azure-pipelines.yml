@@ -152,9 +152,9 @@ jobs:
       cd $(System.DefaultWorkingDirectory)/DinodimeBackend
       mkdir reports
       echo "Start Unit Test"
-      yarn workspace dynodime-infrastructure run test
-      yarn workspace dynodime-lambda run test
-      yarn workspace dynodime-lib run test
+      yarn workspace dynodime-lib run test --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-lib.xml
+      yarn workspace dynodime-lambda run test --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-lambda.xml
+      yarn workspace dynodime-infrastructure run test --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-infrastructure.xml
       mv $(System.DefaultWorkingDirectory)/DinodimeBackend/packages/infrastructure/reports/*.xml $(System.DefaultWorkingDirectory)/DinodimeBackend/reports
       mv $(System.DefaultWorkingDirectory)/DinodimeBackend/packages/lambda/reports/*.xml $(System.DefaultWorkingDirectory)/DinodimeBackend/reports
       mv $(System.DefaultWorkingDirectory)/DinodimeBackend/packages/lib/reports/*.xml $(System.DefaultWorkingDirectory)/DinodimeBackend/reports

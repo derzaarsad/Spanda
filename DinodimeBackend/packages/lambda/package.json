@@ -6,7 +6,7 @@
   "module": "out/src/index.mjs",
   "types": "out/src/index.d.ts",
   "scripts": {
-    "test": "mocha --require ts-node/register test/unit/**/*.ts --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/unit-tests-lambda.xml",
+    "test": "mocha --require ts-node/register test/unit/**/*.ts",
     "package": "webpack"
   },
   "dependencies": {

@@ -7,7 +7,7 @@
   "types": "out/src/index.d.ts",
   "scripts": {
     "cdk": "cdk",
-    "test": "mocha --require ts-node/register test/**/*.ts --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/unit-tests-infrastructure.xml"
+    "test": "mocha --require ts-node/register test/**/*.ts"
   },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "^1.19.0",
