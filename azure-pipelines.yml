@@ -74,6 +74,8 @@ jobs:
     inputs:
       testRunner: JUnit
       testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaApp/reports/**/*.xml'
+  - publish: $(System.DefaultWorkingDirectory)/SpandaApp
+    artifact: NativescriptApp
 
 - job: Build_Serverless
   dependsOn: DetermineJob
