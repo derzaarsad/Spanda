@@ -161,7 +161,6 @@ jobs:
     displayName: 'Run unit tests'
     continueOnError: true
   - script: |
-      cd $(System.DefaultWorkingDirectory)/DinodimeBackend
       echo "Start Integration Test"
       cd $(System.DefaultWorkingDirectory)/SpandaServerless
       docker-compose build && docker-compose up --abort-on-container-exit
