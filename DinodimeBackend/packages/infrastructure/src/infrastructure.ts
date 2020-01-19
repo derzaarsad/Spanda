@@ -9,11 +9,14 @@ export class Infrastructure extends cdk.Stack {
   readonly databaseApplicationsSecurityGroup: ec2.SecurityGroup;
   readonly databasesSecurityGroup: ec2.SecurityGroup;
 
+  readonly databasePort: ec2.Port;
+  readonly sshPort: ec2.Port;
+
   constructor(scope: cdk.App, id: string, props: InfrastructureProps) {
     super(scope, id, props);
 
-    const databasePort = props.databasePort || ec2.Port.tcp(5432);
-    const sshPort = props.sshPort || ec2.Port.tcp(22);
+    this.databasePort = props.databasePort || ec2.Port.tcp(5432);
+    this.sshPort = props.sshPort || ec2.Port.tcp(22);
 
     this.vpc = new ec2.Vpc(this, "VPC", {
       maxAzs: props.numberOfAzs || 2,
@@ -54,7 +57,7 @@ export class Infrastructure extends cdk.Stack {
       vpc: this.vpc,
       description: "A security group for bastion hosts that allows SSH access from within the VPC"
     });
-    bastionSecurityGroup.addIngressRule(ec2.Peer.ipv4(this.vpc.vpcCidrBlock), sshPort);
+    bastionSecurityGroup.addIngressRule(ec2.Peer.ipv4(this.vpc.vpcCidrBlock), this.sshPort);
 
     this.databasesSecurityGroup = new ec2.SecurityGroup(this, "DatabasesSG", {
       vpc: this.vpc,
@@ -63,29 +66,29 @@ export class Infrastructure extends cdk.Stack {
 
     this.databasesSecurityGroup.addIngressRule(
       this.databaseApplicationsSecurityGroup,
-      databasePort,
+      this.databasePort,
       "Grants access to the database port to applications"
     );
 
     this.databaseApplicationsSecurityGroup.addIngressRule(
       bastionSecurityGroup,
-      databasePort,
+      this.databasePort,
       "Grants access to the database port to bastion hosts"
     );
 
     this.initializeBastionHostsConfig(this.vpc.privateSubnets, bastionSecurityGroup);
   }
 
-  public isolatedSubnets() {
-    return this.vpc.isolatedSubnets;
+  public isolatedSubnets(): ec2.SubnetSelection {
+    return { subnets: this.vpc.isolatedSubnets };
   }
 
-  public privateSubnets() {
-    return this.vpc.privateSubnets;
+  public privateSubnets(): ec2.SubnetSelection {
+    return { subnets: this.vpc.privateSubnets };
   }
 
-  public publicSubnets() {
-    return this.vpc.publicSubnets;
+  public publicSubnets(): ec2.SubnetSelection {
+    return { subnets: this.vpc.publicSubnets };
   }
 
   private initializeBastionHostsConfig(
@@ -122,7 +125,7 @@ export class Infrastructure extends cdk.Stack {
       const templateId = `BastionLaunchTemplate${this.pad(index, 2)}`;
 
       return new CfnLaunchTemplate(this, templateId, {
-        launchTemplateName: "BastionHostLaunchTemplate",
+        launchTemplateName: `BastionHostOn${subnet.subnetId}`,
         launchTemplateData: {
           imageId: ami.imageId,
           iamInstanceProfile: {

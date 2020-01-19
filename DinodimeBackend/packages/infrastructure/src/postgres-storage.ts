@@ -4,14 +4,10 @@ import * as ec2 from "@aws-cdk/aws-ec2";
 
 import { PostgresInfrastructureConfiguration } from "./postgres-storage-configuration";
 import { ClusterParameterGroup } from "@aws-cdk/aws-rds";
+import { PostgresDeploymentProps } from "./postgres-deployment-props";
 
 export class PostgresStorage extends cdk.Stack {
-  constructor(
-    scope: cdk.App,
-    id: string,
-    infra: PostgresInfrastructureConfiguration,
-    props?: cdk.StackProps
-  ) {
+  constructor(scope: cdk.App, id: string, props: PostgresDeploymentProps) {
     super(scope, id, props);
 
     const postgres = new rds.DatabaseInstance(this, "DinodimeDatabase", {
@@ -25,8 +21,8 @@ export class PostgresStorage extends cdk.Stack {
       deleteAutomatedBackups: true,
       storageEncrypted: false,
       multiAz: false,
-      vpc: infra.vpc,
-      vpcPlacement: infra.vpcSubnets
+      vpc: props.infrastructureProps.vpc,
+      vpcPlacement: props.infrastructureProps.subnetPlacement
     });
 
     postgres.connections.allowDefaultPortInternally(
