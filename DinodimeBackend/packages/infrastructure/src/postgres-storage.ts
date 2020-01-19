@@ -11,23 +11,20 @@ export class PostgresStorage extends cdk.Stack {
     super(scope, id, props);
 
     const postgres = new rds.DatabaseInstance(this, "DinodimeDatabase", {
-      databaseName: "postgres",
-      masterUsername: "postgres",
-      masterUserPassword: cdk.SecretValue.plainText("covfefe"),
-      instanceClass: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
       engine: rds.DatabaseInstanceEngine.POSTGRES,
-      deletionProtection: false,
-      backupRetention: cdk.Duration.days(0),
-      deleteAutomatedBackups: true,
-      storageEncrypted: false,
-      multiAz: false,
+      databaseName: props.instanceProps.databaseName,
+      masterUsername: props.instanceProps.masterUsername,
+      masterUserPassword: props.instanceProps.masterUserPassword,
+      instanceClass: props.instanceProps.instanceClass,
+      deletionProtection: props.instanceProps.deletionProtection,
+      backupRetention: props.instanceProps.backupRetention,
+      deleteAutomatedBackups: props.instanceProps.deleteAutomatedBackups,
+      storageEncrypted: props.instanceProps.storageEncrypted,
+      multiAz: props.instanceProps.multiAz,
       vpc: props.infrastructureProps.vpc,
-      vpcPlacement: props.infrastructureProps.subnetPlacement
+      vpcPlacement: props.infrastructureProps.subnetPlacement,
+      securityGroups: props.infrastructureProps.databaseSecurityGroups
     });
-
-    postgres.connections.allowDefaultPortInternally(
-      "Allow incoming connections from security group peers"
-    );
   }
 
   private databaseCluster(infra: PostgresInfrastructureConfiguration) {

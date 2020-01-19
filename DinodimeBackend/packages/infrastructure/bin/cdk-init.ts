@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
+import * as iam from "@aws-cdk/aws-iam";
 import { Services } from "../src/services";
 import { PostgresStorage } from "../src/postgres-storage";
 import { Infrastructure } from "../src/infrastructure";
 import { PostgresDeploymentProps } from "../src/postgres-deployment-props";
+import { LambdaDeploymentProps } from "../src/lambda-deployment-props";
 
 const app = new cdk.App();
 
 const account = app.node.tryGetContext("aws-account")! as string;
 const region = app.node.tryGetContext("aws-region")! as string;
+
 const deploymentEnv = { region: region, account: account };
 
 const infrastructure = new Infrastructure(app, "DinodimeInfrastructure", { env: deploymentEnv });
@@ -19,10 +22,11 @@ const postgresProps: PostgresDeploymentProps = {
 
   infrastructureProps: {
     vpc: infrastructure.vpc,
-    subnetPlacement: infrastructure.isolatedSubnets(),
+    subnetPlacement: infrastructure.isolatedSubnetSelection(),
     databasePort: infrastructure.databasePort,
-    databaseSecurityGroup: infrastructure.databasesSecurityGroup
+    databaseSecurityGroups: [infrastructure.databasesSecurityGroup]
   },
+
   instanceProps: {
     databaseName: "postgres",
     masterUsername: "postgres",
@@ -36,5 +40,14 @@ const postgresProps: PostgresDeploymentProps = {
   }
 };
 
-new PostgresStorage(app, "DinodimeStorage", postgresProps);
+const lambdaProps: LambdaDeploymentProps = {
+  vpc: infrastructure.vpc,
+  subnets: infrastructure.privateSubnets(),
+  securityGroups: [infrastructure.databaseApplicationsSecurityGroup],
+  managedExecutionRolePolicies: [
+    iam.ManagedPolicy.fromAwsManagedPolicyName("AWSLambdaVPCAccessExecutionRole")
+  ]
+};
+
+new PostgresStorage(app, "DinodimeDatabase", postgresProps);
 new Services(app, "DinodimeServices", { env: deploymentEnv });

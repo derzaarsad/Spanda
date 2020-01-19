@@ -84,16 +84,28 @@ export class Infrastructure extends cdk.Stack {
     this.initializeBastionHostsConfig(this.vpc.privateSubnets, bastionSecurityGroup);
   }
 
-  public isolatedSubnets(): ec2.SubnetSelection {
-    return { subnets: this.vpc.isolatedSubnets, subnetType: ec2.SubnetType.ISOLATED };
+  public isolatedSubnets() {
+    return this.vpc.isolatedSubnets;
   }
 
-  public privateSubnets(): ec2.SubnetSelection {
-    return { subnets: this.vpc.privateSubnets, subnetType: ec2.SubnetType.PRIVATE };
+  public privateSubnets() {
+    return this.vpc.privateSubnets;
   }
 
-  public publicSubnets(): ec2.SubnetSelection {
-    return { subnets: this.vpc.publicSubnets, subnetType: ec2.SubnetType.PUBLIC };
+  public publicSubnets() {
+    return this.vpc.publicSubnets;
+  }
+
+  public isolatedSubnetSelection(): ec2.SubnetSelection {
+    return { subnets: this.vpc.isolatedSubnets };
+  }
+
+  public privateSubnetSelection(): ec2.SubnetSelection {
+    return { subnets: this.vpc.privateSubnets };
+  }
+
+  public publicSubnetSelection(): ec2.SubnetSelection {
+    return { subnets: this.vpc.publicSubnets };
   }
 
   private initializeBastionHostsConfig(

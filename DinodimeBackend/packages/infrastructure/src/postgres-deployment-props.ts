@@ -6,7 +6,7 @@ interface PostgresInfrastructureProps {
   vpc: ec2.Vpc;
   subnetPlacement: ec2.SubnetSelection;
   databasePort: ec2.Port;
-  databaseSecurityGroup: ec2.SecurityGroup;
+  databaseSecurityGroups: ec2.SecurityGroup[];
 }
 
 interface PostgresInstanceProps {

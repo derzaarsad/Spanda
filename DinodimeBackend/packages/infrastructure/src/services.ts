@@ -8,9 +8,13 @@ export class Services extends cdk.Stack {
 
     const decryptionKey = this.node.tryGetContext("decryptionKey") as string;
 
-    const notifications = new NewTransactionsNotifications(this, "NewTransactionsNotifications", {
-      decryptionKey: decryptionKey
-    });
+    const notifications = new NewTransactionsNotifications(
+      this,
+      "DinodimeNewTransactionsNotifications",
+      {
+        decryptionKey: decryptionKey
+      }
+    );
 
     new DinodimeAPI(this, "DynodimeAPI", {
       region: this.region,
