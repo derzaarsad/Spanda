@@ -80,15 +80,15 @@ export class Infrastructure extends cdk.Stack {
   }
 
   public isolatedSubnets(): ec2.SubnetSelection {
-    return { subnets: this.vpc.isolatedSubnets };
+    return { subnets: this.vpc.isolatedSubnets, subnetType: ec2.SubnetType.ISOLATED };
   }
 
   public privateSubnets(): ec2.SubnetSelection {
-    return { subnets: this.vpc.privateSubnets };
+    return { subnets: this.vpc.privateSubnets, subnetType: ec2.SubnetType.PRIVATE };
   }
 
   public publicSubnets(): ec2.SubnetSelection {
-    return { subnets: this.vpc.publicSubnets };
+    return { subnets: this.vpc.publicSubnets, subnetType: ec2.SubnetType.PUBLIC };
   }
 
   private initializeBastionHostsConfig(
@@ -131,7 +131,7 @@ export class Infrastructure extends cdk.Stack {
           iamInstanceProfile: {
             arn: bastionInstanceProfile.attrArn
           },
-          instanceType: "t3.nano",
+          instanceType: "t2.nano",
           instanceInitiatedShutdownBehavior: "terminate",
           disableApiTermination: false,
           networkInterfaces: [
