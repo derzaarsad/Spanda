@@ -8,3 +8,4 @@ SpandaServer/swagger.json
 out
 cdk.out
 reports
+DinodimeBackend/integration-test.env
