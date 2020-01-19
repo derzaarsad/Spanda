@@ -4,15 +4,7 @@ import winston from "winston";
 
 import { Builder, By, until } from "selenium-webdriver";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import {
-  User,
-  Users,
-  BankConnections,
-  FinAPI,
-  VoidTransport,
-  CallbackCrypto,
-  Encryptions
-} from "dynodime-lib";
+import { User, Users, VoidTransport, CallbackCrypto, Encryptions } from "dynodime-lib";
 
 import { getWebformId } from "../../src/controllers/bank-controller";
 import { CreateFinApiTestInterfaces } from "../test-utility";

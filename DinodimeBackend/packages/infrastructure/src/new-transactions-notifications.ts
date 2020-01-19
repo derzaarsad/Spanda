@@ -53,7 +53,8 @@ export class NewTransactionsNotifications extends cdk.Construct {
     notificationsTopic.grantPublish(fn);
 
     const restAPI = new apigw.LambdaRestApi(this, "NotificationsEndpoint", {
-      handler: fn
+      handler: fn,
+      endpointExportName: "NotificationsEndpointURL"
     });
 
     this.restAPI = restAPI;

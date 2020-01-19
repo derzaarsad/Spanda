@@ -2,7 +2,7 @@ import cdk = require("@aws-cdk/core");
 import { NewTransactionsNotifications } from "./new-transactions-notifications";
 import { DinodimeAPI } from "./dinodime-api";
 
-export class DinodimeStack extends cdk.Stack {
+export class Services extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
@@ -12,7 +12,7 @@ export class DinodimeStack extends cdk.Stack {
       decryptionKey: decryptionKey
     });
 
-    const api = new DinodimeAPI(this, "DynodimeAPI", {
+    new DinodimeAPI(this, "DynodimeAPI", {
       region: this.region,
       finApiConfiguration: {
         finApiUrl: this.node.tryGetContext("finApiUrl") as string,
@@ -26,14 +26,6 @@ export class DinodimeStack extends cdk.Stack {
     });
 
     // Outputs
-
-    new cdk.CfnOutput(this, "APIEndpointURL", {
-      value: api.restAPI.url
-    });
-
-    new cdk.CfnOutput(this, "NotificationsEndpointURL", {
-      value: notifications.restAPI.url
-    });
 
     new cdk.CfnOutput(this, "NotificationsTableName", {
       value: notifications.table.tableName

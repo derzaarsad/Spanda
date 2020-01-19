@@ -1,6 +1,7 @@
 import cdk = require("@aws-cdk/core");
 import lambda = require("@aws-cdk/aws-lambda");
 import apigw = require("@aws-cdk/aws-apigateway");
+
 import { Duration } from "@aws-cdk/core";
 import { LambdaIntegration } from "@aws-cdk/aws-apigateway";
 import { APIConfiguration } from "./api-configuration";
@@ -35,7 +36,9 @@ export class DinodimeAPI extends cdk.Construct {
 
     const commonEnvironment = configureEnvironment(props);
 
-    const restAPI = new apigw.RestApi(this, "DinodimeAPI");
+    const restAPI = new apigw.RestApi(this, "DinodimeAPI", {
+      endpointExportName: "APIEndpointURL"
+    });
 
     // Authenticaction controller
     const users = restAPI.root.addResource("users");
