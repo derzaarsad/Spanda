@@ -161,8 +161,8 @@ jobs:
     continueOnError: true
   - script: |
       echo "Start Integration Test"
-      cd $(System.DefaultWorkingDirectory)/SpandaServerless
-      docker-compose build && docker-compose up --abort-on-container-exit
+      cd $(System.DefaultWorkingDirectory)/DinodimeBackend
+      docker-compose -f packages/lib/docker-compose.yml build && docker-compose -f packages/lib/docker-compose.yml up --abort-on-container-exit 
     displayName: 'Run integration tests'
     continueOnError: true
   - task: PublishTestResults@2

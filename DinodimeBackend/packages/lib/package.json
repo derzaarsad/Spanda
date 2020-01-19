@@ -6,7 +6,8 @@
   "module": "out/src/index.mjs",
   "types": "out/src/index.d.ts",
   "scripts": {
-    "test": "mocha --require ts-node/register test/unit/**/*.ts"
+    "test": "mocha --require ts-node/register test/unit/**/*.ts",
+    "integtest": "mocha --require ts-node/register test/integration/**/*.ts"
   },
   "dependencies": {
     "aws-sdk": "^2.596.0",
