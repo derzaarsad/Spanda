@@ -2,6 +2,7 @@
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as iam from "@aws-cdk/aws-iam";
+
 import { Services } from "../src/services";
 import { PostgresStorage } from "../src/postgres-storage";
 import { Infrastructure } from "../src/infrastructure";
@@ -50,4 +51,4 @@ const lambdaProps: LambdaDeploymentProps = {
 };
 
 new PostgresStorage(app, "DinodimeDatabase", postgresProps);
-new Services(app, "DinodimeServices", { env: deploymentEnv });
+new Services(app, "DinodimeServices", lambdaProps, { env: deploymentEnv });
