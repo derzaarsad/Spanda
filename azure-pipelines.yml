@@ -125,6 +125,7 @@ jobs:
       webformUrlForFetch=`python getWebformUrl.py $accessTokenForFetch $webformIdForFetch`
       echo "get webform url for fetch $webformUrlForFetch"
       python authenticateWebform.py $webformUrlForFetch
+      rm -rf ./integration-test.env
       echo -e "AZURE_TEST_USER_REGISTER=$(AZURE_TEST_USER_REGISTER)" >> ./integration-test.env
       echo -e "AZURE_TEST_USER_LOGIN=$(AZURE_TEST_USER_LOGIN)" >> ./integration-test.env
       echo -e "FinAPIClientId=$(FinAPIClientId)" >> ./integration-test.env
