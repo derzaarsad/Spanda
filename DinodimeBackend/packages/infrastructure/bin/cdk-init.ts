@@ -30,7 +30,7 @@ const postgresProps: PostgresDeploymentProps = {
   instanceProps: {
     databaseName: "postgres",
     masterUsername: "postgres",
-    masterUserPassword: cdk.SecretValue.plainText("covfefe"),
+    masterUserPassword: cdk.SecretValue.plainText("y4Kns2NTvtPz"),
     instanceClass: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
     deletionProtection: false,
     backupRetention: cdk.Duration.days(0),
