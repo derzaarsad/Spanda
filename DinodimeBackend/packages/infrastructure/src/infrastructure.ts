@@ -55,9 +55,14 @@ export class Infrastructure extends cdk.Stack {
 
     const bastionSecurityGroup = new ec2.SecurityGroup(this, "BastionsSG", {
       vpc: this.vpc,
-      description: "A security group for bastion hosts that allows SSH access from within the VPC"
+      description: "A security group for bastion hosts"
     });
-    bastionSecurityGroup.addIngressRule(ec2.Peer.ipv4(this.vpc.vpcCidrBlock), this.sshPort);
+
+    bastionSecurityGroup.addIngressRule(
+      ec2.Peer.ipv4(this.vpc.vpcCidrBlock),
+      this.sshPort,
+      "Grants SSH access from within the VPC"
+    );
 
     this.databasesSecurityGroup = new ec2.SecurityGroup(this, "DatabasesSG", {
       vpc: this.vpc,
@@ -70,7 +75,7 @@ export class Infrastructure extends cdk.Stack {
       "Grants access to the database port to applications"
     );
 
-    this.databaseApplicationsSecurityGroup.addIngressRule(
+    this.databasesSecurityGroup.addIngressRule(
       bastionSecurityGroup,
       this.databasePort,
       "Grants access to the database port to bastion hosts"
