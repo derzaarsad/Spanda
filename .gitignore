@@ -5,3 +5,6 @@
 SpandaServer/src/routes.ts
 SpandaServer/swagger.json
 *packaged.yaml
+out
+cdk.out
+reports
