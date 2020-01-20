@@ -1,6 +1,7 @@
 import mocha from "mocha";
 
-import cdk = require("@aws-cdk/core");
+import * as cdk from "@aws-cdk/core";
+import * as ec2 from "@aws-cdk/aws-ec2";
 import { expect as expectCDK, haveResource } from "@aws-cdk/assert";
 import { Services } from "../src/services";
 import { Vpc } from "@aws-cdk/aws-ec2";
@@ -12,7 +13,7 @@ describe("The services stack", () => {
   before("setup", () => {
     lambdaProps = {
       vpc: {} as Vpc,
-      subnets: [],
+      subnets: { subnetType: ec2.SubnetType.PRIVATE },
       securityGroups: [],
       managedExecutionRolePolicies: []
     };

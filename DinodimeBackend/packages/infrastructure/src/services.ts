@@ -1,4 +1,4 @@
-import cdk = require("@aws-cdk/core");
+import * as cdk from "@aws-cdk/core";
 import { NewTransactionsNotifications } from "./new-transactions-notifications";
 import { DinodimeAPI } from "./dinodime-api";
 import { LambdaDeploymentProps } from "./lambda-deployment-props";
@@ -18,13 +18,16 @@ export class Services extends cdk.Stack {
       this,
       "DinodimeNewTransactionsNotifications",
       {
-        decryptionKey: decryptionKey
+        decryptionKey: decryptionKey,
+        lambdaDeploymentProps: lambdaDeploymentProps
       }
     );
 
     new DinodimeAPI(this, "DynodimeAPI", {
       region: this.region,
+
       lambdaDeploymentProps: lambdaDeploymentProps,
+
       finApiConfiguration: {
         finApiUrl: this.node.tryGetContext("finApiUrl") as string,
         finApiClientId: this.node.tryGetContext("finApiClientId") as string,
@@ -32,6 +35,7 @@ export class Services extends cdk.Stack {
       },
 
       decryptionKey: decryptionKey,
+
       backendConfiguration: {
         storageBackend: "IN_MEMORY"
       }

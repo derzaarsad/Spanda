@@ -1,6 +1,5 @@
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
-import * as rds from "@aws-cdk/aws-rds";
 
 interface PostgresInfrastructureProps {
   vpc: ec2.Vpc;

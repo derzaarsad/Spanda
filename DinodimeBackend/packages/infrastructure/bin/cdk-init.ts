@@ -43,7 +43,7 @@ const postgresProps: PostgresDeploymentProps = {
 
 const lambdaProps: LambdaDeploymentProps = {
   vpc: infrastructure.vpc,
-  subnets: infrastructure.privateSubnets(),
+  subnets: infrastructure.privateSubnetSelection(),
   securityGroups: [infrastructure.databaseApplicationsSecurityGroup],
   managedExecutionRolePolicies: [
     iam.ManagedPolicy.fromAwsManagedPolicyName("AWSLambdaVPCAccessExecutionRole")
