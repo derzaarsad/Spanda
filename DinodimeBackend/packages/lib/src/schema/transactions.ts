@@ -64,4 +64,21 @@ export class TransactionsSchema implements Schema<Transaction> {
   asObject(row: Array<any>) {
     return asObject(row);
   }
+
+  mapColumns(el: any) {
+    return {
+      id: el[this.columns.id],
+      accountId: el[this.columns.accountId],
+      absAmount: el[this.columns.absAmount],
+      isExpense: el[this.columns.isExpense],
+      bookingDate: el[this.columns.bookingDate],
+      purpose: el[this.columns.purpose],
+      counterPartName: el[this.columns.counterPartName],
+      counterPartAccountNumber: el[this.columns.counterPartAccountNumber],
+      counterPartIban: el[this.columns.counterPartIban],
+      counterPartBlz: el[this.columns.counterPartBlz],
+      counterPartBic: el[this.columns.counterPartBic],
+      counterPartBankName: el[this.columns.counterPartBankName]
+    };
+  }
 }

@@ -58,4 +58,19 @@ export class UsersSchema implements Schema<User> {
   asObject(row: Array<any>) {
     return asObject(row);
   }
+
+  mapColumns(el: any) {
+    return {
+      username: el[this.columns.username],
+      creationDate: el[this.columns.creationDate],
+      allowance: el[this.columns.allowance],
+      isAllowanceReady: el[this.columns.isAllowanceReady],
+      email: el[this.columns.email],
+      phone: el[this.columns.phone],
+      isAutoUpdateEnabled: el[this.columns.isAutoUpdateEnabled],
+      bankConnectionIds: el[this.columns.bankConnectionIds],
+      activeWebFormId: el[this.columns.activeWebFormId],
+      activeWebFormAuth: el[this.columns.activeWebFormAuth]
+    };
+  }
 }

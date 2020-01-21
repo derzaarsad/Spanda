@@ -84,7 +84,8 @@ export namespace Transactions {
     async findById(id: number): Promise<Transaction | null> {
       const params = {
         text: this.findByIdQuery(id),
-        rowMode: "array"
+        rowMode: "array",
+        types: this.types
       };
 
       return this.doQuery(params).then(res =>
@@ -102,20 +103,22 @@ export namespace Transactions {
     async findByAccountIds(accountIds: number[]): Promise<Transaction[]> {
       const params = {
         text: this.findByAccountIdsQuery(accountIds),
-        rowMode: "array"
+        rowMode: "array",
+        types: this.types
       };
 
       return this.doQuery(params).then(res => res.rows.map(row => this.schema.asObject(row)));
     }
 
-    async groupByIban(): Promise<Transaction[]> {
+    async groupByIban(): Promise<any> {
       const params = {
         text: this.groupByColumnQuery(8),
-        rowMode: "array"
-      }
+        rowMode: "array",
+        types: this.types
+      };
 
       return this.doQuery(params)
-        .then(res => res.rows.map(row => row[0].map((element: any) => this.schema.asObject(element))));
+        .then(res => res.rows.map(row => row[0].map((element: any) => this.schema.mapColumns(element))));
     }
 
     async saveArray(transactions: Transaction[]): Promise<Transaction[]> {
@@ -143,7 +146,7 @@ export namespace Transactions {
     }
 
     groupByColumnQuery(attributesIndex: number) {
-      const attribute = this.schema.attributes.split(',')[attributesIndex]
+      const attribute = this.schema.attributes.split(",")[attributesIndex];
       return this.format(
         "SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM %I WHERE %I=b.%I) t ) rw FROM %I b WHERE %I IS NOT NULL GROUP BY %I",
         this.schema.tableName,

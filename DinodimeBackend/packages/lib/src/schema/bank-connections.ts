@@ -33,4 +33,12 @@ export class BankConnectionsSchema implements Schema<BankConnection> {
   asObject(row: Array<any>) {
     return asObject(row);
   }
+
+  mapColumns(el: any) {
+    return {
+      id: el[this.columns.id],
+      bankId: el[this.columns.bankId],
+      bankAccountIds: el[this.columns.bankAccountIds]
+    };
+  }
 }

@@ -4,4 +4,5 @@ export interface Schema<T> {
   columns: { [key: string]: string };
   asRow(t: T): Array<any>;
   asObject(row: Array<any>): T;
+  mapColumns(el: any): T;
 }
