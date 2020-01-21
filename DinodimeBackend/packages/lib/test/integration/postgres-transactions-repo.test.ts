@@ -300,4 +300,77 @@ describe("postgres transactions repository", function() {
     expect(await transactions.findById(transactionsData[1].id)).to.not.exist;
     expect(await transactions.findById(transactionsData[2].id)).to.not.exist;
   });
+
+  it('group by iban column', async function() {
+    let transactionsData: Transaction[] = [
+      {
+        id: 1112,
+        accountId: 2,
+        absAmount: 89.871,
+        isExpense: true,
+        bookingDate: new Date("2018-01-01T00:00:00.000Z"),
+        purpose: " RE. 745259",
+        counterPartName: "TueV Bayern",
+        counterPartAccountNumber: "611105",
+        counterPartIban: "AU13700807001061110500",
+        counterPartBlz: "70080000",
+        counterPartBic: "DRESDEFF700",
+        counterPartBankName: "Commerzbank vormals Dresdner Bank"
+      },
+      {
+        id: 1112,
+        accountId: 3,
+        absAmount: 99.81,
+        isExpense: true,
+        bookingDate: new Date("2018-01-02T00:00:00.000Z"),
+        purpose: " RE. 745459",
+        counterPartName: "TueV Bayern",
+        counterPartAccountNumber: "611605",
+        counterPartIban: "AU13700807001061110500",
+        counterPartBlz: "70080070",
+        counterPartBic: "DREEDEFF700",
+        counterPartBankName: "Commerzbank vormals Dresdner Bank"
+      },
+      {
+        id: 4112,
+        accountId: 4,
+        absAmount: 64.81,
+        isExpense: true,
+        bookingDate: new Date("2018-01-03T00:00:00.000Z"),
+        purpose: " RE. 735459",
+        counterPartName: "TueV Bayern",
+        counterPartAccountNumber: "631605",
+        counterPartIban: "DE13700800000061110500",
+        counterPartBlz: "71080070",
+        counterPartBic: "DREEUEFF700",
+        counterPartBankName: "Commerzbank vormals Dresdner Bank"
+      },
+      {
+        id: 4112,
+        accountId: 5,
+        absAmount: 69.81,
+        isExpense: true,
+        bookingDate: new Date("2018-01-03T00:00:00.000Z"),
+        purpose: " RE. 735459",
+        counterPartName: "TueV Bayern",
+        counterPartAccountNumber: "631605",
+        counterPartIban: "DE13700800000061110500",
+        counterPartBlz: "71080070",
+        counterPartBic: "DREEUEFF700",
+        counterPartBankName: "Commerzbank vormals Dresdner Bank"
+      }
+    ];
+
+    await transactions.saveArray(transactionsData);
+    const transactionsGroup = await transactions.groupByIban();
+    expect(transactionsGroup.length).to.equal(2);
+    expect(transactionsGroup[0][0].accountId).to.equal(2);
+    expect(transactionsGroup[0][0].counterPartIban).to.equal('AU13700807001061110500');
+    expect(transactionsGroup[0][1].accountId).to.equal(3);
+    expect(transactionsGroup[0][1].counterPartIban).to.equal('AU13700807001061110500');
+    expect(transactionsGroup[1][0].accountId).to.equal(4);
+    expect(transactionsGroup[1][0].counterPartIban).to.equal('DE13700800000061110500');
+    expect(transactionsGroup[1][1].accountId).to.equal(5);
+    expect(transactionsGroup[1][1].counterPartIban).to.equal('DE13700800000061110500');
+  });
 });
