@@ -45,9 +45,7 @@ const lambdaDeploymentProps: LambdaDeploymentProps = {
   vpc: infrastructure.vpc,
   subnets: infrastructure.publicSubnetSelection(),
   securityGroups: [infrastructure.databaseApplicationsSecurityGroup],
-  managedExecutionRolePolicies: [
-    iam.ManagedPolicy.fromAwsManagedPolicyName("AWSLambdaVPCAccessExecutionRole")
-  ]
+  lambdaExecutionRole: infrastructure.lambdaExecutionRole
 };
 
 new PostgresStorage(app, "DinodimeDatabase", postgresProps);

@@ -4,7 +4,7 @@ import { LambdaDeploymentProps } from "./lambda-deployment-props";
 
 interface LambdaFactoryProps {
   scope: cdk.Construct;
-  deploymentProps: LambdaDeploymentProps;
+  deploymentProps?: LambdaDeploymentProps;
   runtime: lambda.Runtime;
   duration: cdk.Duration;
   env?: { [key: string]: string };
@@ -12,7 +12,7 @@ interface LambdaFactoryProps {
 
 export class LambdaFactory {
   scope: cdk.Construct;
-  deploymentProps: LambdaDeploymentProps;
+  deploymentProps: LambdaDeploymentProps | undefined;
   runtime: lambda.Runtime;
   duration: cdk.Duration;
   env: { [key: string]: string };
@@ -32,13 +32,10 @@ export class LambdaFactory {
       runtime: this.runtime,
       timeout: this.duration,
       environment: this.env,
-      securityGroups: this.deploymentProps.securityGroups,
-      vpc: this.deploymentProps.vpc,
-      vpcSubnets: this.deploymentProps.subnets
-    });
-
-    this.deploymentProps.managedExecutionRolePolicies.forEach(policy => {
-      fn.role.addManagedPolicy(policy);
+      securityGroups: this.deploymentProps?.securityGroups,
+      vpc: this.deploymentProps?.vpc,
+      vpcSubnets: this.deploymentProps?.subnets,
+      role: this.deploymentProps?.lambdaExecutionRole
     });
 
     return fn;

@@ -2,28 +2,22 @@ import mocha from "mocha";
 
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
+import * as iam from "@aws-cdk/aws-iam";
 import { expect as expectCDK, haveResource } from "@aws-cdk/assert";
 import { Services } from "../src/services";
 import { Vpc } from "@aws-cdk/aws-ec2";
 import { LambdaDeploymentProps } from "../src/lambda-deployment-props";
 
 describe("The services stack", () => {
-  let lambdaProps: LambdaDeploymentProps;
+  let app: cdk.App;
 
-  before("setup", () => {
-    lambdaProps = {
-      vpc: {} as Vpc,
-      subnets: { subnetType: ec2.SubnetType.PRIVATE },
-      securityGroups: [],
-      managedExecutionRolePolicies: []
-    };
+  beforeEach("setup", () => {
+    app = new cdk.App();
   });
 
   it("Contains an SQS queue", () => {
-    const app = new cdk.App();
-
     // WHEN
-    const stack = new Services(app, "MyTestStack", lambdaProps);
+    const stack = new Services(app, "MyTestStack");
     // THEN
     expectCDK(stack).to(
       haveResource("AWS::SQS::Queue", {
@@ -33,9 +27,8 @@ describe("The services stack", () => {
   });
 
   it("Contains an SNS topic", () => {
-    const app = new cdk.App();
     // WHEN
-    const stack = new Services(app, "MyTestStack", lambdaProps);
+    const stack = new Services(app, "MyTestStack");
     // THEN
     expectCDK(stack).to(haveResource("AWS::SNS::Topic"));
   });

@@ -8,6 +8,6 @@ export interface APIConfiguration {
   loggerLevel?: string;
   decryptionKey: string;
   finApiConfiguration: FinApiConfiguration;
-  lambdaDeploymentProps: LambdaDeploymentProps;
+  lambdaDeploymentProps?: LambdaDeploymentProps;
   backendConfiguration: PostgresConfiguration | InMemoryConfiguration;
 }

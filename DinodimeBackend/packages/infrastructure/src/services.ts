@@ -7,7 +7,7 @@ export class Services extends cdk.Stack {
   constructor(
     scope: cdk.App,
     id: string,
-    lambdaDeploymentProps: LambdaDeploymentProps,
+    lambdaDeploymentProps?: LambdaDeploymentProps,
     props?: cdk.StackProps
   ) {
     super(scope, id, props);
