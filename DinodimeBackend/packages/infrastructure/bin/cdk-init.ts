@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
-import * as iam from "@aws-cdk/aws-iam";
 
 import { Services } from "../src/services";
 import { PostgresStorage } from "../src/postgres-storage";
@@ -43,7 +42,7 @@ const postgresProps: PostgresDeploymentProps = {
 
 const lambdaDeploymentProps: LambdaDeploymentProps = {
   vpc: infrastructure.vpc,
-  subnets: infrastructure.publicSubnetSelection(),
+  subnets: infrastructure.privateSubnetSelection(),
   securityGroups: [infrastructure.databaseApplicationsSecurityGroup],
   lambdaExecutionRole: infrastructure.lambdaExecutionRole
 };

@@ -1,12 +1,8 @@
 import mocha from "mocha";
 
 import * as cdk from "@aws-cdk/core";
-import * as ec2 from "@aws-cdk/aws-ec2";
-import * as iam from "@aws-cdk/aws-iam";
 import { expect as expectCDK, haveResource } from "@aws-cdk/assert";
 import { Services } from "../src/services";
-import { Vpc } from "@aws-cdk/aws-ec2";
-import { LambdaDeploymentProps } from "../src/lambda-deployment-props";
 
 describe("The services stack", () => {
   let app: cdk.App;

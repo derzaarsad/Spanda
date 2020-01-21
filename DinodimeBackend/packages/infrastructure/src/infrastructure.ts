@@ -30,18 +30,15 @@ export class Infrastructure extends cdk.Stack {
         },
         {
           cidrMask: 20,
-          name: "isolated",
+          name: "private",
+          subnetType: ec2.SubnetType.PRIVATE
+        },
+        {
+          cidrMask: 24,
+          name: "rds",
           subnetType: ec2.SubnetType.ISOLATED
         }
-      ],
-      gatewayEndpoints: {
-        S3: {
-          service: ec2.GatewayVpcEndpointAwsService.S3
-        },
-        DynamoDB: {
-          service: ec2.GatewayVpcEndpointAwsService.DYNAMODB
-        }
-      }
+      ]
     });
 
     this.databaseApplicationsSecurityGroup = new ec2.SecurityGroup(this, "DatabaseApplicationsSG", {
