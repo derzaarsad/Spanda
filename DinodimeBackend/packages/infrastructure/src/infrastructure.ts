@@ -23,18 +23,13 @@ export class Infrastructure extends cdk.Stack {
       cidr: props.vpcCidr,
       subnetConfiguration: [
         {
-          cidrMask: 24,
+          cidrMask: 20,
           name: "public",
           subnetType: ec2.SubnetType.PUBLIC
         },
         {
           cidrMask: 20,
-          name: "private",
-          subnetType: ec2.SubnetType.PRIVATE
-        },
-        {
-          cidrMask: 28,
-          name: "rds",
+          name: "isolated",
           subnetType: ec2.SubnetType.ISOLATED
         }
       ],
@@ -81,7 +76,7 @@ export class Infrastructure extends cdk.Stack {
       "Grants access to the database port to bastion hosts"
     );
 
-    this.initializeBastionHostsConfig(this.vpc.privateSubnets, bastionSecurityGroup);
+    this.initializeBastionHostsConfig(this.vpc.publicSubnets, bastionSecurityGroup);
   }
 
   public isolatedSubnets() {

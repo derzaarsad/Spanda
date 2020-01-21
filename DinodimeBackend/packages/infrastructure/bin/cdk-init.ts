@@ -41,9 +41,9 @@ const postgresProps: PostgresDeploymentProps = {
   }
 };
 
-const lambdaProps: LambdaDeploymentProps = {
+const lambdaDeploymentProps: LambdaDeploymentProps = {
   vpc: infrastructure.vpc,
-  subnets: infrastructure.privateSubnetSelection(),
+  subnets: infrastructure.publicSubnetSelection(),
   securityGroups: [infrastructure.databaseApplicationsSecurityGroup],
   managedExecutionRolePolicies: [
     iam.ManagedPolicy.fromAwsManagedPolicyName("AWSLambdaVPCAccessExecutionRole")
@@ -51,4 +51,4 @@ const lambdaProps: LambdaDeploymentProps = {
 };
 
 new PostgresStorage(app, "DinodimeDatabase", postgresProps);
-new Services(app, "DinodimeServices", lambdaProps, { env: deploymentEnv });
+new Services(app, "DinodimeServices", lambdaDeploymentProps, { env: deploymentEnv });
