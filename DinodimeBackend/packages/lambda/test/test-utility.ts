@@ -1,5 +1,5 @@
 import axios from "axios";
-import { User, FinAPI, FinAPIModel } from "dynodime-lib";
+import { User, FinAPI } from "dynodime-lib";
 import { Authentication, Basic } from "dynodime-lib";
 import { ClientSecretsProvider, Resolved } from "dynodime-lib";
 
@@ -70,7 +70,7 @@ export const CreateUnittestInterfaces = () => {
   };
 };
 
-export const CreateFinApitestInterfaces = (clientId: string, clientSecret: string) => {
+export const CreateFinApiTestInterfaces = (clientId: string, clientSecret: string) => {
   // Create Authentications
   const httpClient = axios.create({
     baseURL: "https://sandbox.finapi.io",
@@ -84,7 +84,7 @@ export const CreateFinApitestInterfaces = (clientId: string, clientSecret: strin
   let clientSecrets = new Resolved(clientId, clientSecret);
 
   // Create bank interface
-  let bankInterface = require("../lib/bankInterface")(httpClient);
+  let bankInterface = new FinAPI(httpClient);
 
   return {
     authentication,

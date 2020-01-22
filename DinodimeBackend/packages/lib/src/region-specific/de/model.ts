@@ -4713,7 +4713,7 @@ export namespace Model {
     /**
      * Array of transactions (for the requested page)
      */
-    "transactions": Array<FinAPITransaction>;
+    "transactions": Array<Transaction>;
     /**
      * Information for pagination
      */
@@ -6437,7 +6437,7 @@ export namespace Model {
   /**
    * Container for a transaction's data
    */
-  export class FinAPITransaction {
+  export class Transaction {
     /**
      * Transaction identifier
      */
@@ -6769,7 +6769,7 @@ export namespace Model {
     ];
 
     static getAttributeTypeMap() {
-      return FinAPITransaction.attributeTypeMap;
+      return Transaction.attributeTypeMap;
     }
   }
 
@@ -6780,7 +6780,7 @@ export namespace Model {
     /**
      * List of transactions
      */
-    "transactions": Array<FinAPITransaction>;
+    "transactions": Array<Transaction>;
 
     static discriminator: string | undefined = undefined;
 

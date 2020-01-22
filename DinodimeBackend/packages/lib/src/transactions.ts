@@ -1,6 +1,7 @@
 import { Repository, PostgresRepository } from "./repository";
 import { Schema } from "./schema/schema";
 import { Pool } from "pg";
+import { Model as FinAPIModel } from "./region-specific/de/model";
 
 export type Transaction = {
   id: number;
@@ -18,6 +19,28 @@ export type Transaction = {
 };
 
 export namespace Transactions {
+  /**
+   * Maps the finapi json format into database json format
+   * @param tx a finAPI Transaction representation.
+   */
+  // TODO: Time conversion is imprecise
+  export const fromFinAPI = (tx: FinAPIModel.Transaction) => {
+    return {
+      id: tx.id,
+      accountId: tx.accountId,
+      absAmount: Math.abs(tx.amount),
+      isExpense: tx.amount < 0,
+      bookingDate: new Date(tx.finapiBookingDate.replace(" ", "T") + "Z"),
+      purpose: tx.purpose,
+      counterPartName: tx.counterpartName,
+      counterPartAccountNumber: tx.counterpartAccountNumber,
+      counterPartIban: tx.counterpartIban,
+      counterPartBlz: tx.counterpartBlz,
+      counterPartBic: tx.counterpartBic,
+      counterPartBankName: tx.counterpartBankName
+    };
+  };
+
   export interface TransactionsRepository extends Repository<number, Transaction> {
     findByAccountIds(accountIds: Array<number>): Promise<Array<Transaction>>;
     saveArray(transactions: Array<Transaction>): Promise<Array<Transaction>>;
@@ -119,6 +142,12 @@ export namespace Transactions {
 
       return this.doQuery(params)
         .then(res => res.rows.map(row => row[0].map((element: any) => this.schema.mapColumns(element))));
+        rowMode: "array"
+      };
+
+      return this.doQuery(params).then(res =>
+        res.rows.map(row => row[0].map((element: any) => this.schema.asObject(element)))
+      );
     }
 
     async saveArray(transactions: Transaction[]): Promise<Transaction[]> {

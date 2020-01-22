@@ -115,7 +115,7 @@ describe("get webform id", function() {
     expect(result.statusCode).to.equal(500);
   });
 
-  it("return webform location", async function() {
+  it("returns webform's location", async function() {
     await users.save(new User(testUsername, testValidEmail, testValidPhone, false));
 
     const event = ({
@@ -152,6 +152,7 @@ describe("get webform id", function() {
 
     // this test proves whether the right data is written to database
     let user = await users.findByWebFormId(2934);
+    expect(user).to.be.ok;
     expect(formId).to.equal(user!.activeWebFormId!);
     expect(
       encryptions.DecryptText({ iv: user!.activeWebFormAuth!, cipherText: encryptedAuth })

@@ -1,5 +1,5 @@
 import qs from "querystring";
-import { Model } from "./model";
+import { Model as FinAPIModel } from "./model";
 
 import { AxiosInstance, AxiosRequestConfig } from "axios";
 import { WebFormHandle } from "./finapi-webform-handle";
@@ -11,7 +11,7 @@ export class FinAPI {
     this.http = http;
   }
 
-  async userInfo(authorization: string): Promise<Model.User> {
+  async userInfo(authorization: string): Promise<FinAPIModel.User> {
     const params = {
       headers: {
         Authorization: authorization
@@ -20,7 +20,7 @@ export class FinAPI {
     return this.http.get("/api/v1/users", params).then(response => response.data);
   }
 
-  async registerUser(authorization: string, user: Model.User) {
+  async registerUser(authorization: string, user: FinAPIModel.User) {
     const config = {
       headers: {
         Authorization: authorization,
@@ -69,7 +69,7 @@ export class FinAPI {
     authorization: string,
     accountIds: number[],
     bankPerPage: number = 400
-  ): Promise<Model.FinAPITransaction[]> {
+  ): Promise<FinAPIModel.Transaction[]> {
     const firstPageResponseJson = await this.getTransactionPerPage(
       authorization,
       accountIds,
@@ -120,7 +120,7 @@ export class FinAPI {
     accountIds: number[],
     page: number,
     bankPerPage: number
-  ): Promise<Model.PageableTransactionList> {
+  ): Promise<FinAPIModel.PageableTransactionList> {
     const config: AxiosRequestConfig = {
       headers: {
         Authorization: authorization,
@@ -157,7 +157,7 @@ export class FinAPI {
     ruleHandle: string,
     accountIds: Array<Number>,
     includeDetails: boolean
-  ): Promise<Model.NotificationRule> {
+  ): Promise<FinAPIModel.NotificationRule> {
     const resource = "/api/v1/notificationRules";
 
     const config = {
@@ -167,8 +167,8 @@ export class FinAPI {
       }
     };
 
-    const rule: Model.NotificationRuleParams = {
-      triggerEvent: Model.NotificationRuleParams.TriggerEventEnum.NEWTRANSACTIONS,
+    const rule: FinAPIModel.NotificationRuleParams = {
+      triggerEvent: FinAPIModel.NotificationRuleParams.TriggerEventEnum.NEWTRANSACTIONS,
       params: {
         accountIds: accountIds.join(",")
       },
