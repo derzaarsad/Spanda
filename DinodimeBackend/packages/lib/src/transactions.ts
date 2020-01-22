@@ -142,12 +142,6 @@ export namespace Transactions {
 
       return this.doQuery(params)
         .then(res => res.rows.map(row => row[0].map((element: any) => this.schema.mapColumns(element))));
-        rowMode: "array"
-      };
-
-      return this.doQuery(params).then(res =>
-        res.rows.map(row => row[0].map((element: any) => this.schema.asObject(element)))
-      );
     }
 
     async saveArray(transactions: Transaction[]): Promise<Transaction[]> {
