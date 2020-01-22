@@ -1,48 +1,24 @@
 import * as cdk from "@aws-cdk/core";
 import { NewTransactionsNotifications } from "./new-transactions-notifications";
 import { DinodimeAPI } from "./dinodime-api";
-import { LambdaDeploymentProps } from "./lambda-deployment-props";
+import { ServicesProps } from "./services-props";
 
 export class Services extends cdk.Stack {
-  constructor(
-    scope: cdk.App,
-    id: string,
-    lambdaDeploymentProps?: LambdaDeploymentProps,
-    props?: cdk.StackProps
-  ) {
+  constructor(scope: cdk.App, id: string, props: ServicesProps) {
     super(scope, id, props);
-
-    const decryptionKey = this.node.tryGetContext("decryptionKey") as string;
 
     const notifications = new NewTransactionsNotifications(
       this,
       "DinodimeNewTransactionsNotifications",
       {
-        decryptionKey: decryptionKey,
-        lambdaDeploymentProps: lambdaDeploymentProps
+        decryptionKey: props.finApiProps.finApiDecryptionKey,
+        lambdaDeploymentProps: props.lambdaDeploymentProps
       }
     );
 
-    new DinodimeAPI(this, "DynodimeAPI", {
-      region: this.region,
-
-      lambdaDeploymentProps: lambdaDeploymentProps,
-
-      finApiConfiguration: {
-        finApiUrl: this.node.tryGetContext("finApiUrl") as string,
-        finApiClientId: this.node.tryGetContext("finApiClientId") as string,
-        finApiClientSecret: this.node.tryGetContext("finApiClientSecret") as string
-      },
-
-      decryptionKey: decryptionKey,
-
-      backendConfiguration: {
-        storageBackend: "IN_MEMORY"
-      }
-    });
+    new DinodimeAPI(this, "DynodimeAPI", props);
 
     // Outputs
-
     new cdk.CfnOutput(this, "NotificationsTableName", {
       value: notifications.table.tableName
     });

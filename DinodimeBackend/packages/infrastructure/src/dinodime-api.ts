@@ -4,24 +4,24 @@ import * as apigw from "@aws-cdk/aws-apigateway";
 
 import { Duration } from "@aws-cdk/core";
 import { LambdaIntegration } from "@aws-cdk/aws-apigateway";
-import { APIConfiguration } from "./api-configuration";
 import { LambdaFactory } from "./lambda-factory";
+import { ServicesProps } from "./services-props";
 
-const configureEnvironment = (apiConfiguration: APIConfiguration): { [key: string]: string } => {
+const configureEnvironment = (servicesProps: ServicesProps): { [key: string]: string } => {
   const environment: { [key: string]: string } = {
-    REGION: apiConfiguration.region,
-    LOGGER_LEVEL: apiConfiguration.loggerLevel || "debug",
-    FINAPI_URL: apiConfiguration.finApiConfiguration.finApiUrl,
-    FINAPI_CLIENT_ID: apiConfiguration.finApiConfiguration.finApiClientId,
-    FINAPI_CLIENT_SECRET: apiConfiguration.finApiConfiguration.finApiClientSecret,
-    FINAPI_TIMEOUT: apiConfiguration.finApiConfiguration.finApiTimeout?.toString() || "3000"
+    REGION: servicesProps.env?.region || "",
+    LOGGER_LEVEL: servicesProps.loggerLevel || "debug",
+    FINAPI_URL: servicesProps.finApiProps.finApiUrl,
+    FINAPI_CLIENT_ID: servicesProps.finApiProps.finApiClientId,
+    FINAPI_CLIENT_SECRET: servicesProps.finApiProps.finApiClientSecret,
+    FINAPI_TIMEOUT: servicesProps.finApiProps.finApiTimeout?.toString() || "3000"
   };
 
-  if (apiConfiguration.backendConfiguration.storageBackend === "POSTGRESQL") {
+  if (servicesProps.backendConfiguration.storageBackend === "POSTGRESQL") {
     throw new Error("not supported yet");
   }
 
-  environment["STORAGE_BACKEND"] = apiConfiguration.backendConfiguration.storageBackend;
+  environment["STORAGE_BACKEND"] = servicesProps.backendConfiguration.storageBackend;
 
   return environment;
 };
@@ -29,7 +29,7 @@ const configureEnvironment = (apiConfiguration: APIConfiguration): { [key: strin
 export class DinodimeAPI extends cdk.Construct {
   readonly restAPI: apigw.RestApi;
 
-  constructor(scope: cdk.Construct, id: string, props: APIConfiguration) {
+  constructor(scope: cdk.Construct, id: string, props: ServicesProps) {
     super(scope, id);
 
     const commonEnvironment = configureEnvironment(props);

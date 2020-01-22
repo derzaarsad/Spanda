@@ -6,13 +6,12 @@ import { Services } from "../src/services";
 import { PostgresStorage } from "../src/postgres-storage";
 import { Infrastructure } from "../src/infrastructure";
 import { PostgresDeploymentProps } from "../src/postgres-deployment-props";
-import { LambdaDeploymentProps } from "../src/lambda-deployment-props";
+import { ServicesProps } from "../src/services-props";
 
 const app = new cdk.App();
 
-const account = app.node.tryGetContext("aws-account")! as string;
-const region = app.node.tryGetContext("aws-region")! as string;
-
+const account = app.node.tryGetContext("awsAccount")! as string;
+const region = app.node.tryGetContext("awsRegion")! as string;
 const deploymentEnv = { region: region, account: account };
 
 const infrastructure = new Infrastructure(app, "DinodimeInfrastructure", { env: deploymentEnv });
@@ -40,12 +39,24 @@ const postgresProps: PostgresDeploymentProps = {
   }
 };
 
-const lambdaDeploymentProps: LambdaDeploymentProps = {
-  vpc: infrastructure.vpc,
-  subnets: infrastructure.privateSubnetSelection(),
-  securityGroups: [infrastructure.databaseApplicationsSecurityGroup],
-  lambdaExecutionRole: infrastructure.lambdaExecutionRole
+const servicesProps: ServicesProps = {
+  env: deploymentEnv,
+  finApiProps: {
+    finApiUrl: app.node.tryGetContext("finApiUrl")! as string,
+    finApiClientId: app.node.tryGetContext("finApiClientId")! as string,
+    finApiClientSecret: app.node.tryGetContext("finApiClientSecret")! as string,
+    finApiDecryptionKey: app.node.tryGetContext("finApiDecryptionKey")! as string
+  },
+  lambdaDeploymentProps: {
+    vpc: infrastructure.vpc,
+    subnets: infrastructure.privateSubnetSelection(),
+    securityGroups: [infrastructure.databaseApplicationsSecurityGroup],
+    lambdaExecutionRole: infrastructure.lambdaExecutionRole
+  },
+  backendConfiguration: {
+    storageBackend: "IN_MEMORY"
+  }
 };
 
 new PostgresStorage(app, "DinodimeDatabase", postgresProps);
-new Services(app, "DinodimeServices", lambdaDeploymentProps, { env: deploymentEnv });
+new Services(app, "DinodimeServices", servicesProps);
