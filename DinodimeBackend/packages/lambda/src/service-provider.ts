@@ -9,7 +9,7 @@ import { BackendProvider } from "./backend-provider";
 
 import InMemoryBackendProvider from "./in-memory-backend-provider";
 import DynamoDBBackendProvider from "./dynamodb-backend-provider";
-import PostgresBackendProvider from "./dynamodb-backend-provider";
+import PostgresBackendProvider from "./postgres-backend-provider";
 
 export class ServiceProvider {
   readonly clientSecrets: ClientSecretsProvider;
@@ -33,7 +33,7 @@ export class ServiceProvider {
       } else if (env["STORAGE_BACKEND"] === "POSTGRESQL") {
         storageBackend = new PostgresBackendProvider(env);
       } else {
-        throw new Error("unknown storage type");
+        throw new Error(`unknown storage type: ${env["STORAGE_BACKEND"]}`);
       }
     }
 
