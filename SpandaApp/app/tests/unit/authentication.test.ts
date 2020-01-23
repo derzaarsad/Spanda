@@ -1,14 +1,12 @@
 import { AuthenticationService } from '../../services/authentication.service';
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpHeaders } from "@angular/common/http";
 
 describe('App Component Test',() => {
 
-	let httpClient;
 	let authenticationService;
 
     beforeEach(function() {
-		httpClient = HttpClient;
-		authenticationService = new AuthenticationService(httpClient);
+		authenticationService = new AuthenticationService();
 	})
 	
 	it('construct message authenticateAndSave to send via REST', async function() {
