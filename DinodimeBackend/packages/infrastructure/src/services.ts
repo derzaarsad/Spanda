@@ -16,7 +16,7 @@ export class Services extends cdk.Stack {
       }
     );
 
-    new DinodimeAPI(this, "DynodimeAPI", props);
+    new DinodimeAPI(this, "DinodimeAPI", props);
 
     // Outputs
     new cdk.CfnOutput(this, "NotificationsTableName", {
