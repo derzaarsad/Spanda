@@ -10,14 +10,20 @@ export class Infrastructure extends cdk.Stack {
   readonly databasesSecurityGroup: ec2.SecurityGroup;
   readonly lambdaExecutionRole: iam.Role;
 
+  readonly databasePortNumber: number;
+  readonly sshPortNumber: number;
+
   readonly databasePort: ec2.Port;
   readonly sshPort: ec2.Port;
 
   constructor(scope: cdk.App, id: string, props: InfrastructureProps) {
     super(scope, id, props);
 
-    this.databasePort = props.databasePort || ec2.Port.tcp(5432);
-    this.sshPort = props.sshPort || ec2.Port.tcp(22);
+    this.databasePortNumber = props.databasePortNumber || 5432;
+    this.sshPortNumber = props.sshPortNumber || 22;
+
+    this.databasePort = ec2.Port.tcp(this.databasePortNumber);
+    this.sshPort = ec2.Port.tcp(this.sshPortNumber);
 
     this.vpc = new ec2.Vpc(this, "VPC", {
       maxAzs: props.numberOfAzs || 2,

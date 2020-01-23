@@ -18,7 +18,11 @@ const configureEnvironment = (servicesProps: ServicesProps): { [key: string]: st
   };
 
   if (servicesProps.backendConfiguration.storageBackend === "POSTGRESQL") {
-    throw new Error("not supported yet");
+    environment["PGPASSWORD"] = servicesProps.backendConfiguration.pgPassword;
+    environment["PGUSER"] = servicesProps.backendConfiguration.pgUser;
+    environment["PGHOST"] = servicesProps.backendConfiguration.pgHost;
+    environment["PGDATABASE"] = servicesProps.backendConfiguration.pgDatabase;
+    environment["PGPORT"] = servicesProps.backendConfiguration.pgPort.toString();
   }
 
   environment["STORAGE_BACKEND"] = servicesProps.backendConfiguration.storageBackend;

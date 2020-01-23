@@ -16,6 +16,10 @@ const deploymentEnv = { region: region, account: account };
 
 const infrastructure = new Infrastructure(app, "DinodimeInfrastructure", { env: deploymentEnv });
 
+const pgDatabaseName = app.node.tryGetContext("pgDatabaseName")! as string;
+const pgMasterUserName = app.node.tryGetContext("pgMasterUserName")! as string;
+const pgMasterPassword = app.node.tryGetContext("pgMasterPassword")! as string;
+
 const postgresProps: PostgresDeploymentProps = {
   env: deploymentEnv,
 
@@ -27,9 +31,9 @@ const postgresProps: PostgresDeploymentProps = {
   },
 
   instanceProps: {
-    databaseName: "postgres",
-    masterUsername: "postgres",
-    masterUserPassword: cdk.SecretValue.plainText("y4Kns2NTvtPz"),
+    databaseName: pgDatabaseName,
+    masterUsername: pgMasterUserName,
+    masterUserPassword: cdk.SecretValue.plainText(pgMasterPassword),
     instanceClass: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
     deletionProtection: false,
     backupRetention: cdk.Duration.days(0),
@@ -38,6 +42,8 @@ const postgresProps: PostgresDeploymentProps = {
     multiAz: false
   }
 };
+
+const storage = new PostgresStorage(app, "DinodimeDatabase", postgresProps);
 
 const servicesProps: ServicesProps = {
   env: deploymentEnv,
@@ -54,9 +60,13 @@ const servicesProps: ServicesProps = {
     lambdaExecutionRole: infrastructure.lambdaExecutionRole
   },
   backendConfiguration: {
-    storageBackend: "IN_MEMORY"
+    pgDatabase: pgDatabaseName,
+    pgHost: storage.endpoint().hostname,
+    pgPort: infrastructure.databasePortNumber,
+    pgUser: pgMasterUserName,
+    pgPassword: pgMasterPassword,
+    storageBackend: "POSTGRESQL"
   }
 };
 
-new PostgresStorage(app, "DinodimeDatabase", postgresProps);
 new Services(app, "DinodimeServices", servicesProps);

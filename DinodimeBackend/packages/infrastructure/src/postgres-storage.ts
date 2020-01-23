@@ -7,10 +7,12 @@ import { ClusterParameterGroup } from "@aws-cdk/aws-rds";
 import { PostgresDeploymentProps } from "./postgres-deployment-props";
 
 export class PostgresStorage extends cdk.Stack {
+  readonly instance: rds.DatabaseInstance;
+
   constructor(scope: cdk.App, id: string, props: PostgresDeploymentProps) {
     super(scope, id, props);
 
-    const postgres = new rds.DatabaseInstance(this, "DinodimeDatabase", {
+    this.instance = new rds.DatabaseInstance(this, "DinodimeDatabase", {
       engine: rds.DatabaseInstanceEngine.POSTGRES,
       databaseName: props.instanceProps.databaseName,
       masterUsername: props.instanceProps.masterUsername,
@@ -25,6 +27,10 @@ export class PostgresStorage extends cdk.Stack {
       vpcPlacement: props.infrastructureProps.subnetPlacement,
       securityGroups: props.infrastructureProps.databaseSecurityGroups
     });
+  }
+
+  endpoint() {
+    return this.instance.instanceEndpoint;
   }
 
   private databaseCluster(infra: PostgresInfrastructureConfiguration) {
