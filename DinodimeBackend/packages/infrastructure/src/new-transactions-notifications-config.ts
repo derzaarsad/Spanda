@@ -1,6 +1,6 @@
 import { LambdaDeploymentProps } from "./lambda-deployment-props";
 
-export interface NewTransactionsNotificationsConfig {
+export interface NewTransactionsNotificationsProps {
   decryptionKey: string;
-  lambdaDeploymentProps?: LambdaDeploymentProps;
+  lambdaDeploymentProps: LambdaDeploymentProps;
 }

@@ -57,7 +57,7 @@ const servicesProps: ServicesProps = {
     vpc: infrastructure.vpc,
     subnets: infrastructure.privateSubnetSelection(),
     securityGroups: [infrastructure.databaseApplicationsSecurityGroup],
-    lambdaExecutionRole: infrastructure.lambdaExecutionRole
+    managedPolicies: infrastructure.lambdaManagedPolicies
   },
   backendConfiguration: {
     pgDatabase: pgDatabaseName,

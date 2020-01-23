@@ -8,13 +8,14 @@ export class Infrastructure extends cdk.Stack {
   readonly vpc: ec2.Vpc;
   readonly databaseApplicationsSecurityGroup: ec2.SecurityGroup;
   readonly databasesSecurityGroup: ec2.SecurityGroup;
-  readonly lambdaExecutionRole: iam.Role;
 
   readonly databasePortNumber: number;
   readonly sshPortNumber: number;
 
   readonly databasePort: ec2.Port;
   readonly sshPort: ec2.Port;
+
+  readonly lambdaManagedPolicies: iam.IManagedPolicy[];
 
   constructor(scope: cdk.App, id: string, props: InfrastructureProps) {
     super(scope, id, props);
@@ -28,6 +29,7 @@ export class Infrastructure extends cdk.Stack {
     this.vpc = new ec2.Vpc(this, "VPC", {
       maxAzs: props.numberOfAzs || 2,
       cidr: props.vpcCidr,
+      natGateways: 1,
       subnetConfiguration: [
         {
           cidrMask: 20,
@@ -82,7 +84,10 @@ export class Infrastructure extends cdk.Stack {
 
     this.initializeBastionHostsConfig(this.vpc.publicSubnets, bastionSecurityGroup);
 
-    this.lambdaExecutionRole = this.initializeLambdaExecutionRole("LambdaExecutionRole");
+    this.lambdaManagedPolicies = [
+      iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
+      iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole")
+    ];
   }
 
   public isolatedSubnets() {
@@ -107,19 +112,6 @@ export class Infrastructure extends cdk.Stack {
 
   public publicSubnetSelection(): ec2.SubnetSelection {
     return { subnets: this.vpc.publicSubnets };
-  }
-
-  private initializeLambdaExecutionRole(iamId: string): iam.Role {
-    const role = new iam.Role(this, iamId, {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com")
-    });
-    role.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName("AWSLambdaVPCAccessExecutionRole")
-    );
-    role.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName("AWSLambdaBasicExecutionRole")
-    );
-    return role;
   }
 
   private initializeBastionHostsConfig(

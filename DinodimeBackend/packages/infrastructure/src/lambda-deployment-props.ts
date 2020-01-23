@@ -8,5 +8,5 @@ export interface LambdaDeploymentProps {
   vpc?: ec2.Vpc;
   subnets?: ec2.SubnetSelection;
   securityGroups?: ec2.SecurityGroup[];
-  lambdaExecutionRole?: iam.Role;
+  managedPolicies: iam.IManagedPolicy[];
 }

@@ -1,6 +1,7 @@
 import * as cdk from "@aws-cdk/core";
 import * as lambda from "@aws-cdk/aws-lambda";
 import * as apigw from "@aws-cdk/aws-apigateway";
+import * as iam from "@aws-cdk/aws-iam";
 
 import { Duration } from "@aws-cdk/core";
 import { LambdaIntegration } from "@aws-cdk/aws-apigateway";
@@ -38,11 +39,17 @@ export class DinodimeAPI extends cdk.Construct {
 
     const commonEnvironment = configureEnvironment(props);
 
+    const role = new iam.Role(this, "APIMethodLambdaRole", {
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+      managedPolicies: props.lambdaDeploymentProps.managedPolicies
+    });
+
     const lambdaFactory = new LambdaFactory({
       scope: this,
       runtime: lambda.Runtime.NODEJS_12_X,
       duration: Duration.seconds(20),
       deploymentProps: props.lambdaDeploymentProps,
+      executionRole: role,
       env: commonEnvironment
     });
 

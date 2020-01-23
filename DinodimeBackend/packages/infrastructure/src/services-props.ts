@@ -11,5 +11,5 @@ export interface ServicesProps extends cdk.StackProps {
   loggerLevel?: string;
   finApiProps: FinApiProps;
   backendConfiguration: PostgresConfiguration | InMemoryConfiguration;
-  lambdaDeploymentProps?: LambdaDeploymentProps;
+  lambdaDeploymentProps: LambdaDeploymentProps;
 }

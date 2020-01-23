@@ -22,6 +22,9 @@ describe("The services stack", () => {
       },
       backendConfiguration: {
         storageBackend: "IN_MEMORY"
+      },
+      lambdaDeploymentProps: {
+        managedPolicies: []
       }
     };
   });
