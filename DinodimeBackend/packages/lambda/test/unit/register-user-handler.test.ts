@@ -4,7 +4,7 @@ const expect = chai.expect;
 import { registerUser } from "../../src/controllers/authentication-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import winston from "winston";
-import { VoidTransport, Authentication, Users, User } from "dynodime-lib";
+import { VoidTransport, Authentication, Users, User } from "dinodime-lib";
 import { CreateUnittestInterfaces } from "../test-utility";
 
 describe("register user handler", function() {

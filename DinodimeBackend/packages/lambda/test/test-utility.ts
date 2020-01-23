@@ -1,7 +1,7 @@
 import axios from "axios";
-import { User, FinAPI } from "dynodime-lib";
-import { Authentication, Basic } from "dynodime-lib";
-import { ClientSecretsProvider, Resolved } from "dynodime-lib";
+import { User, FinAPI } from "dinodime-lib";
+import { Authentication, Basic } from "dinodime-lib";
+import { ClientSecretsProvider, Resolved } from "dinodime-lib";
 
 export const CreateUnittestInterfaces = () => {
   // Create Authentications

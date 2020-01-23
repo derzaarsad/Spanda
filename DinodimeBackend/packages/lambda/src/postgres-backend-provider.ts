@@ -5,7 +5,7 @@ import {
   UsersSchema,
   TransactionsSchema,
   Transactions
-} from "dynodime-lib";
+} from "dinodime-lib";
 import { Pool } from "pg";
 import format from "pg-format";
 import { BackendProvider } from "./backend-provider";

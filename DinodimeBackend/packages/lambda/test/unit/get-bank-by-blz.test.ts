@@ -11,7 +11,7 @@ import {
   Authentication,
   ClientSecretsProvider,
   Resolved
-} from "dynodime-lib";
+} from "dinodime-lib";
 
 describe("get banks by BLZ handler", function() {
   let logger: winston.Logger;

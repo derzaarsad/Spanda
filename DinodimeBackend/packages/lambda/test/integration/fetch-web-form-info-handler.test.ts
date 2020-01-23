@@ -10,11 +10,11 @@ import {
   Transactions,
   VoidTransport,
   CallbackCrypto
-} from "dynodime-lib";
+} from "dinodime-lib";
 
 import { fetchWebFormInfo } from "../../src/controllers/bank-controller";
 import { CreateFinApiTestInterfaces } from "../test-utility";
-import { EncryptedData, Encryptions } from "dynodime-lib/out/src/crypto";
+import { EncryptedData, Encryptions } from "dinodime-lib/out/src/crypto";
 
 describe("fetch webform info handler", function() {
   this.timeout(10000); // Webform needs time.

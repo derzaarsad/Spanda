@@ -5,7 +5,7 @@ const expect = chai.expect;
 
 import { getAllowance } from "../../src/controllers/bank-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { VoidTransport, FinAPI, Users, User } from "dynodime-lib";
+import { VoidTransport, FinAPI, Users, User } from "dinodime-lib";
 
 describe("get allowance handler", function() {
   let logger: winston.Logger;

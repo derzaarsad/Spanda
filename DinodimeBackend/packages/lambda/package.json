@@ -1,5 +1,5 @@
 {
-  "name": "dynodime-lambda",
+  "name": "dinodime-lambda",
   "version": "0.0.0",
   "license": "UNLICENSED",
   "main": "out/src/index.js",
@@ -10,7 +10,7 @@
     "package": "webpack"
   },
   "dependencies": {
-    "dynodime-lib": "0.0.0",
+    "dinodime-lib": "0.0.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {

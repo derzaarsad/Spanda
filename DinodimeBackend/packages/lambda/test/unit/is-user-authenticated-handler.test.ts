@@ -5,7 +5,7 @@ const expect = chai.expect;
 
 import { isUserAuthenticated } from "../../src/controllers/authentication-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { VoidTransport, FinAPI } from "dynodime-lib";
+import { VoidTransport, FinAPI } from "dinodime-lib";
 
 describe("isUserAuthenticated handler", function() {
   let logger: winston.Logger;

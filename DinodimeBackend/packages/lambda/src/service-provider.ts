@@ -1,8 +1,8 @@
-import { Authentication, Basic } from "dynodime-lib";
-import { BankConnections, Users, Transactions } from "dynodime-lib";
-import { ClientSecretsProvider, Resolved } from "dynodime-lib";
-import { Encryptions, CallbackCrypto } from "dynodime-lib";
-import { FinAPI } from "dynodime-lib";
+import { Authentication, Basic } from "dinodime-lib";
+import { BankConnections, Users, Transactions } from "dinodime-lib";
+import { ClientSecretsProvider, Resolved } from "dinodime-lib";
+import { Encryptions, CallbackCrypto } from "dinodime-lib";
+import { FinAPI } from "dinodime-lib";
 
 import axios from "axios";
 import { BackendProvider } from "./backend-provider";

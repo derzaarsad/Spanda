@@ -11,14 +11,14 @@ import SQS, {
   DeleteMessageBatchRequest,
   DeleteMessageBatchResult
 } from "aws-sdk/clients/sqs";
-import { AesCrypto, DecryptedNewTransactionsNotification } from "dynodime-lib";
+import { AesCrypto, DecryptedNewTransactionsNotification } from "dinodime-lib";
 
 import { v4 as uuid } from "uuid";
-import { SNSNotification } from "dynodime-lib";
-import { DynamoDBRuleHandleRepository } from "dynodime-lib";
-import { NewTransactionsEncryptor } from "dynodime-lib";
-import { UUIDRuleHandleFactory } from "dynodime-lib";
-import { RuleHandle } from "dynodime-lib";
+import { SNSNotification } from "dinodime-lib";
+import { DynamoDBRuleHandleRepository } from "dinodime-lib";
+import { NewTransactionsEncryptor } from "dinodime-lib";
+import { UUIDRuleHandleFactory } from "dinodime-lib";
+import { RuleHandle } from "dinodime-lib";
 
 AWS.config.update({ region: process.env.CDK_DEPLOY_REGION });
 

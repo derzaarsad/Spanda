@@ -4,7 +4,7 @@ const expect = chai.expect;
 import { updateRefreshToken } from "../../src/controllers/authentication-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import winston from "winston";
-import { VoidTransport, Authentication, Resolved, ClientSecretsProvider } from "dynodime-lib";
+import { VoidTransport, Authentication, Resolved, ClientSecretsProvider } from "dinodime-lib";
 import { CreateUnittestInterfaces } from "../test-utility";
 
 describe("get refresh token handler", function() {

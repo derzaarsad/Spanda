@@ -1,12 +1,12 @@
 {
-  "name": "dynodime-notifications-integtest",
+  "name": "dinodime-notifications-integtest",
   "version": "0.0.0",
   "license": "UNLICENSED",
   "scripts": {
     "test": "mocha --require ts-node/register ./**/*.ts"
   },
   "dependencies": {
-    "dynodime-lib": "0.0.0",
+    "dinodime-lib": "0.0.0",
     "axios": "^0.19.0"
   },
   "devDependencies": {

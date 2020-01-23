@@ -3,7 +3,7 @@ const expect = chai.expect;
 import winston from "winston";
 
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { VoidTransport, Authentication } from "dynodime-lib";
+import { VoidTransport, Authentication } from "dinodime-lib";
 
 import { authenticateAndSave } from "../../src/controllers/authentication-controller";
 import { CreateFinApiTestInterfaces } from "../test-utility";

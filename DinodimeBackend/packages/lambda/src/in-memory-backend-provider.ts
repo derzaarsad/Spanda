@@ -1,6 +1,6 @@
-import { Users } from "dynodime-lib";
-import { Transactions } from "dynodime-lib";
-import { BankConnections } from "dynodime-lib";
+import { Users } from "dinodime-lib";
+import { Transactions } from "dinodime-lib";
+import { BankConnections } from "dinodime-lib";
 import { BackendProvider } from "./backend-provider";
 
 export default class InMemoryBackendProvider implements BackendProvider {

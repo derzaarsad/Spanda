@@ -8,9 +8,9 @@ import {
   CreateAuthHeader
 } from "../lambda-util";
 
-import { Authentication, Token } from "dynodime-lib";
-import { User, Users } from "dynodime-lib";
-import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dynodime-lib";
+import { Authentication, Token } from "dinodime-lib";
+import { User, Users } from "dinodime-lib";
+import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dinodime-lib";
 
 type RefreshTokenParams = {
   refresh_token: string;

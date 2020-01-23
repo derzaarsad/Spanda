@@ -6,12 +6,12 @@ import winston from "winston";
 
 import { CreateResponse } from "./lambda-util";
 
-import { Notification, EncryptedNewTransactionsNotification } from "dynodime-lib";
-import { AesCrypto } from "dynodime-lib";
-import { NewTransactionsDecryptor } from "dynodime-lib";
-import { AWSSNSPublisher } from "dynodime-lib";
-import { NewTransactionsSNSPublisher } from "dynodime-lib";
-import { DynamoDBRuleHandleRepository } from "dynodime-lib";
+import { Notification, EncryptedNewTransactionsNotification } from "dinodime-lib";
+import { AesCrypto } from "dinodime-lib";
+import { NewTransactionsDecryptor } from "dinodime-lib";
+import { AWSSNSPublisher } from "dinodime-lib";
+import { NewTransactionsSNSPublisher } from "dinodime-lib";
+import { DynamoDBRuleHandleRepository } from "dinodime-lib";
 
 const env = process.env;
 const errorMessage = "error processing notification";

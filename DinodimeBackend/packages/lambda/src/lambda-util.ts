@@ -1,5 +1,5 @@
 import { APIGatewayProxyResult } from "aws-lambda";
-import { Token } from "dynodime-lib";
+import { Token } from "dinodime-lib";
 
 export const HasAuthorization = (header: any): string => {
   return header["authorization"] || header["Authorization"];

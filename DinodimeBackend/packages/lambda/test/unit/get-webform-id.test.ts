@@ -5,9 +5,9 @@ const expect = chai.expect;
 
 import { getWebformId } from "../../src/controllers/bank-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { VoidTransport, Users, User } from "dynodime-lib";
+import { VoidTransport, Users, User } from "dinodime-lib";
 import { CreateUnittestInterfaces } from "../test-utility";
-import { Encryptions, CallbackCrypto } from "dynodime-lib";
+import { Encryptions, CallbackCrypto } from "dinodime-lib";
 
 describe("get webform id", function() {
   let logger: winston.Logger;
