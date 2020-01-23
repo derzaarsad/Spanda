@@ -54,10 +54,21 @@ yarn workspace dynodime-infrastructure run cdk deploy
 
 The lines above correspond to a typical sequence of commands you would use when working with the CDK.
 
-## TODO
+## HOWTO
+
+### Connect to a bastion host with the AWS Systems Manager
+
+The infrastructure stack deploys launch templates for bastion hosts inside our VPC. There is a dedicated template for each of our private subnets. This feature requires the [session manager][6] plugin to be installed on your machine.
+
+To connect to a bastion host from your shell, first launch an instance choosing either one of the launch templates. Wait for the instance to come up and note its id. Then, from the command-line do:
+
+    aws ssm start-session --target <instance-id>
+
+Alternatively, you can initiate an SSH session direct from the browser by clicking on the Connect button on the EC2 console and choosing "Session Manager."
 
 [1]: https://lerna.js.org/
 [2]: https://yarnpkg.com/lang/en/docs/workspaces/
 [3]: https://docs.aws.amazon.com/cdk/
 [4]: https://www.typescriptlang.org/docs/handbook/project-references.html
 [5]: https://webpack.js.org/
+[6]: https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html#install-plugin-macos

@@ -23,11 +23,13 @@ export default class PostgresBackendProvider implements BackendProvider {
     const pool = new Pool();
 
     this.users = new Users.PostgreSQLRepository(pool, format, new UsersSchema());
+
     this.connections = new BankConnections.PostgreSQLRepository(
       pool,
       format,
       new BankConnectionsSchema()
     );
+
     this.transactions = new Transactions.PostgreSQLRepository(
       pool,
       format,

@@ -9,4 +9,3 @@ out
 dist
 cdk.out
 reports
-DinodimeBackend/integration-test.env
