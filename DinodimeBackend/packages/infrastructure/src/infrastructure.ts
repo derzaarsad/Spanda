@@ -82,7 +82,7 @@ export class Infrastructure extends cdk.Stack {
       "Grants access to the database port to bastion hosts"
     );
 
-    this.initializeBastionHostsConfig(this.vpc.publicSubnets, bastionSecurityGroup);
+    this.initializeBastionHostsConfig(this.vpc.privateSubnets, bastionSecurityGroup);
 
     this.lambdaManagedPolicies = [
       iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
