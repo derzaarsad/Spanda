@@ -9,5 +9,6 @@ sudo ./emulator -avd Nexus_5X_API_28_x86
 After the emulator is on, go to SpandaApp folder
 
 ```bash
-tns run android --env.environment="prod"
+tns platform add android
+tns run android --env.environmentJson="{\"stage\":\"prototype\",\"backendUrl\":\"<backendUrl>\"}"
 ```
