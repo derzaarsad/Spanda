@@ -12,6 +12,9 @@ interface LambdaFactoryProps {
   env?: { [key: string]: string };
 }
 
+/**
+ * A utility object for creating functions with common purpose.
+ */
 export class LambdaFactory {
   scope: cdk.Construct;
   deploymentProps: LambdaDeploymentProps;

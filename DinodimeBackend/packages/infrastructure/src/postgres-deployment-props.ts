@@ -1,17 +1,18 @@
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
+import * as ecr from "@aws-cdk/aws-ecr";
 
 interface PostgresInfrastructureProps {
   vpc: ec2.Vpc;
   subnetPlacement: ec2.SubnetSelection;
   databasePort: ec2.Port;
-  databaseSecurityGroups: ec2.SecurityGroup[];
+  databaseSecurityGroup: ec2.SecurityGroup;
 }
 
 interface PostgresInstanceProps {
   databaseName: string;
   masterUsername: string;
-  masterUserPassword: cdk.SecretValue;
+  masterUserPassword: string;
   instanceClass: ec2.InstanceType;
   deletionProtection: boolean;
   backupRetention: cdk.Duration;
@@ -20,10 +21,16 @@ interface PostgresInstanceProps {
   multiAz: boolean;
 }
 
+interface MigrationsContainerProps {
+  imageRepository: ecr.IRepository;
+  imageTag?: string;
+}
+
 /**
  * Configuration interface for the postgres stack.
  */
 export interface PostgresDeploymentProps extends cdk.StackProps {
   infrastructureProps: PostgresInfrastructureProps;
+  migrationsContainerProps: MigrationsContainerProps;
   instanceProps: PostgresInstanceProps;
 }
