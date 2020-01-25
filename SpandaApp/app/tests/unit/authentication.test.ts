@@ -1,5 +1,4 @@
 import { AuthenticationService } from '../../services/authentication.service';
-import { HttpHeaders } from "@angular/common/http";
 
 describe('App Component Test',() => {
 

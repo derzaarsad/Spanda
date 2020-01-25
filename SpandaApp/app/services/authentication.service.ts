@@ -1,5 +1,5 @@
 import { Injectable, InjectionToken } from "@angular/core";
-import * as Https from 'nativescript-https'
+import * as Https from 'nativescript-https';
 import { Token } from "~/models/token.model";
 import * as appSettings from "tns-core-modules/application-settings";
 import { User } from "~/models/user.model";
