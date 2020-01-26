@@ -11,7 +11,7 @@ RUN apk add glibc-2.30-r0.apk
 RUN apk add glibc-bin-2.30-r0.apk
 
 # And of course we need Firefox if we actually want to *use* GeckoDriver
-RUN apk add firefox-esr=60.9.0-r0
+RUN apk add firefox-esr=68.4.1-r0
 
 # Then install GeckoDriver
 RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
