@@ -46,3 +46,7 @@ exports.GetRecurrentTransaction = (transactionsData) => {
 
     return grouped;
 }
+
+exports.GetDominantIncome = (transactionsData) => {
+    //TODO
+}
