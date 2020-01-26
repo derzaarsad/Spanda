@@ -1,6 +1,6 @@
-# Dynodime CDK Demo
+# dinodime CDK Demo
 
-This repository demonstrates the setup of a TypeScript 'monorepo' for Dynodime. It contains a subset of the DynoDime code ported to TypeScript (handling of notifications on new transactions), and a small AWS deployment driven by the Amazon CDK. The repository aims work out a way to organize code in a modular manner and integrate the CDK into the deployment workflow.
+This repository demonstrates the setup of a TypeScript 'monorepo' for dinodime. It contains a subset of the dinodime code ported to TypeScript (handling of notifications on new transactions), and a small AWS deployment driven by the Amazon CDK. The repository aims work out a way to organize code in a modular manner and integrate the CDK into the deployment workflow.
 
 ## Repository Organization
 
@@ -8,10 +8,10 @@ The project layout is organized according to the conventions of [lerna][1] and i
 
 The repository contains the following modules:
 
-- _dynodime-lib_: common classes that are intended to be used as building blocks. This includes the finAPI client, the finAPI data model, controllers that are used in the lambdas, etc.
-- _dynodime-lambda_: lambda handlers. The reason why they are extracted in a different module is that this code should be packaged later by webpack and/or rollup, in order to minify the deployment to AWS.
-- _dynodime-infrastructure_: infrastructure as code implemented with [Amazon CDK][3].
-- _dynodime-notifications-integtest_: an integration test running against the deployed environment.
+- _dinodime-lib_: common classes that are intended to be used as building blocks. This includes the finAPI client, the finAPI data model, controllers that are used in the lambdas, etc.
+- _dinodime-lambda_: lambda handlers. The reason why they are extracted in a different module is that this code should be packaged later by webpack and/or rollup, in order to minify the deployment to AWS.
+- _dinodime-infrastructure_: infrastructure as code implemented with [Amazon CDK][3].
+- _dinodime-notifications-integtest_: an integration test running against the deployed environment.
 
 TypeScript code is compiled incrementally by leveraging [project references][4]. The module dependencies are represented by the `references` array in each `tsconfig*.json` file.
 
@@ -33,23 +33,39 @@ Refer to the diagram below for a different perspective. Nodes connected via dash
 
 You need to explicitly install the Yarn and the Amazon CDK binaries.
 
+## Infrastructure Diagrams
+
+### Database Migrations
+
+The migrations infrastructure is responsible for initializing the RDS instance with the schema definitions of the data model. It requires a bootstrapping step that prepares an image with the migrations scripts and pushes it to an internal docker repository. The step can be executed by the `bootstrap-migrations.sh` script.
+
+The diagram below examines the workflow and related resources:
+
+![The database migrations workflow architecture](documentation/database-migrations.png)
+
+1. Once the database is up, a CloudWatch event rule picks it up.
+2. The rule executes the database migrations state machine.
+3. The state machine contains a single step, which executes the migrations container container.
+4. The container connects with the RDS instance and updates the schemas.
+5. The logs of the container execution are stored in CloudWatch.
+
 ## Development Workflow
 
 Immediately after checkout, you need to do `yarn install`. This downloads all project dependencies and links the dependend modules together.
 
 The project contains a "solution file" that builds everything with a single command: `yarn run build`. You can view the JavaScript output in the `out` directory of each module. While developing, it makes more sense to be performing the build continuously with the "watch" script: `yarn run watch`.
 
-All unit tests from a module can be run by issuing `yarn workspace dynodime-<module_name> run test`.
+All unit tests from a module can be run by issuing `yarn workspace dinodime-<module_name> run test`.
 
-Lambda deployment packages are created by [webpack][5]. To package the handler, do `yarn workspace dynodime-lambda run package` from the project root.
+Lambda deployment packages are created by [webpack][5]. To package the handler, do `yarn workspace dinodime-lambda run package` from the project root.
 
 The deployment can also be triggered directly from the project root, e.g.:
 
 ```
-yarn workspace dynodime-infrastructure run cdk bootstrap
-yarn workspace dynodime-infrastructure run cdk list
-yarn workspace dynodime-infrastructure run cdk diff
-yarn workspace dynodime-infrastructure run cdk deploy
+yarn workspace dinodime-infrastructure run cdk bootstrap
+yarn workspace dinodime-infrastructure run cdk list
+yarn workspace dinodime-infrastructure run cdk diff
+yarn workspace dinodime-infrastructure run cdk deploy
 ```
 
 The lines above correspond to a typical sequence of commands you would use when working with the CDK.
