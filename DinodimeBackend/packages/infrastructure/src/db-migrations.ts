@@ -52,7 +52,8 @@ export class DatabaseMigrations extends cdk.Construct {
         LIQUIBASE_URL: `jdbc:postgresql://${db.instance.instanceEndpoint.hostname}:${db.instance.dbInstanceEndpointPort}/${db.databaseName}`,
         LIQUIBASE_USERNAME: db.username,
         LIQUIBASE_PASSWORD: db.password
-      }
+      },
+      command: ["update"]
     });
 
     const runContainer = new tasks.RunEcsFargateTask({
