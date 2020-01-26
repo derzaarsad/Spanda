@@ -53,6 +53,7 @@ const postgresProps: PostgresDeploymentProps = {
 
   migrationsContainerProps: {
     imageRepository: migrationsRepository.repository,
+    securityGroup: infrastructure.databaseApplicationsSecurityGroup,
     imageTag: "latest"
   }
 };
