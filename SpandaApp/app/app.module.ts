@@ -1,13 +1,9 @@
 import { NgModule, NO_ERRORS_SCHEMA } from "@angular/core";
 import { NativeScriptModule } from "nativescript-angular/nativescript.module";
 import { NativeScriptFormsModule } from "nativescript-angular/forms";
-import { NativeScriptRouterModule } from "nativescript-angular/router";
-import { routes, navigatableComponents, authProviders } from "./app.routing";
-
-import { NativeScriptHttpClientModule } from "nativescript-angular/http-client";
+import { AppRoutingModule, navigatableComponents, authProviders } from "./app.routing";
 
 import { AppComponent } from "./app.component";
-import { HomeComponent } from "./views/home/home.component";
 
 import { AuthenticationService, AUTH_SERVICE_IMPL } from "./services/authentication.service";
 import { BankService } from "./services/bank.service";
@@ -25,11 +21,9 @@ import { BankService } from "./services/bank.service";
   ],
   bootstrap: [AppComponent],
   imports: [
+    AppRoutingModule,
     NativeScriptModule,
-    NativeScriptFormsModule,
-    NativeScriptRouterModule,
-    NativeScriptRouterModule.forRoot(routes),
-    NativeScriptHttpClientModule
+    NativeScriptFormsModule
   ],
   schemas: [NO_ERRORS_SCHEMA],
 })
