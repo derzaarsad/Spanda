@@ -6,179 +6,167 @@
 trigger:
   branches:
     include:
-    - '*'
+      - "*"
 # specific path build
 pr:
   branches:
     include:
-    - master
+      - master
   paths:
     include:
-    - '*'
+      - "*"
     exclude:
-    - README.md
-    - .github/*
-    - .gitignore
+      - README.md
+      - .github/*
+      - .gitignore
 jobs:
-- job: DetermineJob
-  pool:
-    vmImage: 'windows-2019'
-  steps:
-    - bash: |
-        clear
-        sleep 1
-        result=`python determineAzureJobs.py`
-        echo "$result"
-      name: DetermineJobResult
+  - job: DetermineJob
+    pool:
+      vmImage: "windows-2019"
+    steps:
+      - bash: |
+          clear
+          sleep 1
+          result=`python determineAzureJobs.py`
+          echo "$result"
+        name: DetermineJobResult
 
-- job: Build_App
-  dependsOn: DetermineJob
-  condition: or(eq(dependencies.DetermineJob.outputs['DetermineJobResult.jobName'], 'All'),eq(dependencies.DetermineJob.outputs['DetermineJobResult.jobName'], 'App'))
-  pool:
-    vmImage: 'macOS-10.14'
-  steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '12.x'
-    displayName: 'Install Node.js'
-  - script: |
-      npm install -g nativescript
-    displayName: 'install nativescript'
-    continueOnError: false
-  - bash: |
-      echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install 'system-images;android-28;google_apis;x86'
-    displayName: 'install Android image'
-  - script: |
-      $ANDROID_HOME/emulator/emulator -list-avds
-      echo '---'
-      echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd -n test_android_emulator -k 'system-images;android-28;google_apis;x86' --force
-      echo '---'
-      $ANDROID_HOME/emulator/emulator -list-avds
-    displayName: 'create AVD'
-  - script: |
-      $ANDROID_HOME/platform-tools/adb devices
-      echo '---'
-      nohup $ANDROID_HOME/emulator/emulator -avd test_android_emulator -no-snapshot > /dev/null 2>&1 & $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
-      echo '---'
-      $ANDROID_HOME/platform-tools/adb devices
-    displayName: 'start Android emulator'
-  - script: |
-      cd SpandaApp
-      tns platform add android
-      tns test android --justlaunch
-    displayName: 'Run unit test'
-    continueOnError: true
-  - task: PublishTestResults@2
-    displayName: 'Publish test results'
-    condition: succeededOrFailed()
-    inputs:
-      testRunner: JUnit
-      testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaApp/reports/**/*.xml'
-  - publish: $(System.DefaultWorkingDirectory)/SpandaApp
-    artifact: NativescriptApp
+  - job: Build_App
+    dependsOn: DetermineJob
+    condition: or(eq(dependencies.DetermineJob.outputs['DetermineJobResult.jobName'], 'All'),eq(dependencies.DetermineJob.outputs['DetermineJobResult.jobName'], 'App'))
+    pool:
+      vmImage: "macOS-10.14"
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: "12.x"
+        displayName: "Install Node.js"
+      - script: |
+          npm install -g nativescript
+        displayName: "install nativescript"
+        continueOnError: false
+      - bash: |
+          echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install 'system-images;android-28;google_apis;x86'
+        displayName: "install Android image"
+      - script: |
+          $ANDROID_HOME/emulator/emulator -list-avds
+          echo '---'
+          echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd -n test_android_emulator -k 'system-images;android-28;google_apis;x86' --force
+          echo '---'
+          $ANDROID_HOME/emulator/emulator -list-avds
+        displayName: "create AVD"
+      - script: |
+          $ANDROID_HOME/platform-tools/adb devices
+          echo '---'
+          nohup $ANDROID_HOME/emulator/emulator -avd test_android_emulator -no-snapshot > /dev/null 2>&1 & $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
+          echo '---'
+          $ANDROID_HOME/platform-tools/adb devices
+        displayName: "start Android emulator"
+      - script: |
+          cd SpandaApp
+          tns platform add android
+          tns test android --justlaunch
+        displayName: "Run unit test"
+        continueOnError: true
+      - task: PublishTestResults@2
+        displayName: "Publish test results"
+        condition: succeededOrFailed()
+        inputs:
+          testRunner: JUnit
+          testResultsFiles: "$(System.DefaultWorkingDirectory)/SpandaApp/reports/**/*.xml"
+      - publish: $(System.DefaultWorkingDirectory)/SpandaApp
+        artifact: NativescriptApp
 
-- job: Build_Serverless
-  dependsOn: DetermineJob
-  condition: or(eq(dependencies.DetermineJob.outputs['DetermineJobResult.jobName'], 'All'),eq(dependencies.DetermineJob.outputs['DetermineJobResult.jobName'], 'Serverless'))
-  pool:
-    vmImage: 'ubuntu-18.04'
-  steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '12.x'
-    displayName: 'Install Node.js'
-  - script: |
-      echo "Installing Docker"
-      sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
-      sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-      sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-      sudo apt-get update
-      sudo apt-get -y install docker-ce
-      sudo systemctl status docker
-      sudo usermod -aG docker ${USER}
-      su - ${USER}
-      id -nG
-      echo "Installing docker-compose"
-      sudo curl -L https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-      sudo chmod +x /usr/local/bin/docker-compose
-      docker-compose --version
-    displayName: 'Install docker and docker-compose'
-    continueOnError: false
-  - script: |
-      cd SpandaServerless/spanda
-      npm ci
-    displayName: 'npm install and build'
-    continueOnError: false
-  - script: |
-      mkdir $(System.DefaultWorkingDirectory)/3rdparty
-      wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
-      tar -zxf geckodriver-v0.26.0-linux64.tar.gz -C $(System.DefaultWorkingDirectory)/3rdparty
-      echo '##vso[task.prependpath]$(System.DefaultWorkingDirectory)/3rdparty'
-    displayName: 'install geckodriver'
-    continueOnError: false
-  - script: |
-      pip install selenium
-      cd SpandaServerless
-      result=`python deleteUsers.py $(FinAPIAdminId) $(FinAPIAdminSecret) $(AZURE_TEST_USER_REGISTER) $(AZURE_TEST_USER_LOGIN) $(AZURE_TEST_USER_FETCHWEBFORM)`
-      echo "$result"
-      result=`python registerUsers.py $(FinAPIClientId) $(FinAPIClientSecret) $(AZURE_TEST_USER_LOGIN) $(AZURE_TEST_USER_FETCHWEBFORM)`
-      echo "created user $result"
-      accessTokenForFetch=`python loginUser.py $(FinAPIClientId) $(FinAPIClientSecret) $(AZURE_TEST_USER_FETCHWEBFORM) $(AZURE_TEST_USER_FETCHWEBFORM)`
-      echo "get access token for fetch $accessTokenForFetch"
-      webformIdForFetch=`python getWebformId.py $accessTokenForFetch`
-      echo "get webform id for fetch $webformIdForFetch"
-      webformUrlForFetch=`python getWebformUrl.py $accessTokenForFetch $webformIdForFetch`
-      echo "get webform url for fetch $webformUrlForFetch"
-      python authenticateWebform.py $webformUrlForFetch
-      echo -e "AZURE_TEST_USER_REGISTER=$(AZURE_TEST_USER_REGISTER)" >> ./integration-test.env
-      echo -e "AZURE_TEST_USER_LOGIN=$(AZURE_TEST_USER_LOGIN)" >> ./integration-test.env
-      echo -e "FinAPIClientId=$(FinAPIClientId)" >> ./integration-test.env
-      echo -e "FinAPIClientSecret=$(FinAPIClientSecret)" >> ./integration-test.env
-      echo -e "WEBFORM_ID_FOR_FETCH=$webformIdForFetch" >> ./integration-test.env
-      echo -e "ACCESS_TOKEN_FOR_FETCH=$accessTokenForFetch" >> ./integration-test.env
-      echo -e "WAIT_HOSTS=database:5432" >> ./integration-test.env
-      echo -e "PGHOST=database" >> ./integration-test.env
-      echo -e "PGUSER=postgres" >> ./integration-test.env
-      echo -e "PGPASSWORD=" >> ./integration-test.env
-      echo -e "PGDATABASE=postgres" >> ./integration-test.env
-    displayName: 'integration test preparation'
-    continueOnError: false
-  - script: |
-      cd SpandaServerless
-      mkdir reports
-      cd spanda
-      echo "Start Unit Test"
-      npm test
-      mv reports/*.xml ../reports
-      cd ..
-      echo "Start Integration Test"
-      docker-compose build && docker-compose up --abort-on-container-exit
-    displayName: 'Run tests'
-    continueOnError: true
-  - task: PublishTestResults@2
-    displayName: 'Publish test results'
-    condition: succeededOrFailed()
-    inputs:
-      testRunner: JUnit
-      testResultsFiles: '$(System.DefaultWorkingDirectory)/SpandaServerless/reports/*.xml'
-  - script: |
-      curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-      unzip awscli-bundle.zip
-      sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-      sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
-      test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
-      test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-      test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
-      echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
-      brew tap aws/tap
-      brew install aws-sam-cli
-      sam --version
-    displayName: 'Installing the AWS SAM CLI'
-    continueOnError: false
-  - script: |
-      cd $(System.DefaultWorkingDirectory)/SpandaServerless
-      /home/linuxbrew/.linuxbrew/bin/sam build
-    displayName: 'Building Serverless Application Model'
-    continueOnError: false
-  - publish: $(System.DefaultWorkingDirectory)/SpandaServerless
-    artifact: SamApp
+  - job: Build_Serverless
+    dependsOn: DetermineJob
+    condition: or(eq(dependencies.DetermineJob.outputs['DetermineJobResult.jobName'], 'All'),eq(dependencies.DetermineJob.outputs['DetermineJobResult.jobName'], 'Serverless'))
+    pool:
+      vmImage: "ubuntu-18.04"
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: "12.x"
+        displayName: "Install Node.js"
+      - script: |
+          echo "Installing Docker"
+          sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+          sudo apt-get update
+          sudo apt-get -y install docker-ce
+          sudo systemctl status docker
+          sudo usermod -aG docker ${USER}
+          su - ${USER}
+          id -nG
+          echo "Installing docker-compose"
+          sudo curl -L https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+        displayName: "Install docker and docker-compose"
+        continueOnError: false
+      - script: |
+          mkdir $(System.DefaultWorkingDirectory)/3rdparty
+          wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
+          tar -zxf geckodriver-v0.26.0-linux64.tar.gz -C $(System.DefaultWorkingDirectory)/3rdparty
+          echo '##vso[task.prependpath]$(System.DefaultWorkingDirectory)/3rdparty'
+        displayName: "install geckodriver"
+        continueOnError: false
+      - script: |
+          pip install selenium
+          cd DinodimeBackend
+          result=`python deleteUsers.py $(FinAPIAdminId) $(FinAPIAdminSecret) $(AZURE_TEST_USER_REGISTER) $(AZURE_TEST_USER_LOGIN) $(AZURE_TEST_USER_FETCHWEBFORM)`
+          echo "$result"
+          result=`python registerUsers.py $(FinAPIClientId) $(FinAPIClientSecret) $(AZURE_TEST_USER_LOGIN) $(AZURE_TEST_USER_FETCHWEBFORM)`
+          echo "created user $result"
+          accessTokenForFetch=`python loginUser.py $(FinAPIClientId) $(FinAPIClientSecret) $(AZURE_TEST_USER_FETCHWEBFORM) $(AZURE_TEST_USER_FETCHWEBFORM)`
+          echo "get access token for fetch $accessTokenForFetch"
+          webformIdForFetch=`python getWebformId.py $accessTokenForFetch`
+          echo "get webform id for fetch $webformIdForFetch"
+          webformUrlForFetch=`python getWebformUrl.py $accessTokenForFetch $webformIdForFetch`
+          echo "get webform url for fetch $webformUrlForFetch"
+          python authenticateWebform.py $webformUrlForFetch
+          rm -rf ./integration-test.env
+          echo -e "AZURE_TEST_USER_REGISTER=$(AZURE_TEST_USER_REGISTER)" >> ./integration-test.env
+          echo -e "AZURE_TEST_USER_LOGIN=$(AZURE_TEST_USER_LOGIN)" >> ./integration-test.env
+          echo -e "FinAPIClientId=$(FinAPIClientId)" >> ./integration-test.env
+          echo -e "FinAPIClientSecret=$(FinAPIClientSecret)" >> ./integration-test.env
+          echo -e "WEBFORM_ID_FOR_FETCH=$webformIdForFetch" >> ./integration-test.env
+          echo -e "ACCESS_TOKEN_FOR_FETCH=$accessTokenForFetch" >> ./integration-test.env
+          echo -e "WAIT_HOSTS=database:5432" >> ./integration-test.env
+          echo -e "PGHOST=database" >> ./integration-test.env
+          echo -e "PGUSER=postgres" >> ./integration-test.env
+          echo -e "PGPASSWORD=" >> ./integration-test.env
+          echo -e "PGDATABASE=postgres" >> ./integration-test.env
+        displayName: "integration test preparation"
+        continueOnError: false
+      - script: |
+          cd $(System.DefaultWorkingDirectory)/DinodimeBackend
+          yarn install
+          yarn run build
+          yarn workspace dinodime-lambda run package
+        displayName: "Building CDK Application"
+        continueOnError: false
+      - script: |
+          cd $(System.DefaultWorkingDirectory)/DinodimeBackend
+          mkdir reports
+          echo "Start Unit Test"
+          yarn workspace dinodime-lib run test --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-lib.xml
+          yarn workspace dinodime-lambda run test --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-lambda.xml
+          yarn workspace dinodime-infrastructure run test --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-infrastructure.xml
+        displayName: "Run unit tests"
+        continueOnError: true
+      - script: |
+          echo "Start Integration Test"
+          cd $(System.DefaultWorkingDirectory)/DinodimeBackend
+          docker-compose -f packages/lib/docker-compose.yml build && docker-compose -f packages/lib/docker-compose.yml up --abort-on-container-exit 
+          docker-compose -f packages/lambda/docker-compose.yml build && docker-compose -f packages/lambda/docker-compose.yml up --abort-on-container-exit
+        displayName: "Run integration tests"
+        continueOnError: true
+      - task: PublishTestResults@2
+        displayName: "Publish test results"
+        condition: succeededOrFailed()
+        inputs:
+          testRunner: JUnit
+          testResultsFiles: "$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/*.xml"
+      - publish: $(System.DefaultWorkingDirectory)/DinodimeBackend
+        artifact: SamApp
