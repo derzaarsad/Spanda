@@ -111,7 +111,7 @@
     "@aws-cdk/aws-s3" "1.22.0"
     "@aws-cdk/core" "1.22.0"
 
-"@aws-cdk/aws-cloudwatch@1.22.0":
+"@aws-cdk/aws-cloudwatch@1.22.0", "@aws-cdk/aws-cloudwatch@^1.22.0":
   version "1.22.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-cloudwatch/-/aws-cloudwatch-1.22.0.tgz#545cd14bd734caf08640dac4cfad5e1dcbd73a47"
   integrity sha512-Lgd3C8XuST2ApNRoXIIYGszjXHZKByFYI5/Nynkimw10fYksiMxDb4TjN2lzHWFFZeXqJlZL9kUIiEtyiZPDpg==
@@ -310,7 +310,7 @@
     "@aws-cdk/core" "1.22.0"
     "@aws-cdk/cx-api" "1.22.0"
 
-"@aws-cdk/aws-logs@1.22.0":
+"@aws-cdk/aws-logs@1.22.0", "@aws-cdk/aws-logs@^1.22.0":
   version "1.22.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-logs/-/aws-logs-1.22.0.tgz#651ba257279ede92d0a3def8a2c4d2a99b852ab8"
   integrity sha512-IYg2Ll0B7eL5m6KhyPwcNl8413nmFWFFcEcTpPVRJpNWm7NdRMyDVX+XFteJJToYaGUDHdj1UiegOthxWYbgdA==

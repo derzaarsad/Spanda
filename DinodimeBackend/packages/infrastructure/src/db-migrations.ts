@@ -3,6 +3,8 @@ import * as ec2 from "@aws-cdk/aws-ec2";
 import * as ecr from "@aws-cdk/aws-ecr";
 import * as ecs from "@aws-cdk/aws-ecs";
 import * as rds from "@aws-cdk/aws-rds";
+import * as iam from "@aws-cdk/aws-iam";
+import * as logs from "@aws-cdk/aws-logs";
 import * as events from "@aws-cdk/aws-events";
 import * as targets from "@aws-cdk/aws-events-targets";
 import * as stepfn from "@aws-cdk/aws-stepfunctions";
@@ -44,7 +46,20 @@ export class DatabaseMigrations extends cdk.Construct {
 
     const image = ecs.ContainerImage.fromEcrRepository(props.imageRepository, props.imageTag);
 
+    const logGroup = new logs.LogGroup(this, "DbMigrationsLogGroup", {
+      logGroupName: "dinodime-db-migrations",
+      retention: logs.RetentionDays.FIVE_DAYS,
+      removalPolicy: cdk.RemovalPolicy.DESTROY
+    });
+
+    const allowPublishLogs = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+      resources: [logGroup.logGroupArn]
+    });
+
     const taskDefinition = new ecs.FargateTaskDefinition(this, "UpdateSchemaTaskDefinition");
+    taskDefinition.addToExecutionRolePolicy(allowPublishLogs);
 
     taskDefinition.addContainer("dinodime-db-migrations-container", {
       image: image,
@@ -53,13 +68,14 @@ export class DatabaseMigrations extends cdk.Construct {
         LIQUIBASE_USERNAME: db.username,
         LIQUIBASE_PASSWORD: db.password
       },
+      logging: ecs.LogDriver.awsLogs({ logGroup: logGroup, streamPrefix: "update" }),
       command: ["update"]
     });
 
     const runContainer = new tasks.RunEcsFargateTask({
       taskDefinition: taskDefinition,
       cluster: cluster,
-      assignPublicIp: vpcConfig.assignPublicIp,
+      assignPublicIp: vpcConfig.assignPublicIp || false,
       subnets: vpcConfig.subnets,
       securityGroup: vpcConfig.securityGroup
     });
