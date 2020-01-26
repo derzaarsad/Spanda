@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { NavigationOptions } from "nativescript-angular/router/ns-location-strategy";
 import { Page } from "tns-core-modules/ui/page";
 import { IAuthentication,AUTH_SERVICE_IMPL } from "~/services/authentication.service";
@@ -16,6 +17,7 @@ export class AllowanceComponent implements OnInit {
 
     constructor(
         private routerExtensions: RouterExtensions,
+        private activeRoute: ActivatedRoute,
         private page: Page,
         @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication,
         private bankService: BankService) {
@@ -26,12 +28,12 @@ export class AllowanceComponent implements OnInit {
     }
 
     onTap() {
-        this.routerExtensions.navigate(["searchBank"]);
+        this.routerExtensions.navigate(["../searchBank"], { clearHistory: true, relativeTo: this.activeRoute });
     }
 
     onLogOut() {
         this.authenticationService.removeAllUserAuthentication();
-        this.routerExtensions.navigate(["login"]);
+        this.routerExtensions.navigate(["login"], { clearHistory: true });
     }
 
     onRefreshAllowance() {

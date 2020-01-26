@@ -12,11 +12,15 @@ export const authProviders = [
 ];
 
 const routes: Routes = [
-    { path: "", pathMatch: "full", component: HomeComponent },
-    { path: "home", component: HomeComponent },
+    { path: "", redirectTo: "/home", pathMatch: "full" },
     { path: "login", component: LoginComponent },
-    { path: "allowance", component: AllowanceComponent, canActivate: authProviders },
-    { path: "searchBank", component: SearchBankComponent, canActivate: authProviders }
+    {
+      path: "home", component: HomeComponent, children: [
+          { path: "allowance", component: AllowanceComponent, outlet: "homeRouterOutlet" },
+          { path: "searchBank", component: SearchBankComponent, outlet: "homeRouterOutlet" },
+      ],
+      canActivate: authProviders
+    }
 ];
 
 export const navigatableComponents: any = [
