@@ -14,4 +14,4 @@ services:
   database:
     image: postgres:12
     volumes:
-      - ../../migrations/postgres:/docker-entrypoint-initdb.d
+      - ../../migrations/postgres/sql:/docker-entrypoint-initdb.d
