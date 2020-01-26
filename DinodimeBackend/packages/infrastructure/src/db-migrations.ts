@@ -49,7 +49,7 @@ export class DatabaseMigrations extends cdk.Construct {
     taskDefinition.addContainer("dinodime-db-migrations-container", {
       image: image,
       environment: {
-        LIQUIBASE_URL: `jdbc:postgresql://${db.instance.instanceEndpoint}:${db.instance.dbInstanceEndpointPort}/${db.databaseName}`,
+        LIQUIBASE_URL: `jdbc:postgresql://${db.instance.instanceEndpoint.hostname}:${db.instance.instanceEndpoint.port}/${db.databaseName}`,
         LIQUIBASE_USERNAME: db.username,
         LIQUIBASE_PASSWORD: db.password
       }
