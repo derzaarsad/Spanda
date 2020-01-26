@@ -11,5 +11,10 @@ export class DatabaseMigrationsRepository extends cdk.Stack {
       repositoryName: "dinodime-db-migrations",
       removalPolicy: cdk.RemovalPolicy.DESTROY
     });
+
+    new cdk.CfnOutput(this, "RepositoryURI", {
+      description: "The database migrations container repository URI",
+      value: this.repository.repositoryUri
+    });
   }
 }
