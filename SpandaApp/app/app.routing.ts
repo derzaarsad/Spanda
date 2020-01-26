@@ -12,7 +12,7 @@ export const authProviders = [
 ];
 
 const routes: Routes = [
-    { path: "", component: HomeComponent },
+    { path: "", pathMatch: "full", component: HomeComponent },
     { path: "home", component: HomeComponent },
     { path: "login", component: LoginComponent },
     { path: "allowance", component: AllowanceComponent, canActivate: authProviders },
