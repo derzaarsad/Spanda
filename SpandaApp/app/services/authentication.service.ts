@@ -1,5 +1,5 @@
 import { Injectable, InjectionToken } from "@angular/core";
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import * as Https from 'nativescript-https';
 import { Token } from "~/models/token.model";
 import * as appSettings from "tns-core-modules/application-settings";
 import { User } from "~/models/user.model";
@@ -30,7 +30,7 @@ export class AuthenticationService implements IAuthentication {
     private storedUser: User;
     private jsonConvert: JsonConvert;
 
-    constructor(private http: HttpClient) {
+    constructor() {
         this.jsonConvert = new JsonConvert();
 
         if(this.isStoredUserAvailable()) {
@@ -52,51 +52,56 @@ export class AuthenticationService implements IAuthentication {
 
     __authenticateAndSave__(username: string, password: string) : [string, any, any] {
 
-        let headerOptions = new HttpHeaders({
+        let headerOptions = {
             "Content-Type": "application/json"
-        });
+        };
 
-        return [environment.backendUrl + "/oauth/login", { username: username, password: password }, { headers: headerOptions }];
+        return [environment.backendUrl + "/oauth/login", { username: username, password: password }, headerOptions ];
     }
 
     __setNewRefreshAndAccessToken__(refreshToken: string) : [string, any, any] {
 
-        let headerOptions = new HttpHeaders({
+        let headerOptions = {
             "Content-Type": "application/json"
-        });
+        };
 
-        return [environment.backendUrl + "/oauth/token", { refresh_token: refreshToken }, { headers: headerOptions }];
+        return [environment.backendUrl + "/oauth/token", { refresh_token: refreshToken }, headerOptions ];
     }
 
     __isUserAuthenticated__(access_token: string, token_type: string) : [string, any] {
 
-        let headerOptions = new HttpHeaders({
+        let headerOptions = {
             "Authorization": token_type + " " + access_token,
             "Content-Type": "application/json"
-         });
+         };
 
-         return [environment.backendUrl + "/users", { headers: headerOptions }];
+         return [environment.backendUrl + "/users", headerOptions ];
     }
 
     __register__(username: string, password: string) : [string, any, any] {
 
-        let headerOptions = new HttpHeaders({
+        let headerOptions = {
             "Content-Type": "application/json"
-        });
+        };
 
-        return [environment.backendUrl + "/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, { headers: headerOptions }];
+        return [environment.backendUrl + "/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, headerOptions ];
     }
 
     authenticateAndSave(username: string, password: string) : Promise<boolean> {
         let request = this.__authenticateAndSave__(username,password);
-        return this.http.post(request[0],request[1],request[2]).toPromise()
-        .then(res => {
+        return Https.request({
+            url: request[0],
+            method: 'POST',
+            body: request[1],
+            headers: request[2],
+            timeout: 10
+        }).then(res => {
             if(!this.storedUser) {
                 this.storedUser = new User();
             }
             this.storedUser.Username = username;
             this.storedUser.Password = password;
-            this.storedUser.UserToken = new Token(res["access_token"], res["refresh_token"], res["token_type"]);
+            this.storedUser.UserToken = new Token(res["content"]["access_token"], res["content"]["refresh_token"], res["content"]["token_type"]);
             let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
             appSettings.setString("storedUser",storedUserJson);
 
@@ -106,9 +111,14 @@ export class AuthenticationService implements IAuthentication {
 
     setNewRefreshAndAccessToken() : Promise<boolean> {
         let request = this.__setNewRefreshAndAccessToken__(this.storedUser.UserToken.RefreshToken);
-        return this.http.post(request[0],request[1],request[2]).toPromise()
-        .then(res => {
-            this.storedUser.UserToken = new Token(res["access_token"], res["refresh_token"], res["token_type"]);
+        return Https.request({
+            url: request[0],
+            method: 'POST',
+            body: request[1],
+            headers: request[2],
+            timeout: 10
+        }).then(res => {
+            this.storedUser.UserToken = new Token(res["content"]["access_token"], res["content"]["refresh_token"], res["content"]["token_type"]);
             let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
             appSettings.setString("storedUser",storedUserJson);
             
@@ -122,8 +132,12 @@ export class AuthenticationService implements IAuthentication {
 
     isUserAuthenticated(access_token: string, token_type: string) : Promise<boolean> {
         let request = this.__isUserAuthenticated__(access_token, token_type);
-        return this.http.get(request[0],request[1]).toPromise()
-        .then(res => {
+        return Https.request({
+            url: request[0],
+            method: 'GET',
+            headers: request[1],
+            timeout: 10
+        }).then(res => {
             console.log("user is authenticated!");
             console.log(res);
             return true;
@@ -140,8 +154,13 @@ export class AuthenticationService implements IAuthentication {
 
     register(username: string, password: string) : Promise<boolean> {
         let request = this.__register__(username, password);
-        return this.http.post(request[0],request[1],request[2]).toPromise()
-        .then(res => {
+        return Https.request({
+            url: request[0],
+            method: 'POST',
+            body: request[1],
+            headers: request[2],
+            timeout: 10
+        }).then(res => {
             
             console.log("registration successful");
             console.log(res);

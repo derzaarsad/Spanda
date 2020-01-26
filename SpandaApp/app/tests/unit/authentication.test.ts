@@ -1,14 +1,11 @@
 import { AuthenticationService } from '../../services/authentication.service';
-import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 describe('App Component Test',() => {
 
-	let httpClient;
 	let authenticationService;
 
     beforeEach(function() {
-		httpClient = HttpClient;
-		authenticationService = new AuthenticationService(httpClient);
+		authenticationService = new AuthenticationService();
 	})
 	
 	it('construct message authenticateAndSave to send via REST', async function() {
@@ -27,14 +24,11 @@ describe('App Component Test',() => {
 		expect(result[1].username).to.be.an('string')
 		expect(result[1].password).to.be.an('string')
 
-		expect(result[2].headers).to.be.an('object')
-
 		expect(result[0]).to.be.equal("onlyfortest/oauth/login")
 		expect(result[1].username).to.be.equal(username)
 		expect(result[1].password).to.be.equal(password)
 
-		expect(result[2].headers.has("Content-Type")).to.be.true
-		expect(result[2].headers.get("Content-Type")).to.be.equal("application/json")
+		expect(result[2]["Content-Type"]).to.be.equal("application/json")
 	})
 
 	it('construct message setNewRefreshAndAccessToken to send via REST', async function() {
@@ -50,13 +44,10 @@ describe('App Component Test',() => {
 
 		expect(result[1].refresh_token).to.be.an('string')
 
-		expect(result[2].headers).to.be.an('object')
-
 		expect(result[0]).to.be.equal("onlyfortest/oauth/token")
 		expect(result[1].refresh_token).to.be.equal(refresh_token)
 
-		expect(result[2].headers.has("Content-Type")).to.be.true
-		expect(result[2].headers.get("Content-Type")).to.be.equal("application/json")
+		expect(result[2]["Content-Type"]).to.be.equal("application/json")
 	})
 
 	it('construct message isUserAuthenticated to send via REST', async function() {
@@ -69,14 +60,10 @@ describe('App Component Test',() => {
 		expect(result[0]).to.be.an('string')
 		expect(result[1]).to.be.an('object')
 
-		expect(result[1].headers).to.be.an('object')
-
 		expect(result[0]).to.be.equal("onlyfortest/users")
 
-		expect(result[1].headers.has("Authorization")).to.be.true
-		expect(result[1].headers.get("Authorization")).to.be.equal("bearer " + access_token)
-		expect(result[1].headers.has("Content-Type")).to.be.true
-		expect(result[1].headers.get("Content-Type")).to.be.equal("application/json")
+		expect(result[1]["Authorization"]).to.be.equal("bearer " + access_token)
+		expect(result[1]["Content-Type"]).to.be.equal("application/json")
 	})
 
 	it('construct message register to send via REST', async function() {
@@ -94,14 +81,11 @@ describe('App Component Test',() => {
 		expect(result[1].id).to.be.an('string')
 		expect(result[1].password).to.be.an('string')
 
-		expect(result[2].headers).to.be.an('object')
-
 		expect(result[0]).to.be.equal("onlyfortest/users")
 		expect(result[1].id).to.be.equal(username)
 		expect(result[1].password).to.be.equal(password)
 
-		expect(result[2].headers.has("Content-Type")).to.be.true
-		expect(result[2].headers.get("Content-Type")).to.be.equal("application/json")
+		expect(result[2]["Content-Type"]).to.be.equal("application/json")
 	})
 
 });
