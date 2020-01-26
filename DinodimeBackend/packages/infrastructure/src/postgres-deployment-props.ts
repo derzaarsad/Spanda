@@ -22,6 +22,7 @@ interface PostgresInstanceProps {
 }
 
 interface MigrationsContainerProps {
+  subnetPlacement: ec2.SubnetSelection;
   securityGroup: ec2.SecurityGroup;
   imageRepository: ecr.IRepository;
   imageTag?: string;

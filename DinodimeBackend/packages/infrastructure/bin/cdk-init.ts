@@ -52,6 +52,7 @@ const postgresProps: PostgresDeploymentProps = {
   },
 
   migrationsContainerProps: {
+    subnetPlacement: infrastructure.privateSubnetSelection(),
     imageRepository: migrationsRepository.repository,
     securityGroup: infrastructure.databaseApplicationsSecurityGroup,
     imageTag: "latest"

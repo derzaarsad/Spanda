@@ -39,7 +39,7 @@ export class PostgresStorage extends cdk.Stack {
       vpcConfiguration: {
         vpc: props.infrastructureProps.vpc,
         securityGroup: props.migrationsContainerProps.securityGroup,
-        subnets: props.infrastructureProps.subnetPlacement
+        subnets: props.migrationsContainerProps.subnetPlacement
       },
       imageRepository: props.migrationsContainerProps.imageRepository,
       imageTag: props.migrationsContainerProps.imageTag
