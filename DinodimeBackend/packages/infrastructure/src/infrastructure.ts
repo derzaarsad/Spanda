@@ -1,6 +1,7 @@
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as iam from "@aws-cdk/aws-iam";
+import * as kms from "@aws-cdk/aws-kms";
 import { InfrastructureProps } from "./infrastructure-props";
 import { CfnLaunchTemplate, UserData } from "@aws-cdk/aws-ec2";
 
@@ -16,6 +17,7 @@ export class Infrastructure extends cdk.Stack {
   readonly sshPort: ec2.Port;
 
   readonly lambdaManagedPolicies: iam.IManagedPolicy[];
+  key: kms.Key;
 
   constructor(scope: cdk.App, id: string, props: InfrastructureProps) {
     super(scope, id, props);
@@ -88,6 +90,11 @@ export class Infrastructure extends cdk.Stack {
       iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
       iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole")
     ];
+
+    this.key = new kms.Key(this, "GeneralKey", {
+      enableKeyRotation: true
+    });
+    this.key.addAlias("alias/dinodime/general");
   }
 
   public isolatedSubnets() {
