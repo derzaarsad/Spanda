@@ -140,7 +140,7 @@ export class AuthenticationService implements IAuthentication {
         }).then(res => {
             console.log("user is authenticated!");
             console.log(res);
-            return true;
+            return (res["statusCode"] === 200) ? true : false;
         }, err => {
             console.log("user not authenticated!");
             console.log(err);
@@ -165,7 +165,7 @@ export class AuthenticationService implements IAuthentication {
             console.log("registration successful");
             console.log(res);
 
-            return true;
+            return (res["statusCode"] === 201) ? true : false;
         });
     }
 
