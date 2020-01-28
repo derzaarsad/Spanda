@@ -2,6 +2,8 @@ import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as iam from "@aws-cdk/aws-iam";
 import * as kms from "@aws-cdk/aws-kms";
+import * as sm from "@aws-cdk/aws-secretsmanager";
+
 import { InfrastructureProps } from "./infrastructure-props";
 import { CfnLaunchTemplate, UserData } from "@aws-cdk/aws-ec2";
 
@@ -17,7 +19,8 @@ export class Infrastructure extends cdk.Stack {
   readonly sshPort: ec2.Port;
 
   readonly lambdaManagedPolicies: iam.IManagedPolicy[];
-  key: kms.Key;
+  readonly key: kms.Key;
+  readonly databaseSecret: sm.Secret;
 
   constructor(scope: cdk.App, id: string, props: InfrastructureProps) {
     super(scope, id, props);
@@ -95,6 +98,13 @@ export class Infrastructure extends cdk.Stack {
       enableKeyRotation: true
     });
     this.key.addAlias("alias/dinodime/general");
+
+    this.databaseSecret = new sm.Secret(this, "DatabaseSecret", {
+      description: "The database master user secret",
+      encryptionKey: this.key,
+      secretName: "database-password",
+      generateSecretString: { excludeCharacters: '"@/\\;' }
+    });
   }
 
   public isolatedSubnets() {
