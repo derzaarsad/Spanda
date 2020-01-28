@@ -7,12 +7,21 @@ import { PostgresStorage } from "../src/postgres-storage";
 import { Infrastructure } from "../src/infrastructure";
 import { PostgresDeploymentProps } from "../src/postgres-deployment-props";
 import { ServicesProps } from "../src/services-props";
+import { DatabaseMigrationsRepository } from "../src/db-migrations-repo";
 
 const app = new cdk.App();
 
 const account = app.node.tryGetContext("awsAccount")! as string;
 const region = app.node.tryGetContext("awsRegion")! as string;
 const deploymentEnv = { region: region, account: account };
+
+const migrationsRepository = new DatabaseMigrationsRepository(
+  app,
+  "DinodimeDbMigrationsRepository",
+  {
+    env: deploymentEnv
+  }
+);
 
 const infrastructure = new Infrastructure(app, "DinodimeInfrastructure", { env: deploymentEnv });
 
@@ -27,19 +36,26 @@ const postgresProps: PostgresDeploymentProps = {
     vpc: infrastructure.vpc,
     subnetPlacement: infrastructure.isolatedSubnetSelection(),
     databasePort: infrastructure.databasePort,
-    databaseSecurityGroups: [infrastructure.databasesSecurityGroup]
+    databaseSecurityGroup: infrastructure.databasesSecurityGroup
   },
 
   instanceProps: {
     databaseName: pgDatabaseName,
     masterUsername: pgMasterUserName,
-    masterUserPassword: cdk.SecretValue.plainText(pgMasterPassword),
+    masterUserPassword: pgMasterPassword,
     instanceClass: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
     deletionProtection: false,
     backupRetention: cdk.Duration.days(0),
     deleteAutomatedBackups: true,
     storageEncrypted: false,
     multiAz: false
+  },
+
+  migrationsContainerProps: {
+    subnetPlacement: infrastructure.privateSubnetSelection(),
+    imageRepository: migrationsRepository.repository,
+    securityGroup: infrastructure.databaseApplicationsSecurityGroup,
+    imageTag: "latest"
   }
 };
 

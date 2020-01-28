@@ -5,6 +5,7 @@ import * as ec2 from "@aws-cdk/aws-ec2";
 import { PostgresInfrastructureConfiguration } from "./postgres-storage-configuration";
 import { ClusterParameterGroup } from "@aws-cdk/aws-rds";
 import { PostgresDeploymentProps } from "./postgres-deployment-props";
+import { DatabaseMigrations } from "./db-migrations";
 
 export class PostgresStorage extends cdk.Stack {
   readonly instance: rds.DatabaseInstance;
@@ -16,7 +17,7 @@ export class PostgresStorage extends cdk.Stack {
       engine: rds.DatabaseInstanceEngine.POSTGRES,
       databaseName: props.instanceProps.databaseName,
       masterUsername: props.instanceProps.masterUsername,
-      masterUserPassword: props.instanceProps.masterUserPassword,
+      masterUserPassword: cdk.SecretValue.plainText(props.instanceProps.masterUserPassword),
       instanceClass: props.instanceProps.instanceClass,
       deletionProtection: props.instanceProps.deletionProtection,
       backupRetention: props.instanceProps.backupRetention,
@@ -25,7 +26,23 @@ export class PostgresStorage extends cdk.Stack {
       multiAz: props.instanceProps.multiAz,
       vpc: props.infrastructureProps.vpc,
       vpcPlacement: props.infrastructureProps.subnetPlacement,
-      securityGroups: props.infrastructureProps.databaseSecurityGroups
+      securityGroups: [props.infrastructureProps.databaseSecurityGroup]
+    });
+
+    new DatabaseMigrations(this, "DatabaseMigrations", {
+      databaseConfiguration: {
+        instance: this.instance,
+        username: props.instanceProps.masterUsername,
+        password: props.instanceProps.masterUserPassword,
+        databaseName: props.instanceProps.databaseName
+      },
+      vpcConfiguration: {
+        vpc: props.infrastructureProps.vpc,
+        securityGroup: props.migrationsContainerProps.securityGroup,
+        subnets: props.migrationsContainerProps.subnetPlacement
+      },
+      imageRepository: props.migrationsContainerProps.imageRepository,
+      imageTag: props.migrationsContainerProps.imageTag
     });
   }
 
