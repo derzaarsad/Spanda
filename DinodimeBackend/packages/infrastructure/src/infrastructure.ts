@@ -19,8 +19,8 @@ export class Infrastructure extends cdk.Stack {
   readonly sshPort: ec2.Port;
 
   readonly lambdaManagedPolicies: iam.IManagedPolicy[];
-  readonly key: kms.Key;
-  readonly databaseSecret: sm.Secret;
+  readonly generalKey: kms.Key;
+  readonly databasePassword: sm.Secret;
 
   constructor(scope: cdk.App, id: string, props: InfrastructureProps) {
     super(scope, id, props);
@@ -94,14 +94,14 @@ export class Infrastructure extends cdk.Stack {
       iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole")
     ];
 
-    this.key = new kms.Key(this, "GeneralKey", {
-      enableKeyRotation: true
+    this.generalKey = new kms.Key(this, "GeneralKey", {
+      enableKeyRotation: false
     });
-    this.key.addAlias("alias/dinodime/general");
+    this.generalKey.addAlias("alias/dinodime/general");
 
-    this.databaseSecret = new sm.Secret(this, "DatabaseSecret", {
+    this.databasePassword = new sm.Secret(this, "DatabaseSecret", {
       description: "The database master user secret",
-      encryptionKey: this.key,
+      encryptionKey: this.generalKey,
       secretName: "database-password",
       generateSecretString: { excludeCharacters: '"@/\\;' }
     });

@@ -7,6 +7,7 @@ import * as iam from "@aws-cdk/aws-iam";
 import * as logs from "@aws-cdk/aws-logs";
 import * as events from "@aws-cdk/aws-events";
 import * as targets from "@aws-cdk/aws-events-targets";
+import * as sm from "@aws-cdk/aws-secretsmanager";
 import * as stepfn from "@aws-cdk/aws-stepfunctions";
 import * as tasks from "@aws-cdk/aws-stepfunctions-tasks";
 
@@ -21,7 +22,7 @@ interface PostgresConfiguration {
   instance: rds.DatabaseInstance;
   databaseName: string;
   username: string;
-  password: string;
+  password: sm.Secret;
 }
 
 interface DatabaseMigrationsProperties extends cdk.StackProps {
@@ -61,13 +62,36 @@ export class DatabaseMigrations extends cdk.Construct {
     const taskDefinition = new ecs.FargateTaskDefinition(this, "UpdateSchemaTaskDefinition");
     taskDefinition.addToExecutionRolePolicy(allowPublishLogs);
 
+    const databasePassword = sm.Secret.fromSecretArn(
+      this,
+      "DatabasePassword",
+      db.password.secretArn
+    );
+    taskDefinition.addToTaskRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["secretsmanager:GetSecretValue"],
+        resources: [databasePassword.secretArn]
+      })
+    );
+
+    if (databasePassword.encryptionKey) {
+      taskDefinition.addToTaskRolePolicy(
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          actions: ["kms:Decrypt"],
+          resources: [databasePassword.encryptionKey.keyArn]
+        })
+      );
+    }
+
     taskDefinition.addContainer("dinodime-db-migrations-container", {
       image: image,
       environment: {
         LIQUIBASE_URL: `jdbc:postgresql://${db.instance.instanceEndpoint.hostname}:${db.instance.dbInstanceEndpointPort}/${db.databaseName}`,
-        LIQUIBASE_USERNAME: db.username,
-        LIQUIBASE_PASSWORD: db.password
+        LIQUIBASE_USERNAME: db.username
       },
+      secrets: { LIQUIBASE_PASSWORD: ecs.Secret.fromSecretsManager(databasePassword) },
       logging: ecs.LogDriver.awsLogs({ logGroup: logGroup, streamPrefix: "update" }),
       command: ["update"]
     });

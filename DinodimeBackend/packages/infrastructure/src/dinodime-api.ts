@@ -19,7 +19,9 @@ const configureEnvironment = (servicesProps: ServicesProps): { [key: string]: st
   };
 
   if (servicesProps.backendConfiguration.storageBackend === "POSTGRESQL") {
-    environment["PGPASSWORD"] = servicesProps.backendConfiguration.pgPassword;
+    environment[
+      "PGPASSWORD"
+    ] = servicesProps.backendConfiguration.pgPassword.secretValue.toString();
     environment["PGUSER"] = servicesProps.backendConfiguration.pgUser;
     environment["PGHOST"] = servicesProps.backendConfiguration.pgHost;
     environment["PGDATABASE"] = servicesProps.backendConfiguration.pgDatabase;
@@ -40,8 +42,7 @@ export class DinodimeAPI extends cdk.Construct {
     const commonEnvironment = configureEnvironment(props);
 
     const role = new iam.Role(this, "APIMethodLambdaRole", {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
-      managedPolicies: props.lambdaDeploymentProps.managedPolicies
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com")
     });
 
     const lambdaFactory = new LambdaFactory({
@@ -49,6 +50,7 @@ export class DinodimeAPI extends cdk.Construct {
       runtime: lambda.Runtime.NODEJS_12_X,
       duration: Duration.seconds(20),
       deploymentProps: props.lambdaDeploymentProps,
+      permissionProps: props.lambdaPermissionProps,
       executionRole: role,
       env: commonEnvironment
     });

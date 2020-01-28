@@ -41,8 +41,7 @@ export class NewTransactionsNotifications extends cdk.Construct {
     notificationsTopic.addSubscription(new subs.SqsSubscription(notifcationsQueue));
 
     const role = new iam.Role(this, "NewTransactionsNotificationLambdaRole", {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
-      managedPolicies: props.lambdaDeploymentProps.managedPolicies
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com")
     });
 
     const lambdaFactory = new LambdaFactory({
@@ -50,6 +49,7 @@ export class NewTransactionsNotifications extends cdk.Construct {
       runtime: lambda.Runtime.NODEJS_12_X,
       duration: Duration.seconds(20),
       deploymentProps: props.lambdaDeploymentProps,
+      permissionProps: props.lambdaPermissionProps,
       executionRole: role,
       env: {
         TABLE_NAME: tableName,

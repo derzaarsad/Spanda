@@ -8,6 +8,7 @@ import { Infrastructure } from "../src/infrastructure";
 import { PostgresDeploymentProps } from "../src/postgres-deployment-props";
 import { ServicesProps } from "../src/services-props";
 import { DatabaseMigrationsRepository } from "../src/db-migrations-repo";
+import { LambdaPermissionProps } from "../src/lambda-factory";
 
 const app = new cdk.App();
 
@@ -27,7 +28,6 @@ const infrastructure = new Infrastructure(app, "DinodimeInfrastructure", { env: 
 
 const pgDatabaseName = app.node.tryGetContext("pgDatabaseName")! as string;
 const pgMasterUserName = app.node.tryGetContext("pgMasterUserName")! as string;
-const pgMasterPassword = app.node.tryGetContext("pgMasterPassword")! as string;
 
 const postgresProps: PostgresDeploymentProps = {
   env: deploymentEnv,
@@ -42,7 +42,7 @@ const postgresProps: PostgresDeploymentProps = {
   instanceProps: {
     databaseName: pgDatabaseName,
     masterUsername: pgMasterUserName,
-    masterUserPassword: pgMasterPassword,
+    masterUserPassword: infrastructure.databasePassword,
     instanceClass: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
     deletionProtection: false,
     backupRetention: cdk.Duration.days(0),
@@ -53,6 +53,7 @@ const postgresProps: PostgresDeploymentProps = {
 
   migrationsContainerProps: {
     subnetPlacement: infrastructure.privateSubnetSelection(),
+    databasePassword: infrastructure.databasePassword,
     imageRepository: migrationsRepository.repository,
     securityGroup: infrastructure.databaseApplicationsSecurityGroup,
     imageTag: "latest"
@@ -72,15 +73,15 @@ const servicesProps: ServicesProps = {
   lambdaDeploymentProps: {
     vpc: infrastructure.vpc,
     subnets: infrastructure.privateSubnetSelection(),
-    securityGroups: [infrastructure.databaseApplicationsSecurityGroup],
-    managedPolicies: infrastructure.lambdaManagedPolicies
+    securityGroups: [infrastructure.databaseApplicationsSecurityGroup]
   },
+  lambdaPermissionProps: new LambdaPermissionProps(infrastructure.lambdaManagedPolicies),
   backendConfiguration: {
     pgDatabase: pgDatabaseName,
     pgHost: storage.endpoint().hostname,
     pgPort: infrastructure.databasePortNumber,
     pgUser: pgMasterUserName,
-    pgPassword: pgMasterPassword,
+    pgPassword: infrastructure.databasePassword,
     storageBackend: "POSTGRESQL"
   }
 };

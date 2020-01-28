@@ -12,7 +12,8 @@ export class Services extends cdk.Stack {
       "DinodimeNewTransactionsNotifications",
       {
         decryptionKey: props.finApiProps.finApiDecryptionKey,
-        lambdaDeploymentProps: props.lambdaDeploymentProps
+        lambdaDeploymentProps: props.lambdaDeploymentProps,
+        lambdaPermissionProps: props.lambdaPermissionProps
       }
     );
 

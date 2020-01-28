@@ -4,6 +4,7 @@ import * as cdk from "@aws-cdk/core";
 import { expect as expectCDK, haveResource } from "@aws-cdk/assert";
 import { Services } from "../src/services";
 import { ServicesProps } from "../src/services-props";
+import { LambdaPermissionProps } from "../src/lambda-factory";
 
 describe("The services stack", () => {
   let app: cdk.App;
@@ -23,9 +24,8 @@ describe("The services stack", () => {
       backendConfiguration: {
         storageBackend: "IN_MEMORY"
       },
-      lambdaDeploymentProps: {
-        managedPolicies: []
-      }
+      lambdaDeploymentProps: {},
+      lambdaPermissionProps: new LambdaPermissionProps()
     };
   });
 

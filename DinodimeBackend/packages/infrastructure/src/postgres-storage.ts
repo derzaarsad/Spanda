@@ -17,7 +17,9 @@ export class PostgresStorage extends cdk.Stack {
       engine: rds.DatabaseInstanceEngine.POSTGRES,
       databaseName: props.instanceProps.databaseName,
       masterUsername: props.instanceProps.masterUsername,
-      masterUserPassword: cdk.SecretValue.plainText(props.instanceProps.masterUserPassword),
+      masterUserPassword: cdk.SecretValue.secretsManager(
+        props.instanceProps.masterUserPassword.secretArn
+      ),
       instanceClass: props.instanceProps.instanceClass,
       deletionProtection: props.instanceProps.deletionProtection,
       backupRetention: props.instanceProps.backupRetention,

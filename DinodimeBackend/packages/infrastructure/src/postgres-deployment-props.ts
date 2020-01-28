@@ -1,6 +1,7 @@
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as ecr from "@aws-cdk/aws-ecr";
+import * as sm from "@aws-cdk/aws-secretsmanager";
 
 interface PostgresInfrastructureProps {
   vpc: ec2.Vpc;
@@ -12,7 +13,7 @@ interface PostgresInfrastructureProps {
 interface PostgresInstanceProps {
   databaseName: string;
   masterUsername: string;
-  masterUserPassword: string;
+  masterUserPassword: sm.Secret;
   instanceClass: ec2.InstanceType;
   deletionProtection: boolean;
   backupRetention: cdk.Duration;
@@ -25,6 +26,7 @@ interface MigrationsContainerProps {
   subnetPlacement: ec2.SubnetSelection;
   securityGroup: ec2.SecurityGroup;
   imageRepository: ecr.IRepository;
+  databasePassword: sm.Secret;
   imageTag?: string;
 }
 

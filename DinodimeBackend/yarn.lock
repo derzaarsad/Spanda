@@ -286,7 +286,7 @@
     "@aws-cdk/core" "1.22.0"
     "@aws-cdk/region-info" "1.22.0"
 
-"@aws-cdk/aws-kms@1.22.0":
+"@aws-cdk/aws-kms@1.22.0", "@aws-cdk/aws-kms@^1.22.0":
   version "1.22.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-kms/-/aws-kms-1.22.0.tgz#70ad52592a1a9990fbcf2af010c249f1b7bd83a7"
   integrity sha512-bkFMkp6I609O4x6AKHz4B8DK6zvRvbNCrKRIiNvFfibuN66ncgLeVjQXGfe51Nc3fSW8Xxa1cXyBuo24EiSq7A==
