@@ -99,7 +99,7 @@ export class Infrastructure extends cdk.Stack {
     this.databasePassword = new sm.Secret(this, "DatabaseSecret", {
       description: "The database master user secret",
       secretName: "database-password",
-      generateSecretString: { excludeCharacters: '"@/\\;' }
+      generateSecretString: { excludeCharacters: '",|@/\\;' }
     });
   }
 
