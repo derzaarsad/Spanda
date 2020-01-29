@@ -7,6 +7,9 @@ import * as sm from "@aws-cdk/aws-secretsmanager";
 import { InfrastructureProps } from "./infrastructure-props";
 import { CfnLaunchTemplate, UserData } from "@aws-cdk/aws-ec2";
 
+/**
+ * A stack laying the foundations for the backend resources: networking and security.
+ */
 export class Infrastructure extends cdk.Stack {
   readonly vpc: ec2.Vpc;
   readonly databaseApplicationsSecurityGroup: ec2.SecurityGroup;
@@ -19,7 +22,6 @@ export class Infrastructure extends cdk.Stack {
   readonly sshPort: ec2.Port;
 
   readonly lambdaManagedPolicies: iam.IManagedPolicy[];
-  readonly generalKey: kms.Key;
   readonly databasePassword: sm.Secret;
 
   constructor(scope: cdk.App, id: string, props: InfrastructureProps) {
@@ -94,14 +96,8 @@ export class Infrastructure extends cdk.Stack {
       iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole")
     ];
 
-    this.generalKey = new kms.Key(this, "GeneralKey", {
-      enableKeyRotation: false
-    });
-    this.generalKey.addAlias("alias/dinodime/general");
-
     this.databasePassword = new sm.Secret(this, "DatabaseSecret", {
       description: "The database master user secret",
-      encryptionKey: this.generalKey,
       secretName: "database-password",
       generateSecretString: { excludeCharacters: '"@/\\;' }
     });
