@@ -120,7 +120,7 @@ export class DatabaseMigrations extends cdk.Construct {
       source: ["aws.rds"],
       detailType: ["RDS DB Instance Event"],
       detail: {
-        EventCategories: ["availability"]
+        EventCategories: ["creation"]
       }
     });
 
