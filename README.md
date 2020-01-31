@@ -18,6 +18,7 @@ List of features to be added:
 10. Two Part Tariff calculation
 11. Ability to program a financial consultant
 12. Investation prediction marketplace
+13. Person Trust Indicator based on money management
 
 ## Getting Started
 
