@@ -10,6 +10,8 @@ import { BankService } from "./services/bank.service";
 
 import { HomeModule } from "./views/home/home.module";
 
+import { TranslateModule } from './@ngx-translate/core@10.0.2';
+
 @NgModule({
   providers: [
     authProviders,
@@ -26,7 +28,9 @@ import { HomeModule } from "./views/home/home.module";
     AppRoutingModule,
     HomeModule,
     NativeScriptModule,
-    NativeScriptFormsModule
+    NativeScriptFormsModule,
+
+    TranslateModule.forRoot()
   ],
   schemas: [NO_ERRORS_SCHEMA],
 })

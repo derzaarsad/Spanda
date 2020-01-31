@@ -5,11 +5,15 @@ import { NativeScriptFormsModule } from "nativescript-angular/forms";
 import { HomeRoutingModule } from "./home.routing";
 import { HomeComponent } from "./home.component";
 
+import { TranslateModule } from '../../@ngx-translate/core@10.0.2';
+
 @NgModule({
     imports: [
         NativeScriptCommonModule,
         HomeRoutingModule,
-        NativeScriptFormsModule
+        NativeScriptFormsModule,
+
+        TranslateModule.forChild()
     ],
     declarations: [
         HomeComponent
