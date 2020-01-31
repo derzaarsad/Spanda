@@ -1,5 +1,4 @@
 import { AllowanceComponent } from "./views/allowance/allowance.component";
-import { LoginComponent } from "./views/login/login.component";
 import { SearchBankComponent } from "./views/searchBank/searchBank.component";
 import { AuthGuard } from "./services/auth-guard.service";
 import { NgModule } from "@angular/core";
@@ -11,12 +10,10 @@ export const authProviders = [
 ];
 
 const routes: Routes = [
-    { path: "", redirectTo: "/home", pathMatch: "full" },
-    { path: "login", component: LoginComponent }
+    { path: "", redirectTo: "/home", pathMatch: "full" }
 ];
 
 export const navigatableComponents: any = [
-    LoginComponent,
     AllowanceComponent,
     SearchBankComponent
 ];

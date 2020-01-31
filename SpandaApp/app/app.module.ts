@@ -9,6 +9,7 @@ import { AuthenticationService, AUTH_SERVICE_IMPL } from "./services/authenticat
 import { BankService } from "./services/bank.service";
 
 import { HomeModule } from "./views/home/home.module";
+import { LoginModule } from "./views/login/login.module";
 
 import { TranslateModule } from './@ngx-translate/core@10.0.2';
 
@@ -27,6 +28,7 @@ import { TranslateModule } from './@ngx-translate/core@10.0.2';
   imports: [
     AppRoutingModule,
     HomeModule,
+    LoginModule,
     NativeScriptModule,
     NativeScriptFormsModule,
 

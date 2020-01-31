@@ -6,6 +6,8 @@ import { alert, prompt } from "tns-core-modules/ui/dialogs";
 import { Page } from "tns-core-modules/ui/page";
 import { IAuthentication, AUTH_SERVICE_IMPL } from "~/services/authentication.service";
 
+import { TranslateService, LangChangeEvent } from '../../@ngx-translate/core@10.0.2';
+
 @Component({
     selector: "login",
     templateUrl: "./login.html",
@@ -19,16 +21,23 @@ export class LoginComponent {
     @ViewChild("password", {static: false}) password: ElementRef;
     @ViewChild("confirmPassword", {static: false}) confirmPassword: ElementRef;
 
+    public currentLanguage = 'id';
+
     constructor(
         private page: Page,
         private activeRoute: ActivatedRoute,
-		private routerExtension: RouterExtensions, @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) {
+        private routerExtension: RouterExtensions,
+        private translate: TranslateService, @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) {
         this.page.actionBarHidden = true;
 
         if(this.authenticationService.isStoredUserAvailable()) {
             this.Username = this.authenticationService.getStoredUser().Username;
             this.Password = this.authenticationService.getStoredUser().Password;
         }
+
+        translate.onLangChange.subscribe((event: LangChangeEvent) => {
+            this.currentLanguage = event.lang;
+        });
     }
 
     ngOnInit(): void {
