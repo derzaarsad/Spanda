@@ -1,8 +1,3 @@
-/**
-* @author Bazzite (https://www.bazzite.com)
-* @license MIT License Copyright (c) 2018 Bazzite
-*/
-
 import { NgModule, NO_ERRORS_SCHEMA } from "@angular/core";
 import { NativeScriptCommonModule } from "nativescript-angular/common";
 import { NativeScriptFormsModule } from "nativescript-angular/forms";
