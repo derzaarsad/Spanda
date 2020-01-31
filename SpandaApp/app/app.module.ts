@@ -8,6 +8,8 @@ import { AppComponent } from "./app.component";
 import { AuthenticationService, AUTH_SERVICE_IMPL } from "./services/authentication.service";
 import { BankService } from "./services/bank.service";
 
+import { HomeModule } from "./views/home/home.module";
+
 @NgModule({
   providers: [
     authProviders,
@@ -22,6 +24,7 @@ import { BankService } from "./services/bank.service";
   bootstrap: [AppComponent],
   imports: [
     AppRoutingModule,
+    HomeModule,
     NativeScriptModule,
     NativeScriptFormsModule
   ],
