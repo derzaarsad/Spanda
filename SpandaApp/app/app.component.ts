@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { DrawerTransitionBase, RadSideDrawer, SlideInOnTopTransition } from "nativescript-ui-sidedrawer";
 
 import { TranslateService, LangChangeEvent } from './@ngx-translate/core@10.0.2';
 
@@ -11,6 +12,8 @@ import idLang from './locale/id'
   templateUrl: "app.component.html"
 })
 export class AppComponent {
+  private _sideDrawerTransition: DrawerTransitionBase;
+
   public currentLanguage = 'id';
 
     constructor(
@@ -30,4 +33,16 @@ export class AppComponent {
             this.currentLanguage = event.lang;
         });
     }
+
+    ngOnInit(): void {
+      this._sideDrawerTransition = new SlideInOnTopTransition();
+    }
+
+    get sideDrawerTransition(): DrawerTransitionBase {
+      return this._sideDrawerTransition;
+    }
+
+    changeLanguage(locale: string): void {
+      this.translate.use(locale);
+  }
 }

@@ -5,6 +5,8 @@ import { NativeScriptFormsModule } from "nativescript-angular/forms";
 import { HomeRoutingModule } from "./home.routing";
 import { HomeComponent } from "./home.component";
 
+import { BottomNavigationComponent } from "../../shared/components/bottom-navigation.component";
+
 import { TranslateModule } from '../../@ngx-translate/core@10.0.2';
 
 @NgModule({
@@ -16,7 +18,9 @@ import { TranslateModule } from '../../@ngx-translate/core@10.0.2';
         TranslateModule.forChild()
     ],
     declarations: [
-        HomeComponent
+        HomeComponent,
+
+        BottomNavigationComponent
     ],
     schemas: [
         NO_ERRORS_SCHEMA

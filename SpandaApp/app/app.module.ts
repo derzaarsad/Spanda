@@ -1,6 +1,7 @@
 import { NgModule, NO_ERRORS_SCHEMA } from "@angular/core";
 import { NativeScriptModule } from "nativescript-angular/nativescript.module";
 import { NativeScriptFormsModule } from "nativescript-angular/forms";
+import { NativeScriptUISideDrawerModule } from "nativescript-ui-sidedrawer/angular";
 import { AppRoutingModule, navigatableComponents, authProviders } from "./app.routing";
 
 import { AppComponent } from "./app.component";
@@ -31,6 +32,7 @@ import { TranslateModule } from './@ngx-translate/core@10.0.2';
     LoginModule,
     NativeScriptModule,
     NativeScriptFormsModule,
+    NativeScriptUISideDrawerModule,
 
     TranslateModule.forRoot()
   ],
