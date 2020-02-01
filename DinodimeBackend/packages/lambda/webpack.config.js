@@ -7,7 +7,8 @@ const OUT_DIR = path.resolve(__dirname, "dist");
 const config = {
   entry: {
     api: path.resolve(SRC_DIR, "api.js"),
-    "notifications-callback": path.resolve(SRC_DIR, "notifications-callback.js")
+    "notifications-callback": path.resolve(SRC_DIR, "notifications-callback.js"),
+    "describe-db-instance": path.resolve(SRC_DIR, "describe-db-instance.js")
   },
   externals: ["aws-sdk"],
   output: {

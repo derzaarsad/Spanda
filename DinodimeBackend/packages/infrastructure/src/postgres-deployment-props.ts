@@ -2,6 +2,7 @@ import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as ecr from "@aws-cdk/aws-ecr";
 import * as sm from "@aws-cdk/aws-secretsmanager";
+import * as iam from "@aws-cdk/aws-iam";
 
 interface PostgresInfrastructureProps {
   vpc: ec2.Vpc;
@@ -28,6 +29,7 @@ interface MigrationsContainerProps {
   imageRepository: ecr.IRepository;
   databasePassword: sm.Secret;
   imageTag?: string;
+  lambdaManagedPolicies: iam.IManagedPolicy[];
 }
 
 /**

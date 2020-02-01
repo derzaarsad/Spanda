@@ -23,10 +23,16 @@ interface DatabaseInstanceQuery {
 interface DatabaseInstanceDetails {
   dbInstanceIdentifier: string;
   dbInstanceArn: string;
-  endpoint: string;
-  port: number;
+  dbInstanceEndpoint: string;
+  dbInstancePort: number;
 }
 
+/**
+ * Describes a database instance given a database instance identifier.
+ *
+ * @param event a database instance query.
+ * @param context the execution context.
+ */
 export const handler = async (
   event: DatabaseInstanceQuery,
   context: Context
@@ -42,7 +48,7 @@ export const handler = async (
 
   const instances = description.DBInstances;
 
-  if (instances.length < 1) {
+  if (instances === undefined || instances.length < 1) {
     throw new Error(`No instances found for id ${dbInstanceIdentifier}`);
   }
 
@@ -56,8 +62,8 @@ export const handler = async (
 
   return {
     dbInstanceIdentifier: dbInstanceIdentifier,
-    dbInstanceArn: instance.DBInstanceArn,
-    endpoint: instance.Endpoint.Address,
-    port: instance.Endpoint.Port
+    dbInstanceArn: instance.DBInstanceArn!,
+    dbInstanceEndpoint: instance.Endpoint!.Address!,
+    dbInstancePort: instance.Endpoint!.Port!
   };
 };

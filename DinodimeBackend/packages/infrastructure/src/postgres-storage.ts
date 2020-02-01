@@ -13,6 +13,24 @@ export class PostgresStorage extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props: PostgresDeploymentProps) {
     super(scope, id, props);
 
+    new DatabaseMigrations(this, "DatabaseMigrations", {
+      databaseConfiguration: {
+        username: props.instanceProps.masterUsername,
+        password: props.instanceProps.masterUserPassword,
+        databaseName: props.instanceProps.databaseName
+      },
+      vpcConfiguration: {
+        vpc: props.infrastructureProps.vpc,
+        securityGroup: props.migrationsContainerProps.securityGroup,
+        subnets: props.migrationsContainerProps.subnetPlacement
+      },
+      imageConfiguration: {
+        imageRepository: props.migrationsContainerProps.imageRepository,
+        imageTag: props.migrationsContainerProps.imageTag
+      },
+      lambdaManagedPolicies: props.migrationsContainerProps.lambdaManagedPolicies
+    });
+
     this.instance = new rds.DatabaseInstance(this, "DinodimeDatabase", {
       engine: rds.DatabaseInstanceEngine.POSTGRES,
       databaseName: props.instanceProps.databaseName,
@@ -29,22 +47,6 @@ export class PostgresStorage extends cdk.Stack {
       vpc: props.infrastructureProps.vpc,
       vpcPlacement: props.infrastructureProps.subnetPlacement,
       securityGroups: [props.infrastructureProps.databaseSecurityGroup]
-    });
-
-    new DatabaseMigrations(this, "DatabaseMigrations", {
-      databaseConfiguration: {
-        instance: this.instance,
-        username: props.instanceProps.masterUsername,
-        password: props.instanceProps.masterUserPassword,
-        databaseName: props.instanceProps.databaseName
-      },
-      vpcConfiguration: {
-        vpc: props.infrastructureProps.vpc,
-        securityGroup: props.migrationsContainerProps.securityGroup,
-        subnets: props.migrationsContainerProps.subnetPlacement
-      },
-      imageRepository: props.migrationsContainerProps.imageRepository,
-      imageTag: props.migrationsContainerProps.imageTag
     });
   }
 
