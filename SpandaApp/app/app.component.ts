@@ -1,5 +1,8 @@
-import { Component } from "@angular/core";
+import { Injectable, Inject, Component } from "@angular/core";
 import { DrawerTransitionBase, RadSideDrawer, SlideInOnTopTransition } from "nativescript-ui-sidedrawer";
+import { AUTH_SERVICE_IMPL, IAuthentication } from "./services/authentication.service";
+import { RouterExtensions } from "nativescript-angular/router";
+import * as app from "application";
 
 import { TranslateService, LangChangeEvent } from './@ngx-translate/core@10.0.2';
 
@@ -17,7 +20,9 @@ export class AppComponent {
   public currentLanguage = 'id';
 
     constructor(
-        private translate: TranslateService) {
+        private translate: TranslateService,
+        private routerExtensions: RouterExtensions,
+        @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) {
         // Add translations
         translate.setTranslation('en', enLang);
         translate.setTranslation('id', idLang);
@@ -44,5 +49,12 @@ export class AppComponent {
 
     changeLanguage(locale: string): void {
       this.translate.use(locale);
+    }
+
+    onLogOut() {
+      this.authenticationService.removeAllUserAuthentication();
+      this.routerExtensions.navigate(["login"], { clearHistory: true });
+      const sideDrawer = <RadSideDrawer>app.getRootView();
+      sideDrawer.closeDrawer();
   }
 }
