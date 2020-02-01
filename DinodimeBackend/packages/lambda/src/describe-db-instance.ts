@@ -25,6 +25,7 @@ interface DatabaseInstanceDetails {
   dbInstanceArn: string;
   dbInstanceEndpoint: string;
   dbInstancePort: number;
+  postgresJdbcUrl: string;
 }
 
 /**
@@ -43,8 +44,7 @@ export const handler = async (
 
   const description = await rds
     .describeDBInstances({ DBInstanceIdentifier: dbInstanceIdentifier })
-    .promise()
-    .then();
+    .promise();
 
   const instances = description.DBInstances;
 
@@ -60,10 +60,14 @@ export const handler = async (
     );
   }
 
+  const endpoint = instance.Endpoint!.Address!;
+  const port = instance.Endpoint!.Port!;
+
   return {
     dbInstanceIdentifier: dbInstanceIdentifier,
     dbInstanceArn: instance.DBInstanceArn!,
-    dbInstanceEndpoint: instance.Endpoint!.Address!,
-    dbInstancePort: instance.Endpoint!.Port!
+    dbInstanceEndpoint: endpoint,
+    dbInstancePort: port,
+    postgresJdbcUrl: `jdbc:postgresql://${endpoint}:${port}`
   };
 };

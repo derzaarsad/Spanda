@@ -110,7 +110,8 @@ export class DatabaseMigrations extends cdk.Construct {
 
     return new stepfn.Task(this, "DescribeDbInstance", {
       task: taskDefinition,
-      timeout: cdk.Duration.minutes(1)
+      timeout: cdk.Duration.minutes(1),
+      outputPath: "$.Payload"
     });
   }
 
@@ -193,7 +194,7 @@ export class DatabaseMigrations extends cdk.Construct {
           environment: [
             {
               name: "LIQUIBASE_URL",
-              value: "jdbc:postgresql://$.dbInstanceEndpoint:$.dbInstancePort"
+              value: stepfn.Data.stringAt("$.postgresJdbcUrl")
             }
           ]
         }
