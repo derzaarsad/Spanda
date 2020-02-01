@@ -2,6 +2,18 @@ import winston from "winston";
 import { RDS } from "aws-sdk/clients/all";
 import { Context } from "aws-lambda";
 
+interface DatabaseInstanceQuery {
+  dbInstanceIdentifier: string;
+}
+
+interface DatabaseInstanceDetails {
+  dbInstanceIdentifier: string;
+  dbInstanceArn: string;
+  dbInstanceEndpoint: string;
+  dbInstancePort: number;
+  postgresJdbcUrl: string;
+}
+
 const env = process.env;
 
 const log = winston.createLogger({
@@ -16,18 +28,6 @@ const log = winston.createLogger({
 
 const rds = new RDS();
 
-interface DatabaseInstanceQuery {
-  dbInstanceIdentifier: string;
-}
-
-interface DatabaseInstanceDetails {
-  dbInstanceIdentifier: string;
-  dbInstanceArn: string;
-  dbInstanceEndpoint: string;
-  dbInstancePort: number;
-  postgresJdbcUrl: string;
-}
-
 /**
  * Describes a database instance given a database instance identifier.
  *
@@ -38,7 +38,7 @@ export const handler = async (
   event: DatabaseInstanceQuery,
   context: Context
 ): Promise<DatabaseInstanceDetails> => {
-  log.debug("Received event", event);
+  log.debug("Invoking describe instance", { event: event });
 
   const dbInstanceIdentifier = event.dbInstanceIdentifier;
 
@@ -63,11 +63,14 @@ export const handler = async (
   const endpoint = instance.Endpoint!.Address!;
   const port = instance.Endpoint!.Port!;
 
-  return {
+  const result = {
     dbInstanceIdentifier: dbInstanceIdentifier,
     dbInstanceArn: instance.DBInstanceArn!,
     dbInstanceEndpoint: endpoint,
     dbInstancePort: port,
     postgresJdbcUrl: `jdbc:postgresql://${endpoint}:${port}`
   };
+
+  log.debug("Returning database instance details", { details: result });
+  return result;
 };
