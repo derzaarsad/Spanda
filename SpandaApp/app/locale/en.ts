@@ -1,4 +1,7 @@
 export default {
+    MENU: 'MENU',
+    ALLOWANCE: 'ALLOWANCE',
+    TRANSACTIONS: 'TRANSACTIONS',
     login_page: {
         email: 'Email',
         password: 'Password',

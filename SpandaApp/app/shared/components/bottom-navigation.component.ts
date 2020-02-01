@@ -9,6 +9,7 @@ import { RouterExtensions } from "nativescript-angular/router";
 import { filter } from "rxjs/operators";
 import * as app from "application";
 import { RadSideDrawer } from "nativescript-ui-sidedrawer";
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
 	selector: "app-bottom-navigation",
@@ -20,7 +21,8 @@ export class BottomNavigationComponent implements OnInit {
 
 	constructor(
 		private router: Router,
-		private routerExtensions: RouterExtensions) {
+		private routerExtensions: RouterExtensions,
+        private activeRoute: ActivatedRoute) {
 	}
 
 	ngOnInit(): void {
@@ -41,11 +43,12 @@ export class BottomNavigationComponent implements OnInit {
 	}
 
 	onNavItemTap(navItemRoute: string): void {
-		this.routerExtensions.navigate([navItemRoute], {
+		this.routerExtensions.navigate([{ outlets: { homeRouterOutlet: [navItemRoute] } }], {
 			transition: {
 				name: "fade"
 			},
-			clearHistory: true
+			clearHistory: true,
+			relativeTo: this.activeRoute
 		});
 
 		const sideDrawer = <RadSideDrawer>app.getRootView();

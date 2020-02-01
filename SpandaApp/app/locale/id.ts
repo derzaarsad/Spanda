@@ -1,4 +1,7 @@
 export default {
+    MENU: 'MENU',
+    ALLOWANCE: 'UANG SAKU',
+    TRANSACTIONS: 'TRANSAKSI',
     login_page: {
         email: 'Email',
         password: 'Kata Sandi',

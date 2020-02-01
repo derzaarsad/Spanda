@@ -4,15 +4,15 @@
         <Label row="1" [text]="'MENU' | translate" class="label"></Label>
     </GridLayout>
 
-    <GridLayout col="1" rows="auto, *" class="bottom-navigation-item" [class.selected]="isComponentSelected('/home')"
-        (tap)="onNavItemTap('/home')">
+    <GridLayout col="1" rows="auto, *" class="bottom-navigation-item" [class.selected]="isComponentSelected('/home/(homeRouterOutlet:allowance)')"
+        (tap)="onNavItemTap('allowance')">
         <Label row="0" text="&#xe9ad;" class="icon"></Label>
-        <Label row="1" [text]="'TRANSACTIONS' | translate" class="label"></Label>
+        <Label row="1" [text]="'ALLOWANCE' | translate" class="label"></Label>
     </GridLayout>
 
-    <GridLayout col="2" rows="auto, *" class="bottom-navigation-item" [class.selected]="isComponentSelected('/cards')"
-        (tap)="onNavItemTap('/cards')">
+    <GridLayout col="2" rows="auto, *" class="bottom-navigation-item" [class.selected]="isComponentSelected('/home/(homeRouterOutlet:searchBank)')"
+        (tap)="onNavItemTap('searchBank')">
         <Label row="0" text="&#xea15;" class="icon"></Label>
-        <Label row="1" [text]="'CARDS' | translate" class="label"></Label>
+        <Label row="1" [text]="'TRANSACTIONS' | translate" class="label"></Label>
     </GridLayout>
 </GridLayout>
