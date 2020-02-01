@@ -39,9 +39,8 @@ export const handler = async (
   event: DatabaseInstanceQuery,
   context: Context
 ): Promise<DatabaseInstanceDetails> => {
-  log.debug("Invoking describe instance", { event: event });
-
   const dbInstanceIdentifier = event.dbInstanceIdentifier;
+  log.debug("Invoking describe instance", { dbInstanceIdentifier: dbInstanceIdentifier });
 
   const description = await rds
     .describeDBInstances({ DBInstanceIdentifier: dbInstanceIdentifier })
