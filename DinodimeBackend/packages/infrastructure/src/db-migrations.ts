@@ -45,6 +45,7 @@ export class DatabaseMigrations extends cdk.Construct {
 
     const describeDbInstanceTask = this.createDescribeDbInstancesTask(
       props.vpcConfiguration,
+      props.databaseConfiguration,
       props.lambdaManagedPolicies
     );
 
@@ -79,6 +80,7 @@ export class DatabaseMigrations extends cdk.Construct {
 
   private createDescribeDbInstancesTask(
     vpcConfig: TaskVpcConfiguration,
+    databaseConfiguration: PostgresConfiguration,
     lambdaManagedPolicies: iam.IManagedPolicy[]
   ): stepfn.Task {
     const role = new iam.Role(this, "DescribeDbInstancesRole", {
@@ -93,7 +95,10 @@ export class DatabaseMigrations extends cdk.Construct {
       vpc: vpcConfig.vpc,
       securityGroup: vpcConfig.securityGroup,
       vpcSubnets: vpcConfig.subnets,
-      role: role
+      role: role,
+      environment: {
+        DATABASE_NAME: databaseConfiguration.databaseName
+      }
     });
 
     lambdaManagedPolicies.forEach(policy => role.addManagedPolicy(policy));

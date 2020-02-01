@@ -26,6 +26,7 @@ const log = winston.createLogger({
   ]
 });
 
+const databaseName = env["DATABASE_NAME"];
 const rds = new RDS();
 
 /**
@@ -63,12 +64,17 @@ export const handler = async (
   const endpoint = instance.Endpoint!.Address!;
   const port = instance.Endpoint!.Port!;
 
+  let url = `jdbc:postgresql://${endpoint}:${port}`;
+  if (databaseName) {
+    url = url + "/" + databaseName;
+  }
+
   const result = {
     dbInstanceIdentifier: dbInstanceIdentifier,
     dbInstanceArn: instance.DBInstanceArn!,
     dbInstanceEndpoint: endpoint,
     dbInstancePort: port,
-    postgresJdbcUrl: `jdbc:postgresql://${endpoint}:${port}`
+    postgresJdbcUrl: url
   };
 
   log.debug("Returning database instance details", { details: result });
