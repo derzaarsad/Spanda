@@ -113,11 +113,14 @@ export class DatabaseMigrations extends cdk.Construct {
 
     const taskDefinition = new tasks.RunLambdaTask(fn);
 
-    return new stepfn.Task(this, "DescribeDbInstance", {
+    const task = new stepfn.Task(this, "DescribeDbInstance", {
       task: taskDefinition,
       timeout: cdk.Duration.minutes(1),
       outputPath: "$.Payload"
     });
+    task.addRetry({ backoffRate: 2, maxAttempts: 3, interval: cdk.Duration.seconds(2) });
+
+    return task;
   }
 
   private createUpdateSchemaTask(
