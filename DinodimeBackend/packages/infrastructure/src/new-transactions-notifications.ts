@@ -6,6 +6,7 @@ import * as sqs from "@aws-cdk/aws-sqs";
 import * as lambda from "@aws-cdk/aws-lambda";
 import * as apigw from "@aws-cdk/aws-apigateway";
 import * as iam from "@aws-cdk/aws-iam";
+import * as path from "path";
 
 import { Duration, RemovalPolicy } from "@aws-cdk/core";
 import { NewTransactionsNotificationsProps } from "./new-transactions-notifications-config";
@@ -60,8 +61,8 @@ export class NewTransactionsNotifications extends cdk.Construct {
 
     const fn = lambdaFactory.createLambda(
       "CallbackHandler",
-      lambda.Code.asset("../lambda/dist"),
-      "notifications-callback.handler"
+      lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-notifications-callback")),
+      "main.handler"
     );
 
     table.grantReadData(fn);
