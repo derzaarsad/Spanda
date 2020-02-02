@@ -1,9 +1,11 @@
 import { Component, OnInit, Inject } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { NavigationOptions } from "nativescript-angular/router/ns-location-strategy";
 import { Page } from "tns-core-modules/ui/page";
 import { IAuthentication,AUTH_SERVICE_IMPL } from "~/services/authentication.service";
 import { BankService } from "~/services/bank.service"
+import { AnimationCurve } from 'ui/enums';
 
 @Component({
     selector: "allowance",
@@ -12,10 +14,13 @@ import { BankService } from "~/services/bank.service"
 })
 export class AllowanceComponent implements OnInit {
 
-    private allowanceValue: number = 0;
+    private allowanceValue: string = '30€';
+    private allowanceValue_: number = 30; // TODO: ONLY FOR TEST
+    private isAllowanceIncreased: boolean = true;
 
     constructor(
         private routerExtensions: RouterExtensions,
+        private activeRoute: ActivatedRoute,
         private page: Page,
         @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication,
         private bankService: BankService) {
@@ -23,20 +28,23 @@ export class AllowanceComponent implements OnInit {
 
     ngOnInit(): void {
         this.page.actionBarHidden = true;
+        this.isAllowanceIncreased = Math.random() >= 0.5 ? true : false; // TODO: ONLY FOR TEST
+        let diff = this.isAllowanceIncreased ? 1 : (-1); // TODO: ONLY FOR TEST
+        this.allowanceValue = (this.allowanceValue_ + diff).toString() + "€"; // TODO: ONLY FOR TEST
     }
 
     onTap() {
-        this.routerExtensions.navigate(["searchBank"]);
+        this.routerExtensions.navigate(["../searchBank"], { clearHistory: true, relativeTo: this.activeRoute });
     }
 
     onLogOut() {
         this.authenticationService.removeAllUserAuthentication();
-        this.routerExtensions.navigate(["login"]);
+        this.routerExtensions.navigate(["login"], { clearHistory: true });
     }
 
     onRefreshAllowance() {
         this.bankService.getAllowance().then((res) => {
-            this.allowanceValue = res;
+            this.allowanceValue = res.toString() + "€";
         });
     }
 }

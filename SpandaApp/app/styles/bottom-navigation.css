@@ -1,0 +1,31 @@
+.bottom-navigation {
+  height: 52;
+  text-align: center;
+  background-color: #ffffff;
+  border-top-color: #dae1e7;
+  border-top-width: 1;
+}
+
+.bottom-navigation .bottom-navigation-item .icon,
+.bottom-navigation .bottom-navigation-item .label {
+  color: #C1C1C1;
+}
+
+.bottom-navigation .bottom-navigation-item .icon {
+  font-size: 20;
+  margin-bottom: 2;
+}
+
+.bottom-navigation .bottom-navigation-item .label {
+  font-size: 10;
+}
+
+.bottom-navigation .bottom-navigation-item.selected .icon,
+.bottom-navigation .bottom-navigation-item.selected .label {
+  color: #22292f;
+}
+
+.bottom-navigation GridLayout {
+  margin: 10;
+}
+

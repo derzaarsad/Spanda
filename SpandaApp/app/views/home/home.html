@@ -1,3 +1,7 @@
-<StackLayout>
-    <label text="this is home"></label>
-</StackLayout>
+<GridLayout rows="*, auto" class="page" tkMainContent>
+    <StackLayout row="0">
+        <page-router-outlet name="homeRouterOutlet"></page-router-outlet>
+    </StackLayout>
+
+    <app-bottom-navigation row="1"></app-bottom-navigation>
+</GridLayout>

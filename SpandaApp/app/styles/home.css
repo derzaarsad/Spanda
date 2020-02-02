@@ -1,0 +1,110 @@
+.home-page-content {
+  padding-top: 15;
+}
+
+.home-page-content .balance-chart {
+  background-color: #ffffff;
+  border-radius: 5;
+  margin-left: 15;
+  margin-right: 15;
+  border-color: #f1f5f8;
+  border-width: 1;
+}
+
+.home-page-content .balance-chart {
+  padding: 7.5;
+}
+
+.home-page-content .balance-summary {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.home-page-content .balance-summary StackLayout {
+  padding-left: 20;
+  padding-right: 20;
+}
+
+.home-page-content .balance-summary .title {
+  color: #606f7b;
+  font-size: 12;
+  margin-bottom: 5;
+}
+
+.home-page-content .balance-summary .ammount {
+  color: #3d4852;
+  font-size: 128;
+  font-weight: 600;
+  margin-bottom: 5;
+}
+
+.home-page-content .balance-summary .hr-light {
+  height: 3;
+}
+
+.home-page-content .balance-summary .hr-light.green {
+  background-color: #38c172;
+}
+
+.home-page-content .balance-summary .hr-light.red {
+  background-color: #e3342f;
+}
+
+@keyframes example-size {
+  from { transform: scale(1.1, 1.1); }
+  to { transform: scale(1, 1); }
+}
+
+.home-page-content .balance-summary .allowance-value {
+  animation-name: example-size;
+  animation-duration: 1;
+  animation-timing-function: spring;
+  animation-fill-mode: forwards;
+}
+
+@keyframes example-up {
+  from { transform: translate(0, 50); }
+  to { transform: translate(0, 0); }
+}
+
+@keyframes example-down {
+  from { transform: translate(0, -50); }
+  to { transform: translate(0, 0); }
+}
+
+.home-page-content .balance-summary .arrowanimation-up {
+  animation-name: example-up;
+  animation-duration: 1;
+  animation-timing-function: spring;
+  animation-fill-mode: forwards;
+}
+
+.home-page-content .balance-summary .arrowanimation-down {
+  animation-name: example-down;
+  animation-duration: 1;
+  animation-timing-function: spring;
+  animation-fill-mode: forwards;
+}
+
+.home-page-content .balance-summary .arrow-up {
+  border-style: solid;
+  border-width: 0 100% 100% 100%;
+  border-color: transparent transparent #38c172 transparent;
+}
+
+.home-page-content .balance-summary .arrow-down {
+  border-style: solid;
+  border-width: 100% 100% 0 100%;
+  border-color: #e3342f transparent transparent transparent;  
+}
+
+.home-page-content .expenses-chart {
+  padding-left: 15;
+  padding-right: 15;
+}
+
+.home-page-content .expenses-chart Label {
+  font-size: 16;
+  text-align: center;
+  color: #3d4852;
+}

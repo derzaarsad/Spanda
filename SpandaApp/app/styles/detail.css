@@ -1,0 +1,168 @@
+.detail-action-bar {
+  text-align: center;
+  vertical-align: middle;
+  padding-bottom: 20;
+  background-color: #f1f5f8;
+}
+
+.detail-action-bar .icon {
+  color: #606f7b;
+  font-size: 18;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.detail-action-bar .btn {
+  border-color: transparent;
+  border-width: 1;
+  margin-top: 10;
+  width: 40;
+  min-width: 40;
+}
+
+.detail-modal-content {
+  background-color: #f1f5f8;
+}
+
+.detail-modal-content .detail-modal-badge {
+  text-align: center;
+  border-radius: 50%;
+  height: 48;
+  width: 48;
+  vertical-align: middle;
+}
+
+.detail-modal-content .detail-modal-badge.home {
+  background-color: #3490dc;
+}
+
+.detail-modal-content .detail-modal-badge.transport {
+  background-color: #22292f;
+}
+
+.detail-modal-content .detail-modal-badge.communication {
+  background-color: #3490dc;
+}
+
+.detail-modal-content .detail-modal-badge.hotel {
+  background-color: #38c172;
+}
+
+.detail-modal-content .detail-modal-badge.restaurant {
+  background-color: #f6993f;
+}
+
+.detail-modal-content .detail-modal-badge Label {
+  color: #ffffff;
+  font-size: 24;
+}
+
+.detail-modal-content .detail-modal-info {
+  text-align: center;
+  vertical-align: middle;
+  background-color: #ffffff;
+  border-radius: 5;
+  border-color: #f1f5f8;
+  border-width: 1;
+  margin-left: 15;
+  margin-right: 15;
+  height: 170;
+}
+
+.detail-modal-content .detail-modal-info .ammount {
+  margin-top: 30;
+  font-size: 32;
+  color: #22292f;
+}
+
+.detail-modal-content .detail-modal-info .category {
+  font-size: 14;
+  border-radius: 25%;
+  width: 150;
+  padding-top: 2;
+  padding-bottom: 2;
+  margin-top: 10;
+  margin-bottom: 10;
+}
+
+.detail-modal-content .detail-modal-info .category.home {
+  color: #3490dc;
+  background-color: #bcdefa;
+}
+
+.detail-modal-content .detail-modal-info .category.transport {
+  color: #22292f;
+  background-color: #b8c2cc;
+}
+
+.detail-modal-content .detail-modal-info .category.communication {
+  color: #3490dc;
+  background-color: #bcdefa;
+}
+
+.detail-modal-content .detail-modal-info .category.hotel {
+  color: #38c172;
+  background-color: #a2f5bf;
+}
+
+.detail-modal-content .detail-modal-info .category.restaurant {
+  color: #f6993f;
+  background-color: #fcd9b6;
+}
+
+.detail-modal-content .detail-modal-info .status {
+  horizontal-align: center;
+  color: #22292f;
+  font-size: 14;
+  margin-bottom: 10;
+}
+
+.detail-modal-content .detail-modal-info .status.completed .icon {
+  color: #38c172;
+}
+
+.detail-modal-content .detail-modal-info .status.pending .icon {
+  color: #6574cd;
+}
+
+.detail-modal-content .detail-modal-info .status .icon {
+  margin-right: 10;
+}
+
+.detail-modal-content .detail-modal-info .status-date {
+  font-size: 14;
+  color: #8795a1;
+}
+
+.detail-modal-content .detail-company {
+  text-align: center;
+  margin-top: 10;
+  margin-bottom: 10;
+}
+
+.detail-modal-content .detail-company .name {
+  color: #22292f;
+  font-size: 20;
+  margin-bottom: 5;
+}
+
+.detail-modal-content .detail-company .address {
+  color: #606f7b;
+  font-size: 12;
+}
+
+.detail-modal-content .detail-company-map {
+  background-color: #f1f5f8;
+  padding: 0;
+  height: 220;
+  border-radius: 5;
+  border-color: #f1f5f8;
+  border-width: 1;
+  margin-left: 15;
+  margin-right: 15;
+}
+
+.detail-modal-content .detail-company-map WebView {
+  height: 100%;
+  margin: 0;
+}

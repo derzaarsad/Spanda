@@ -1,0 +1,28 @@
+<!--
+RadSideDrawer is a UI component part of the Progress NativeScript UI set of components.
+Learn more about the RadSideDrawer UI component and how it can be customized in this documentation article:
+https://docs.nativescript.org/angular/ui/professional-ui-components/ng-SideDrawer/getting-started
+-->
+<RadSideDrawer [drawerTransition]="sideDrawerTransition">
+    <GridLayout tkDrawerContent rows="auto, *" class="sidedrawer">
+        <StackLayout row="0" class="sidedrawer-header">
+            <Label class="sidedrawer-header-image fa" text="&#xf2bd;"></Label>
+            <Label class="sidedrawer-header-brand" text="User Name"></Label>
+            <Label class="footnote" text="username@mail.com"></Label>
+        </StackLayout>
+
+        <GridLayout row="1" columns="10, 130, 130, 10" class="sidedrawer-language">
+            <Label col="1" text="english"
+                [class.selected]="currentLanguage === 'en'" (tap)="changeLanguage('en')"></Label>
+            <Label col="2" text="indonesia"
+                [class.selected]="currentLanguage === 'id'" (tap)="changeLanguage('id')"></Label>
+        </GridLayout>
+
+        <StackLayout row="2" class="sidedrawer-footer">
+            <Button [text]="'LOGOUT' | translate" (tap)="onLogOut()" ></Button>
+
+        </StackLayout>
+    </GridLayout>
+
+    <page-router-outlet tkMainContent class="page page-content"></page-router-outlet>
+</RadSideDrawer>

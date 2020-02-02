@@ -1,0 +1,18 @@
+.page {
+  background-color: #f1f5f8;
+}
+
+.action-bar {
+  background-color: #f1f5f8;
+  border-width: 1;
+  border-color: transparent;
+}
+
+.action-bar .action-item {
+  color: black;
+}
+
+.action-bar .action-bar-title {
+  color: #3d4852;
+  font-size: 20;
+}

@@ -1,9 +1,12 @@
 // TODO
 import { Component, ElementRef, ViewChild, Inject } from "@angular/core";
-import { Router } from "@angular/router";
+import { RouterExtensions } from "nativescript-angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { alert, prompt } from "tns-core-modules/ui/dialogs";
 import { Page } from "tns-core-modules/ui/page";
 import { IAuthentication, AUTH_SERVICE_IMPL } from "~/services/authentication.service";
+
+import { TranslateService, LangChangeEvent } from '../../@ngx-translate/core@10.0.2';
 
 @Component({
     selector: "login",
@@ -18,13 +21,23 @@ export class LoginComponent {
     @ViewChild("password", {static: false}) password: ElementRef;
     @ViewChild("confirmPassword", {static: false}) confirmPassword: ElementRef;
 
-    constructor(private page: Page, private router: Router, @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) {
+    public currentLanguage = 'id';
+
+    constructor(
+        private page: Page,
+        private activeRoute: ActivatedRoute,
+        private routerExtension: RouterExtensions,
+        private translate: TranslateService, @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) {
         this.page.actionBarHidden = true;
 
         if(this.authenticationService.isStoredUserAvailable()) {
             this.Username = this.authenticationService.getStoredUser().Username;
             this.Password = this.authenticationService.getStoredUser().Password;
         }
+
+        translate.onLangChange.subscribe((event: LangChangeEvent) => {
+            this.currentLanguage = event.lang;
+        });
     }
 
     ngOnInit(): void {
@@ -51,7 +64,7 @@ export class LoginComponent {
     login() {
         this.authenticationService.authenticateAndSave(this.Username,this.Password)
             .then(() => {
-                this.router.navigate(["allowance"]);
+                this.routerExtension.navigate(['../home'], { clearHistory: true, relativeTo: this.activeRoute });
             })
             .catch(() => {
                 this.alert("Unfortunately we could not find your account.");
@@ -69,7 +82,7 @@ export class LoginComponent {
                 this.isLoggingIn = true;
                 this.authenticationService.authenticateAndSave(this.Username,this.Password)
                 .then(() => {
-                    this.router.navigate(["searchBank"]);
+                    this.routerExtension.navigate(['../home'], { clearHistory: true, relativeTo: this.activeRoute });
                 });
             })
             .catch((err) => {
