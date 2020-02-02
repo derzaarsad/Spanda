@@ -90,7 +90,7 @@ export class DatabaseMigrations extends cdk.Construct {
       runtime: lambda.Runtime.NODEJS_12_X,
       timeout: cdk.Duration.seconds(20),
       code: lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-describe-db-instance")),
-      handler: "describe-db-instance.handler",
+      handler: "main.handler",
       vpc: vpcConfig.vpc,
       securityGroup: vpcConfig.securityGroup,
       vpcSubnets: vpcConfig.subnets,
