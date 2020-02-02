@@ -50,6 +50,18 @@
   background-color: #e3342f;
 }
 
+@keyframes example-size {
+  from { transform: scale(1.1, 1.1); }
+  to { transform: scale(1, 1); }
+}
+
+.home-page-content .balance-summary .allowance-value {
+  animation-name: example-size;
+  animation-duration: 1;
+  animation-timing-function: spring;
+  animation-fill-mode: forwards;
+}
+
 @keyframes example-up {
   from { transform: translate(0, 50); }
   to { transform: translate(0, 0); }
