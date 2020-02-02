@@ -1,9 +1,15 @@
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as iam from "@aws-cdk/aws-iam";
+import * as kms from "@aws-cdk/aws-kms";
+import * as sm from "@aws-cdk/aws-secretsmanager";
+
 import { InfrastructureProps } from "./infrastructure-props";
 import { CfnLaunchTemplate, UserData } from "@aws-cdk/aws-ec2";
 
+/**
+ * A stack laying the foundations for the backend resources: networking and security.
+ */
 export class Infrastructure extends cdk.Stack {
   readonly vpc: ec2.Vpc;
   readonly databaseApplicationsSecurityGroup: ec2.SecurityGroup;
@@ -16,6 +22,7 @@ export class Infrastructure extends cdk.Stack {
   readonly sshPort: ec2.Port;
 
   readonly lambdaManagedPolicies: iam.IManagedPolicy[];
+  readonly databasePassword: sm.Secret;
 
   constructor(scope: cdk.App, id: string, props: InfrastructureProps) {
     super(scope, id, props);
@@ -88,6 +95,12 @@ export class Infrastructure extends cdk.Stack {
       iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
       iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole")
     ];
+
+    this.databasePassword = new sm.Secret(this, "DatabaseSecret", {
+      description: "The database master user secret",
+      secretName: "database-password",
+      generateSecretString: { excludeCharacters: '",|@/\\;' }
+    });
   }
 
   public isolatedSubnets() {

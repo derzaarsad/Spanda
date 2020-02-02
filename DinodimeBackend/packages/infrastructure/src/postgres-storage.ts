@@ -13,25 +13,8 @@ export class PostgresStorage extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props: PostgresDeploymentProps) {
     super(scope, id, props);
 
-    this.instance = new rds.DatabaseInstance(this, "DinodimeDatabase", {
-      engine: rds.DatabaseInstanceEngine.POSTGRES,
-      databaseName: props.instanceProps.databaseName,
-      masterUsername: props.instanceProps.masterUsername,
-      masterUserPassword: cdk.SecretValue.plainText(props.instanceProps.masterUserPassword),
-      instanceClass: props.instanceProps.instanceClass,
-      deletionProtection: props.instanceProps.deletionProtection,
-      backupRetention: props.instanceProps.backupRetention,
-      deleteAutomatedBackups: props.instanceProps.deleteAutomatedBackups,
-      storageEncrypted: props.instanceProps.storageEncrypted,
-      multiAz: props.instanceProps.multiAz,
-      vpc: props.infrastructureProps.vpc,
-      vpcPlacement: props.infrastructureProps.subnetPlacement,
-      securityGroups: [props.infrastructureProps.databaseSecurityGroup]
-    });
-
     new DatabaseMigrations(this, "DatabaseMigrations", {
       databaseConfiguration: {
-        instance: this.instance,
         username: props.instanceProps.masterUsername,
         password: props.instanceProps.masterUserPassword,
         databaseName: props.instanceProps.databaseName
@@ -41,8 +24,29 @@ export class PostgresStorage extends cdk.Stack {
         securityGroup: props.migrationsContainerProps.securityGroup,
         subnets: props.migrationsContainerProps.subnetPlacement
       },
-      imageRepository: props.migrationsContainerProps.imageRepository,
-      imageTag: props.migrationsContainerProps.imageTag
+      imageConfiguration: {
+        imageRepository: props.migrationsContainerProps.imageRepository,
+        imageTag: props.migrationsContainerProps.imageTag
+      },
+      lambdaManagedPolicies: props.migrationsContainerProps.lambdaManagedPolicies
+    });
+
+    this.instance = new rds.DatabaseInstance(this, "DinodimeDatabase", {
+      engine: rds.DatabaseInstanceEngine.POSTGRES,
+      databaseName: props.instanceProps.databaseName,
+      masterUsername: props.instanceProps.masterUsername,
+      masterUserPassword: cdk.SecretValue.secretsManager(
+        props.instanceProps.masterUserPassword.secretArn
+      ),
+      instanceClass: props.instanceProps.instanceClass,
+      deletionProtection: props.instanceProps.deletionProtection,
+      backupRetention: props.instanceProps.backupRetention,
+      deleteAutomatedBackups: props.instanceProps.deleteAutomatedBackups,
+      storageEncrypted: props.instanceProps.storageEncrypted,
+      multiAz: props.instanceProps.multiAz,
+      vpc: props.infrastructureProps.vpc,
+      vpcPlacement: props.infrastructureProps.subnetPlacement,
+      securityGroups: [props.infrastructureProps.databaseSecurityGroup]
     });
   }
 
