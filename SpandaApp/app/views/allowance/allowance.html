@@ -1,5 +1,18 @@
-<StackLayout>
-    <Label [text]="allowanceValue" class="label"></Label>
-    <Button text="Add Bank Account" (tap)="onTap()" ></Button>
-    <Button text="Refresh Allowance" (tap)="onRefreshAllowance()" ></Button>
-</StackLayout>
+<GridLayout class="page page-content home-page-content" rows="280, 100, *">
+
+    <!-- Balance Summary -->
+    <GridLayout row="0" columns="*, 190, *" class="balance-summary">
+        <StackLayout col="1">
+            <Label class="arrow-up" [style.width]="'100px'" [style.height]="'50px'"></Label>
+            <Label [text]="allowanceValue" class="ammount"></Label>
+            <Label class="arrow-down" [style.width]="'100px'" [style.height]="'50px'"></Label>
+        </StackLayout>
+    </GridLayout>
+
+    <GridLayout row="1" columns="*" class="balance-summary">
+        <StackLayout col="0">
+            <Button text="Add Bank Account" (tap)="onTap()" ></Button>
+            <Button text="Refresh Allowance" (tap)="onRefreshAllowance()" ></Button>
+        </StackLayout>
+    </GridLayout>
+</GridLayout>

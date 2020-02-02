@@ -7,18 +7,19 @@ This app shows your budget allowance for every single day. The allowance is auto
 
 List of features to be added:
 1. Price alarm
-2. Wish list price tracker
-3. Wish list price forecasting
-4. Recommender system based on the financial capability and willingness to pay
-5. Wish oriented used item shop
-6. Trusted seller evaluation based on successful transaction
-7. Financial profiling (what can you afford in 5 years?): This can create an image if someone is financially stable
-8. Smart spending, unlock buy only if you are capable: In conjunction to financial profiling, so that if people buy something through app, means that he is capable
-9. Investment Robo Advisor
-10. Two Part Tariff calculation
-11. Ability to program a financial consultant
-12. Investation prediction marketplace
-13. Person Trust Indicator based on money management
+2. Demand Map to help people starts a business
+3. Wish list price tracker
+4. Wish list price forecasting
+5. Recommender system based on the financial capability and willingness to pay
+6. Wish oriented used item shop
+7. Trusted seller evaluation based on successful transaction
+8. Financial profiling (what can you afford in 5 years?): This can create an image if someone is financially stable
+9. Smart spending, unlock buy only if you are capable: In conjunction to financial profiling, so that if people buy something through app, means that he is capable
+10. Investment Robo Advisor
+11. Two Part Tariff calculation
+12. Ability to program a financial consultant
+13. Investation prediction marketplace
+14. Person Trust Indicator based on money management
 
 ## Getting Started
 

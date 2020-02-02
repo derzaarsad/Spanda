@@ -13,7 +13,7 @@ import { BankService } from "~/services/bank.service"
 })
 export class AllowanceComponent implements OnInit {
 
-    private allowanceValue: number = 0;
+    private allowanceValue: string = '0€';
 
     constructor(
         private routerExtensions: RouterExtensions,
@@ -38,7 +38,7 @@ export class AllowanceComponent implements OnInit {
 
     onRefreshAllowance() {
         this.bankService.getAllowance().then((res) => {
-            this.allowanceValue = res;
+            this.allowanceValue = res.toString() + "€";
         });
     }
 }
