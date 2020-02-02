@@ -2,6 +2,7 @@ import * as cdk from "@aws-cdk/core";
 import * as lambda from "@aws-cdk/aws-lambda";
 import * as apigw from "@aws-cdk/aws-apigateway";
 import * as iam from "@aws-cdk/aws-iam";
+import * as path from "path";
 
 import { Duration } from "@aws-cdk/core";
 import { LambdaIntegration } from "@aws-cdk/aws-apigateway";
@@ -55,6 +56,8 @@ export class DinodimeAPI extends cdk.Construct {
       env: commonEnvironment
     });
 
+    const asset = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-api"));
+
     const restAPI = new apigw.RestApi(this, "DinodimeAPI", {
       endpointExportName: "APIEndpointURL"
     });
@@ -64,19 +67,15 @@ export class DinodimeAPI extends cdk.Construct {
 
     const isUserAuthenticated = lambdaFactory.createLambda(
       "IsUserAuthenticated",
-      lambda.Code.asset("../lambda/dist"),
-      "api.isUserAuthenticated"
+      asset,
+      "main.isUserAuthenticated"
     );
 
     users.addMethod("GET", new LambdaIntegration(isUserAuthenticated), {
       operationName: "is user authenticated"
     });
 
-    const registerUser = lambdaFactory.createLambda(
-      "RegisterUser",
-      lambda.Code.asset("../lambda/dist"),
-      "api.registerUser"
-    );
+    const registerUser = lambdaFactory.createLambda("RegisterUser", asset, "main.registerUser");
 
     users.addMethod("POST", new LambdaIntegration(registerUser), {
       operationName: "register user"
@@ -87,8 +86,8 @@ export class DinodimeAPI extends cdk.Construct {
 
     const authenticateAndSaveUser = lambdaFactory.createLambda(
       "AuthenticateAndSaveUser",
-      lambda.Code.asset("../lambda/dist"),
-      "api.authenticateAndSaveUser"
+      asset,
+      "main.authenticateAndSaveUser"
     );
 
     login.addMethod("POST", new LambdaIntegration(authenticateAndSaveUser), {
@@ -99,8 +98,8 @@ export class DinodimeAPI extends cdk.Construct {
 
     const updateRefreshToken = lambdaFactory.createLambda(
       "UpdateRefreshToken",
-      lambda.Code.asset("../lambda/dist"),
-      "api.updateRefreshToken"
+      asset,
+      "main.updateRefreshToken"
     );
 
     token.addMethod("POST", new LambdaIntegration(updateRefreshToken), {
@@ -112,22 +111,14 @@ export class DinodimeAPI extends cdk.Construct {
     const banks = restAPI.root.addResource("banks");
     const blz = banks.addResource("{blz}");
 
-    const getBankByBLZ = lambdaFactory.createLambda(
-      "GetBankByBLZ",
-      lambda.Code.asset("../lambda/dist"),
-      "api.getBankByBLZ"
-    );
+    const getBankByBLZ = lambdaFactory.createLambda("GetBankByBLZ", asset, "main.getBankByBLZ");
 
     blz.addMethod("GET", new LambdaIntegration(getBankByBLZ), { operationName: "get bank by BLZ" });
 
     const bankConnections = restAPI.root.addResource("bankConnections");
     const importBankConnections = bankConnections.addResource("import");
 
-    const getWebFormId = lambdaFactory.createLambda(
-      "GetWebFormId",
-      lambda.Code.asset("../lambda/dist"),
-      "api.getWebFormId"
-    );
+    const getWebFormId = lambdaFactory.createLambda("GetWebFormId", asset, "main.getWebFormId");
 
     importBankConnections.addMethod("POST", new LambdaIntegration(getWebFormId), {
       operationName: "get webform id"
@@ -139,8 +130,8 @@ export class DinodimeAPI extends cdk.Construct {
 
     const webFormCallback = lambdaFactory.createLambda(
       "WebFormCallback",
-      lambda.Code.asset("../lambda/dist"),
-      "api.webFormCallback"
+      asset,
+      "main.webFormCallback"
     );
 
     webFormCallbackResource.addMethod("POST", new LambdaIntegration(webFormCallback), {
@@ -151,8 +142,8 @@ export class DinodimeAPI extends cdk.Construct {
 
     const getWebFormInfo = lambdaFactory.createLambda(
       "GetWebFormInfo",
-      lambda.Code.asset("../lambda/dist"),
-      "api.getWebFormInfo"
+      asset,
+      "main.getWebFormInfo"
     );
 
     webForm.addMethod("GET", new LambdaIntegration(getWebFormInfo), {
@@ -161,11 +152,7 @@ export class DinodimeAPI extends cdk.Construct {
 
     const allowance = restAPI.root.addResource("allowance");
 
-    const getAllowance = lambdaFactory.createLambda(
-      "GetAllowance",
-      lambda.Code.asset("../lambda/dist"),
-      "api.getAllowance"
-    );
+    const getAllowance = lambdaFactory.createLambda("GetAllowance", asset, "main.getAllowance");
 
     allowance.addMethod("GET", new LambdaIntegration(getAllowance), {
       operationName: "get allowance"

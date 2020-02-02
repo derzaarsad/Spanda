@@ -4,20 +4,21 @@ const path = require("path");
 const SRC_DIR = path.resolve(__dirname, "out/src");
 const OUT_DIR = path.resolve(__dirname, "dist");
 
-const config = {
-  entry: {
-    api: path.resolve(SRC_DIR, "api.js"),
-    "notifications-callback": path.resolve(SRC_DIR, "notifications-callback.js"),
-    "describe-db-instance": path.resolve(SRC_DIR, "describe-db-instance.js")
-  },
-  externals: ["aws-sdk"],
-  output: {
-    path: OUT_DIR,
-    filename: "[name].js",
-    libraryTarget: "umd"
-  },
-  target: "node",
-  plugins: [new webpack.IgnorePlugin(/^pg-native$/)]
+var config = function(name) {
+  return {
+    name: name,
+    entry: path.resolve(SRC_DIR, name + ".js"),
+    output: {
+      path: path.resolve(OUT_DIR, "lambda-" + name),
+      libraryTarget: "umd",
+      filename: "main.js"
+    },
+    externals: ["aws-sdk"],
+    target: "node",
+    plugins: [new webpack.IgnorePlugin(/^pg-native$/)]
+  };
 };
 
-module.exports = config;
+var modules = ["api", "notifications-callback", "describe-db-instance"];
+
+module.exports = modules.map(moduleName => config(moduleName));

@@ -2,7 +2,6 @@ import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as ecr from "@aws-cdk/aws-ecr";
 import * as ecs from "@aws-cdk/aws-ecs";
-import * as rds from "@aws-cdk/aws-rds";
 import * as lambda from "@aws-cdk/aws-lambda";
 import * as iam from "@aws-cdk/aws-iam";
 import * as logs from "@aws-cdk/aws-logs";
@@ -11,8 +10,8 @@ import * as targets from "@aws-cdk/aws-events-targets";
 import * as sm from "@aws-cdk/aws-secretsmanager";
 import * as stepfn from "@aws-cdk/aws-stepfunctions";
 import * as tasks from "@aws-cdk/aws-stepfunctions-tasks";
+import * as path from "path";
 import { RuleTargetInput, EventField } from "@aws-cdk/aws-events";
-import { Duration } from "@aws-cdk/core";
 
 interface TaskVpcConfiguration {
   assignPublicIp?: boolean;
@@ -90,7 +89,7 @@ export class DatabaseMigrations extends cdk.Construct {
     const fn = new lambda.Function(this, "DescribeDatabaseInstanceFunctionLambda", {
       runtime: lambda.Runtime.NODEJS_12_X,
       timeout: cdk.Duration.seconds(20),
-      code: lambda.Code.asset("../lambda/dist"),
+      code: lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-describe-db-instance")),
       handler: "describe-db-instance.handler",
       vpc: vpcConfig.vpc,
       securityGroup: vpcConfig.securityGroup,
