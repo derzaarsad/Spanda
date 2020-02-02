@@ -8,9 +8,7 @@ import { alert } from "tns-core-modules/ui/dialogs";
 import { BankService } from "~/services/bank.service";
 import { AuthenticationService } from "~/services/authentication.service";
 import { Bank } from "~/models/bank.model";
-
-import { WebView, LoadEventData } from "tns-core-modules/ui/web-view";
-import { Label } from "tns-core-modules/ui/label";
+import * as utils from "tns-core-modules/utils/utils";
 
 @Component({
     selector: "searchBank",
@@ -22,11 +20,7 @@ export class SearchBankComponent implements OnInit {
     private SearchedBlz: string = "";
     private bank: Bank;
     private EnableBank: boolean = false;
-    private webViewSrc: string = "";
     private invalidUrl = "https://invalidurl";
-
-    @ViewChild("myWebView", { read: ElementRef, static: false }) webViewRef: ElementRef;
-    @ViewChild("labelResult", { read: ElementRef, static: false }) labelResultRef: ElementRef;
 
     constructor(
         private routerExtensions: RouterExtensions,
@@ -37,29 +31,6 @@ export class SearchBankComponent implements OnInit {
 
     ngOnInit(): void {
         this.page.actionBarHidden = true;
-    }
-
-    ngAfterViewInit() {
-        let webview: WebView = this.webViewRef.nativeElement;
-        let label: Label = this.labelResultRef.nativeElement;
-        label.text = "WebView is still loading...";
-
-        webview.on(WebView.loadFinishedEvent, (args: LoadEventData) => {
-            if(args.error && (args.url !== undefined) && (args.url.startsWith(this.invalidUrl))) {
-                // This is a workaround until I get a better solution
-                this.routerExtensions.navigate(["../allowance"], { clearHistory: true, relativeTo: this.activeRoute });
-            }
-
-            let message;
-            if (!args.error) {
-                message = "WebView finished loading of " + args.url;
-            } else {
-                message = "Error loading " + args.url + ": " + args.error;
-            }
-
-            label.text = message;
-            console.log("WebView message - " + message);
-        });
     }
 
     alert(message: string) {
@@ -86,10 +57,10 @@ export class SearchBankComponent implements OnInit {
 
     private onAddAccount() {
         this.bankService.getWebformIdAndToken(this.bank).then((res) => {
-            this.webViewSrc = res + "&redirectUrl=" + this.invalidUrl;
-            console.log(res[0]);
-            console.log(res[1]);
-            console.log(res[2]);
+            if(!res) {
+                return;
+            }
+            utils.openUrl(res + "&redirectUrl=" + this.invalidUrl);
         });
     }
 }

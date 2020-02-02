@@ -76,6 +76,9 @@ export class BankService {
             headers: request[2],
             timeout: 10
         }).then(res => {
+            if(res.statusCode != 200) {
+                return undefined;
+            }
             console.log("WebForm Valid");
             console.log(res);
             return res["content"]["location"] + "?callbackUrl=" + this.authenticationService.getBackendUrl() + "/webForms/callback/" + res["content"]["webFormAuth"];
