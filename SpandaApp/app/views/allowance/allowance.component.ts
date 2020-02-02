@@ -15,6 +15,8 @@ import { AnimationCurve } from 'ui/enums';
 export class AllowanceComponent implements OnInit {
 
     private allowanceValue: string = '30€';
+    private allowanceValue_: number = 30; // TODO: ONLY FOR TEST
+    private isAllowanceIncreased: boolean = true;
 
     constructor(
         private routerExtensions: RouterExtensions,
@@ -26,6 +28,9 @@ export class AllowanceComponent implements OnInit {
 
     ngOnInit(): void {
         this.page.actionBarHidden = true;
+        this.isAllowanceIncreased = Math.random() >= 0.5 ? true : false; // TODO: ONLY FOR TEST
+        let diff = this.isAllowanceIncreased ? 1 : (-1); // TODO: ONLY FOR TEST
+        this.allowanceValue = (this.allowanceValue_ + diff).toString() + "€"; // TODO: ONLY FOR TEST
     }
 
     onTap() {
