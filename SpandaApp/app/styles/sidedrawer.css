@@ -1,0 +1,120 @@
+/* Side Drawer */
+.sidedrawer-list-item-icon,
+.sidedrawer-list-item {
+  color: #022734;
+}
+
+.sidedrawer {
+  background-color: #ffffff;
+}
+
+.sidedrawer .sidedrawer-header-image {
+  height: 60;
+  width: 60;
+  padding: 0;
+  margin-bottom: 5;
+  border-radius: 50%;
+}
+
+.sidedrawer .sidedrawer-header {
+  background-color: #f1f5f8;
+  horizontal-align: center;
+  vertical-align: center;
+  font-size: 14;
+  font-weight: 600;
+  text-align: center;
+  height: 200;
+  align-items: center;
+  flex-direction: column;
+}
+
+.sidedrawer .sidedrawer-header .sidedrawer-header-name {
+  color: #22292f;
+  font-size: 24;
+}
+
+.sidedrawer .sidedrawer-header .sidedrawer-header-balance {
+  background-color: #ffffff;
+  padding: 5;
+  margin-top: 10;
+  border-radius: 5;
+  width: 150;
+}
+
+.sidedrawer .sidedrawer-header .sidedrawer-header-balance .label {
+  color: #3d4852;
+  font-weight: 600;
+}
+
+.sidedrawer .sidedrawer-header .sidedrawer-header-balance .ammount {
+  color: #38c172;
+  font-weight: 600;
+}
+
+.sidedrawer .sidedrawer-body {
+  padding-top: 10;
+}
+
+.sidedrawer .sidedrawer-menu .sidedrawer-list-item {
+  padding-left: 30;
+  height: 50;
+}
+
+.sidedrawer .sidedrawer-menu .sidedrawer-list-item Label {
+  vertical-align: center;
+  font-size: 20;
+  color: #606f7b;
+}
+
+.sidedrawer .sidedrawer-menu .sidedrawer-list-item .icon {
+  font-size: 20;
+  margin-right: 10;
+  color: #b8c2cc;
+}
+
+.sidedrawer .sidedrawer-menu .sidedrawer-list-item.selected Label {
+  color: #3d4852;
+}
+
+.sidedrawer .sidedrawer-menu .sidedrawer-list-item.selected Label,
+.sidedrawer .sidedrawer-menu .sidedrawer-list-item.selected .icon {
+  color: #22292f;
+}
+
+.sidedrawer .sidedrawer-language {
+  padding-top: 30;
+  padding-bottom: 30;
+  horizontal-align: center;
+}
+
+.sidedrawer .sidedrawer-language Label {
+  padding: 5;
+  border-radius: 5;
+  height: 34;
+  color: #3d4852;
+  text-align: center;
+  margin-left: 5;
+  margin-right: 5;
+  font-size: 16;
+  padding-left: 14;
+  padding-right: 14;
+}
+
+.sidedrawer .sidedrawer-language Label.selected {
+  background-color: #f1f5f8;
+  color: #606f7b;
+}
+
+.sidedrawer .sidedrawer-footer {
+  text-align: center;
+  color: #606f7b;
+}
+
+.sidedrawer .sidedrawer-footer .sidedrawer-footer-logo {
+  height: 30;
+  margin-bottom: 10;
+}
+
+.sidedrawer .sidedrawer-footer .sidedrawer-footer-by {
+  font-size: 14;
+}

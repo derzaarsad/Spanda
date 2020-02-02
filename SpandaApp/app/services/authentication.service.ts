@@ -118,11 +118,17 @@ export class AuthenticationService implements IAuthentication {
             headers: request[2],
             timeout: 10
         }).then(res => {
-            this.storedUser.UserToken = new Token(res["content"]["access_token"], res["content"]["refresh_token"], res["content"]["token_type"]);
-            let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
-            appSettings.setString("storedUser",storedUserJson);
-            
-            return true;
+            console.log(res);
+            if(res["statusCode"] === 200) {
+                this.storedUser.UserToken = new Token(res["content"]["access_token"], res["content"]["refresh_token"], res["content"]["token_type"]);
+                let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
+                appSettings.setString("storedUser",storedUserJson);
+
+                return true;
+            }
+            else {
+                return false;
+            }
         }, err => {
             console.log("invalid refresh_token");
             console.log(err);
@@ -140,7 +146,7 @@ export class AuthenticationService implements IAuthentication {
         }).then(res => {
             console.log("user is authenticated!");
             console.log(res);
-            return true;
+            return (res["statusCode"] === 200) ? true : false;
         }, err => {
             console.log("user not authenticated!");
             console.log(err);
@@ -165,7 +171,7 @@ export class AuthenticationService implements IAuthentication {
             console.log("registration successful");
             console.log(res);
 
-            return true;
+            return (res["statusCode"] === 201) ? true : false;
         });
     }
 

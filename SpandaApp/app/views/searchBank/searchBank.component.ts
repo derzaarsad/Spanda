@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from "@angular/core";
 import { RouterExtensions } from "nativescript-angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { NavigationOptions } from "nativescript-angular/router/ns-location-strategy";
 import { Page, EventData } from "tns-core-modules/ui/page";
 import { alert } from "tns-core-modules/ui/dialogs";
@@ -29,6 +30,7 @@ export class SearchBankComponent implements OnInit {
 
     constructor(
         private routerExtensions: RouterExtensions,
+        private activeRoute: ActivatedRoute,
         private page: Page,
         private bankService: BankService) {
     }
@@ -45,7 +47,7 @@ export class SearchBankComponent implements OnInit {
         webview.on(WebView.loadFinishedEvent, (args: LoadEventData) => {
             if(args.error && (args.url !== undefined) && (args.url.startsWith(this.invalidUrl))) {
                 // This is a workaround until I get a better solution
-                this.routerExtensions.navigate(["allowance"]);
+                this.routerExtensions.navigate(["../allowance"], { clearHistory: true, relativeTo: this.activeRoute });
             }
 
             let message;

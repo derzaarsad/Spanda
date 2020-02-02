@@ -1,0 +1,55 @@
+.card {
+  height: 170;
+  border-radius: 5;
+  padding: 10;
+  color: #ffffff;
+  background-color: #22292f;
+  margin: 15;
+  padding: 15;
+  border-color: #f1f5f8;
+  border-width: 1;
+}
+
+.card .blue {
+  background-color: #3490dc;
+}
+
+.card .red {
+  background-color: #e3342f;
+}
+
+.card .green {
+  background-color: #38c172;
+}
+
+.card .orange {
+  background-color: #f6993f;
+}
+
+.card .icon {
+  font-size: 40;
+  text-align: right;
+  vertical-align: top;
+}
+
+.card .card-balance .card-balance-label {
+  font-size: 12;
+}
+
+.card .card-balance .card-balance-ammount {
+  font-size: 26;
+}
+
+.card .card-number {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.card .card-number Label {
+  font-size: 18;
+}
+
+.card .card-expires {
+  text-align: center;
+  font-size: 12;
+}

@@ -1,1 +1,31 @@
-@import "~nativescript-theme-core/css/core.light.css";
+/**
+* @author Bazzite (https://www.bazzite.com)
+* @license MIT License Copyright (c) 2018 Bazzite
+*/
+
+@import '~nativescript-theme-core/css/blue.css';
+
+/* General */
+@import './styles/general.css';
+
+/* SideDrawer */
+@import './styles/sidedrawer.css';
+
+/* Bottom Navigation */
+@import './styles/bottom-navigation.css';
+
+/* Home Page */
+@import './styles/home.css';
+
+/* Transactions List */
+@import './styles/transactions-list.css';
+
+/* Detail */
+@import './styles/detail.css';
+
+/* Cards */
+@import './styles/cards.css';
+
+.icon {
+    font-family: "MyGoldIcons";
+}

@@ -1,10 +1,11 @@
 import { Injectable, Inject } from "@angular/core";
-import { Router, CanActivate } from "@angular/router";
+import { CanActivate } from "@angular/router";
+import { RouterExtensions } from "nativescript-angular/router";
 import { IAuthentication,AUTH_SERVICE_IMPL } from "./authentication.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private router: Router, @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) { }
+  constructor(private routerExtensions: RouterExtensions, @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) { }
 
   canActivate() : Promise<boolean> | boolean {
     
@@ -18,7 +19,7 @@ export class AuthGuard implements CanActivate {
           // Get access token using refresh token
           return this.authenticationService.setNewRefreshAndAccessToken().then((resultRefresh) => {
             if(!resultRefresh) {
-              this.router.navigate(['login']);
+              this.routerExtensions.navigate(['login'], { clearHistory: true });
             }
 
             return resultRefresh;
@@ -30,7 +31,7 @@ export class AuthGuard implements CanActivate {
     }
 
     console.log("no credentials!");
-    this.router.navigate(['login']);
+    this.routerExtensions.navigate(['login'], { clearHistory: true });
     return false;
   }
 
