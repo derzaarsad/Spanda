@@ -1,11 +1,11 @@
 <GridLayout class="page page-content home-page-content" rows="280, 100, *">
 
     <!-- Balance Summary -->
-    <GridLayout row="0" columns="*, 190, *" class="balance-summary">
+    <GridLayout row="0" columns="*, 300, *" class="balance-summary">
         <StackLayout col="1">
-            <Label class="arrow-up" [style.width]="'100px'" [style.height]="'50px'"></Label>
+            <Label class="arrow-up arrowanimation-up" [style.width]="'100px'" [style.height]="'50px'"></Label>
             <Label [text]="allowanceValue" class="ammount"></Label>
-            <Label class="arrow-down" [style.width]="'100px'" [style.height]="'50px'"></Label>
+            <Label class="arrow-down arrowanimation-down" [style.width]="'100px'" [style.height]="'50px'"></Label>
         </StackLayout>
     </GridLayout>
 

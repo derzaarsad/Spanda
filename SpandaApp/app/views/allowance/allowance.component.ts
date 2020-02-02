@@ -5,6 +5,7 @@ import { NavigationOptions } from "nativescript-angular/router/ns-location-strat
 import { Page } from "tns-core-modules/ui/page";
 import { IAuthentication,AUTH_SERVICE_IMPL } from "~/services/authentication.service";
 import { BankService } from "~/services/bank.service"
+import { AnimationCurve } from 'ui/enums';
 
 @Component({
     selector: "allowance",
@@ -13,7 +14,7 @@ import { BankService } from "~/services/bank.service"
 })
 export class AllowanceComponent implements OnInit {
 
-    private allowanceValue: string = '0€';
+    private allowanceValue: string = '30€';
 
     constructor(
         private routerExtensions: RouterExtensions,

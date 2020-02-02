@@ -50,6 +50,30 @@
   background-color: #e3342f;
 }
 
+@keyframes example-up {
+  from { transform: translate(0, 50); }
+  to { transform: translate(0, 0); }
+}
+
+@keyframes example-down {
+  from { transform: translate(0, -50); }
+  to { transform: translate(0, 0); }
+}
+
+.home-page-content .balance-summary .arrowanimation-up {
+  animation-name: example-up;
+  animation-duration: 1;
+  animation-timing-function: spring;
+  animation-fill-mode: forwards;
+}
+
+.home-page-content .balance-summary .arrowanimation-down {
+  animation-name: example-down;
+  animation-duration: 1;
+  animation-timing-function: spring;
+  animation-fill-mode: forwards;
+}
+
 .home-page-content .balance-summary .arrow-up {
   border-style: solid;
   border-width: 0 100% 100% 100%;
