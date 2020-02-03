@@ -126,7 +126,7 @@ export namespace RecurrentTransactions {
       return this.doQuery(params).then(res => res.rows.map(row => this.schema.asObject(row)));
     }
 
-    async groupByIsExpense(): Promise<any> {
+    async groupByIsExpense(): Promise<RecurrentTransaction[][]> {
       const params = {
         text: this.groupByColumnQuery(3),
         rowMode: "array",
