@@ -229,6 +229,20 @@ describe("Algorithm", function() {
             counterPartBlz: undefined,
             counterPartBic: undefined,
             counterPartBankName: undefined
+        },
+        {
+            id: 1,
+            accountId: 1,
+            absAmount: 2109.13,
+            isExpense: true,
+            bookingDate: new Date(),
+            purpose: "I do not have a friend",
+            counterPartName: undefined,
+            counterPartAccountNumber: undefined,
+            counterPartIban: undefined,
+            counterPartBlz: undefined,
+            counterPartBic: undefined,
+            counterPartBankName: undefined
         }
     ]
     const result = Algorithm.GetRecurrentTransaction(transactionsData);

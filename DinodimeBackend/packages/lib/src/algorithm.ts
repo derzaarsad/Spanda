@@ -44,7 +44,7 @@ export namespace Algorithm {
             grouped[matchGroupIndex].push(transactionsData[i]);
         }
     
-        return grouped;
+        return grouped.filter(item => item.length > 1);
     }
     
     export const GetDominantIncome = (transactionsData: Transaction[]): Transaction => {
