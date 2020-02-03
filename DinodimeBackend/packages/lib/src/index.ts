@@ -5,6 +5,8 @@ export { Crypto, Encryptions, AesCrypto, CallbackCrypto } from "./crypto";
 
 export { SNSNotification } from "./sns-notification";
 
+export { WebFormCompletion } from "./web-form-completion";
+
 export {
   NotificationDecoder,
   NewTransactionsDecryptor,
