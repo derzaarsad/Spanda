@@ -126,9 +126,9 @@ export namespace RecurrentTransactions {
       return this.doQuery(params).then(res => res.rows.map(row => this.schema.asObject(row)));
     }
 
-    async groupByIban(): Promise<any> {
+    async groupByIsExpense(): Promise<any> {
       const params = {
-        text: this.groupByColumnQuery(8),
+        text: this.groupByColumnQuery(3),
         rowMode: "array",
         types: this.types
       };
