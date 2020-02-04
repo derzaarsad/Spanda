@@ -18,12 +18,12 @@ export class RecurrentTransaction {
   frequency: TransactionFrequency;
 
   constructor(
-    id: number,
     accountId: number,
     transactionIds: number[],
-    isExpense: boolean
+    isExpense: boolean,
+    id?: number
   ) {
-      this.id = id;
+      this.id = id ? id : NaN;
       this.accountId = accountId;
       this.transactionIds = transactionIds;
       this.isExpense = isExpense;
@@ -37,17 +37,25 @@ export namespace RecurrentTransactions {
   export interface RecurrentTransactionsRepository extends Repository<number, RecurrentTransaction> {
     findByAccountIds(accountIds: Array<number>): Promise<Array<RecurrentTransaction>>;
     saveArray(recurrentTransactions: Array<RecurrentTransaction>): Promise<Array<RecurrentTransaction>>;
+    saveWithoutId(recurrentTransaction: RecurrentTransaction): Promise<RecurrentTransaction>;
   }
 
   export class InMemoryRepository implements RecurrentTransactionsRepository {
     private repository: { [key: number]: RecurrentTransaction };
+    private id_seq: number;
 
     constructor() {
       this.repository = {};
+      this.id_seq = 1;
     }
 
     async save(transaction: RecurrentTransaction): Promise<RecurrentTransaction> {
       this.repository[transaction.id] = transaction;
+      return transaction;
+    }
+
+    async saveWithoutId(transaction: RecurrentTransaction): Promise<RecurrentTransaction> {
+      this.repository[this.id_seq++] = transaction;
       return transaction;
     }
 
@@ -93,6 +101,13 @@ export namespace RecurrentTransactions {
     async save(recurrentTransaction: RecurrentTransaction): Promise<RecurrentTransaction> {
       const params = {
         text: this.saveQuery(recurrentTransaction)
+      };
+      return this.doQuery(params).then(() => recurrentTransaction);
+    }
+
+    async saveWithoutId(recurrentTransaction: RecurrentTransaction): Promise<RecurrentTransaction> {
+      const params = {
+        text: this.saveWithoutIdQuery(recurrentTransaction)
       };
       return this.doQuery(params).then(() => recurrentTransaction);
     }
@@ -184,6 +199,14 @@ export namespace RecurrentTransactions {
       const attributes = this.schema.attributes;
 
       return this.format("INSERT INTO %I (%s) VALUES (%L)", tableName, attributes, row);
+    }
+
+    saveWithoutIdQuery(recurrentTransaction: RecurrentTransaction) {
+      const tableName = this.schema.tableName;
+      const row = this.schema.asRow(recurrentTransaction);
+      const attributes = this.schema.attributes.replace("id,","");
+
+      return this.format("INSERT INTO %I (%s) VALUES (%L)", tableName, attributes, row.slice(1));
     }
 
     saveArrayQuery(recurrentTransactions: RecurrentTransaction[]) {
