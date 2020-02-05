@@ -82,7 +82,7 @@ export namespace Transactions {
     }
 
     async groupByIban(accountId: number): Promise<Transaction[][]> {
-      let indexDictionary: { [iban: string]: number };
+      let indexDictionary: { [iban: string]: number } = {};
 
       let grouped: Transaction[][] = [];
       for (let id in this.repository) {
@@ -91,6 +91,10 @@ export namespace Transactions {
         }
 
         let currentIban = this.repository[id].counterPartIban;
+        if(!currentIban) {
+          continue;
+        }
+
         if(indexDictionary[currentIban] == null) {
           indexDictionary[currentIban] = grouped.length;
           grouped.push([]);
