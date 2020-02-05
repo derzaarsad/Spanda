@@ -141,9 +141,9 @@ export namespace RecurrentTransactions {
       return this.doQuery(params).then(res => res.rows.map(row => this.schema.asObject(row)));
     }
 
-    async groupByIsExpense(): Promise<RecurrentTransaction[][]> {
+    async groupByIsExpense(accountId: number): Promise<RecurrentTransaction[][]> {
       const params = {
-        text: this.groupByColumnQuery(3),
+        text: this.groupByColumnQuery(accountId, 3),
         rowMode: "array",
         types: this.types
       };
@@ -176,13 +176,14 @@ export namespace RecurrentTransactions {
       );
     }
 
-    groupByColumnQuery(attributesIndex: number) {
+    groupByColumnQuery(accountId: number, attributesIndex: number) {
       const attribute = this.schema.attributes.split(",")[attributesIndex];
       return this.format(
-        "SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM %I WHERE %I=b.%I) t ) rw FROM %I b WHERE %I IS NOT NULL GROUP BY %I",
+        "SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM %I WHERE %I=b.%I AND accountid=%L) t ) rw FROM %I b WHERE %I IS NOT NULL GROUP BY %I",
         this.schema.tableName,
         attribute,
         attribute,
+        accountId,
         this.schema.tableName,
         attribute,
         attribute

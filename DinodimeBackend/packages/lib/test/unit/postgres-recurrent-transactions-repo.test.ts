@@ -70,8 +70,8 @@ describe("postgres recurrent transactions repository", function() {
   });
 
   it("renders the group-by-column query", async function() {
-    const result = recurrentTransactions.groupByColumnQuery(3);
+    const result = recurrentTransactions.groupByColumnQuery(2,3);
     expect(result).to.be.a("string");
-    expect(result).to.equal("SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM recurrenttransactions WHERE isexpense=b.isexpense) t ) rw FROM recurrenttransactions b WHERE isexpense IS NOT NULL GROUP BY isexpense");
+    expect(result).to.equal("SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM recurrenttransactions WHERE isexpense=b.isexpense AND accountid='2') t ) rw FROM recurrenttransactions b WHERE isexpense IS NOT NULL GROUP BY isexpense");
   });
 });
