@@ -133,7 +133,7 @@ export namespace Transactions {
       return this.doQuery(params).then(res => res.rows.map(row => this.schema.asObject(row)));
     }
 
-    async groupByIban(): Promise<any> {
+    async groupByIban(): Promise<Transaction[][]> {
       const params = {
         text: this.groupByColumnQuery(8),
         rowMode: "array",
