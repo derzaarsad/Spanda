@@ -25,12 +25,22 @@ describe("postgres recurrent transactions repository", function() {
   });
 
   it("renders the save query with an empty account ids", async function() {
-    const recurrentTransaction = new RecurrentTransaction(209864836, 995070, [1,2,3], true);
+    const recurrentTransaction = new RecurrentTransaction(995070, [1,2,3], true, 209864836);
 
     const result = recurrentTransactions.saveQuery(recurrentTransaction);
     expect(result).to.be.a("string");
     expect(result).to.equal(
       "INSERT INTO recurrenttransactions (id,accountid,transactionids,isexpense,isconfirmed,frequency) VALUES ('209864836','995070','{1,2,3}','t','f','Unknown')"
+    );
+  });
+
+  it("renders the save without id query with an empty account ids", async function() {
+    const recurrentTransaction = new RecurrentTransaction(995070, [1,2,3], true);
+
+    const result = recurrentTransactions.saveWithoutIdQuery(recurrentTransaction);
+    expect(result).to.be.a("string");
+    expect(result).to.equal(
+      "INSERT INTO recurrenttransactions (accountid,transactionids,isexpense,isconfirmed,frequency) VALUES ('995070','{1,2,3}','t','f','Unknown')"
     );
   });
 
@@ -42,8 +52,8 @@ describe("postgres recurrent transactions repository", function() {
 
   it("renders the save array query", async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(1112,2,[1,2,3],true),
-        new RecurrentTransaction(2233,2,[4,5,6],false)
+        new RecurrentTransaction(2,[1,2,3],true,1112),
+        new RecurrentTransaction(2,[4,5,6],false,2233)
     ];
 
     const result = recurrentTransactions.saveArrayQuery(recurrentTransactionsData);
@@ -60,8 +70,8 @@ describe("postgres recurrent transactions repository", function() {
   });
 
   it("renders the group-by-column query", async function() {
-    const result = recurrentTransactions.groupByColumnQuery(3);
+    const result = recurrentTransactions.groupByColumnQuery(2,3);
     expect(result).to.be.a("string");
-    expect(result).to.equal("SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM recurrenttransactions WHERE isexpense=b.isexpense) t ) rw FROM recurrenttransactions b WHERE isexpense IS NOT NULL GROUP BY isexpense");
+    expect(result).to.equal("SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM recurrenttransactions WHERE isexpense=b.isexpense AND accountid='2') t ) rw FROM recurrenttransactions b WHERE isexpense IS NOT NULL GROUP BY isexpense");
   });
 });

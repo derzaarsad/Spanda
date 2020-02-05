@@ -28,7 +28,7 @@ describe("postgres recurrent transactions repository", function() {
   });
 
   it("saves and retrieves a transaction", async function() {
-    const recurrentTransaction = new RecurrentTransaction(209864836, 995070, [1,2,3], true);
+    const recurrentTransaction = new RecurrentTransaction(995070, [1,2,3], true, 209864836);
     await recurrentTransactions.save(recurrentTransaction);
 
     const result = await recurrentTransactions.findById(209864836);
@@ -41,17 +41,43 @@ describe("postgres recurrent transactions repository", function() {
     expect(TransactionFrequency[result!.frequency]).to.eql(recurrentTransaction.frequency); // I don't feel right about this because I expect enum to equal enum
   });
 
+  it("saves and retrieves a recurrent transaction without id", async function() {
+    const recurrentTransaction = new RecurrentTransaction(995070, [1,2,3], true);
+    await recurrentTransactions.saveWithoutId(recurrentTransaction);
+
+    const result = await recurrentTransactions.findById(1);
+    expect(result).to.be.not.null;
+    expect(result!.id).to.eql(1);
+    expect(result!.accountId).to.eql(recurrentTransaction.accountId);
+    expect(result!.transactionIds).to.eql(recurrentTransaction.transactionIds);
+    expect(result!.isExpense).to.eql(recurrentTransaction.isExpense);
+    expect(result!.isConfirmed).to.eql(recurrentTransaction.isConfirmed);
+    expect(TransactionFrequency[result!.frequency]).to.eql(recurrentTransaction.frequency); // I don't feel right about this because I expect enum to equal enum
+
+    const recurrentTransaction2 = new RecurrentTransaction(885070, [4,5,6], false);
+    await recurrentTransactions.saveWithoutId(recurrentTransaction2);
+
+    const result2 = await recurrentTransactions.findById(2);
+    expect(result2).to.be.not.null;
+    expect(result2!.id).to.eql(2);
+    expect(result2!.accountId).to.eql(recurrentTransaction2.accountId);
+    expect(result2!.transactionIds).to.eql(recurrentTransaction2.transactionIds);
+    expect(result2!.isExpense).to.eql(recurrentTransaction2.isExpense);
+    expect(result2!.isConfirmed).to.eql(recurrentTransaction2.isConfirmed);
+    expect(TransactionFrequency[result2!.frequency]).to.eql(recurrentTransaction2.frequency); // I don't feel right about this because I expect enum to equal enum
+  });
+
   it("save with unique id and account id", async function() {
-    const firstRecurrentTransaction = new RecurrentTransaction(1, 1, [1,2,3], true);
+    const firstRecurrentTransaction = new RecurrentTransaction(1, [1,2,3], true, 1);
     await recurrentTransactions.save(firstRecurrentTransaction);
 
-    const secondRecurrentTransaction = new RecurrentTransaction(1, 2, [4,5,6], true);
+    const secondRecurrentTransaction = new RecurrentTransaction(2, [4,5,6], true, 1);
     await expect(recurrentTransactions.save(secondRecurrentTransaction)).to.eventually.be.fulfilled;
 
-    const thirdRecurrentTransaction = new RecurrentTransaction(2, 1, [7,8,9], true);
+    const thirdRecurrentTransaction = new RecurrentTransaction(1, [7,8,9], true, 2);
     await expect(recurrentTransactions.save(thirdRecurrentTransaction)).to.eventually.be.fulfilled;
 
-    const fourthRecurrentTransaction = new RecurrentTransaction(1, 1, [10,11,12], true);
+    const fourthRecurrentTransaction = new RecurrentTransaction(1, [10,11,12], true, 1);
     await expect(recurrentTransactions.save(fourthRecurrentTransaction)).to.eventually.be.rejectedWith(
       'duplicate key value violates unique constraint "recurrenttransactions_pkey"'
     );
@@ -59,9 +85,9 @@ describe("postgres recurrent transactions repository", function() {
 
   it("save multiple transactions with different id", async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(1112, 2, [1,2,3], true),
-        new RecurrentTransaction(2233, 2, [4,5,6], true),
-        new RecurrentTransaction(4112, 5, [7,8,9], true)
+        new RecurrentTransaction(2, [1,2,3], true, 1112),
+        new RecurrentTransaction(2, [4,5,6], true, 2233),
+        new RecurrentTransaction(5, [7,8,9], true, 4112)
     ];
 
     await recurrentTransactions.saveArray(recurrentTransactionsData);
@@ -89,8 +115,8 @@ describe("postgres recurrent transactions repository", function() {
 
   it("save multiple transactions with different account id", async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(1112, 5, [1,2,3], true),
-        new RecurrentTransaction(1112, 2, [4,5,6], true)
+        new RecurrentTransaction(5, [1,2,3], true, 1112),
+        new RecurrentTransaction(2, [4,5,6], true, 1112)
     ];
 
     await recurrentTransactions.saveArray(recurrentTransactionsData);
@@ -109,9 +135,9 @@ describe("postgres recurrent transactions repository", function() {
      * If save fails, everything is not saved
      */
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(1112, 2, [1,2,3], true),
-        new RecurrentTransaction(1112, 2, [4,5,6], true),
-        new RecurrentTransaction(4112, 4, [7,8,9], true)
+        new RecurrentTransaction(2, [1,2,3], true, 1112),
+        new RecurrentTransaction(2, [4,5,6], true, 1112),
+        new RecurrentTransaction(4, [7,8,9], true, 4112)
     ];
 
     await expect(recurrentTransactions.saveArray(recurrentTransactionsData)).to.eventually.be.rejectedWith(
@@ -124,22 +150,25 @@ describe("postgres recurrent transactions repository", function() {
 
   it('group by isExpense column', async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(1112, 2, [1,2,3], true),
-        new RecurrentTransaction(1112, 3, [4,5,6], false),
-        new RecurrentTransaction(4112, 4, [7,8,9], true),
-        new RecurrentTransaction(4112, 5, [10,11,12], false)
+        new RecurrentTransaction(2, [1,2,3], true, 1112),
+        new RecurrentTransaction(2, [4,5,6], false, 1113),
+        new RecurrentTransaction(2, [7,8,9], true, 4112),
+        new RecurrentTransaction(2, [10,11,12], false, 4113),
+        new RecurrentTransaction(3, [10,11,12], false, 4113)
     ];
 
     await recurrentTransactions.saveArray(recurrentTransactionsData);
-    const recurrentTransactionsGroup = await recurrentTransactions.groupByIsExpense();
+    const recurrentTransactionsGroup = await recurrentTransactions.groupByIsExpense(2);
     expect(recurrentTransactionsGroup.length).to.equal(2);
-    expect(recurrentTransactionsGroup[0][0].accountId).to.equal(3);
+    expect(recurrentTransactionsGroup[0].length).to.equal(2);
+    expect(recurrentTransactionsGroup[0][0].accountId).to.equal(2);
     expect(recurrentTransactionsGroup[0][0].isExpense).to.equal(false);
-    expect(recurrentTransactionsGroup[0][1].accountId).to.equal(5);
+    expect(recurrentTransactionsGroup[0][1].accountId).to.equal(2);
     expect(recurrentTransactionsGroup[0][1].isExpense).to.equal(false);
+    expect(recurrentTransactionsGroup[1].length).to.equal(2);
     expect(recurrentTransactionsGroup[1][0].accountId).to.equal(2);
     expect(recurrentTransactionsGroup[1][0].isExpense).to.equal(true);
-    expect(recurrentTransactionsGroup[1][1].accountId).to.equal(4);
+    expect(recurrentTransactionsGroup[1][1].accountId).to.equal(2);
     expect(recurrentTransactionsGroup[1][1].isExpense).to.equal(true);
   });
 });

@@ -99,8 +99,8 @@ describe("postgres transactions repository", function() {
   });
 
   it("renders the group-by-column query", async function() {
-    const result = transactions.groupByColumnQuery(8);
+    const result = transactions.groupByColumnQuery(2,8);
     expect(result).to.be.a("string");
-    expect(result).to.equal("SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM transactions WHERE counterpartiban=b.counterpartiban) t ) rw FROM transactions b WHERE counterpartiban IS NOT NULL GROUP BY counterpartiban");
+    expect(result).to.equal("SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM transactions WHERE counterpartiban=b.counterpartiban AND accountid='2') t ) rw FROM transactions b WHERE counterpartiban IS NOT NULL GROUP BY counterpartiban");
   });
 });
