@@ -63,6 +63,19 @@ describe("postgres recurrent transactions repository", function() {
     );
   });
 
+  it("renders the save array without id query", async function() {
+    let recurrentTransactionsData: RecurrentTransaction[] = [
+        new RecurrentTransaction(2,[1,2,3],true),
+        new RecurrentTransaction(2,[4,5,6],false)
+    ];
+
+    const result = recurrentTransactions.saveArrayWithoutIdQuery(recurrentTransactionsData);
+    expect(result).to.be.a("string");
+    expect(result).to.equal(
+      "INSERT INTO recurrenttransactions (accountid,transactionids,isexpense,isconfirmed,frequency) VALUES ('2','{1,2,3}','true','false','Unknown'), ('2','{4,5,6}','false','false','Unknown')"
+    );
+  });
+
   it("renders the find-by-account-id query", async function() {
     const result = recurrentTransactions.findByAccountIdsQuery([2, 5]);
     expect(result).to.be.a("string");
