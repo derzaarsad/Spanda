@@ -151,21 +151,24 @@ describe("postgres recurrent transactions repository", function() {
   it('group by isExpense column', async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
         new RecurrentTransaction(2, [1,2,3], true, 1112),
-        new RecurrentTransaction(3, [4,5,6], false, 1112),
-        new RecurrentTransaction(4, [7,8,9], true, 4112),
-        new RecurrentTransaction(5, [10,11,12], false, 4112)
+        new RecurrentTransaction(2, [4,5,6], false, 1113),
+        new RecurrentTransaction(2, [7,8,9], true, 4112),
+        new RecurrentTransaction(2, [10,11,12], false, 4113),
+        new RecurrentTransaction(3, [10,11,12], false, 4113)
     ];
 
     await recurrentTransactions.saveArray(recurrentTransactionsData);
-    const recurrentTransactionsGroup = await recurrentTransactions.groupByIsExpense();
+    const recurrentTransactionsGroup = await recurrentTransactions.groupByIsExpense(2);
     expect(recurrentTransactionsGroup.length).to.equal(2);
-    expect(recurrentTransactionsGroup[0][0].accountId).to.equal(3);
+    expect(recurrentTransactionsGroup[0].length).to.equal(2);
+    expect(recurrentTransactionsGroup[0][0].accountId).to.equal(2);
     expect(recurrentTransactionsGroup[0][0].isExpense).to.equal(false);
-    expect(recurrentTransactionsGroup[0][1].accountId).to.equal(5);
+    expect(recurrentTransactionsGroup[0][1].accountId).to.equal(2);
     expect(recurrentTransactionsGroup[0][1].isExpense).to.equal(false);
+    expect(recurrentTransactionsGroup[1].length).to.equal(2);
     expect(recurrentTransactionsGroup[1][0].accountId).to.equal(2);
     expect(recurrentTransactionsGroup[1][0].isExpense).to.equal(true);
-    expect(recurrentTransactionsGroup[1][1].accountId).to.equal(4);
+    expect(recurrentTransactionsGroup[1][1].accountId).to.equal(2);
     expect(recurrentTransactionsGroup[1][1].isExpense).to.equal(true);
   });
 });
