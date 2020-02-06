@@ -37,6 +37,7 @@ export namespace RecurrentTransactions {
   export interface RecurrentTransactionsRepository extends Repository<number, RecurrentTransaction> {
     findByAccountIds(accountIds: Array<number>): Promise<Array<RecurrentTransaction>>;
     saveArray(recurrentTransactions: Array<RecurrentTransaction>): Promise<Array<RecurrentTransaction>>;
+    saveArrayWithoutId(recurrentTransactions: Array<RecurrentTransaction>): Promise<Array<RecurrentTransaction>>;
     saveWithoutId(recurrentTransaction: RecurrentTransaction): Promise<RecurrentTransaction>;
   }
 
@@ -63,6 +64,11 @@ export namespace RecurrentTransactions {
         recurrentTransactions.forEach(recurrentTransaction => this.save(recurrentTransaction));
       return recurrentTransactions;
     }
+
+    async saveArrayWithoutId(recurrentTransactions: Array<RecurrentTransaction>) {
+      recurrentTransactions.forEach(recurrentTransaction => this.saveWithoutId(recurrentTransaction));
+    return recurrentTransactions;
+  }
 
     async findByAccountIds(accountIds: Array<number>) {
       return Object.keys(this.repository)
@@ -160,6 +166,14 @@ export namespace RecurrentTransactions {
       return this.doQuery(params).then(res => recurrentTransactions);
     }
 
+    async saveArrayWithoutId(recurrentTransactions: RecurrentTransaction[]): Promise<RecurrentTransaction[]> {
+      const params = {
+        text: this.saveArrayWithoutIdQuery(recurrentTransactions)
+      };
+
+      return this.doQuery(params).then(res => recurrentTransactions);
+    }
+
     findByIdQuery(id: number) {
       return this.format(
         "SELECT * FROM %I WHERE id = %L LIMIT 1",
@@ -218,6 +232,22 @@ export namespace RecurrentTransactions {
           return (
             "(" +
             this.schema.asRow(recurrentTransaction).map(item => this.format("%L", item.toString())) +
+            ")"
+          );
+        })
+        .join(", ");
+
+      return this.format("INSERT INTO %I (%s) VALUES %s", tableName, attributes, values);
+    }
+
+    saveArrayWithoutIdQuery(recurrentTransactions: RecurrentTransaction[]) {
+      const tableName = this.schema.tableName;
+      const attributes = this.schema.attributes.replace("id,","");
+      const values = recurrentTransactions
+        .map(recurrentTransaction => {
+          return (
+            "(" +
+            this.schema.asRow(recurrentTransaction).slice(1).map(item => this.format("%L", item.toString())) +
             ")"
           );
         })
