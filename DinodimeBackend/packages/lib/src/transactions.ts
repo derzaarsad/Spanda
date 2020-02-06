@@ -44,6 +44,7 @@ export namespace Transactions {
   export interface TransactionsRepository extends Repository<number, Transaction> {
     findByAccountIds(accountIds: Array<number>): Promise<Array<Transaction>>;
     saveArray(transactions: Array<Transaction>): Promise<Array<Transaction>>;
+    groupByIban(accountId: number): Promise<Transaction[][]>;
   }
 
   export class InMemoryRepository implements TransactionsRepository {
@@ -78,6 +79,32 @@ export namespace Transactions {
     async findById(id: number): Promise<Transaction | null> {
       const candidate = this.repository[id];
       return candidate ? candidate : null;
+    }
+
+    async groupByIban(accountId: number): Promise<Transaction[][]> {
+      let indexDictionary: { [iban: string]: number } = {};
+
+      let grouped: Transaction[][] = [];
+      for (let id in this.repository) {
+        if(this.repository[id].accountId != accountId) {
+          continue;
+        }
+
+        let currentIban = this.repository[id].counterPartIban;
+        if(!currentIban) {
+          continue;
+        }
+
+        if(indexDictionary[currentIban] == null) {
+          indexDictionary[currentIban] = grouped.length;
+          grouped.push([]);
+          grouped[indexDictionary[currentIban]].push(this.repository[id]);
+        }
+        else {
+          grouped[indexDictionary[currentIban]].push(this.repository[id]);
+        }
+      }
+      return grouped;
     }
 
     async deleteAll(): Promise<void> {

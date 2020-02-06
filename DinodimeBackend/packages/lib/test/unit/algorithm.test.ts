@@ -233,6 +233,34 @@ describe("Algorithm", function() {
         {
             id: 1,
             accountId: 1,
+            absAmount: 25.6,
+            isExpense: false,
+            bookingDate: new Date(),
+            purpose: "Strom August",
+            counterPartName: undefined,
+            counterPartAccountNumber: undefined,
+            counterPartIban: undefined,
+            counterPartBlz: undefined,
+            counterPartBic: undefined,
+            counterPartBankName: undefined
+        },
+        {
+            id: 1,
+            accountId: 1,
+            absAmount: 25.6,
+            isExpense: false,
+            bookingDate: new Date(),
+            purpose: "Strom August",
+            counterPartName: undefined,
+            counterPartAccountNumber: undefined,
+            counterPartIban: undefined,
+            counterPartBlz: undefined,
+            counterPartBic: undefined,
+            counterPartBankName: undefined
+        },
+        {
+            id: 1,
+            accountId: 1,
             absAmount: 2109.13,
             isExpense: true,
             bookingDate: new Date(),
@@ -246,9 +274,10 @@ describe("Algorithm", function() {
         }
     ]
     const result = Algorithm.GetRecurrentTransaction(transactionsData);
-    expect(result.length).to.equal(2)
+    expect(result.length).to.equal(3)
     expect(result[0].length).to.equal(8)
     expect(result[1].length).to.equal(8)
+    expect(result[2].length).to.equal(2)
 
     expect(result[0][0].absAmount).to.equal(575)
     expect(result[0][1].absAmount).to.equal(575)
@@ -267,5 +296,30 @@ describe("Algorithm", function() {
     expect(result[1][5].absAmount).to.equal(25.6)
     expect(result[1][6].absAmount).to.equal(25.6)
     expect(result[1][7].absAmount).to.equal(25.6)
+
+    expect(result[2][0].absAmount).to.equal(25.6)
+    expect(result[2][1].absAmount).to.equal(25.6)
+
+    // isExpense
+    expect(result[0][0].isExpense).to.equal(true)
+    expect(result[0][1].isExpense).to.equal(true)
+    expect(result[0][2].isExpense).to.equal(true)
+    expect(result[0][3].isExpense).to.equal(true)
+    expect(result[0][4].isExpense).to.equal(true)
+    expect(result[0][5].isExpense).to.equal(true)
+    expect(result[0][6].isExpense).to.equal(true)
+    expect(result[0][7].isExpense).to.equal(true)
+
+    expect(result[1][0].isExpense).to.equal(true)
+    expect(result[1][1].isExpense).to.equal(true)
+    expect(result[1][2].isExpense).to.equal(true)
+    expect(result[1][3].isExpense).to.equal(true)
+    expect(result[1][4].isExpense).to.equal(true)
+    expect(result[1][5].isExpense).to.equal(true)
+    expect(result[1][6].isExpense).to.equal(true)
+    expect(result[1][7].isExpense).to.equal(true)
+
+    expect(result[2][0].isExpense).to.equal(false)
+    expect(result[2][1].isExpense).to.equal(false)
   });
 });
