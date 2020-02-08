@@ -56,6 +56,7 @@ export namespace RecurrentTransactions {
     }
 
     async saveWithoutId(transaction: RecurrentTransaction): Promise<RecurrentTransaction> {
+      transaction.id = this.id_seq;
       this.repository[this.id_seq++] = transaction;
       return transaction;
     }
