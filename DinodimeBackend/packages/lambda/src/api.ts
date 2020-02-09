@@ -6,7 +6,6 @@ import * as authenticationController from "./controllers/authentication-controll
 import * as bankController from "./controllers/bank-controller";
 
 const services = new ServiceProvider(process.env);
-
 const logger = services.logger;
 
 /*
