@@ -1,4 +1,4 @@
 export interface WebFormCompletion {
-  webFormId: string;
+  webFormId: number;
   userSecret: string;
 }
