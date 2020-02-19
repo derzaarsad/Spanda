@@ -46,6 +46,7 @@ export { Schema } from "./schema/schema";
 export { UsersSchema } from "./schema/users";
 export { BankConnectionsSchema } from "./schema/bank-connections";
 export { TransactionsSchema } from "./schema/transactions";
+export { RecurrentTransactionsSchema } from "./schema/recurrent-transactions";
 
 export { FinAPI } from "./region-specific/de/finapi";
 export { Model as FinAPIModel } from "./region-specific/de/model";
