@@ -10,7 +10,7 @@ import { RecurrentTransactions, Transactions } from "dinodime-lib";
 import { Transaction } from "dinodime-lib";
 import { TransactionFrequency } from "dinodime-lib";
 
-describe("fetch webform info handler", function() {
+describe("deduce recurrent transactions", function() {
   let logger: winston.Logger;
   let recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
   let transactions: Transactions.TransactionsRepository;
@@ -22,7 +22,7 @@ describe("fetch webform info handler", function() {
     transactions = new Transactions.InMemoryRepository();
   });
 
-  it("rejects a request with missing webFormAuth", async function() {
+  it("transactions are correctly categorized", async function() {
     let transactionsData: Transaction[] = [
         {
             id: 1,
