@@ -7,6 +7,10 @@ import { User, Users, VoidTransport, Authentication } from "dinodime-lib";
 import { registerUser } from "../../src/controllers/authentication-controller";
 import { CreateFinApiTestInterfaces } from "../test-utility";
 
+import { Pool } from "pg";
+import format from "pg-format";
+import { UsersSchema } from "dinodime-lib";
+
 describe("register user handler", function() {
   let logger: winston.Logger;
   let users: Users.UsersRepository;
@@ -37,7 +41,7 @@ describe("register user handler", function() {
 
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
-    users = new Users.InMemoryRepository();
+    users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
     context = {} as Context;
   });
 

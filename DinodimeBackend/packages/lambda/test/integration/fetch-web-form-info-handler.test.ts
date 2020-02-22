@@ -16,6 +16,12 @@ import { fetchWebFormInfo } from "../../src/controllers/bank-controller";
 import { CreateFinApiTestInterfaces } from "../test-utility";
 import { EncryptedData, Encryptions } from "dinodime-lib/out/src/crypto";
 
+import { Pool } from "pg";
+import format from "pg-format";
+import { UsersSchema } from "dinodime-lib";
+import { BankConnectionsSchema } from "dinodime-lib";
+import { TransactionsSchema } from "dinodime-lib";
+
 describe("fetch webform info handler", function() {
   this.timeout(10000); // Webform needs time.
 
@@ -40,9 +46,9 @@ describe("fetch webform info handler", function() {
   beforeEach(function() {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
-    users = new Users.InMemoryRepository();
-    connections = new BankConnections.InMemoryRepository();
-    transactions = new Transactions.InMemoryRepository();
+    users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
+    connections = new BankConnections.PostgreSQLRepository(new Pool(), format, new BankConnectionsSchema());
+    transactions = new Transactions.PostgreSQLRepository(new Pool(), format, new TransactionsSchema());
 
     context = {} as Context;
     encryptions = new CallbackCrypto();
