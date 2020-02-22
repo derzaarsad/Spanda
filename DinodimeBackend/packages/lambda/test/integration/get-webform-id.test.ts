@@ -9,6 +9,10 @@ import { User, Users, VoidTransport, CallbackCrypto, Encryptions } from "dinodim
 import { getWebformId } from "../../src/controllers/bank-controller";
 import { CreateFinApiTestInterfaces } from "../test-utility";
 
+import { Pool } from "pg";
+import format from "pg-format";
+import { UsersSchema } from "dinodime-lib";
+
 describe("get webform id", function() {
   this.timeout(10000); // Selenium browser takes so much time.
 
@@ -38,7 +42,7 @@ describe("get webform id", function() {
 
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
-    users = new Users.InMemoryRepository();
+    users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
     encryptions = new CallbackCrypto();
 
     context = {} as Context;
