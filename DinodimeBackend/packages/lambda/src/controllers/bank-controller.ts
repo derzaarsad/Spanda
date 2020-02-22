@@ -12,6 +12,9 @@ import { Authentication, Encryptions, Transactions } from "dinodime-lib";
 import { BankConnection, BankConnections } from "dinodime-lib";
 import { User, Users } from "dinodime-lib";
 import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dinodime-lib";
+import { Transaction } from "dinodime-lib";
+import { RecurrentTransaction, RecurrentTransactions } from "dinodime-lib";
+import { Algorithm } from "dinodime-lib"
 
 const blzPattern = /^\d{8}$/;
 
@@ -133,6 +136,20 @@ export const getWebformId = async (
       logger.log("error", "error importing connection", { cause: err });
       return CreateSimpleResponse(500, "could not import connection");
     });
+};
+
+export const deduceRecurrentTransactions = async (
+  recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository,
+  transactions: Transactions.TransactionsRepository,
+  accountId: number
+): Promise<any> => {
+  let ibanGroupedTransactions: Transaction[][] = await transactions.groupByIban(accountId);
+  let deducedRecurrent: RecurrentTransaction[][] = ibanGroupedTransactions.map(ibanGroupedTransaction =>
+    Algorithm.GetRecurrentTransaction(ibanGroupedTransaction).map(res => new RecurrentTransaction(accountId, res.map(el => el.id), res[0].isExpense))
+  );
+  for(let i = 0; i < deducedRecurrent.length; ++i) {
+    await recurrentTransactions.saveArrayWithoutId(deducedRecurrent[i]);
+  }
 };
 
 // @Get('/webForms/{webFormId}')
