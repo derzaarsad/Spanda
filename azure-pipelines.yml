@@ -135,7 +135,6 @@ jobs:
           echo -e "WAIT_HOSTS=database:5432" >> ./integration-test.env
           echo -e "PGHOST=database" >> ./integration-test.env
           echo -e "PGUSER=postgres" >> ./integration-test.env
-          echo -e "PGPASSWORD=" >> ./integration-test.env
           echo -e "PGDATABASE=postgres" >> ./integration-test.env
           echo -e "POSTGRES_HOST_AUTH_METHOD=trust" >> ./integration-test.env
         displayName: "integration test preparation"
