@@ -4,7 +4,9 @@ import {
   Users,
   UsersSchema,
   TransactionsSchema,
-  Transactions
+  Transactions,
+  RecurrentTransactions,
+  RecurrentTransactionsSchema
 } from "dinodime-lib";
 import { Pool } from "pg";
 import format from "pg-format";
@@ -14,6 +16,7 @@ export default class PostgresBackendProvider implements BackendProvider {
   readonly users: Users.UsersRepository;
   readonly connections: BankConnections.BankConnectionsRepository;
   readonly transactions: Transactions.TransactionsRepository;
+  readonly recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
 
   constructor(env: NodeJS.ProcessEnv) {
     if (!env["PGUSER"] || !env["PGPASSWORD"]) {
@@ -34,6 +37,12 @@ export default class PostgresBackendProvider implements BackendProvider {
       pool,
       format,
       new TransactionsSchema()
+    );
+
+    this.recurrentTransactions = new RecurrentTransactions.PostgreSQLRepository(
+      pool,
+      format,
+      new RecurrentTransactionsSchema()
     );
   }
 }

@@ -138,6 +138,73 @@ export const getWebformId = async (
     });
 };
 
+// @Get('/recurrenttransactions')
+// @Header('Authorization') authorization: string
+export const getRecurrentTransactions = async (
+  event: APIGatewayProxyEvent,
+  context: Context,
+  logger: winston.Logger,
+  bankInterface: FinAPI,
+  users: Users.UsersRepository,
+  connections: BankConnections.BankConnectionsRepository,
+  recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository
+): Promise<APIGatewayProxyResult> => {
+  const authorization = HasAuthorization(event.headers);
+
+  if (!authorization) {
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  let user: User | null;
+
+  try {
+    let userInfo = await getUserInfo(logger, bankInterface, authorization);
+    user = await users.findById(userInfo.id);
+    if (!user) {
+      throw new Error("user is not found in the database");
+    }
+  } catch (err) {
+    logger.log("error", "error authenticating user", err);
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  let accountIds: Array<number> = [];
+
+  try {
+    let bankConnections = await connections.findByIds(user.bankConnectionIds);
+
+    if(bankConnections.length == 0) {
+      return CreateSimpleResponse(401, "unauthorized");
+    }
+
+    for(let id in bankConnections) {
+      accountIds.concat(bankConnections[id].bankAccountIds);
+    }
+
+  } catch (err) {
+    logger.log("error", "error authenticating user", err);
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  let body: any;
+  try {
+    let recurrentTransactions_ = await recurrentTransactions.findByAccountIds(accountIds);
+    body = recurrentTransactions_.map(el => {
+      return {
+        isExpense: el.isExpense,
+        isConfirmed: el.isConfirmed,
+        frequency: el.frequency,
+        counterPartName: el.counterPartName
+      }
+    });
+  } catch (err) {
+    logger.log("error", "error authenticating user", err);
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  return CreateResponse(200, body);
+};
+
 export const deduceRecurrentTransactions = async (
   recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository,
   transactions: Transactions.TransactionsRepository,
