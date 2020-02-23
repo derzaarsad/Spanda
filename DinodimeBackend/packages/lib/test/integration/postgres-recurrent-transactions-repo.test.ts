@@ -41,6 +41,22 @@ describe("postgres recurrent transactions repository", function() {
     expect(TransactionFrequency[result!.frequency]).to.eql(recurrentTransaction.frequency); // I don't feel right about this because I expect enum to equal enum
   });
 
+  it("find by ids", async function() {
+    await recurrentTransactions.save(new RecurrentTransaction(69, [1,2,3], true, 22));
+    await recurrentTransactions.save(new RecurrentTransaction(70, [1,2,3], true, 23));
+    await recurrentTransactions.save(new RecurrentTransaction(71, [1,2,3], true, 24));
+
+    const result = await recurrentTransactions.findByIds([22,23,24]);
+    expect(result.length).to.equal(3);
+    expect(result[0].id).to.equal(22);
+    expect(result[1].id).to.equal(23);
+    expect(result[2].id).to.equal(24);
+
+    expect(result[0].accountId).to.equal(69);
+    expect(result[1].accountId).to.equal(70);
+    expect(result[2].accountId).to.equal(71);
+  });
+
   it("saves and retrieves a recurrent transaction without id", async function() {
     const recurrentTransaction = new RecurrentTransaction(995070, [1,2,3], true);
     await recurrentTransactions.saveWithoutId(recurrentTransaction);

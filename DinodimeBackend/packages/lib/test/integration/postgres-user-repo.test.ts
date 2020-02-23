@@ -45,6 +45,22 @@ describe("postgres users repository", function() {
     expect(result).to.eql(user);
   });
 
+  it("find by ids", async function() {
+    await users.save(new User("chapu1", "chapu1@mischung.net", "+666 666 666", false));
+    await users.save(new User("chapu2", "chapu2@mischung.net", "+666 666 666", false));
+    await users.save(new User("chapu3", "chapu3@mischung.net", "+666 666 666", false));
+
+    const result = await users.findByIds(["chapu1","chapu2","chapu3"]);
+    expect(result.length).to.equal(3);
+    expect(result[0].username).to.equal("chapu1");
+    expect(result[1].username).to.equal("chapu2");
+    expect(result[2].username).to.equal("chapu3");
+
+    expect(result[0].email).to.equal("chapu1@mischung.net");
+    expect(result[1].email).to.equal("chapu2@mischung.net");
+    expect(result[2].email).to.equal("chapu3@mischung.net");
+  });
+
   it("overwrites the properties of an existing user on save", async function() {
     const user = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
     user.creationDate = new Date("2019-11-11T19:31:50.379+00:00");
