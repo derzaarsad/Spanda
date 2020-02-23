@@ -24,6 +24,12 @@ describe("postgres recurrent transactions repository", function() {
     expect(result).to.equal("SELECT * FROM recurrenttransactions WHERE id = '1' LIMIT 1");
   });
 
+  it("renders the find-by-ids query", async function() {
+    const result = recurrentTransactions.findByIdsQuery([1,2,3]);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("SELECT * FROM recurrenttransactions WHERE id in ('1','2','3')");
+  });
+
   it("renders the save query with an empty account ids", async function() {
     const recurrentTransaction = new RecurrentTransaction(995070, [1,2,3], true, 209864836);
 

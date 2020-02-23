@@ -5,6 +5,7 @@ import types from "./schema/types";
 export interface Repository<K, T> {
   save(entity: T): Promise<T>;
   findById(id: K): Promise<T | null>;
+  findByIds(ids: Array<K>): Promise<Array<T> | null>;
   deleteAll(): Promise<void>;
 }
 
@@ -27,6 +28,7 @@ export abstract class PostgresRepository<K, T> implements Repository<K, T> {
 
   abstract save(entity: T): Promise<T>;
   abstract findById(id: K): Promise<T | null>;
+  abstract findByIds(ids: Array<K>): Promise<Array<T> | null>;
   abstract deleteAll(): Promise<void>;
 
   async doQuery(queryConfig: QueryConfig<any[]>): Promise<QueryResult<any>> {

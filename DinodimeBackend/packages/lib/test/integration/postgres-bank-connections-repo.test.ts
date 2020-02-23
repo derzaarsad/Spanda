@@ -43,6 +43,22 @@ describe("postgres bank connections repository", function() {
     expect(result).to.eql(connection);
   });
 
+  it("find by ids", async function() {
+    await connections.save(new BankConnection(22, 69));
+    await connections.save(new BankConnection(23, 70));
+    await connections.save(new BankConnection(24, 71));
+
+    const result = await connections.findByIds([22,23,24]);
+    expect(result.length).to.equal(3);
+    expect(result[0].id).to.equal(22);
+    expect(result[1].id).to.equal(23);
+    expect(result[2].id).to.equal(24);
+
+    expect(result[0].bankId).to.equal(69);
+    expect(result[1].bankId).to.equal(70);
+    expect(result[2].bankId).to.equal(71);
+  });
+
   it("overwrites an existing bank connection on save", async function() {
     const connection = new BankConnection(2, 69);
     connection.bankAccountIds.push(1);

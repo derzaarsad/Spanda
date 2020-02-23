@@ -81,6 +81,21 @@ export namespace Transactions {
       return candidate ? candidate : null;
     }
 
+    async findByIds(ids: Array<number>): Promise<Array<Transaction> | null> {
+
+      let candidate = [];
+
+      for (let id in ids) {
+        if(!this.repository[id]) {
+          continue;
+        }
+
+        candidate.push(this.repository[id]);
+      }
+
+      return candidate.length > 0 ? candidate : null;
+    }
+
     async groupByIban(accountId: number): Promise<Transaction[][]> {
       let indexDictionary: { [iban: string]: number } = {};
 
@@ -143,6 +158,21 @@ export namespace Transactions {
       );
     }
 
+    async findByIds(ids: Array<number>): Promise<Array<Transaction> | null> {
+      const params = {
+        text: this.findByIdsQuery(ids),
+        rowMode: "array",
+        types: this.types
+      };
+
+      return this.doQuery(params).then(res =>
+        res.rowCount > 0 ? res.rows
+        .map(row => {
+          return this.schema.asObject(row)
+        }) : null
+      );
+    }
+
     async deleteAll(): Promise<void> {
       const params = {
         text: this.deleteAllQuery()
@@ -184,6 +214,14 @@ export namespace Transactions {
         "SELECT * FROM %I WHERE id = %L LIMIT 1",
         this.schema.tableName,
         id.toString()
+      );
+    }
+
+    findByIdsQuery(ids: Array<number>) {
+      return this.format(
+        "SELECT * FROM %I WHERE id in (%L)",
+        this.schema.tableName,
+        ids
       );
     }
 

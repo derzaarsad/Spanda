@@ -51,6 +51,21 @@ export namespace Users {
       return candidate ? candidate : null;
     }
 
+    async findByIds(usernames: Array<string>): Promise<Array<User> | null> {
+
+      let candidate = [];
+
+      for (let id in usernames) {
+        if(!this.repository[id]) {
+          continue;
+        }
+
+        candidate.push(this.repository[id]);
+      }
+
+      return candidate.length > 0 ? candidate : null;
+    }
+
     async findByWebFormId(activeWebFormId: number) {
       for (let key in this.repository) {
         const currentUser = this.repository[key];
@@ -103,6 +118,11 @@ export namespace Users {
             return null;
           }
         });
+    }
+
+    async findByIds(usernames: Array<string>) {
+      throw new Error("Method not implemented.");
+      return null;
     }
 
     async save(user: User) {
@@ -192,6 +212,14 @@ export namespace Users {
       );
     }
 
+    findByIdsQuery(userNames: Array<string>) {
+      return this.format(
+        "SELECT * FROM %I WHERE username in (%L)",
+        this.schema.tableName,
+        userNames
+      );
+    }
+
     findByWebFormIdQuery(activeWebFormId: number) {
       return this.format(
         "SELECT * FROM %I WHERE activewebformid = %L LIMIT 1",
@@ -232,6 +260,21 @@ export namespace Users {
 
       return this.doQuery(params).then(res =>
         res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null
+      );
+    }
+
+    async findByIds(usernames: Array<string>): Promise<Array<User> | null> {
+      const params = {
+        text: this.findByIdsQuery(usernames),
+        rowMode: "array",
+        types: this.types
+      };
+
+      return this.doQuery(params).then(res =>
+        res.rowCount > 0 ? res.rows
+        .map(row => {
+          return this.schema.asObject(row)
+        }) : null
       );
     }
 
