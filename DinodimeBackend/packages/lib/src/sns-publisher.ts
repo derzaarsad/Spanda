@@ -1,5 +1,6 @@
 import SNS from "aws-sdk/clients/sns";
 import { MessageAttributeMap } from "aws-sdk/clients/sns";
+import { PublishStatus, PublishFailure, PublishSuccess } from "./publish-status";
 
 /**
  * A type summarizing the required input parameters for publishing to SQS.
@@ -23,17 +24,6 @@ export class PublishInput {
     return messageEnvelope;
   }
 }
-
-export type PublishSuccess = {
-  kind: "success";
-};
-
-export type PublishFailure = {
-  kind: "failure";
-  error: any;
-};
-
-export type PublishStatus = PublishSuccess | PublishFailure;
 
 /**
  * Publishes json-formatted messages on an SNS topic.

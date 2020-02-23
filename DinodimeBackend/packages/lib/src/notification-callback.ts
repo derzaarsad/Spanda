@@ -9,7 +9,8 @@ import {
 import { NotificationDecoder } from "./notification-decoder";
 import * as winston from "winston";
 import SNS from "aws-sdk/clients/sns";
-import { SNSPublisher, PublishInput, PublishStatus } from "./sns-publisher";
+import { PublishStatus } from "./publish-status";
+import { SNSPublisher, PublishInput } from "./sns-publisher";
 import { RuleHandle } from "./rule-handle";
 import { RuleHandleRepository } from "./rule-handle-repository";
 
