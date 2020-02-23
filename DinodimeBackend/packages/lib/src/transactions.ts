@@ -158,7 +158,7 @@ export namespace Transactions {
       );
     }
 
-    async findByIds(ids: Array<number>): Promise<Array<Transaction> | null> {
+    async findByIds(ids: Array<number>): Promise<Array<Transaction>> {
       const params = {
         text: this.findByIdsQuery(ids),
         rowMode: "array",
@@ -169,7 +169,7 @@ export namespace Transactions {
         res.rowCount > 0 ? res.rows
         .map(row => {
           return this.schema.asObject(row)
-        }) : null
+        }) : []
       );
     }
 

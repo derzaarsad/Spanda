@@ -263,7 +263,7 @@ export namespace Users {
       );
     }
 
-    async findByIds(usernames: Array<string>): Promise<Array<User> | null> {
+    async findByIds(usernames: Array<string>): Promise<Array<User>> {
       const params = {
         text: this.findByIdsQuery(usernames),
         rowMode: "array",
@@ -274,7 +274,7 @@ export namespace Users {
         res.rowCount > 0 ? res.rows
         .map(row => {
           return this.schema.asObject(row)
-        }) : null
+        }) : []
       );
     }
 

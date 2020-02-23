@@ -146,7 +146,7 @@ export namespace RecurrentTransactions {
       );
     }
 
-    async findByIds(ids: Array<number>): Promise<Array<RecurrentTransaction> | null> {
+    async findByIds(ids: Array<number>): Promise<Array<RecurrentTransaction>> {
       const params = {
         text: this.findByIdsQuery(ids),
         rowMode: "array",
@@ -157,7 +157,7 @@ export namespace RecurrentTransactions {
         res.rowCount > 0 ? res.rows
         .map(row => {
           return this.schema.asObject(row)
-        }) : null
+        }) : []
       );
     }
 

@@ -206,7 +206,7 @@ export namespace BankConnections {
       );
     }
 
-    async findByIds(ids: Array<number>): Promise<Array<BankConnection> | null> {
+    async findByIds(ids: Array<number>): Promise<Array<BankConnection>> {
       const params = {
         text: this.findByIdsQuery(ids),
         rowMode: "array",
@@ -217,7 +217,7 @@ export namespace BankConnections {
         res.rowCount > 0 ? res.rows
         .map(row => {
           return this.schema.asObject(row)
-        }) : null
+        }) : []
       );
     }
 

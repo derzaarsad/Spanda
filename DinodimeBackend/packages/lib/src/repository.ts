@@ -28,7 +28,7 @@ export abstract class PostgresRepository<K, T> implements Repository<K, T> {
 
   abstract save(entity: T): Promise<T>;
   abstract findById(id: K): Promise<T | null>;
-  abstract findByIds(ids: Array<K>): Promise<Array<T> | null>;
+  abstract findByIds(ids: Array<K>): Promise<Array<T>>;
   abstract deleteAll(): Promise<void>;
 
   async doQuery(queryConfig: QueryConfig<any[]>): Promise<QueryResult<any>> {
