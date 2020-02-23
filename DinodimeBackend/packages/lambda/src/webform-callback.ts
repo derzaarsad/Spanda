@@ -1,30 +1,34 @@
+import winston from "winston";
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from "aws-lambda";
 import { CreateInternalErrorResponse, CreateSimpleResponse } from "./lambda-util";
-import { ServiceProvider } from "./service-provider";
-import { WebFormCompletion } from "dinodime-lib";
-import SQS from "aws-sdk/clients/sqs";
-
-const env = process.env;
-
-const services = new ServiceProvider(env);
-const log = services.logger;
-const users = services.users;
-
-const queueUrl = env["QUEUE_URL"];
-const sqs = new SQS();
+import { Users, WebFormCompletion, SQSPublisher } from "dinodime-lib";
 
 // Since this can be called by anyone, don't reveal anything in the response
 const response = CreateSimpleResponse(202, "Accepted");
 
-export const receiveWebformId = async (
+export interface HandlerConfiguration {
+  sqs: SQSPublisher;
+  queueUrl: string;
+  users: Users.UsersRepository;
+  log: winston.Logger;
+}
+
+export const webformCallback = async (
   event: APIGatewayProxyEvent,
-  context: Context
+  context: Context,
+  configuration: HandlerConfiguration
 ): Promise<APIGatewayProxyResult> => {
+  const log = configuration.log;
+  const queueUrl = configuration.queueUrl;
+  const sqs = configuration.sqs;
+  const users = configuration.users;
+
   log.debug("Received event", event);
 
   const pathParameters = event.pathParameters;
   if (pathParameters === null || !pathParameters.webFormAuth) {
-    return CreateInternalErrorResponse("no webFormAuth");
+    log.error("No authorization provided");
+    return response;
   }
 
   const webFormAuth = pathParameters.webFormAuth;
@@ -39,6 +43,7 @@ export const receiveWebformId = async (
 
   if (isNaN(webFormId) || userSecret.length === 0) {
     log.error(`Invalid webform authorization received: ${webFormAuth}`);
+    return response;
   }
 
   const user = await users.findByWebFormId(webFormId);
@@ -52,20 +57,19 @@ export const receiveWebformId = async (
     userSecret: userSecret
   };
 
-  const sendMessageRequest: SQS.Types.SendMessageRequest = {
-    QueueUrl: queueUrl,
-    MessageBody: JSON.stringify(messageBody)
+  const sendMessageRequest = {
+    queueUrl: queueUrl,
+    messageBody: messageBody
   };
 
   return sqs
-    .sendMessage(sendMessageRequest)
-    .promise()
+    .publish(sendMessageRequest)
     .then(() => {
-      log.info("Successfully sent message to topic");
+      log.info(`Successfully sent message to topic ${queueUrl}`);
       return response;
     })
     .catch(err => {
-      log.error("Error sending message to topic", err);
+      log.error(`Error sending message to topic ${queueUrl}`, err);
       return response;
     });
 };

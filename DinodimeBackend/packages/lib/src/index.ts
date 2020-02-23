@@ -32,7 +32,8 @@ export {
   DecryptedNewTransactionsNotification
 } from "./finapi-notifications";
 
-export { SNSPublisher, AWSSNSPublisher } from "./sns-publisher";
+export { SNSPublisher, AWSSNSPublisher, MockSNSPublisher } from "./sns-publisher";
+export { SQSPublisher, AWSSQSPublisher, MockSQSPublisher } from "./sqs-publisher";
 
 export { NotificationCallback, NewTransactionsSNSPublisher } from "./notification-callback";
 
