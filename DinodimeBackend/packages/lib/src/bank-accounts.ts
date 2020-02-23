@@ -28,11 +28,12 @@ export namespace BankAccounts {
       let candidate: Array<BankAccount> = [];
 
       for (let id in ids) {
-        if(!this.repository[id]) {
+        const bankAccount = this.repository[id];
+        if(!bankAccount) {
           continue;
         }
 
-        candidate.push(this.repository[id]);
+        candidate.push(bankAccount);
       }
 
       return candidate;

@@ -31,11 +31,12 @@ export namespace BankConnections {
       let candidate: Array<BankConnection> = [];
 
       for (let id in ids) {
-        if(!this.repository[id]) {
+        const bankConnection = this.repository[id];
+        if(!bankConnection) {
           continue;
         }
 
-        candidate.push(this.repository[id]);
+        candidate.push(bankConnection);
       }
 
       return candidate;
