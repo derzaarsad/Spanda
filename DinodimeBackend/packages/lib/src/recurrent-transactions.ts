@@ -16,11 +16,13 @@ export class RecurrentTransaction {
   isExpense: boolean;
   isConfirmed: boolean;
   frequency: TransactionFrequency;
+  counterPartName: string | null;
 
   constructor(
     accountId: number,
     transactionIds: number[],
     isExpense: boolean,
+    counterPartName: string | null,
     id?: number
   ) {
       this.id = id ? id : NaN;
@@ -29,6 +31,7 @@ export class RecurrentTransaction {
       this.isExpense = isExpense;
       this.isConfirmed = false;
       this.frequency = TransactionFrequency.Unknown;
+      this.counterPartName = counterPartName;
   }
 };
 
@@ -270,7 +273,7 @@ export namespace RecurrentTransactions {
         .map(recurrentTransaction => {
           return (
             "(" +
-            this.schema.asRow(recurrentTransaction).map(item => this.format("%L", item.toString())) +
+            this.schema.asRow(recurrentTransaction).map(item => this.format("%L", item != null ? item.toString() : item)) +
             ")"
           );
         })
@@ -286,7 +289,7 @@ export namespace RecurrentTransactions {
         .map(recurrentTransaction => {
           return (
             "(" +
-            this.schema.asRow(recurrentTransaction).slice(1).map(item => this.format("%L", item.toString())) +
+            this.schema.asRow(recurrentTransaction).slice(1).map(item => this.format("%L", item != null ? item.toString() : item)) +
             ")"
           );
         })
