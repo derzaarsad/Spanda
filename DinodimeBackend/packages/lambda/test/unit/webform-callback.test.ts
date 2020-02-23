@@ -10,7 +10,6 @@ const expect = chai.expect;
 describe("webform callback handler", function() {
   let context: Context;
   let sqs: MockSQSPublisher;
-  let queueUrl: string;
   let users: Users.UsersRepository;
   let configuration: HandlerConfiguration;
 
@@ -18,10 +17,8 @@ describe("webform callback handler", function() {
     context = {} as Context;
     sqs = new MockSQSPublisher();
     users = new Users.InMemoryRepository();
-    queueUrl = "http://test";
     configuration = {
       log: winston.createLogger({ transports: [new VoidTransport()] }),
-      queueUrl: queueUrl,
       sqs: sqs,
       users: users
     };
@@ -86,7 +83,6 @@ describe("webform callback handler", function() {
     expect(sqs.publishedData.length).to.equal(1);
 
     expect(sqs.publishedData[0]).to.eql({
-      queueUrl: queueUrl,
       messageBody: {
         webFormId: 123,
         userSecret: "secret"

@@ -1,11 +1,11 @@
 /* eslint-env node, mocha */
 import chai from "chai";
-const expect = chai.expect;
+import winston from "winston";
 import { updateRefreshToken } from "../../src/controllers/authentication-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import winston from "winston";
 import { VoidTransport, Authentication, Resolved, ClientSecretsProvider } from "dinodime-lib";
-import { CreateUnittestInterfaces } from "../test-utility";
+
+const expect = chai.expect;
 
 describe("get refresh token handler", function() {
   let logger: winston.Logger;

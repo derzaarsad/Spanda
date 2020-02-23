@@ -2,27 +2,31 @@ import SQS from "aws-sdk/clients/sqs";
 import { PublishStatus, PublishFailure, PublishSuccess } from "./publish-status";
 
 export interface PublishInput {
-  queueUrl: string;
   messageBody: any;
 }
 
+/**
+ * An SQS publisher.
+ */
 export interface SQSPublisher {
   publish(input: PublishInput): Promise<PublishStatus>;
 }
 
 /**
- * The
+ * The proper SQS publisher backed by AWS.
  */
 export class AWSSQSPublisher implements SQSPublisher {
   private sqs: SQS;
+  private queueUrl: string;
 
-  constructor(sqs: SQS) {
+  constructor(sqs: SQS, queueUrl: string) {
     this.sqs = sqs;
+    this.queueUrl = queueUrl;
   }
 
   async publish(input: PublishInput): Promise<PublishStatus> {
     const sendMessageRequest: SQS.Types.SendMessageRequest = {
-      QueueUrl: input.queueUrl,
+      QueueUrl: this.queueUrl,
       MessageBody: JSON.stringify(input.messageBody)
     };
 

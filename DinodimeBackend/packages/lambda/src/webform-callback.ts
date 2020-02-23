@@ -1,14 +1,13 @@
 import winston from "winston";
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from "aws-lambda";
-import { CreateInternalErrorResponse, CreateSimpleResponse } from "./lambda-util";
 import { Users, WebFormCompletion, SQSPublisher } from "dinodime-lib";
+import { CreateSimpleResponse } from "./lambda-util";
 
 // Since this can be called by anyone, don't reveal anything in the response
 const response = CreateSimpleResponse(202, "Accepted");
 
 export interface HandlerConfiguration {
   sqs: SQSPublisher;
-  queueUrl: string;
   users: Users.UsersRepository;
   log: winston.Logger;
 }
@@ -19,7 +18,6 @@ export const webformCallback = async (
   configuration: HandlerConfiguration
 ): Promise<APIGatewayProxyResult> => {
   const log = configuration.log;
-  const queueUrl = configuration.queueUrl;
   const sqs = configuration.sqs;
   const users = configuration.users;
 
@@ -58,18 +56,17 @@ export const webformCallback = async (
   };
 
   const sendMessageRequest = {
-    queueUrl: queueUrl,
     messageBody: messageBody
   };
 
   return sqs
     .publish(sendMessageRequest)
     .then(() => {
-      log.info(`Successfully sent message to topic ${queueUrl}`);
+      log.info("Successfully sent message to topic");
       return response;
     })
     .catch(err => {
-      log.error(`Error sending message to topic ${queueUrl}`, err);
+      log.error("Error sending message to topic", err);
       return response;
     });
 };

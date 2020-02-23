@@ -34,6 +34,7 @@ export {
 
 export { SNSPublisher, AWSSNSPublisher, MockSNSPublisher } from "./sns-publisher";
 export { SQSPublisher, AWSSQSPublisher, MockSQSPublisher } from "./sqs-publisher";
+export { SQSClient, AWSSQSClient, MockSQSClient } from "./sqs-client";
 
 export { NotificationCallback, NewTransactionsSNSPublisher } from "./notification-callback";
 
