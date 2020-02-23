@@ -88,9 +88,9 @@ export namespace RecurrentTransactions {
       return candidate ? candidate : null;
     }
 
-    async findByIds(ids: Array<number>): Promise<Array<RecurrentTransaction> | null> {
+    async findByIds(ids: Array<number>): Promise<Array<RecurrentTransaction>> {
 
-      let candidate = [];
+      let candidate: Array<RecurrentTransaction> = [];
 
       for (let id in ids) {
         if(!this.repository[id]) {
@@ -100,7 +100,7 @@ export namespace RecurrentTransactions {
         candidate.push(this.repository[id]);
       }
 
-      return candidate.length > 0 ? candidate : null;
+      return candidate;
     }
 
     async deleteAll(): Promise<void> {

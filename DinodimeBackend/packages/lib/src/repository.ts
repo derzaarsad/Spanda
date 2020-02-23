@@ -5,7 +5,7 @@ import types from "./schema/types";
 export interface Repository<K, T> {
   save(entity: T): Promise<T>;
   findById(id: K): Promise<T | null>;
-  findByIds(ids: Array<K>): Promise<Array<T> | null>;
+  findByIds(ids: Array<K>): Promise<Array<T>>;
   deleteAll(): Promise<void>;
 }
 

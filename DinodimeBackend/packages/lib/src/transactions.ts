@@ -81,9 +81,9 @@ export namespace Transactions {
       return candidate ? candidate : null;
     }
 
-    async findByIds(ids: Array<number>): Promise<Array<Transaction> | null> {
+    async findByIds(ids: Array<number>): Promise<Array<Transaction>> {
 
-      let candidate = [];
+      let candidate: Array<Transaction> = [];
 
       for (let id in ids) {
         if(!this.repository[id]) {
@@ -93,7 +93,7 @@ export namespace Transactions {
         candidate.push(this.repository[id]);
       }
 
-      return candidate.length > 0 ? candidate : null;
+      return candidate;
     }
 
     async groupByIban(accountId: number): Promise<Transaction[][]> {

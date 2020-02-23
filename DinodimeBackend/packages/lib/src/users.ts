@@ -51,9 +51,9 @@ export namespace Users {
       return candidate ? candidate : null;
     }
 
-    async findByIds(usernames: Array<string>): Promise<Array<User> | null> {
+    async findByIds(usernames: Array<string>): Promise<Array<User>> {
 
-      let candidate = [];
+      let candidate: Array<User> = [];
 
       for (let id in usernames) {
         if(!this.repository[id]) {
@@ -63,7 +63,7 @@ export namespace Users {
         candidate.push(this.repository[id]);
       }
 
-      return candidate.length > 0 ? candidate : null;
+      return candidate;
     }
 
     async findByWebFormId(activeWebFormId: number) {
@@ -122,7 +122,7 @@ export namespace Users {
 
     async findByIds(usernames: Array<string>) {
       throw new Error("Method not implemented.");
-      return null;
+      return [];
     }
 
     async save(user: User) {
