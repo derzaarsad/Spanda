@@ -27,8 +27,8 @@ export namespace BankAccounts {
 
       let candidate: Array<BankAccount> = [];
 
-      for (let id in ids) {
-        const bankAccount = this.repository[id];
+      for (let i in ids) {
+        const bankAccount = this.repository[ids[i]];
         if(!bankAccount) {
           continue;
         }

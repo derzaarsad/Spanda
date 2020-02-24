@@ -55,12 +55,13 @@ export namespace Users {
 
       let candidate: Array<User> = [];
 
-      for (let id in usernames) {
-        if(!this.repository[id]) {
+      for (let i in usernames) {
+        const username = this.repository[usernames[i]];
+        if(!username) {
           continue;
         }
 
-        candidate.push(this.repository[id]);
+        candidate.push(username);
       }
 
       return candidate;

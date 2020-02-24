@@ -30,8 +30,8 @@ export namespace BankConnections {
 
       let candidate: Array<BankConnection> = [];
 
-      for (let id in ids) {
-        const bankConnection = this.repository[id];
+      for (let i in ids) {
+        const bankConnection = this.repository[ids[i]];
         if(!bankConnection) {
           continue;
         }
