@@ -1,5 +1,4 @@
 import * as winston from "winston";
-import SQS, { DeleteMessageRequest } from "aws-sdk/clients/sqs";
 import { SQSEvent, SQSRecord, Context } from "aws-lambda";
 import {
   Encryptions,
