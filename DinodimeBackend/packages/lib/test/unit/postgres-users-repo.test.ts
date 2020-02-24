@@ -19,6 +19,12 @@ describe("postgres users repository", function() {
     expect(result).to.equal("SELECT * FROM users WHERE username = 'chapu' LIMIT 1");
   });
 
+  it("renders the find-by-ids query", async function() {
+    const result = users.findByIdsQuery(['chapu1','chapu2','chapu3']);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("SELECT * FROM users WHERE username in ('chapu1','chapu2','chapu3')");
+  });
+
   it("renders the find-by-webform query", async function() {
     const result = users.findByWebFormIdQuery(2934);
     expect(result).to.be.a("string");

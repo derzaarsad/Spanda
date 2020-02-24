@@ -23,6 +23,22 @@ export namespace BankAccounts {
       return this.repository[id];
     }
 
+    async findByIds(ids: Array<number>): Promise<Array<BankAccount>> {
+
+      let candidate: Array<BankAccount> = [];
+
+      for (let id in ids) {
+        const bankAccount = this.repository[id];
+        if(!bankAccount) {
+          continue;
+        }
+
+        candidate.push(bankAccount);
+      }
+
+      return candidate;
+    }
+
     async save(bankAccount: BankAccount) {
       this.repository[bankAccount.id] = bankAccount;
       return bankAccount;
@@ -104,6 +120,10 @@ export namespace BankAccounts {
             return null;
           }
         });
+    }
+
+    async findByIds(ids: Array<number>): Promise<Array<BankAccount>> {
+      throw new Error("Method not implemented.");
     }
 
     async save(bankAccount: BankAccount) {

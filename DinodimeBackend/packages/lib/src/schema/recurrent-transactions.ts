@@ -7,7 +7,8 @@ const attributes = [
   "transactionids",
   "isexpense",
   "isconfirmed",
-  "frequency"
+  "frequency",
+  "counterpartname"
 ];
 
 const asObject = (row: Array<any>) => {
@@ -17,7 +18,8 @@ const asObject = (row: Array<any>) => {
     transactionIds: row[2] ? row[2] : [],
     isExpense: row[3],
     isConfirmed: row[4],
-    frequency: row[5]
+    frequency: row[5],
+    counterPartName: row[6]
   };
 };
 
@@ -39,7 +41,8 @@ export class RecurrentTransactionsSchema implements Schema<RecurrentTransaction>
       transaction.transactionIds.length === 0 ? null : "{" + transaction.transactionIds.join(",") + "}",
       transaction.isExpense,
       transaction.isConfirmed,
-      TransactionFrequency[transaction.frequency]
+      TransactionFrequency[transaction.frequency],
+      transaction.counterPartName
     ];
   }
 
@@ -54,7 +57,8 @@ export class RecurrentTransactionsSchema implements Schema<RecurrentTransaction>
       transactionIds: el[this.columns.transactionIds],
       isExpense: el[this.columns.isExpense],
       isConfirmed: el[this.columns.isConfirmed],
-      frequency: el[this.columns.frequency]
+      frequency: el[this.columns.frequency],
+      counterPartName: el[this.columns.counterPartName]
     };
   }
 }

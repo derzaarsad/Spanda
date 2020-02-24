@@ -48,6 +48,67 @@ describe("postgres transactions repository", function() {
     expect(result).to.eql(transaction);
   });
 
+  it("find by ids", async function() {
+
+    const transaction1 = {
+      id: 22,
+      accountId: 69,
+      absAmount: 89.81,
+      isExpense: true,
+      bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
+      purpose: " RE. 745259",
+      counterPartName: "TueV Bayern",
+      counterPartAccountNumber: "611105",
+      counterPartIban: "DE13700800000061110500",
+      counterPartBlz: "70080000",
+      counterPartBic: "DRESDEFF700",
+      counterPartBankName: "Commerzbank vormals Dresdner Bank"
+    };
+
+    const transaction2 = {
+      id: 23,
+      accountId: 70,
+      absAmount: 89.81,
+      isExpense: true,
+      bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
+      purpose: " RE. 745259",
+      counterPartName: "TueV Bayern",
+      counterPartAccountNumber: "611105",
+      counterPartIban: "DE13700800000061110500",
+      counterPartBlz: "70080000",
+      counterPartBic: "DRESDEFF700",
+      counterPartBankName: "Commerzbank vormals Dresdner Bank"
+    };
+
+    const transaction3 = {
+      id: 24,
+      accountId: 71,
+      absAmount: 89.81,
+      isExpense: true,
+      bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
+      purpose: " RE. 745259",
+      counterPartName: "TueV Bayern",
+      counterPartAccountNumber: "611105",
+      counterPartIban: "DE13700800000061110500",
+      counterPartBlz: "70080000",
+      counterPartBic: "DRESDEFF700",
+      counterPartBankName: "Commerzbank vormals Dresdner Bank"
+    };
+    await transactions.save(transaction1);
+    await transactions.save(transaction2);
+    await transactions.save(transaction3);
+
+    const result = await transactions.findByIds([22,23,24]);
+    expect(result.length).to.equal(3);
+    expect(result[0].id).to.equal(22);
+    expect(result[1].id).to.equal(23);
+    expect(result[2].id).to.equal(24);
+
+    expect(result[0].accountId).to.equal(69);
+    expect(result[1].accountId).to.equal(70);
+    expect(result[2].accountId).to.equal(71);
+  });
+
   it("save with unique id and account id", async function() {
     const firstTransaction = {
       id: 1,

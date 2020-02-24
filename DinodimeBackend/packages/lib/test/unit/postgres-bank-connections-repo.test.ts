@@ -21,6 +21,12 @@ describe("postgres bank connections repository", function() {
     expect(result).to.equal("SELECT * FROM bankconnections WHERE id = '1' LIMIT 1");
   });
 
+  it("renders the find-by-ids query", async function() {
+    const result = connections.findByIdsQuery([1,2,3]);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("SELECT * FROM bankconnections WHERE id in ('1','2','3')");
+  });
+
   it("renders the save query with an emtpy account ids", async function() {
     const connection = new BankConnection(1, 666);
 

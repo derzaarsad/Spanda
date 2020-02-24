@@ -16,11 +16,13 @@ export class RecurrentTransaction {
   isExpense: boolean;
   isConfirmed: boolean;
   frequency: TransactionFrequency;
+  counterPartName: string | null;
 
   constructor(
     accountId: number,
     transactionIds: number[],
     isExpense: boolean,
+    counterPartName: string | null,
     id?: number
   ) {
       this.id = id ? id : NaN;
@@ -29,6 +31,7 @@ export class RecurrentTransaction {
       this.isExpense = isExpense;
       this.isConfirmed = false;
       this.frequency = TransactionFrequency.Unknown;
+      this.counterPartName = counterPartName;
   }
 };
 
@@ -88,6 +91,22 @@ export namespace RecurrentTransactions {
       return candidate ? candidate : null;
     }
 
+    async findByIds(ids: Array<number>): Promise<Array<RecurrentTransaction>> {
+
+      let candidate: Array<RecurrentTransaction> = [];
+
+      for (let id in ids) {
+        const recurrentTransaction = this.repository[id];
+        if(!recurrentTransaction) {
+          continue;
+        }
+
+        candidate.push(recurrentTransaction);
+      }
+
+      return candidate;
+    }
+
     async deleteAll(): Promise<void> {
       for (let id in this.repository) {
         delete this.repository[id];
@@ -128,6 +147,21 @@ export namespace RecurrentTransactions {
 
       return this.doQuery(params).then(res =>
         res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null
+      );
+    }
+
+    async findByIds(ids: Array<number>): Promise<Array<RecurrentTransaction>> {
+      const params = {
+        text: this.findByIdsQuery(ids),
+        rowMode: "array",
+        types: this.types
+      };
+
+      return this.doQuery(params).then(res =>
+        res.rowCount > 0 ? res.rows
+        .map(row => {
+          return this.schema.asObject(row)
+        }) : []
       );
     }
 
@@ -183,6 +217,14 @@ export namespace RecurrentTransactions {
       );
     }
 
+    findByIdsQuery(ids: Array<number>) {
+      return this.format(
+        "SELECT * FROM %I WHERE id in (%L)",
+        this.schema.tableName,
+        ids
+      );
+    }
+
     findByAccountIdsQuery(accountIds: Array<number>) {
       return this.format(
         "SELECT * FROM %I WHERE accountid in (%L)",
@@ -232,7 +274,7 @@ export namespace RecurrentTransactions {
         .map(recurrentTransaction => {
           return (
             "(" +
-            this.schema.asRow(recurrentTransaction).map(item => this.format("%L", item.toString())) +
+            this.schema.asRow(recurrentTransaction).map(item => this.format("%L", item != null ? item.toString() : item)) +
             ")"
           );
         })
@@ -248,7 +290,7 @@ export namespace RecurrentTransactions {
         .map(recurrentTransaction => {
           return (
             "(" +
-            this.schema.asRow(recurrentTransaction).slice(1).map(item => this.format("%L", item.toString())) +
+            this.schema.asRow(recurrentTransaction).slice(1).map(item => this.format("%L", item != null ? item.toString() : item)) +
             ")"
           );
         })

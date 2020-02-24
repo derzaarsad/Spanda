@@ -8,5 +8,6 @@ CREATE TABLE recurrenttransactions
     isexpense boolean NOT NULL,
     isconfirmed boolean NOT NULL,
     frequency transactionfrequency DEFAULT NULL,
+    counterpartname text COLLATE pg_catalog."default",
     CONSTRAINT recurrenttransactions_pkey PRIMARY KEY (id,accountid)
 )

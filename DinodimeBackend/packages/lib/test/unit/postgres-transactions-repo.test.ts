@@ -24,6 +24,12 @@ describe("postgres transactions repository", function() {
     expect(result).to.equal("SELECT * FROM transactions WHERE id = '1' LIMIT 1");
   });
 
+  it("renders the find-by-ids query", async function() {
+    const result = transactions.findByIdsQuery([1,2,3]);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("SELECT * FROM transactions WHERE id in ('1','2','3')");
+  });
+
   it("renders the save query with an emtpy account ids", async function() {
     const transaction: Transaction = {
       id: 209864836,
