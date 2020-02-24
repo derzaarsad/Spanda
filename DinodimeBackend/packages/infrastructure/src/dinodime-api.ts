@@ -158,6 +158,14 @@ export class DinodimeAPI extends cdk.Construct {
       operationName: "get allowance"
     });
 
+    const recurrentTransactions = restAPI.root.addResource("recurrentTransactions");
+
+    const getRecurrentTransactions = lambdaFactory.createLambda("GetRecurrentTransactions", asset, "main.getRecurrentTransactions");
+
+    recurrentTransactions.addMethod("GET", new LambdaIntegration(getRecurrentTransactions), {
+      operationName: "get recurrent transactions"
+    });
+
     this.restAPI = restAPI;
   }
 }

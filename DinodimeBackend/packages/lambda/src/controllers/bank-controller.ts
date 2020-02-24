@@ -138,7 +138,7 @@ export const getWebformId = async (
     });
 };
 
-// @Get('/recurrenttransactions')
+// @Get('/recurrentTransactions')
 // @Header('Authorization') authorization: string
 export const getRecurrentTransactions = async (
   event: APIGatewayProxyEvent,
