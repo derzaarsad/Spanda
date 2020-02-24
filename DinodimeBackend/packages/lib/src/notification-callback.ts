@@ -1,32 +1,22 @@
-/**
- * This module defines the callback handler interface for components receiving push notifications.
- */
+import * as winston from "winston";
+import SNS from "aws-sdk/clients/sns";
+
 import {
   Notification,
   EncryptedNewTransactionsNotification,
   DecryptedNewTransactionsNotification
 } from "./finapi-notifications";
 import { NotificationDecoder } from "./notification-decoder";
-import * as winston from "winston";
-import SNS from "aws-sdk/clients/sns";
-import { PublishStatus } from "./publish-status";
+import { Status, Success, Failure } from "./status";
 import { SNSPublisher, PublishInput } from "./sns-publisher";
 import { RuleHandle } from "./rule-handle";
 import { RuleHandleRepository } from "./rule-handle-repository";
 
-export type CallbackSuccess = {
-  kind: "success";
-};
-
-export type CallbackFailure = {
-  kind: "failure";
-  error: any;
-};
-
-export type CallbackStatus = CallbackSuccess | CallbackFailure;
-
+/**
+ * This module defines the callback handler interface for components receiving push notifications.
+ */
 export interface NotificationCallback<N extends Notification> {
-  accept(notification: N): Promise<CallbackStatus>;
+  accept(notification: N): Promise<Status>;
 }
 
 /**
@@ -60,7 +50,7 @@ export class NewTransactionsSNSPublisher
     this.logger = logger;
   }
 
-  async accept(notification: EncryptedNewTransactionsNotification): Promise<CallbackStatus> {
+  async accept(notification: EncryptedNewTransactionsNotification): Promise<Status> {
     const validated = this.validateNotification(notification);
 
     if (!validated) {
@@ -83,16 +73,16 @@ export class NewTransactionsSNSPublisher
 
     return this.sns
       .publish(params)
-      .then((response: PublishStatus) => {
+      .then((response: Status) => {
         if (response.kind === "success") {
           this.logger.log("info", "notification forwarded successfully");
-          const status: CallbackSuccess = {
+          const status: Success = {
             kind: "success"
           };
           return status;
         } else {
           this.logger.log("info", "error forwarding notification");
-          const status: CallbackFailure = {
+          const status: Failure = {
             kind: "failure",
             error: response.error
           };
@@ -101,7 +91,7 @@ export class NewTransactionsSNSPublisher
       })
       .catch((err: any) => {
         this.logger.log("error", "unexpected failure trying to publish message", { cause: err });
-        const status: CallbackFailure = {
+        const status: Failure = {
           kind: "failure",
           error: err
         };
@@ -161,7 +151,7 @@ export class Accumulator<N extends Notification, O> implements NotificationCallb
     this.notifications = [];
   }
 
-  accept(notification: N): Promise<CallbackStatus> {
+  accept(notification: N): Promise<Status> {
     const decoded: O = this.decoder.map(notification);
     this.notifications.push(decoded);
     return Promise.resolve({ kind: "success" });

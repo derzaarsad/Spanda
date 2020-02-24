@@ -1,5 +1,5 @@
 import SQS from "aws-sdk/clients/sqs";
-import { PublishStatus, PublishFailure, PublishSuccess } from "./publish-status";
+import { Status, Failure, Success } from "./status";
 
 export interface PublishInput {
   messageBody: any;
@@ -9,7 +9,7 @@ export interface PublishInput {
  * An SQS publisher.
  */
 export interface SQSPublisher {
-  publish(input: PublishInput): Promise<PublishStatus>;
+  publish(input: PublishInput): Promise<Status>;
 }
 
 /**
@@ -24,7 +24,7 @@ export class AWSSQSPublisher implements SQSPublisher {
     this.queueUrl = queueUrl;
   }
 
-  async publish(input: PublishInput): Promise<PublishStatus> {
+  async publish(input: PublishInput): Promise<Status> {
     const sendMessageRequest: SQS.Types.SendMessageRequest = {
       QueueUrl: this.queueUrl,
       MessageBody: JSON.stringify(input.messageBody)
@@ -34,13 +34,13 @@ export class AWSSQSPublisher implements SQSPublisher {
       .sendMessage(sendMessageRequest)
       .promise()
       .then(() => {
-        const status: PublishSuccess = {
+        const status: Success = {
           kind: "success"
         };
         return status;
       })
       .catch(err => {
-        const status: PublishFailure = {
+        const status: Failure = {
           kind: "failure",
           error: err
         };
@@ -56,7 +56,7 @@ export class MockSQSPublisher implements SQSPublisher {
     this.publishedData = [];
   }
 
-  async publish(input: PublishInput): Promise<PublishStatus> {
+  async publish(input: PublishInput): Promise<Status> {
     this.publishedData.push(input);
     return { kind: "success" };
   }

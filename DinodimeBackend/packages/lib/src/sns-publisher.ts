@@ -1,6 +1,6 @@
 import SNS from "aws-sdk/clients/sns";
 import { MessageAttributeMap } from "aws-sdk/clients/sns";
-import { PublishStatus, PublishFailure, PublishSuccess } from "./publish-status";
+import { Status, Failure, Success } from "./status";
 
 /**
  * A type summarizing the required input parameters for publishing to SQS.
@@ -29,7 +29,7 @@ export class PublishInput {
  * Publishes json-formatted messages on an SNS topic.
  */
 export interface SNSPublisher {
-  publish(input: PublishInput): Promise<PublishStatus>;
+  publish(input: PublishInput): Promise<Status>;
 }
 
 /**
@@ -42,7 +42,7 @@ export class AWSSNSPublisher implements SNSPublisher {
     this.sns = sns;
   }
 
-  async publish(input: PublishInput): Promise<PublishStatus> {
+  async publish(input: PublishInput): Promise<Status> {
     const params: SNS.PublishInput = {
       TopicArn: input.topicArn,
       MessageStructure: "json",
@@ -54,13 +54,13 @@ export class AWSSNSPublisher implements SNSPublisher {
       .publish(params)
       .promise()
       .then(() => {
-        const status: PublishSuccess = {
+        const status: Success = {
           kind: "success"
         };
         return status;
       })
       .catch((err: any) => {
-        const status: PublishFailure = {
+        const status: Failure = {
           kind: "failure",
           error: err
         };
@@ -76,7 +76,7 @@ export class MockSNSPublisher implements SNSPublisher {
     this.publishedData = [];
   }
 
-  async publish(input: PublishInput): Promise<PublishStatus> {
+  async publish(input: PublishInput): Promise<Status> {
     this.publishedData.push(input);
     return { kind: "success" };
   }
