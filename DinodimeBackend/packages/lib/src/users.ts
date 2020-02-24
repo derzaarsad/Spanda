@@ -120,9 +120,8 @@ export namespace Users {
         });
     }
 
-    async findByIds(usernames: Array<string>) {
+    async findByIds(usernames: Array<string>): Promise<Array<User>> {
       throw new Error("Method not implemented.");
-      return [];
     }
 
     async save(user: User) {
