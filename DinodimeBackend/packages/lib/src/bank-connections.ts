@@ -127,9 +127,8 @@ export namespace BankConnections {
         });
     }
 
-    async findByIds(ids: Array<number>) {
+    async findByIds(ids: Array<number>): Promise<Array<BankConnection>> {
       throw new Error("Method not implemented.");
-      return [];
     }
 
     async save(bankConnection: BankConnection): Promise<BankConnection> {
