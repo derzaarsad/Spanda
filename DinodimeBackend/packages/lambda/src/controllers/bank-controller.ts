@@ -178,7 +178,7 @@ export const getRecurrentTransactions = async (
     }
 
     for(let id in bankConnections) {
-      accountIds.concat(bankConnections[id].bankAccountIds);
+      accountIds = accountIds.concat(bankConnections[id].bankAccountIds);
     }
 
   } catch (err) {
