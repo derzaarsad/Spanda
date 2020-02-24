@@ -189,7 +189,7 @@ export const getRecurrentTransactions = async (
   let body: any;
   try {
     let recurrentTransactions_ = await recurrentTransactions.findByAccountIds(accountIds);
-    body = recurrentTransactions_.map(el => {
+    let recurrenttransactions = recurrentTransactions_.map(el => {
       return {
         isExpense: el.isExpense,
         isConfirmed: el.isConfirmed,
@@ -197,6 +197,9 @@ export const getRecurrentTransactions = async (
         counterPartName: el.counterPartName
       }
     });
+    body = {
+      recurrenttransactions
+    }
   } catch (err) {
     logger.log("error", "error authenticating user", err);
     return CreateSimpleResponse(401, "unauthorized");
