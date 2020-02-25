@@ -117,11 +117,11 @@ describe("get recurrent transactions", function() {
     );
 
     expect(result).to.be.an("object");
-    expect(result.statusCode).to.equal(401);
+    expect(result.statusCode).to.equal(204);
 
     const body = JSON.parse(result.body);
     expect(body.message).to.exist;
-    expect(body.message).to.equal("unauthorized");
+    expect(body.message).to.equal("getting bank connections failed");
   });
 
   it("no user must fail", async function() {
