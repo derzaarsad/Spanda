@@ -274,6 +274,11 @@ describe("get recurrent transactions", function() {
     const body = JSON.parse(result.body);
     expect(body.recurrenttransactions).to.exist;
     expect(body.recurrenttransactions.length).to.equal(6);
+    expect(body.recurrenttransactions[0].id).to.exist;
+    expect(body.recurrenttransactions[0].accountId).to.exist;
+    expect(body.recurrenttransactions[0].isExpense).to.exist;
+    expect(body.recurrenttransactions[0].isConfirmed).to.exist;
+    expect(body.recurrenttransactions[0].frequency).to.exist;
     expect(body.recurrenttransactions[0].counterPartName).to.equal("Dinodime1 GmbH");
     expect(body.recurrenttransactions[1].counterPartName).to.equal("Dinodime2 GmbH");
     expect(body.recurrenttransactions[2].counterPartName).to.equal("Dinodime3 GmbH");

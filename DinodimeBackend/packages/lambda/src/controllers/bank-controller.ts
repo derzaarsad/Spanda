@@ -196,6 +196,8 @@ export const getRecurrentTransactions = async (
 
   let recurrenttransactions = recurrentTransactions_.map(el => {
     return {
+      id: el.id,
+      accountId: el.accountId,
       isExpense: el.isExpense,
       isConfirmed: el.isConfirmed,
       frequency: el.frequency,
