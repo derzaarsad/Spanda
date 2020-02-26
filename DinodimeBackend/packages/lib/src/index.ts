@@ -1,6 +1,8 @@
 import VoidTransport from "./void-transport";
 export { VoidTransport };
 
+export { Status, Success, Failure } from "./status";
+
 export { Crypto, Encryptions, AesCrypto, CallbackCrypto } from "./crypto";
 
 export { SNSNotification } from "./sns-notification";

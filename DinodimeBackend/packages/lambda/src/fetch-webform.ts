@@ -1,4 +1,5 @@
 import * as winston from "winston";
+import { Status, Success, Failure } from "dinodime-lib";
 import { SQSEvent, SQSRecord, Context } from "aws-lambda";
 import {
   Encryptions,
@@ -10,21 +11,6 @@ import {
   BankConnection,
   SQSClient
 } from "dinodime-lib";
-
-type RecordHandling = {
-  record: SQSRecord;
-};
-
-type RecordHandlingSuccess = RecordHandling & {
-  kind: "success";
-};
-
-type RecordHandlingFailure = RecordHandling & {
-  kind: "failure";
-  error: any;
-};
-
-type RecordHandlingStatus = RecordHandlingFailure | RecordHandlingSuccess;
 
 export interface HandlerConfiguration {
   sqs: SQSClient;
@@ -73,7 +59,7 @@ export const fetchWebform = async (
 const handleRecord = async (
   record: SQSRecord,
   configuration: HandlerConfiguration
-): Promise<RecordHandlingStatus> => {
+): Promise<Status> => {
   const users = configuration.users;
   const bankInterface = configuration.bankInterface;
   const transactions = configuration.transactions;
@@ -84,7 +70,7 @@ const handleRecord = async (
 
   const user = await users.findByWebFormId(completion.webFormId);
   if (user === null || user.activeWebFormId === null || user.activeWebFormAuth === null) {
-    return { record: record, kind: "failure", error: new Error("no user found") };
+    return { kind: "failure", error: new Error("no user found") };
   }
 
   const authorization = encryptions.DecryptText({
@@ -96,16 +82,16 @@ const handleRecord = async (
   try {
     webForm = await bankInterface.fetchWebForm(authorization, completion.webFormId);
   } catch (err) {
-    return { record: record, kind: "failure", error: new Error("could not fetch web form") };
+    return { kind: "failure", error: new Error("could not fetch web form") };
   }
 
   if (!webForm.serviceResponseBody) {
-    return { record: record, kind: "failure", error: new Error("empty body") };
+    return { kind: "failure", error: new Error("empty body") };
   }
 
   const body = JSON.parse(webForm.serviceResponseBody);
   if (!body.accountIds || body.accountIds.length == 0) {
-    return { record: record, kind: "failure", error: new Error("no accound IDs available") };
+    return { kind: "failure", error: new Error("no accound IDs available") };
   }
 
   const transactionsDataBankSpecific = await bankInterface.getAllTransactions(
@@ -129,11 +115,11 @@ const handleRecord = async (
     transactions.saveArray(transactionsData)
   ])
     .then(() => {
-      const status: RecordHandlingSuccess = { record: record, kind: "success" };
+      const status: Success = { kind: "success" };
       return status;
     })
     .catch(err => {
-      const status: RecordHandlingFailure = { record: record, kind: "failure", error: err };
+      const status: Failure = { kind: "failure", error: err };
       return status;
     });
 };
