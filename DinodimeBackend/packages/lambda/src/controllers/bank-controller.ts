@@ -138,6 +138,76 @@ export const getWebformId = async (
     });
 };
 
+// @Get('/recurrentTransactions')
+// @Header('Authorization') authorization: string
+export const getRecurrentTransactions = async (
+  event: APIGatewayProxyEvent,
+  context: Context,
+  logger: winston.Logger,
+  bankInterface: FinAPI,
+  users: Users.UsersRepository,
+  connections: BankConnections.BankConnectionsRepository,
+  recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository
+): Promise<APIGatewayProxyResult> => {
+  const authorization = HasAuthorization(event.headers);
+
+  if (!authorization) {
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  let user: User | null;
+
+  try {
+    let userInfo = await getUserInfo(logger, bankInterface, authorization);
+    user = await users.findById(userInfo.id);
+    if (!user) {
+      throw new Error("user is not found in the database");
+    }
+  } catch (err) {
+    logger.log("error", "error authenticating user", err);
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  let accountIds: Array<number> = [];
+  let bankConnections: Array<BankConnection> = [];
+
+  try {
+    bankConnections = await connections.findByIds(user.bankConnectionIds);
+
+    if(bankConnections.length == 0) {
+      throw new Error("this user does not have any bank connection");
+    }
+  } catch (err) {
+    logger.log("error", "error getting bank connections", err);
+    return CreateSimpleResponse(204, "getting bank connections failed");
+  }
+
+  for(let id in bankConnections) {
+    accountIds = accountIds.concat(bankConnections[id].bankAccountIds);
+  }
+
+  let recurrentTransactions_: Array<RecurrentTransaction> = [];
+  try {
+    recurrentTransactions_ = await recurrentTransactions.findByAccountIds(accountIds);
+  } catch (err) {
+    logger.log("error", "error getting recurrent transactions", err);
+    return CreateSimpleResponse(204, "getting recurrent transactions failed");
+  }
+
+  let recurrenttransactions = recurrentTransactions_.map(el => {
+    return {
+      id: el.id,
+      accountId: el.accountId,
+      isExpense: el.isExpense,
+      isConfirmed: el.isConfirmed,
+      frequency: el.frequency,
+      counterPartName: el.counterPartName
+    }
+  });
+
+  return CreateResponse(200, { recurrenttransactions });
+};
+
 export const deduceRecurrentTransactions = async (
   recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository,
   transactions: Transactions.TransactionsRepository,

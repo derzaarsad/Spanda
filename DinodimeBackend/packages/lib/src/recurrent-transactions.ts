@@ -95,8 +95,8 @@ export namespace RecurrentTransactions {
 
       let candidate: Array<RecurrentTransaction> = [];
 
-      for (let id in ids) {
-        const recurrentTransaction = this.repository[id];
+      for (let i in ids) {
+        const recurrentTransaction = this.repository[ids[i]];
         if(!recurrentTransaction) {
           continue;
         }

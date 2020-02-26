@@ -85,12 +85,13 @@ export namespace Transactions {
 
       let candidate: Array<Transaction> = [];
 
-      for (let id in ids) {
-        if(!this.repository[id]) {
+      for (let i in ids) {
+        const transaction = this.repository[ids[i]];
+        if(!transaction) {
           continue;
         }
 
-        candidate.push(this.repository[id]);
+        candidate.push(transaction);
       }
 
       return candidate;
