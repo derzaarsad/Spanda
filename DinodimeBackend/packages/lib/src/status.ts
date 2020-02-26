@@ -4,7 +4,7 @@ export type Success = {
 
 export type Failure = {
   kind: "failure";
-  error: any;
+  error: Error;
 };
 
 export type Status = Success | Failure;

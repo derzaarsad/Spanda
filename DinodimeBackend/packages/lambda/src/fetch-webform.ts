@@ -22,7 +22,7 @@ export interface HandlerConfiguration {
   encryptions: Encryptions;
 }
 
-export const fetchWebform = async (
+export const fetchWebForm = async (
   event: SQSEvent,
   context: Context,
   configuration: HandlerConfiguration
@@ -31,7 +31,7 @@ export const fetchWebform = async (
   const sqs = configuration.sqs;
 
   event.Records.forEach(record => {
-    handleRecord(record, configuration)
+    handleRecord(record, context, configuration)
       .then(status => {
         if (status.kind === "success") {
           log.info("Successfully extracted transactions data");
@@ -56,8 +56,9 @@ export const fetchWebform = async (
   });
 };
 
-const handleRecord = async (
+export const handleRecord = async (
   record: SQSRecord,
+  context: Context,
   configuration: HandlerConfiguration
 ): Promise<Status> => {
   const users = configuration.users;
@@ -66,7 +67,12 @@ const handleRecord = async (
   const connections = configuration.connections;
   const encryptions = configuration.encryptions;
 
-  const completion = JSON.parse(record.body) as WebFormCompletion;
+  let completion: WebFormCompletion;
+  try {
+    completion = JSON.parse(record.body) as WebFormCompletion;
+  } catch (err) {
+    return { kind: "failure", error: err };
+  }
 
   const user = await users.findByWebFormId(completion.webFormId);
   if (user === null || user.activeWebFormId === null || user.activeWebFormAuth === null) {

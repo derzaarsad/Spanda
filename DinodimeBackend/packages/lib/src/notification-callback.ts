@@ -56,7 +56,7 @@ export class NewTransactionsSNSPublisher
     if (!validated) {
       return {
         kind: "failure",
-        error: "received an invalid notification " + JSON.stringify(notification)
+        error: new Error("received an invalid notification " + JSON.stringify(notification))
       };
     }
 
@@ -65,7 +65,7 @@ export class NewTransactionsSNSPublisher
     if (!ruleHandle) {
       return Promise.resolve({
         kind: "failure",
-        error: "no rule handle found for the callback handle"
+        error: new Error("no rule handle found for the callback handle")
       });
     }
 
