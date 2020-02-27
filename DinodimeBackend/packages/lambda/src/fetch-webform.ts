@@ -33,25 +33,10 @@ export const fetchWebForm = async (
   event.Records.forEach(record => {
     handleRecord(record, context, configuration)
       .then(status => {
-        if (status.kind === "success") {
-          log.info("Successfully extracted transactions data");
-        } else {
-          log.error("Could not extract transactions data", status.error);
-        }
+        handleStatus(record, status, configuration);
       })
       .catch(err => {
         log.error("Could not extract transactions data", err);
-      })
-      .finally(() => {
-        const receiptHandle = record.receiptHandle;
-        sqs
-          .deleteMessage(receiptHandle)
-          .then(() => {
-            log.debug(`Deleted message with receipt handle ${receiptHandle} successfully`);
-          })
-          .catch(err => {
-            log.error(`Error deleting SQS record with receipt handle ${receiptHandle}`, err);
-          });
       });
   });
 };
@@ -127,5 +112,27 @@ export const handleRecord = async (
     .catch(err => {
       const status: Failure = { kind: "failure", error: err };
       return status;
+    });
+};
+
+const handleStatus = async (
+  record: SQSRecord,
+  status: Status,
+  configuration: HandlerConfiguration
+) => {
+  const log = configuration.log;
+  if (status.kind === "failure") {
+    log.error("Could not extract transactions data", status.error);
+    return;
+  }
+  const sqs = configuration.sqs;
+  const receiptHandle = record.receiptHandle;
+  sqs
+    .deleteMessage(receiptHandle)
+    .then(() => {
+      log.debug(`Deleted message with receipt handle ${receiptHandle} successfully`);
+    })
+    .catch(err => {
+      log.error(`Error deleting SQS record with receipt handle ${receiptHandle}`, err);
     });
 };
