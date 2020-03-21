@@ -208,6 +208,68 @@ export const getRecurrentTransactions = async (
   return CreateResponse(200, { recurrenttransactions });
 };
 
+// @Post('/recurrentTransactions/update')
+// @Header('Authorization') authorization: string,
+// @BodyProp() recurrenttransactions: [])
+export const updateRecurrentTransactions = async (
+  event: APIGatewayProxyEvent,
+  context: Context,
+  logger: winston.Logger,
+  bankInterface: FinAPI,
+  users: Users.UsersRepository,
+  connections: BankConnections.BankConnectionsRepository,
+  recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository
+): Promise<APIGatewayProxyResult> => {
+  const authorization = HasAuthorization(event.headers);
+
+  if (!authorization) {
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  let user: User | null;
+
+  try {
+    let userInfo = await getUserInfo(logger, bankInterface, authorization);
+    user = await users.findById(userInfo.id);
+    if (!user) {
+      throw new Error("user is not found in the database");
+    }
+  } catch (err) {
+    logger.log("error", "error authenticating user", err);
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  const body = event.body;
+  if (body === null) {
+    logger.log("error", "empty body in request");
+    return CreateSimpleResponse(400, "empty body");
+  }
+
+  const params = JSON.parse(body);
+  if (!params.recurrenttransactions) {
+    logger.log("error", "invalid request");
+    return CreateSimpleResponse(400, "invalid request");
+  }
+
+  const recurrentArray: Array<any> = params.recurrenttransactions;
+
+  const recurrenttransactions = recurrentArray.map(el => {
+    let ret = new RecurrentTransaction(el.accountId, [], el.isExpense, el.counterPartName, el.id);
+    ret.isConfirmed = el.isConfirmed;
+    ret.frequency = el.frequency;
+    return ret;
+  });
+
+  try {
+    await recurrentTransactions.updateArray(recurrenttransactions);
+  } catch (err) {
+    logger.log("error", "error updating recurrent transactions", err);
+    return CreateSimpleResponse(204, "updating recurrent transactions failed");
+  }
+
+  return CreateResponse(200, "success");
+};
+
 export const deduceRecurrentTransactions = async (
   recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository,
   transactions: Transactions.TransactionsRepository,
