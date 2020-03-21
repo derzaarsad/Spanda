@@ -213,8 +213,8 @@ describe("postgres recurrent transactions repository", function() {
     expect(modifiedResults[1].id).to.eql(recurrentTransactionsData[1].id);
 
     // Only isConfirmed can be updated
-    expect(modifiedResults[0].counterPartName).to.eql("Dinodime GmbH");
-    expect(modifiedResults[0].isConfirmed).to.eql(true);
+    expect(modifiedResults[1].counterPartName).to.eql("Dinodime GmbH");
+    expect(modifiedResults[1].isConfirmed).to.eql(true);
   });
 
   it('group by isExpense column', async function() {
