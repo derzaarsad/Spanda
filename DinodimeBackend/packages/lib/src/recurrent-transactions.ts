@@ -326,7 +326,7 @@ export namespace RecurrentTransactions {
         })
         .join(", ");
 
-      return this.format("UPDATE %I SET isconfirmed = nv.isconfirmed FROM ( VALUES %s) as nv (%s) WHERE recurrenttransactions.id = nv.id::int8 AND recurrenttransactions.accountid = nv.accountid", tableName, values, attributes);
+      return this.format("UPDATE %I SET isconfirmed = nv.isconfirmed FROM ( VALUES %s) as nv (%s) WHERE recurrenttransactions.id = nv.id::int8 AND recurrenttransactions.accountid = nv.accountid::int8", tableName, values, attributes);
     }
   }
 }
