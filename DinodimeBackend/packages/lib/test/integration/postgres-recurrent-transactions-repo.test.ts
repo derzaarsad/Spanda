@@ -209,8 +209,8 @@ describe("postgres recurrent transactions repository", function() {
     await recurrentTransactions.updateArray(recurrentTransactionsData2);
     const modifiedResults = await recurrentTransactions.findByAccountIds([2, 5]);
     expect(modifiedResults.length).to.eql(2);
-    expect(modifiedResults[0].id).to.eql(1113);
-    expect(modifiedResults[1].id).to.eql(1112);
+    expect(modifiedResults[0].id).to.eql(1112);
+    expect(modifiedResults[1].id).to.eql(1113);
 
     // Only isConfirmed can be updated
     expect(modifiedResults[1].counterPartName).to.eql("Dinodime GmbH");
