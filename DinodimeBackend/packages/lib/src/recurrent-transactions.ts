@@ -76,7 +76,9 @@ export namespace RecurrentTransactions {
     }
 
     async updateArray(recurrentTransactions: Array<RecurrentTransaction>) {
-      recurrentTransactions.forEach(recurrentTransaction => this.save(recurrentTransaction));
+      recurrentTransactions.forEach(recurrentTransaction => {
+        this.repository[recurrentTransaction.id].isConfirmed = recurrentTransaction.isConfirmed;
+      });
       return recurrentTransactions;
     }
 

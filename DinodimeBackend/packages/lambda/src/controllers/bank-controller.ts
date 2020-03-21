@@ -217,7 +217,6 @@ export const updateRecurrentTransactions = async (
   logger: winston.Logger,
   bankInterface: FinAPI,
   users: Users.UsersRepository,
-  connections: BankConnections.BankConnectionsRepository,
   recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository
 ): Promise<APIGatewayProxyResult> => {
   const authorization = HasAuthorization(event.headers);
@@ -239,13 +238,12 @@ export const updateRecurrentTransactions = async (
     return CreateSimpleResponse(401, "unauthorized");
   }
 
-  const body = event.body;
-  if (body === null) {
+  if (!event.body) {
     logger.log("error", "empty body in request");
     return CreateSimpleResponse(400, "empty body");
   }
 
-  const params = JSON.parse(body);
+  const params = JSON.parse(event.body);
   if (!params.recurrenttransactions) {
     logger.log("error", "invalid request");
     return CreateSimpleResponse(400, "invalid request");
@@ -267,7 +265,7 @@ export const updateRecurrentTransactions = async (
     return CreateSimpleResponse(204, "updating recurrent transactions failed");
   }
 
-  return CreateResponse(200, "success");
+  return CreateResponse(200, { message: "success" });
 };
 
 export const deduceRecurrentTransactions = async (
