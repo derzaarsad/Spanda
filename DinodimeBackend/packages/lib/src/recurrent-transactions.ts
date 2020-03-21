@@ -326,7 +326,7 @@ export namespace RecurrentTransactions {
         })
         .join(", ");
 
-      return this.format("UPDATE INTO %I (%s) VALUES %s", tableName, attributes, values);
+      return this.format("UPDATE %I (%s) VALUES %s", tableName, attributes, values);
     }
   }
 }
