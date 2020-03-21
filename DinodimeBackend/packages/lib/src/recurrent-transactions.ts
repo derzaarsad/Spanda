@@ -42,6 +42,7 @@ export namespace RecurrentTransactions {
     saveArray(recurrentTransactions: Array<RecurrentTransaction>): Promise<Array<RecurrentTransaction>>;
     saveArrayWithoutId(recurrentTransactions: Array<RecurrentTransaction>): Promise<Array<RecurrentTransaction>>;
     saveWithoutId(recurrentTransaction: RecurrentTransaction): Promise<RecurrentTransaction>;
+    updateArray(recurrentTransactions: Array<RecurrentTransaction>): Promise<Array<RecurrentTransaction>>;
   }
 
   export class InMemoryRepository implements RecurrentTransactionsRepository {
@@ -71,8 +72,13 @@ export namespace RecurrentTransactions {
 
     async saveArrayWithoutId(recurrentTransactions: Array<RecurrentTransaction>) {
       recurrentTransactions.forEach(recurrentTransaction => this.saveWithoutId(recurrentTransaction));
-    return recurrentTransactions;
-  }
+      return recurrentTransactions;
+    }
+
+    async updateArray(recurrentTransactions: Array<RecurrentTransaction>) {
+      recurrentTransactions.forEach(recurrentTransaction => this.save(recurrentTransaction));
+      return recurrentTransactions;
+    }
 
     async findByAccountIds(accountIds: Array<number>) {
       return Object.keys(this.repository)
@@ -209,6 +215,14 @@ export namespace RecurrentTransactions {
       return this.doQuery(params).then(res => recurrentTransactions);
     }
 
+    async updateArray(recurrentTransactions: RecurrentTransaction[]): Promise<RecurrentTransaction[]> {
+      const params = {
+        text: this.updateArrayQuery(recurrentTransactions)
+      };
+
+      return this.doQuery(params).then(res => recurrentTransactions);
+    }
+
     findByIdQuery(id: number) {
       return this.format(
         "SELECT * FROM %I WHERE id = %L LIMIT 1",
@@ -297,6 +311,22 @@ export namespace RecurrentTransactions {
         .join(", ");
 
       return this.format("INSERT INTO %I (%s) VALUES %s", tableName, attributes, values);
+    }
+
+    updateArrayQuery(recurrentTransactions: RecurrentTransaction[]) {
+      const tableName = this.schema.tableName;
+      const attributes = this.schema.attributes;
+      const values = recurrentTransactions
+        .map(recurrentTransaction => {
+          return (
+            "(" +
+            this.schema.asRow(recurrentTransaction).map(item => this.format("%L", item != null ? item.toString() : item)) +
+            ")"
+          );
+        })
+        .join(", ");
+
+      return this.format("UPDATE INTO %I (%s) VALUES %s", tableName, attributes, values);
     }
   }
 }

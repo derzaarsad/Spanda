@@ -27,7 +27,7 @@ describe("postgres recurrent transactions repository", function() {
     expect(result).to.be.null;
   });
 
-  it("saves and retrieves a transaction", async function() {
+  it("saves and retrieves a recurrent transaction", async function() {
     const recurrentTransaction = new RecurrentTransaction(995070, [1,2,3], true, null, 209864836);
     await recurrentTransactions.save(recurrentTransaction);
 
@@ -102,7 +102,7 @@ describe("postgres recurrent transactions repository", function() {
     );
   });
 
-  it("save multiple transactions with different id", async function() {
+  it("save multiple recurrent transactions with different id", async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
         new RecurrentTransaction(2, [1,2,3], true, null, 1112),
         new RecurrentTransaction(2, [4,5,6], true, null, 2233),
@@ -133,7 +133,7 @@ describe("postgres recurrent transactions repository", function() {
     expect(results2[2].accountId).to.eql(5);
   });
 
-  it("save multiple transactions with different account id", async function() {
+  it("save multiple recurrent transactions with different account id", async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
         new RecurrentTransaction(5, [1,2,3], true, "Dinodime GmbH", 1112),
         new RecurrentTransaction(2, [4,5,6], true, null, 1112)
@@ -163,7 +163,7 @@ describe("postgres recurrent transactions repository", function() {
     expect(resultNotExist).to.be.null;
   });
 
-  it("save multiple transactions with same id and account id", async function() {
+  it("save multiple recurrent transactions with same id and account id", async function() {
     /*
      * If save fails, everything is not saved
      */
@@ -179,6 +179,41 @@ describe("postgres recurrent transactions repository", function() {
     expect(await recurrentTransactions.findById(recurrentTransactionsData[0].id)).to.not.exist;
     expect(await recurrentTransactions.findById(recurrentTransactionsData[1].id)).to.not.exist;
     expect(await recurrentTransactions.findById(recurrentTransactionsData[2].id)).to.not.exist;
+  });
+
+  it("update multiple recurrent transactions", async function() {
+    let recurrentTransactionsData: RecurrentTransaction[] = [
+        new RecurrentTransaction(5, [1,2,3], true, "Dinodime GmbH", 1112),
+        new RecurrentTransaction(2, [4,5,6], true, null, 1112)
+    ];
+
+    await recurrentTransactions.saveArray(recurrentTransactionsData);
+    const result = await recurrentTransactions.findById(recurrentTransactionsData[1].id);
+    expect(result).to.be.not.null;
+    expect(result!.id).to.eql(recurrentTransactionsData[0].id);
+    expect(result!.accountId).to.eql(recurrentTransactionsData[0].accountId);
+    expect(result!.transactionIds).to.eql(recurrentTransactionsData[0].transactionIds);
+    expect(result!.isExpense).to.eql(recurrentTransactionsData[0].isExpense);
+    expect(result!.isConfirmed).to.eql(recurrentTransactionsData[0].isConfirmed);
+    expect(TransactionFrequency[result!.frequency]).to.eql(recurrentTransactionsData[0].frequency); // I don't feel right about this because I expect enum to equal enum
+    expect(result!.counterPartName).to.eql("Dinodime GmbH");
+
+    // If the array contains at least one not existing object,
+    // update is rejected and other updates are not saved
+    let modifiedRecurrentTransaction = recurrentTransactionsData[0];
+    modifiedRecurrentTransaction.counterPartName = "Modified Dinodime GmbH";
+    let recurrentTransactionsData2: RecurrentTransaction[] = [
+      modifiedRecurrentTransaction,
+      new RecurrentTransaction(2, [4,5,6], true, null, 1111)
+    ];
+    await expect(recurrentTransactions.saveArray(recurrentTransactionsData2)).to.eventually.be.rejectedWith(
+      'duplicate key value violates unique constraint "recurrenttransactions_pkey"'
+    );
+    const resultNotModified = await recurrentTransactions.findByAccountIds([2, 5]);
+    expect(resultNotModified.length).to.eql(2);
+    expect(resultNotModified[0].id).to.eql(recurrentTransactionsData[0].id);
+    expect(resultNotModified[1].id).to.eql(recurrentTransactionsData[1].id);
+    expect(resultNotModified[0].counterPartName).to.eql("Dinodime GmbH");
   });
 
   it('group by isExpense column', async function() {
