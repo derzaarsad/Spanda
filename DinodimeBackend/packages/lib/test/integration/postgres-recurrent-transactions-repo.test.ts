@@ -183,7 +183,7 @@ describe("postgres recurrent transactions repository", function() {
 
   it("update multiple recurrent transactions", async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(5, [1,2,3], true, "Dinodime GmbH", 1112),
+        new RecurrentTransaction(5, [1,2,3], true, "Dinodime GmbH", 1113),
         new RecurrentTransaction(2, [4,5,6], true, null, 1112)
     ];
 
@@ -209,8 +209,8 @@ describe("postgres recurrent transactions repository", function() {
     await recurrentTransactions.updateArray(recurrentTransactionsData2);
     const modifiedResults = await recurrentTransactions.findByAccountIds([2, 5]);
     expect(modifiedResults.length).to.eql(2);
-    expect(modifiedResults[0].id).to.eql(recurrentTransactionsData[0].id);
-    expect(modifiedResults[1].id).to.eql(recurrentTransactionsData[1].id);
+    expect(modifiedResults[0].id).to.eql(1113);
+    expect(modifiedResults[1].id).to.eql(1112);
 
     // Only isConfirmed can be updated
     expect(modifiedResults[1].counterPartName).to.eql("Dinodime GmbH");
