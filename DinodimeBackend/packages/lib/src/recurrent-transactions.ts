@@ -320,13 +320,13 @@ export namespace RecurrentTransactions {
         .map(recurrentTransaction => {
           return (
             "(" +
-            this.schema.asRow(recurrentTransaction).map(item => this.format("%s", item != null ? item.toString() : item)) +
+            this.schema.asRow(recurrentTransaction).map(item => this.format("%L", item != null ? item.toString() : item)) +
             ")"
           );
         })
         .join(", ");
 
-      return this.format("UPDATE %I SET isconfirmed = nv.isconfirmed FROM ( VALUES %s) as nv (%s) WHERE recurrenttransactions.id = nv.id AND recurrenttransactions.accountid = nv.accountid", tableName, values, attributes);
+      return this.format("UPDATE %I SET isconfirmed = nv.isconfirmed FROM ( VALUES %s) as nv (%s) WHERE recurrenttransactions.id = nv.id::int8 AND recurrenttransactions.accountid = nv.accountid", tableName, values, attributes);
     }
   }
 }
