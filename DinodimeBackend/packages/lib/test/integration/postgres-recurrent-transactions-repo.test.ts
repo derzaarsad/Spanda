@@ -206,7 +206,7 @@ describe("postgres recurrent transactions repository", function() {
       modifiedRecurrentTransaction,
       new RecurrentTransaction(2, [4,5,6], true, null, 1111)
     ];
-    await expect(recurrentTransactions.saveArray(recurrentTransactionsData2)).to.eventually.be.rejectedWith(
+    await expect(recurrentTransactions.updateArray(recurrentTransactionsData2)).to.eventually.be.rejectedWith(
       'duplicate key value violates unique constraint "recurrenttransactions_pkey"'
     );
     const resultNotModified = await recurrentTransactions.findByAccountIds([2, 5]);
