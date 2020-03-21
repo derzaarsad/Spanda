@@ -148,7 +148,19 @@ describe("postgres recurrent transactions repository", function() {
     expect(result!.isExpense).to.eql(recurrentTransactionsData[0].isExpense);
     expect(result!.isConfirmed).to.eql(recurrentTransactionsData[0].isConfirmed);
     expect(TransactionFrequency[result!.frequency]).to.eql(recurrentTransactionsData[0].frequency); // I don't feel right about this because I expect enum to equal enum
-    expect(result!.counterPartName).to.eql("Dinodime GmbH")
+    expect(result!.counterPartName).to.eql("Dinodime GmbH");
+
+    // If the array contains at least one object with the same ids,
+    // save is rejected and the other objects are not saved
+    let recurrentTransactionsData2: RecurrentTransaction[] = [
+      new RecurrentTransaction(5, [1,2,3], true, "Dinodime GmbH", 1112),
+      new RecurrentTransaction(1, [4,5,6], true, null, 1111)
+    ];
+    await expect(recurrentTransactions.saveArray(recurrentTransactionsData2)).to.eventually.be.rejectedWith(
+      'duplicate key value violates unique constraint "recurrenttransactions_pkey"'
+    );
+    const resultNotExist = await recurrentTransactions.findById(1111);
+    expect(resultNotExist).to.be.null;
   });
 
   it("save multiple transactions with same id and account id", async function() {
