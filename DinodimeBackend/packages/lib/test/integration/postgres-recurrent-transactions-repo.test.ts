@@ -188,7 +188,7 @@ describe("postgres recurrent transactions repository", function() {
     ];
 
     await recurrentTransactions.saveArray(recurrentTransactionsData);
-    const result = await recurrentTransactions.findById(recurrentTransactionsData[1].id);
+    const result = await recurrentTransactions.findById(recurrentTransactionsData[0].id);
     expect(result).to.be.not.null;
     expect(result!.id).to.eql(recurrentTransactionsData[0].id);
     expect(result!.accountId).to.eql(recurrentTransactionsData[0].accountId);
