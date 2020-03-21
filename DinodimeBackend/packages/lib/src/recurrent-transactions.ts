@@ -320,7 +320,7 @@ export namespace RecurrentTransactions {
         .map(recurrentTransaction => {
           return (
             "(" +
-            this.schema.asRow(recurrentTransaction).map(item => this.format("%L", item != null ? item.toString() : item)) +
+            this.schema.asRow(recurrentTransaction).map(item => this.format("%s", item != null ? item.toString() : item)) +
             ")"
           );
         })
