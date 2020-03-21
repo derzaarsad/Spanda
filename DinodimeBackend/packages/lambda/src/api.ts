@@ -139,6 +139,22 @@ export const getRecurrentTransactions = async (event: APIGatewayProxyEvent, cont
   }
 };
 
+export const updateRecurrentTransactions = async (event: APIGatewayProxyEvent, context: Context) => {
+  try {
+    return bankController.updateRecurrentTransactions(
+      event,
+      context,
+      logger,
+      services.bankInterface,
+      services.users,
+      services.recurrentTransactions
+    );
+  } catch (err) {
+    logger.log("error", "error get recurrent transactions", err);
+    return CreateInternalErrorResponse(err);
+  }
+};
+
 export const fetchWebFormInfo = async (event: APIGatewayProxyEvent, context: Context) => {
   try {
     return bankController.fetchWebFormInfo(
