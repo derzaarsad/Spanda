@@ -198,22 +198,23 @@ describe("postgres recurrent transactions repository", function() {
     expect(TransactionFrequency[result!.frequency]).to.eql(recurrentTransactionsData[0].frequency); // I don't feel right about this because I expect enum to equal enum
     expect(result!.counterPartName).to.eql("Dinodime GmbH");
 
-    // If the array contains at least one not existing object,
-    // update is rejected and other updates are not saved
+    // Update only modifies existing objects
     let modifiedRecurrentTransaction = recurrentTransactionsData[0];
     modifiedRecurrentTransaction.counterPartName = "Modified Dinodime GmbH";
+    modifiedRecurrentTransaction.isConfirmed = true;
     let recurrentTransactionsData2: RecurrentTransaction[] = [
       modifiedRecurrentTransaction,
       new RecurrentTransaction(2, [4,5,6], true, null, 1111)
     ];
-    await expect(recurrentTransactions.updateArray(recurrentTransactionsData2)).to.eventually.be.rejectedWith(
-      'duplicate key value violates unique constraint "recurrenttransactions_pkey"'
-    );
-    const resultNotModified = await recurrentTransactions.findByAccountIds([2, 5]);
-    expect(resultNotModified.length).to.eql(2);
-    expect(resultNotModified[0].id).to.eql(recurrentTransactionsData[0].id);
-    expect(resultNotModified[1].id).to.eql(recurrentTransactionsData[1].id);
-    expect(resultNotModified[0].counterPartName).to.eql("Dinodime GmbH");
+    await recurrentTransactions.updateArray(recurrentTransactionsData2);
+    const modifiedResults = await recurrentTransactions.findByAccountIds([2, 5]);
+    expect(modifiedResults.length).to.eql(2);
+    expect(modifiedResults[0].id).to.eql(recurrentTransactionsData[0].id);
+    expect(modifiedResults[1].id).to.eql(recurrentTransactionsData[1].id);
+
+    // Only isConfirmed can be updated
+    expect(modifiedResults[0].counterPartName).to.eql("Dinodime GmbH");
+    expect(modifiedResults[0].isConfirmed).to.eql(true);
   });
 
   it('group by isExpense column', async function() {
