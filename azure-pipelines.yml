@@ -168,6 +168,13 @@ jobs:
         inputs:
           testRunner: JUnit
           testResultsFiles: "$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/*.xml"
+      - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
+        displayName: ReportGenerator
+        inputs:
+          reports: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/**/*coverage.xml'
+          targetdir: '$(System.DefaultWorkingDirectory)/DinodimeBackend'
+          reporttypes: 'HtmlInline_AzurePipelines;Cobertura'
+          assemblyfilters: '-xunit*'
       - task: PublishCodeCoverageResults@1
         inputs:
           codeCoverageTool: Cobertura
