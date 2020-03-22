@@ -168,5 +168,10 @@ jobs:
         inputs:
           testRunner: JUnit
           testResultsFiles: "$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/*.xml"
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/**/*coverage.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages'
       - publish: $(System.DefaultWorkingDirectory)/DinodimeBackend
         artifact: SamApp
