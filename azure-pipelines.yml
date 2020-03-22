@@ -172,13 +172,13 @@ jobs:
         displayName: ReportGenerator
         inputs:
           reports: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/**/*coverage.xml'
-          targetdir: '$(System.DefaultWorkingDirectory)/DinodimeBackend'
-          reporttypes: 'HtmlInline_AzurePipelines;Cobertura'
+          targetdir: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverage_summary'
+          reporttypes: 'Cobertura'
           assemblyfilters: '-xunit*'
       - task: PublishCodeCoverageResults@1
         inputs:
           codeCoverageTool: Cobertura
-          summaryFileLocation: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/**/*coverage.xml'
-          reportDirectory: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages'
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverage_summary/Cobertura.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverage_summary'
       - publish: $(System.DefaultWorkingDirectory)/DinodimeBackend
         artifact: SamApp
