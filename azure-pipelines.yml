@@ -168,5 +168,16 @@ jobs:
         inputs:
           testRunner: JUnit
           testResultsFiles: "$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/*.xml"
+      - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
+        displayName: ReportGenerator
+        inputs:
+          reports: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lib/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lambda/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/infrastructure/cobertura-coverage.xml'
+          targetdir: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverage_summary'
+          reporttypes: 'Cobertura'
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverage_summary/Cobertura.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverage_summary'
       - publish: $(System.DefaultWorkingDirectory)/DinodimeBackend
         artifact: SamApp
