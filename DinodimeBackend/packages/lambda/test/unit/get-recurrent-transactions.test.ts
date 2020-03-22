@@ -276,5 +276,12 @@ describe("get recurrent transactions", function() {
     expect(body.recurrenttransactions[3].counterPartName).to.equal("Dinodime4 GmbH");
     expect(body.recurrenttransactions[4].counterPartName).to.equal("Dinodime5 GmbH");
     expect(body.recurrenttransactions[5].counterPartName).to.equal("Dinodime6 GmbH");
+
+    expect(body.recurrenttransactions[0].id).to.equal(1);
+    expect(body.recurrenttransactions[1].id).to.equal(2);
+    expect(body.recurrenttransactions[2].id).to.equal(3);
+    expect(body.recurrenttransactions[3].id).to.equal(4);
+    expect(body.recurrenttransactions[4].id).to.equal(5);
+    expect(body.recurrenttransactions[5].id).to.equal(6);
   });
 });

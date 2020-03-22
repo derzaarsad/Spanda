@@ -82,6 +82,19 @@ describe("postgres recurrent transactions repository", function() {
     );
   });
 
+  it("renders the update array query", async function() {
+    let recurrentTransactionsData: RecurrentTransaction[] = [
+        new RecurrentTransaction(2,[1,2,3],true,null,1112),
+        new RecurrentTransaction(2,[4,5,6],false,null,2233)
+    ];
+
+    const result = recurrentTransactions.updateArrayQuery(recurrentTransactionsData);
+    expect(result).to.be.a("string");
+    expect(result).to.equal(
+      "UPDATE recurrenttransactions SET isconfirmed = nv.isconfirmed::boolean FROM ( VALUES ('1112','2','{1,2,3}','true','false','Unknown',NULL), ('2233','2','{4,5,6}','false','false','Unknown',NULL)) as nv (id,accountid,transactionids,isexpense,isconfirmed,frequency,counterpartname) WHERE recurrenttransactions.id = nv.id::int8 AND recurrenttransactions.accountid = nv.accountid::int8"
+    );
+  });
+
   it("renders the find-by-account-id query", async function() {
     const result = recurrentTransactions.findByAccountIdsQuery([2, 5]);
     expect(result).to.be.a("string");
