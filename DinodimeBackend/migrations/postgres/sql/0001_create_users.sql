@@ -4,6 +4,7 @@ CREATE TABLE users
     creationdate timestamp with time zone NOT NULL,
     allowance numeric,
     isallowanceready boolean NOT NULL,
+    isrecurrenttransactionconfirmed boolean NOT NULL,
     email text COLLATE pg_catalog."default",
     phone text COLLATE pg_catalog."default",
     isautoupdateenabled boolean NOT NULL,

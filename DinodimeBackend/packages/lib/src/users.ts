@@ -7,6 +7,7 @@ export class User {
   username: string;
   allowance: number;
   isAllowanceReady: boolean;
+  isRecurrentTransactionConfirmed: boolean;
   email: string;
   phone: string;
   isAutoUpdateEnabled: boolean;
@@ -26,6 +27,7 @@ export class User {
     this.phone = phone;
     this.isAutoUpdateEnabled = isAutoUpdateEnabled;
     this.isAllowanceReady = false;
+    this.isRecurrentTransactionConfirmed = true;
     this.bankConnectionIds = [];
     this.activeWebFormId = null;
     this.activeWebFormAuth = null;
@@ -151,6 +153,7 @@ export namespace Users {
         username: data["username"]!["S"]!,
         allowance: parseFloat(data["allowance"]!["N"]!),
         isAllowanceReady: data["isAllowanceReady"]!["BOOL"]!,
+        isRecurrentTransactionConfirmed: data["isRecurrentTransactionConfirmed"]!["BOOL"]!,
         creationDate: new Date(data["creationDate"]!["N"]!),
         email: data["email"]!["S"]!,
         phone: data["phone"]!["S"]!,
@@ -168,6 +171,7 @@ export namespace Users {
       const values: DynamoDB.ExpressionAttributeValueMap = {
         allowance: { N: user.allowance.toString() },
         isAllowanceReady: { BOOL: user.isAllowanceReady },
+        isRecurrentTransactionConfirmed: { BOOL: user.isRecurrentTransactionConfirmed },
         email: { S: user.email },
         phone: { S: user.phone },
         isAutoUpdateEnabled: { BOOL: user.isAutoUpdateEnabled },
