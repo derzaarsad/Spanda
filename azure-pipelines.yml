@@ -174,13 +174,6 @@ jobs:
           reports: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lib/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lambda/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/infrastructure/cobertura-coverage.xml'
           targetdir: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverage_summary'
           reporttypes: 'Cobertura'
-      - script: |
-          echo "Start Removing Code Coverages"
-          rm -rf $(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lib/cobertura-coverage.xml
-          rm -rf $(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lambda/cobertura-coverage.xml
-          rm -rf $(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/infrastructure/cobertura-coverage.xml
-        displayName: "Start Removing Code Coverages"
-        continueOnError: true
       - task: PublishCodeCoverageResults@1
         inputs:
           codeCoverageTool: Cobertura
