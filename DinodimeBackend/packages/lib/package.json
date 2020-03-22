@@ -7,7 +7,7 @@
   "types": "out/src/index.d.ts",
   "scripts": {
     "test": "nyc --report-dir=../../coverages/unit/lib mocha --require ts-node/register test/unit/**/*.ts",
-    "integtest": "nyc --report-dir=../../coverages/integration/lib mocha --require ts-node/register test/integration/**/*.ts"
+    "integtest": "mocha --require ts-node/register test/integration/**/*.ts"
   },
   "nyc": {
     "reporter": [
