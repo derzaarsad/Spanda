@@ -7,7 +7,7 @@ import winston from "winston";
 import { VoidTransport, Authentication, Resolved, ClientSecretsProvider } from "dinodime-lib";
 import { CreateUnittestInterfaces } from "../test-utility";
 
-describe("get refresh token handler", function() {
+describe("unit: get refresh token handler", function() {
   let logger: winston.Logger;
   let clientSecrets: ClientSecretsProvider;
   let authentication: Authentication;

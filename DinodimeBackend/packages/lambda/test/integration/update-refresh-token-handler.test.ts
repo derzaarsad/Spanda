@@ -9,7 +9,7 @@ import { VoidTransport, Authentication } from "dinodime-lib";
 import { updateRefreshToken } from "../../src/controllers/authentication-controller";
 import { CreateFinApiTestInterfaces } from "../test-utility";
 
-describe("get refresh token handler", function() {
+describe("integration: get refresh token handler", function() {
   let logger: winston.Logger;
   let context: Context;
   let testUsername: string;

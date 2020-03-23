@@ -13,7 +13,7 @@ import { Pool } from "pg";
 import format from "pg-format";
 import { UsersSchema } from "dinodime-lib";
 
-describe("get webform id", function() {
+describe("integration: get webform id", function() {
   this.timeout(10000); // Selenium browser takes so much time.
 
   let logger: winston.Logger;

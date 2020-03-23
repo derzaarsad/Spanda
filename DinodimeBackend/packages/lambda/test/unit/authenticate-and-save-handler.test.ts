@@ -7,7 +7,7 @@ import winston from "winston";
 import { VoidTransport, Authentication } from "dinodime-lib";
 import { CreateUnittestInterfaces } from "../test-utility";
 
-describe("authenticate user handler", function() {
+describe("unit: authenticate user handler", function() {
   let logger: winston.Logger;
   let context: Context;
   let testUsername: string;

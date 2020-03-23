@@ -10,7 +10,7 @@ import { RecurrentTransactions, Users } from "dinodime-lib";
 import { RecurrentTransaction } from "dinodime-lib";
 import { TransactionFrequency } from "dinodime-lib";
 
-describe("update recurrent transactions", function() {
+describe("unit: update recurrent transactions", function() {
   let logger: winston.Logger;
   let recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
   let users: Users.UsersRepository;
