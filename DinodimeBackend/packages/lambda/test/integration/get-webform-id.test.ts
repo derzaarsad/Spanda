@@ -34,7 +34,7 @@ describe("get webform id", function() {
   );
   let encryptions: Encryptions;
 
-  beforeEach(function() {
+  beforeEach(async function() {
     testUsername = process.env.AZURE_TEST_USER_LOGIN!;
     testPassword = process.env.AZURE_TEST_USER_LOGIN!;
     testValidEmail = "chapu@chapu.com";
@@ -46,6 +46,7 @@ describe("get webform id", function() {
     encryptions = new CallbackCrypto();
 
     context = {} as Context;
+    await users.deleteAll();
   });
 
   it("rejects requests with failing authentication", async () => {
