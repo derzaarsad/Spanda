@@ -22,7 +22,7 @@ import { UsersSchema } from "dinodime-lib";
 import { BankConnectionsSchema } from "dinodime-lib";
 import { TransactionsSchema } from "dinodime-lib";
 
-describe("fetch webform info handler", function() {
+describe("integration: fetch webform info handler", function() {
   this.timeout(10000); // Webform needs time.
 
   let logger: winston.Logger;

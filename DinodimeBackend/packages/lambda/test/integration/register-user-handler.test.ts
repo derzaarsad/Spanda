@@ -11,7 +11,7 @@ import { Pool } from "pg";
 import format from "pg-format";
 import { UsersSchema } from "dinodime-lib";
 
-describe("register user handler", function() {
+describe("integration: register user handler", function() {
   let logger: winston.Logger;
   let users: Users.UsersRepository;
   let context: Context;

@@ -7,7 +7,7 @@ import { BankConnection } from "../../src/bank-connections";
 import { BankConnections } from "../../src/bank-connections";
 import { BankConnectionsSchema } from "../../src/schema/bank-connections";
 
-describe("postgres bank connections repository", function() {
+describe("unit: postgres bank connections repository", function() {
   let connections: BankConnections.PostgreSQLRepository;
 
   beforeEach(function() {

@@ -4,7 +4,7 @@ const expect = chai.expect;
 
 import { HasAuthorization, HasMissingProperty } from "../../src/lambda-util";
 
-describe("lambda util", function() {
+describe("unit: lambda util", function() {
   
     beforeEach(function() { });
   

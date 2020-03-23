@@ -11,7 +11,7 @@ import { RecurrentTransaction } from "dinodime-lib";
 import { TransactionFrequency } from "dinodime-lib";
 import { CreateUnittestInterfaces } from "../test-utility";
 
-describe("get recurrent transactions", function() {
+describe("unit: get recurrent transactions", function() {
   let logger: winston.Logger;
   let context: Context;
   let users: Users.UsersRepository;

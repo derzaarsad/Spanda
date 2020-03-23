@@ -7,7 +7,7 @@ import format from "pg-format";
 import { Transaction, Transactions } from "../../src/transactions";
 import { TransactionsSchema } from "../../src/schema/transactions";
 
-describe("postgres transactions repository", function() {
+describe("unit: postgres transactions repository", function() {
   let transactions: Transactions.PostgreSQLRepository;
 
   beforeEach(function() {

@@ -17,7 +17,7 @@ import { UsersSchema } from "dinodime-lib";
 import { BankConnectionsSchema } from "dinodime-lib";
 import { RecurrentTransactionsSchema } from "dinodime-lib";
 
-describe("update recurrent transactions", function() {
+describe("integration: update recurrent transactions", function() {
   let logger: winston.Logger;
   let context: Context;
   let users: Users.UsersRepository;

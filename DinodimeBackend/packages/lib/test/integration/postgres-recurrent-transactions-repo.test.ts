@@ -10,7 +10,7 @@ import { Pool } from "pg";
 import { RecurrentTransaction, RecurrentTransactions, TransactionFrequency } from "../../src/recurrent-transactions";
 import { RecurrentTransactionsSchema } from "../../src/schema/recurrent-transactions";
 
-describe("postgres recurrent transactions repository", function() {
+describe("integration: postgres recurrent transactions repository", function() {
   let recurrentTransactions: RecurrentTransactions.PostgreSQLRepository;
 
   before(function() {
