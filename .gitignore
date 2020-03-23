@@ -4,6 +4,7 @@
 *.aws
 SpandaServer/src/routes.ts
 SpandaServer/swagger.json
+SpandaApp/platforms
 *packaged.yaml
 out
 dist

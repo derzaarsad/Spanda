@@ -4,7 +4,10 @@
 	"readme": "NativeScript Application",
 	"repository": "<fill-your-repository-here>",
 	"nativescript": {
-		"id": "org.nativescript.SpandaApp"
+		"id": "org.nativescript.SpandaApp",
+		"tns-ios": {
+			"version": "6.4.0"
+		}
 	},
 	"dependencies": {
 		"@angular/animations": "8.0.0",
