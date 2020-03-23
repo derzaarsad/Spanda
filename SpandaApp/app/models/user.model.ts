@@ -15,4 +15,7 @@ export class User {
 
     @JsonProperty("IsRecurrentTransactionConfirmed", Boolean)
     IsRecurrentTransactionConfirmed: boolean = true;
+
+    @JsonProperty("IsAllowanceReady", Boolean)
+    IsAllowanceReady: boolean = true;
 }
