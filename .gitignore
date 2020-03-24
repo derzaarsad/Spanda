@@ -2,6 +2,7 @@
 *node_modules
 .aws-sam
 *.aws
+SpandaApp/platforms
 SpandaServer/src/routes.ts
 SpandaServer/swagger.json
 *packaged.yaml

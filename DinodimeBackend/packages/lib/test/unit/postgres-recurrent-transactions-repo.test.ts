@@ -7,7 +7,7 @@ import format from "pg-format";
 import { RecurrentTransaction, RecurrentTransactions } from "../../src/recurrent-transactions";
 import { RecurrentTransactionsSchema } from "../../src/schema/recurrent-transactions";
 
-describe("postgres recurrent transactions repository", function() {
+describe("unit: postgres recurrent transactions repository", function() {
   let recurrentTransactions: RecurrentTransactions.PostgreSQLRepository;
 
   beforeEach(function() {

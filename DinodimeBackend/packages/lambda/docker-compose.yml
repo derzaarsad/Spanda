@@ -9,7 +9,7 @@ services:
       - ../../integration-test.env
     volumes:
       - ../../reports:/app/packages/lambda/reports
-    command: sh -c "/wait && cd packages/lib && npm run-script integtest -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integtests-lambda.xml"
+    command: sh -c "/wait && cd packages/lambda && npm run-script integtest -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integtests-lambda.xml"
 
   database:
     image: postgres:12

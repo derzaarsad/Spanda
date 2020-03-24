@@ -2,7 +2,7 @@ import { AesCrypto } from "../../src/crypto";
 import chai from "chai";
 const expect = chai.expect;
 
-describe("AES-based crypto", function() {
+describe("unit: AES-based crypto", function() {
   it("decrypts a ciphertext encrypted by self", async function() {
     const key = "8deec885781c421794ceda8af70a5e63";
     const crypto = new AesCrypto(key);

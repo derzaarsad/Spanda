@@ -28,13 +28,15 @@ describe("integration: update recurrent transactions", function() {
    */
   let dummyInterfaces = CreateUnittestInterfaces();
 
-  beforeEach(function() {
+  beforeEach(async function() {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
     users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
     recurrentTransactions = new RecurrentTransactions.PostgreSQLRepository(new Pool(), format, new RecurrentTransactionsSchema());
 
     context = {} as Context;
+    await users.deleteAll();
+    await recurrentTransactions.deleteAll();
   });
 
   it("no auth must fail", async function() {

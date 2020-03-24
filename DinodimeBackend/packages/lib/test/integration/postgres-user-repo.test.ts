@@ -7,7 +7,7 @@ import { UsersSchema } from "../../src/schema/users";
 import { Users, User } from "../../src/users";
 import { Pool } from "pg";
 
-describe("postgres users repository", function() {
+describe("integration: postgres users repository", function() {
   let users: Users.PostgreSQLRepository;
 
   before(function() {

@@ -26,13 +26,15 @@ describe("integration: deduce recurrent transactions", function() {
   let recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
   let context: Context;
 
-  beforeEach(function() {
+  beforeEach(async function() {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
     transactions = new Transactions.PostgreSQLRepository(new Pool(), format, new TransactionsSchema());
     recurrentTransactions = new RecurrentTransactions.PostgreSQLRepository(new Pool(), format, new RecurrentTransactionsSchema());
 
     context = {} as Context;
+    await transactions.deleteAll();
+    await recurrentTransactions.deleteAll();
   });
 
   it("transactions are correctly categorized", async function() {

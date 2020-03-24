@@ -31,7 +31,7 @@ describe("integration: register user handler", function() {
     process.env.FinAPIClientSecret!
   );
 
-  beforeEach(function() {
+  beforeEach(async function() {
     testUsername = process.env.AZURE_TEST_USER_REGISTER!;
     testPassword = "secret";
     testValidEmail = "chapu@mischung.net";
@@ -43,6 +43,8 @@ describe("integration: register user handler", function() {
 
     users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
     context = {} as Context;
+
+    await users.deleteAll();
   });
 
   it("rejects a request with missing attributes", async () => {

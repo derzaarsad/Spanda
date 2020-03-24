@@ -10,7 +10,7 @@ import { Pool } from "pg";
 import { Transaction, Transactions } from "../../src/transactions";
 import { TransactionsSchema } from "../../src/schema/transactions";
 
-describe("postgres transactions repository", function() {
+describe("integration: postgres transactions repository", function() {
   let transactions: Transactions.PostgreSQLRepository;
 
   before(function() {

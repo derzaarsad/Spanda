@@ -6,7 +6,7 @@ import chai from "chai";
 
 const expect = chai.expect;
 
-describe("encryptions", function() {
+describe("unit: encryptions", function() {
   it("encryption and decryption", async function() {
     const encryptions = new CallbackCrypto();
     let someString = "708578 64aaddc201e87f11425be34ce019833f9c175472a52c3d168f5a3231a7680df9";

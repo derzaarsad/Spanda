@@ -6,7 +6,7 @@ import format from "pg-format";
 import { UsersSchema } from "../../src/schema/users";
 import { Users, User } from "../../src/users";
 
-describe("postgres users repository", function() {
+describe("unit: postgres users repository", function() {
   let users: Users.PostgreSQLRepository;
 
   beforeEach(function() {
