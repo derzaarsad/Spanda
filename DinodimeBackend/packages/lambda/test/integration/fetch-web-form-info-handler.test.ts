@@ -43,7 +43,7 @@ describe("integration: fetch webform info handler", function() {
     process.env.FinAPIClientSecret!
   );
 
-  beforeEach(function() {
+  beforeEach(async function() {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
     users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
@@ -53,6 +53,9 @@ describe("integration: fetch webform info handler", function() {
     context = {} as Context;
     encryptions = new CallbackCrypto();
     encrypted = encryptions.EncryptText("bearer " + process.env.ACCESS_TOKEN_FOR_FETCH!);
+    await users.deleteAll();
+    await connections.deleteAll();
+    await transactions.deleteAll();
   });
 
   it("rejects a request with could not fetch web form", async function() {

@@ -29,7 +29,7 @@ describe("integration: get recurrent transactions", function() {
    */
   let dummyInterfaces = CreateUnittestInterfaces();
 
-  beforeEach(function() {
+  beforeEach(async function() {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
     users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
@@ -37,6 +37,9 @@ describe("integration: get recurrent transactions", function() {
     connections = new BankConnections.PostgreSQLRepository(new Pool(), format, new BankConnectionsSchema());
 
     context = {} as Context;
+    await users.deleteAll();
+    await recurrentTransactions.deleteAll();
+    await connections.deleteAll();
   });
 
   it("no authorization must fail", async function() {
