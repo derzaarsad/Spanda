@@ -275,8 +275,8 @@ export const deduceRecurrentTransactions = async (
 ): Promise<any> => {
   let ibanGroupedTransactions: Transaction[][] = await transactions.groupByIban(accountId);
   let deducedRecurrent: RecurrentTransaction[][] = ibanGroupedTransactions.map(ibanGroupedTransaction =>
-    Algorithm.GetRecurrentTransaction(ibanGroupedTransaction).map(res => new RecurrentTransaction(accountId, res.map(el => el.id), res[0].isExpense, res[0].counterPartName == undefined ? null : res[0].counterPartName))
-  );
+    Algorithm.GetRecurrentTransaction(ibanGroupedTransaction).map(res => new RecurrentTransaction(accountId, res.map(el => el.id), res[0].isExpense, res[0].counterPartName === undefined ? null : res[0].counterPartName))
+  ).filter(fil => fil.length > 0);
   for(let i = 0; i < deducedRecurrent.length; ++i) {
     await recurrentTransactions.saveArrayWithoutId(deducedRecurrent[i]);
   }
