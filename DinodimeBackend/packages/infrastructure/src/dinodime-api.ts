@@ -7,32 +7,7 @@ import * as path from "path";
 import { Duration } from "@aws-cdk/core";
 import { LambdaIntegration } from "@aws-cdk/aws-apigateway";
 import { LambdaFactory } from "./lambda-factory";
-import { ServicesProps } from "./services-props";
-
-const configureEnvironment = (servicesProps: ServicesProps): { [key: string]: string } => {
-  const environment: { [key: string]: string } = {
-    REGION: servicesProps.env?.region || "",
-    LOGGER_LEVEL: servicesProps.loggerLevel || "debug",
-    FINAPI_URL: servicesProps.finApiProps.finApiUrl,
-    FINAPI_CLIENT_ID: servicesProps.finApiProps.finApiClientId,
-    FINAPI_CLIENT_SECRET: servicesProps.finApiProps.finApiClientSecret,
-    FINAPI_TIMEOUT: servicesProps.finApiProps.finApiTimeout?.toString() || "3000"
-  };
-
-  if (servicesProps.backendConfiguration.storageBackend === "POSTGRESQL") {
-    environment[
-      "PGPASSWORD"
-    ] = servicesProps.backendConfiguration.pgPassword.secretValue.toString();
-    environment["PGUSER"] = servicesProps.backendConfiguration.pgUser;
-    environment["PGHOST"] = servicesProps.backendConfiguration.pgHost;
-    environment["PGDATABASE"] = servicesProps.backendConfiguration.pgDatabase;
-    environment["PGPORT"] = servicesProps.backendConfiguration.pgPort.toString();
-  }
-
-  environment["STORAGE_BACKEND"] = servicesProps.backendConfiguration.storageBackend;
-
-  return environment;
-};
+import { ServicesProps, lambdaEnvironment } from "./services-props";
 
 export class DinodimeAPI extends cdk.Construct {
   readonly restAPI: apigw.RestApi;
@@ -40,7 +15,17 @@ export class DinodimeAPI extends cdk.Construct {
   constructor(scope: cdk.Construct, id: string, props: ServicesProps) {
     super(scope, id);
 
-    const commonEnvironment = configureEnvironment(props);
+    const restAPI = new apigw.RestApi(this, "DinodimeAPI", {
+      endpointExportName: "APIEndpointURL"
+    });
+
+    this.initializeAppApi(restAPI, props);
+
+    this.restAPI = restAPI;
+  }
+
+  private initializeAppApi(restAPI: apigw.RestApi, props: ServicesProps) {
+    const environment = lambdaEnvironment(props);
 
     const role = new iam.Role(this, "APIMethodLambdaRole", {
       assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com")
@@ -53,14 +38,10 @@ export class DinodimeAPI extends cdk.Construct {
       deploymentProps: props.lambdaDeploymentProps,
       permissionProps: props.lambdaPermissionProps,
       executionRole: role,
-      env: commonEnvironment
+      env: environment
     });
 
     const asset = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-api"));
-
-    const restAPI = new apigw.RestApi(this, "DinodimeAPI", {
-      endpointExportName: "APIEndpointURL"
-    });
 
     // Authenticaction controller
     const users = restAPI.root.addResource("users");
@@ -107,7 +88,6 @@ export class DinodimeAPI extends cdk.Construct {
     });
 
     // Authenticaction controller
-
     const banks = restAPI.root.addResource("banks");
     const blz = banks.addResource("{blz}");
 
@@ -157,7 +137,5 @@ export class DinodimeAPI extends cdk.Construct {
     allowance.addMethod("GET", new LambdaIntegration(getAllowance), {
       operationName: "get allowance"
     });
-
-    this.restAPI = restAPI;
   }
 }

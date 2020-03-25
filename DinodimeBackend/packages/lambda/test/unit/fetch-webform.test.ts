@@ -1,7 +1,6 @@
 /* eslint-env node, mocha */
 import winston from "winston";
 import chai from "chai";
-const expect = chai.expect;
 
 import { SQSRecord, Context } from "aws-lambda";
 import { VoidTransport, FinAPI, Users, User, Failure } from "dinodime-lib";
@@ -10,6 +9,8 @@ import { BankConnections, Transactions } from "dinodime-lib";
 import { Encryptions, CallbackCrypto } from "dinodime-lib";
 import { MockSQSClient } from "dinodime-lib";
 import { handleRecord, HandlerConfiguration } from "../../src/fetch-webform";
+
+const expect = chai.expect;
 
 describe("fetch webform info handler", function() {
   let logger: winston.Logger;

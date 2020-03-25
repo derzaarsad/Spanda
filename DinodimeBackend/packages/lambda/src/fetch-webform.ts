@@ -22,23 +22,29 @@ export interface HandlerConfiguration {
   encryptions: Encryptions;
 }
 
+/*
+ * Receives Webform completions from an SQS queue and fetches the transactions from the imported
+ * bank connections.
+ */
 export const fetchWebForm = async (
   event: SQSEvent,
   context: Context,
   configuration: HandlerConfiguration
 ) => {
   const log = configuration.log;
-  const sqs = configuration.sqs;
+  const records = event.Records;
 
-  event.Records.forEach(record => {
-    handleRecord(record, context, configuration)
+  for (let i = 0; i < records.length; i++) {
+    const record = records[i];
+
+    await handleRecord(record, context, configuration)
       .then(status => {
         handleStatus(record, status, configuration);
       })
       .catch(err => {
         log.error("Could not extract transactions data", err);
       });
-  });
+  }
 };
 
 export const handleRecord = async (

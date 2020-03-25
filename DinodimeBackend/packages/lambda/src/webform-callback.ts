@@ -3,7 +3,7 @@ import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from "aws-lambda
 import { Users, WebFormCompletion, SQSPublisher } from "dinodime-lib";
 import { CreateSimpleResponse } from "./lambda-util";
 
-// Since this can be called by anyone, don't reveal anything in the response
+// Since this can be called by anyone, we don't reveal anything in the response
 const response = CreateSimpleResponse(202, "Accepted");
 
 export interface HandlerConfiguration {
@@ -12,6 +12,9 @@ export interface HandlerConfiguration {
   log: winston.Logger;
 }
 
+/**
+ * Receives a webform coordinates as path parameters and puts a WebFormCompletion on an SQS queue.
+ */
 export const webformCallback = async (
   event: APIGatewayProxyEvent,
   context: Context,
@@ -30,9 +33,9 @@ export const webformCallback = async (
   }
 
   const webFormAuth = pathParameters.webFormAuth;
-  const tokens = webFormAuth.split("-");
+  const tokens = webFormAuth.split("-", 2);
   if (tokens.length !== 2) {
-    log.error("Invalid webform authorization received: " + webFormAuth);
+    log.error(`Invalid webform authorization received: ${webFormAuth}`);
     return response;
   }
 

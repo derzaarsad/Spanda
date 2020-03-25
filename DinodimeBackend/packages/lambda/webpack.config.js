@@ -19,6 +19,12 @@ var config = function(name) {
   };
 };
 
-var modules = ["api", "notifications-callback", "describe-db-instance"];
+var modules = [
+  "api",
+  "notifications-callback",
+  "describe-db-instance",
+  "webform-callback",
+  "fetch-webform"
+];
 
 module.exports = modules.map(moduleName => config(moduleName));
