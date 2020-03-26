@@ -16,7 +16,7 @@ describe("integration: postgres bank connections repository", function() {
     connections = new BankConnections.PostgreSQLRepository(new Pool(), format, schema);
   });
 
-  beforeEach(async function() {
+  afterEach(async function() {
     await connections.deleteAll();
   });
 
@@ -48,7 +48,7 @@ describe("integration: postgres bank connections repository", function() {
     await connections.save(new BankConnection(23, 70));
     await connections.save(new BankConnection(24, 71));
 
-    const result = await connections.findByIds([22,23,24]);
+    const result = await connections.findByIds([22, 23, 24]);
     expect(result.length).to.equal(3);
     expect(result[0].id).to.equal(22);
     expect(result[1].id).to.equal(23);
