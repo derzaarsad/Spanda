@@ -1,9 +1,10 @@
 {
-  "name": "dinodime-notifications-integtest",
+  "name": "dinodime-infrastructure-integtests",
   "version": "0.0.0",
   "license": "UNLICENSED",
   "scripts": {
-    "test": "mocha --require ts-node/register ./**/*.ts"
+    "test-new-transactions-notification": "mocha --require ts-node/register ./src/new-transactions-notification.ts",
+    "test-webform-callback": "mocha --require ts-node/register ./src/webform-callback.ts"
   },
   "dependencies": {
     "dinodime-lib": "0.0.0",

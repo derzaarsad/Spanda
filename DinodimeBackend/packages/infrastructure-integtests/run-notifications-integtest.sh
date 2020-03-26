@@ -1,6 +1,6 @@
 #!/bin/bash -e
-
-STACK_NAME=DinodimeStack
+# Run this script from the root backend directory
+STACK_NAME=DinodimeServices
 
 function getStackOutputsAsJson() {
   local stackName=$1
@@ -22,4 +22,4 @@ env ENDPOINT_URL=$endpointUrl \
   DECRYPTION_KEY=covfefe \
   TABLE_NAME=$tableName \
   QUEUE_URL=$queueUrl \
-  yarn workspace dynodime-notifications-integtest run test $@
+  yarn workspace dinodime-infrastructure-integtests run test-new-transactions-notification $@
