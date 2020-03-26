@@ -1,0 +1,14 @@
+#!/bin/bash -e
+# Run this script from the root backend directory
+SCRIPT="$0"
+DIRNAME=$(dirname "$0")
+STACK_NAME=DinodimeServices
+
+source "$0/common_function.sh"
+
+endpointUrl=$(getStackOutput $STACK_NAME WebFormCallbackAPIEndpoint)
+queueUrl=$(getStackOutput $STACK_NAME WebFormCompletionsQueueURL)
+
+env ENDPOINT_URL=$endpointUrl \
+  QUEUE_URL=$queueUrl \
+  yarn workspace dinodime-infrastructure-integtests run test-webform-callback $@

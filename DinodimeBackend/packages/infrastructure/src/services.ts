@@ -18,9 +18,9 @@ export class Services extends cdk.Stack {
       }
     );
 
-    new DinodimeAPI(this, "DinodimeAPI", props);
+    const callbackAPI = new WebFormCallbackAPI(this, "DinodimeWebFormCallbackAPI", props);
 
-    new WebFormCallbackAPI(this, "DinodimeWebFormCallbackAPI", props);
+    new DinodimeAPI(this, "DinodimeAPI", props);
 
     // Outputs
     new cdk.CfnOutput(this, "NotificationsTableName", {
@@ -33,6 +33,10 @@ export class Services extends cdk.Stack {
 
     new cdk.CfnOutput(this, "NotificationsTopicARN", {
       value: notifications.notificationsTopic.topicArn
+    });
+
+    new cdk.CfnOutput(this, "WebFormCompletionsQueueURL", {
+      value: callbackAPI.completionsQueue.queueUrl
     });
   }
 }
