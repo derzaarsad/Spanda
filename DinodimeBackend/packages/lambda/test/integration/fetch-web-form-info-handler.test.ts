@@ -75,7 +75,7 @@ describe("integration: fetch webform info handler", function() {
     const user = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
     user.activeWebFormId = rejectedWebId;
     user.activeWebFormAuth = encrypted.iv;
-    users.save(user);
+    await users.save(user);
 
     const event = ({
       headers: {},
@@ -104,7 +104,7 @@ describe("integration: fetch webform info handler", function() {
     const user = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
     user.activeWebFormId = parseInt(process.env.WEBFORM_ID_FOR_FETCH!);
     user.activeWebFormAuth = encrypted.iv;
-    users.save(user);
+    await users.save(user);
 
     const event = ({
       headers: {},
