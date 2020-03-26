@@ -188,7 +188,7 @@ describe("integration: get webform id", function() {
 
     const location = JSON.parse(result.body).location as string;
     const slash = location.lastIndexOf("/");
-    const token = location.substring(slash);
+    const token = location.substring(slash + 1);
     console.log(`location: ${location}; token: ${token}`);
 
     await http.post("/webForm", {
