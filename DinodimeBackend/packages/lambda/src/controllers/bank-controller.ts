@@ -285,7 +285,7 @@ export const deduceRecurrentTransactions = async (
             res[0].counterPartName == undefined ? null : res[0].counterPartName
           )
       )
-  );
+  ).filter(deduced => deduced.length > 0);
   for (let i = 0; i < deducedRecurrent.length; ++i) {
     await recurrentTransactions.saveArrayWithoutId(deducedRecurrent[i]);
   }

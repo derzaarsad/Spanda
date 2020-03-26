@@ -267,7 +267,7 @@ export namespace Transactions {
         .map(transaction => {
           return (
             "(" +
-            this.schema.asRow(transaction).map(item => this.format("%L", item.toString())) +
+            this.schema.asRow(transaction).map(item => this.format("%L", (item === undefined) ? null : item.toString())) +
             ")"
           );
         })

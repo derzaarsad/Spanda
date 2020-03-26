@@ -321,19 +321,19 @@ describe("integration: deduce recurrent transactions", function() {
     expect(result.length).to.equal(3);
 
     expect(result[0].id).to.equal(1);
-    expect(result[0].frequency).to.equal(TransactionFrequency.Unknown);
+    expect(TransactionFrequency[result[0].frequency]).to.equal(TransactionFrequency.Unknown);
     expect(result[0].isExpense).to.equal(true);
     expect(result[0].isConfirmed).to.equal(false);
     expect(result[0].transactionIds).to.eql([1, 3, 5, 7, 9, 11, 13, 15]);
 
     expect(result[1].id).to.equal(2);
-    expect(result[1].frequency).to.equal(TransactionFrequency.Unknown);
+    expect(TransactionFrequency[result[1].frequency]).to.equal(TransactionFrequency.Unknown);
     expect(result[1].isExpense).to.equal(true);
     expect(result[1].isConfirmed).to.equal(false);
     expect(result[1].transactionIds).to.eql([2, 4, 6, 8, 10, 12, 14, 16]);
 
     expect(result[2].id).to.equal(3);
-    expect(result[2].frequency).to.equal(TransactionFrequency.Unknown);
+    expect(TransactionFrequency[result[2].frequency]).to.equal(TransactionFrequency.Unknown);
     expect(result[2].isExpense).to.equal(false);
     expect(result[2].isConfirmed).to.equal(false);
     expect(result[2].transactionIds).to.eql([17, 18]);
