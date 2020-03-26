@@ -46,6 +46,9 @@ describe("integration: get webform id", function() {
     encryptions = new CallbackCrypto();
 
     context = {} as Context;
+  });
+
+  afterEach(async function() {
     await users.deleteAll();
   });
 

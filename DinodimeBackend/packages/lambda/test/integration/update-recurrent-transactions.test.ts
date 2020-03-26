@@ -41,6 +41,9 @@ describe("integration: update recurrent transactions", function() {
     );
 
     context = {} as Context;
+  });
+
+  afterEach(async function() {
     await users.deleteAll();
     await recurrentTransactions.deleteAll();
   });

@@ -43,7 +43,9 @@ describe("integration: register user handler", function() {
 
     users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
     context = {} as Context;
+  });
 
+  afterEach(async function() {
     await users.deleteAll();
   });
 

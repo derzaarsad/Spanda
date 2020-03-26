@@ -47,12 +47,23 @@ describe("integration: fetch webform info handler", function() {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
     users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
-    connections = new BankConnections.PostgreSQLRepository(new Pool(), format, new BankConnectionsSchema());
-    transactions = new Transactions.PostgreSQLRepository(new Pool(), format, new TransactionsSchema());
+    connections = new BankConnections.PostgreSQLRepository(
+      new Pool(),
+      format,
+      new BankConnectionsSchema()
+    );
+    transactions = new Transactions.PostgreSQLRepository(
+      new Pool(),
+      format,
+      new TransactionsSchema()
+    );
 
     context = {} as Context;
     encryptions = new CallbackCrypto();
     encrypted = encryptions.EncryptText("bearer " + process.env.ACCESS_TOKEN_FOR_FETCH!);
+  });
+
+  afterEach(async function() {
     await users.deleteAll();
     await connections.deleteAll();
     await transactions.deleteAll();

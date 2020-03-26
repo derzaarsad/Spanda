@@ -33,48 +33,57 @@ describe("integration: get recurrent transactions", function() {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
     users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
-    recurrentTransactions = new RecurrentTransactions.PostgreSQLRepository(new Pool(), format, new RecurrentTransactionsSchema());
-    connections = new BankConnections.PostgreSQLRepository(new Pool(), format, new BankConnectionsSchema());
+    recurrentTransactions = new RecurrentTransactions.PostgreSQLRepository(
+      new Pool(),
+      format,
+      new RecurrentTransactionsSchema()
+    );
+    connections = new BankConnections.PostgreSQLRepository(
+      new Pool(),
+      format,
+      new BankConnectionsSchema()
+    );
 
     context = {} as Context;
+  });
+
+  afterEach(async function() {
     await users.deleteAll();
     await recurrentTransactions.deleteAll();
     await connections.deleteAll();
   });
 
   it("no authorization must fail", async function() {
-
     // adding recurrent transactions
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(10, [1,2,3], true, "Dinodime1 GmbH"),
-        new RecurrentTransaction(11, [4,5,6], true, "Dinodime2 GmbH"),
-        new RecurrentTransaction(13, [1,2,3], true, "Dinodime3 GmbH"),
-        new RecurrentTransaction(14, [4,5,6], true, "Dinodime4 GmbH"),
-        new RecurrentTransaction(16, [1,2,3], true, "Dinodime5 GmbH"),
-        new RecurrentTransaction(17, [4,5,6], true, "Dinodime6 GmbH")
+      new RecurrentTransaction(10, [1, 2, 3], true, "Dinodime1 GmbH"),
+      new RecurrentTransaction(11, [4, 5, 6], true, "Dinodime2 GmbH"),
+      new RecurrentTransaction(13, [1, 2, 3], true, "Dinodime3 GmbH"),
+      new RecurrentTransaction(14, [4, 5, 6], true, "Dinodime4 GmbH"),
+      new RecurrentTransaction(16, [1, 2, 3], true, "Dinodime5 GmbH"),
+      new RecurrentTransaction(17, [4, 5, 6], true, "Dinodime6 GmbH")
     ];
     await recurrentTransactions.saveArrayWithoutId(recurrentTransactionsData);
 
     // adding user
     const user1 = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
-    user1.bankConnectionIds = [22,23,24];
+    user1.bankConnectionIds = [22, 23, 24];
     await users.save(user1);
 
     // adding connections
-    const bankConnection1 = new BankConnection(22,220);
-    const bankConnection2 = new BankConnection(23,230);
-    const bankConnection3 = new BankConnection(24,240);
-    bankConnection1.bankAccountIds = [10,11];
-    bankConnection2.bankAccountIds = [13,14];
-    bankConnection3.bankAccountIds = [16,17];
+    const bankConnection1 = new BankConnection(22, 220);
+    const bankConnection2 = new BankConnection(23, 230);
+    const bankConnection3 = new BankConnection(24, 240);
+    bankConnection1.bankAccountIds = [10, 11];
+    bankConnection2.bankAccountIds = [13, 14];
+    bankConnection3.bankAccountIds = [16, 17];
     await connections.save(bankConnection1);
     await connections.save(bankConnection2);
     await connections.save(bankConnection3);
 
     const event = ({
-        headers: {
-        }
-      } as unknown) as APIGatewayProxyEvent;
+      headers: {}
+    } as unknown) as APIGatewayProxyEvent;
 
     const result = await getRecurrentTransactions(
       event,
@@ -95,28 +104,27 @@ describe("integration: get recurrent transactions", function() {
   });
 
   it("no bank connections must fail", async function() {
-
     // adding recurrent transactions
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(10, [1,2,3], true, "Dinodime1 GmbH"),
-        new RecurrentTransaction(11, [4,5,6], true, "Dinodime2 GmbH"),
-        new RecurrentTransaction(13, [1,2,3], true, "Dinodime3 GmbH"),
-        new RecurrentTransaction(14, [4,5,6], true, "Dinodime4 GmbH"),
-        new RecurrentTransaction(16, [1,2,3], true, "Dinodime5 GmbH"),
-        new RecurrentTransaction(17, [4,5,6], true, "Dinodime6 GmbH")
+      new RecurrentTransaction(10, [1, 2, 3], true, "Dinodime1 GmbH"),
+      new RecurrentTransaction(11, [4, 5, 6], true, "Dinodime2 GmbH"),
+      new RecurrentTransaction(13, [1, 2, 3], true, "Dinodime3 GmbH"),
+      new RecurrentTransaction(14, [4, 5, 6], true, "Dinodime4 GmbH"),
+      new RecurrentTransaction(16, [1, 2, 3], true, "Dinodime5 GmbH"),
+      new RecurrentTransaction(17, [4, 5, 6], true, "Dinodime6 GmbH")
     ];
     await recurrentTransactions.saveArrayWithoutId(recurrentTransactionsData);
 
     // adding user
     const user1 = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
-    user1.bankConnectionIds = [22,23,24];
+    user1.bankConnectionIds = [22, 23, 24];
     await users.save(user1);
 
     const event = ({
-        headers: {
-          Authorization: "bearer 12345678"
-        }
-      } as unknown) as APIGatewayProxyEvent;
+      headers: {
+        Authorization: "bearer 12345678"
+      }
+    } as unknown) as APIGatewayProxyEvent;
 
     const result = await getRecurrentTransactions(
       event,
@@ -137,34 +145,33 @@ describe("integration: get recurrent transactions", function() {
   });
 
   it("no user must fail", async function() {
-
     // adding recurrent transactions
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(10, [1,2,3], true, "Dinodime1 GmbH"),
-        new RecurrentTransaction(11, [4,5,6], true, "Dinodime2 GmbH"),
-        new RecurrentTransaction(13, [1,2,3], true, "Dinodime3 GmbH"),
-        new RecurrentTransaction(14, [4,5,6], true, "Dinodime4 GmbH"),
-        new RecurrentTransaction(16, [1,2,3], true, "Dinodime5 GmbH"),
-        new RecurrentTransaction(17, [4,5,6], true, "Dinodime6 GmbH")
+      new RecurrentTransaction(10, [1, 2, 3], true, "Dinodime1 GmbH"),
+      new RecurrentTransaction(11, [4, 5, 6], true, "Dinodime2 GmbH"),
+      new RecurrentTransaction(13, [1, 2, 3], true, "Dinodime3 GmbH"),
+      new RecurrentTransaction(14, [4, 5, 6], true, "Dinodime4 GmbH"),
+      new RecurrentTransaction(16, [1, 2, 3], true, "Dinodime5 GmbH"),
+      new RecurrentTransaction(17, [4, 5, 6], true, "Dinodime6 GmbH")
     ];
     await recurrentTransactions.saveArrayWithoutId(recurrentTransactionsData);
 
     // adding connections
-    const bankConnection1 = new BankConnection(22,220);
-    const bankConnection2 = new BankConnection(23,230);
-    const bankConnection3 = new BankConnection(24,240);
-    bankConnection1.bankAccountIds = [10,11];
-    bankConnection2.bankAccountIds = [13,14];
-    bankConnection3.bankAccountIds = [16,17];
+    const bankConnection1 = new BankConnection(22, 220);
+    const bankConnection2 = new BankConnection(23, 230);
+    const bankConnection3 = new BankConnection(24, 240);
+    bankConnection1.bankAccountIds = [10, 11];
+    bankConnection2.bankAccountIds = [13, 14];
+    bankConnection3.bankAccountIds = [16, 17];
     await connections.save(bankConnection1);
     await connections.save(bankConnection2);
     await connections.save(bankConnection3);
 
     const event = ({
-        headers: {
-          Authorization: "bearer 12345678"
-        }
-      } as unknown) as APIGatewayProxyEvent;
+      headers: {
+        Authorization: "bearer 12345678"
+      }
+    } as unknown) as APIGatewayProxyEvent;
 
     const result = await getRecurrentTransactions(
       event,
@@ -185,28 +192,27 @@ describe("integration: get recurrent transactions", function() {
   });
 
   it("no recurrent transactions must success but with empty recurrenttransactions", async function() {
-
     // adding user
     const user1 = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
-    user1.bankConnectionIds = [22,23,24];
+    user1.bankConnectionIds = [22, 23, 24];
     await users.save(user1);
 
     // adding connections
-    const bankConnection1 = new BankConnection(22,220);
-    const bankConnection2 = new BankConnection(23,230);
-    const bankConnection3 = new BankConnection(24,240);
-    bankConnection1.bankAccountIds = [10,11];
-    bankConnection2.bankAccountIds = [13,14];
-    bankConnection3.bankAccountIds = [16,17];
+    const bankConnection1 = new BankConnection(22, 220);
+    const bankConnection2 = new BankConnection(23, 230);
+    const bankConnection3 = new BankConnection(24, 240);
+    bankConnection1.bankAccountIds = [10, 11];
+    bankConnection2.bankAccountIds = [13, 14];
+    bankConnection3.bankAccountIds = [16, 17];
     await connections.save(bankConnection1);
     await connections.save(bankConnection2);
     await connections.save(bankConnection3);
 
     const event = ({
-        headers: {
-          Authorization: "bearer 12345678"
-        }
-      } as unknown) as APIGatewayProxyEvent;
+      headers: {
+        Authorization: "bearer 12345678"
+      }
+    } as unknown) as APIGatewayProxyEvent;
 
     const result = await getRecurrentTransactions(
       event,
@@ -227,39 +233,38 @@ describe("integration: get recurrent transactions", function() {
   });
 
   it("recurrent transactions, bank connections and authorization are available", async function() {
-
     // adding recurrent transactions
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(10, [1,2,3], true, "Dinodime1 GmbH"),
-        new RecurrentTransaction(11, [4,5,6], true, "Dinodime2 GmbH"),
-        new RecurrentTransaction(13, [1,2,3], true, "Dinodime3 GmbH"),
-        new RecurrentTransaction(14, [4,5,6], true, "Dinodime4 GmbH"),
-        new RecurrentTransaction(16, [1,2,3], true, "Dinodime5 GmbH"),
-        new RecurrentTransaction(17, [4,5,6], true, "Dinodime6 GmbH")
+      new RecurrentTransaction(10, [1, 2, 3], true, "Dinodime1 GmbH"),
+      new RecurrentTransaction(11, [4, 5, 6], true, "Dinodime2 GmbH"),
+      new RecurrentTransaction(13, [1, 2, 3], true, "Dinodime3 GmbH"),
+      new RecurrentTransaction(14, [4, 5, 6], true, "Dinodime4 GmbH"),
+      new RecurrentTransaction(16, [1, 2, 3], true, "Dinodime5 GmbH"),
+      new RecurrentTransaction(17, [4, 5, 6], true, "Dinodime6 GmbH")
     ];
     await recurrentTransactions.saveArrayWithoutId(recurrentTransactionsData);
 
     // adding user
     const user1 = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
-    user1.bankConnectionIds = [22,23,24];
+    user1.bankConnectionIds = [22, 23, 24];
     await users.save(user1);
 
     // adding connections
-    const bankConnection1 = new BankConnection(22,220);
-    const bankConnection2 = new BankConnection(23,230);
-    const bankConnection3 = new BankConnection(24,240);
-    bankConnection1.bankAccountIds = [10,11];
-    bankConnection2.bankAccountIds = [13,14];
-    bankConnection3.bankAccountIds = [16,17];
+    const bankConnection1 = new BankConnection(22, 220);
+    const bankConnection2 = new BankConnection(23, 230);
+    const bankConnection3 = new BankConnection(24, 240);
+    bankConnection1.bankAccountIds = [10, 11];
+    bankConnection2.bankAccountIds = [13, 14];
+    bankConnection3.bankAccountIds = [16, 17];
     await connections.save(bankConnection1);
     await connections.save(bankConnection2);
     await connections.save(bankConnection3);
 
     const event = ({
-        headers: {
-          Authorization: "bearer 12345678"
-        }
-      } as unknown) as APIGatewayProxyEvent;
+      headers: {
+        Authorization: "bearer 12345678"
+      }
+    } as unknown) as APIGatewayProxyEvent;
 
     const result = await getRecurrentTransactions(
       event,
