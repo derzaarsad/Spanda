@@ -1,8 +1,8 @@
 import chai from "chai";
 const expect = chai.expect;
 import winston from "winston";
+import axios, { AxiosInstance } from "axios";
 
-import { Builder, By, until } from "selenium-webdriver";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import { User, Users, VoidTransport, CallbackCrypto, Encryptions } from "dinodime-lib";
 
@@ -23,6 +23,7 @@ describe("integration: get webform id", function() {
   let testPassword: string;
   let testValidEmail: string;
   let testValidPhone: string;
+  let http: AxiosInstance;
 
   expect(process.env.AZURE_TEST_USER_LOGIN).to.exist;
   expect(process.env.FinAPIClientId).to.exist;
@@ -33,6 +34,14 @@ describe("integration: get webform id", function() {
     process.env.FinAPIClientSecret!
   );
   let encryptions: Encryptions;
+
+  this.beforeAll(async function() {
+    http = axios.create({
+      baseURL: "https://sandbox.finapi.io",
+      timeout: 3000,
+      headers: { Accept: "application/json" }
+    });
+  });
 
   beforeEach(async function() {
     testUsername = process.env.AZURE_TEST_USER_LOGIN!;
@@ -176,16 +185,27 @@ describe("integration: get webform id", function() {
     expect(result.statusCode).to.equal(200);
     expect(JSON.parse(result.body).location).to.be.an("string");
     expect(JSON.parse(result.body).webFormAuth).to.be.an("string");
-    console.log(JSON.parse(result.body).location);
 
-    let driver = await new Builder().forBrowser("firefox").build();
-    try {
-      await driver.get(JSON.parse(result.body).location);
-      await driver.findElement(By.id("btnSubmit")).click();
-      await driver.wait(until.elementsLocated(By.id("exitWithoutRedirect")), 1000);
-    } finally {
-      await driver.quit();
-    }
+    const location = JSON.parse(result.body).location as string;
+    const slash = location.lastIndexOf("/");
+    const token = location.substring(slash);
+    console.log(`location: ${location}; token: ${token}`);
+
+    await http.post("/webForm", {
+      webFormToken: token,
+      agbVersion: "v1.3",
+      changeCredentials: null,
+      changeTwoStepProcedure: null,
+      loginCredentials: [],
+      storeSecrets: false,
+      accountReferences: null,
+      twoStepProcedureId: null,
+      storeTwoStepProcedure: false,
+      decoupledCallback: false,
+      msaHash: null,
+      msaChallengeResponse: null,
+      sepaRequestChallengeResponse: null
+    });
 
     //expect(JSON.parse(result.body).location).to.equal('testlocation');
     expect(JSON.parse(result.body).webFormAuth.split("-").length).to.equal(2);
