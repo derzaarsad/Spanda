@@ -14,7 +14,7 @@ import { User, Users } from "dinodime-lib";
 import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dinodime-lib";
 import { Transaction } from "dinodime-lib";
 import { RecurrentTransaction, RecurrentTransactions } from "dinodime-lib";
-import { Algorithm } from "dinodime-lib"
+import { Algorithm } from "dinodime-lib";
 
 const blzPattern = /^\d{8}$/;
 
@@ -174,7 +174,7 @@ export const getRecurrentTransactions = async (
   try {
     bankConnections = await connections.findByIds(user.bankConnectionIds);
 
-    if(bankConnections.length == 0) {
+    if (bankConnections.length == 0) {
       throw new Error("this user does not have any bank connection");
     }
   } catch (err) {
@@ -182,7 +182,7 @@ export const getRecurrentTransactions = async (
     return CreateSimpleResponse(204, "getting bank connections failed");
   }
 
-  for(let id in bankConnections) {
+  for (let id in bankConnections) {
     accountIds = accountIds.concat(bankConnections[id].bankAccountIds);
   }
 
@@ -202,7 +202,7 @@ export const getRecurrentTransactions = async (
       isConfirmed: el.isConfirmed,
       frequency: el.frequency,
       counterPartName: el.counterPartName
-    }
+    };
   });
 
   return CreateResponse(200, { recurrenttransactions });
@@ -274,10 +274,19 @@ export const deduceRecurrentTransactions = async (
   accountId: number
 ): Promise<any> => {
   let ibanGroupedTransactions: Transaction[][] = await transactions.groupByIban(accountId);
-  let deducedRecurrent: RecurrentTransaction[][] = ibanGroupedTransactions.map(ibanGroupedTransaction =>
-    Algorithm.GetRecurrentTransaction(ibanGroupedTransaction).map(res => new RecurrentTransaction(accountId, res.map(el => el.id), res[0].isExpense, res[0].counterPartName == undefined ? null : res[0].counterPartName))
+  let deducedRecurrent: RecurrentTransaction[][] = ibanGroupedTransactions.map(
+    ibanGroupedTransaction =>
+      Algorithm.GetRecurrentTransaction(ibanGroupedTransaction).map(
+        res =>
+          new RecurrentTransaction(
+            accountId,
+            res.map(el => el.id),
+            res[0].isExpense,
+            res[0].counterPartName == undefined ? null : res[0].counterPartName
+          )
+      )
   );
-  for(let i = 0; i < deducedRecurrent.length; ++i) {
+  for (let i = 0; i < deducedRecurrent.length; ++i) {
     await recurrentTransactions.saveArrayWithoutId(deducedRecurrent[i]);
   }
 };
