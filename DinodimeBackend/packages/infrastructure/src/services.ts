@@ -2,6 +2,7 @@ import * as cdk from "@aws-cdk/core";
 import { NewTransactionsNotifications } from "./new-transactions-notifications";
 import { DinodimeAPI } from "./dinodime-api";
 import { ServicesProps } from "./services-props";
+import { WebFormCallbackAPI } from "./webform-callback-api";
 
 export class Services extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props: ServicesProps) {
@@ -18,6 +19,8 @@ export class Services extends cdk.Stack {
     );
 
     new DinodimeAPI(this, "DinodimeAPI", props);
+
+    new WebFormCallbackAPI(this, "DinodimeWebFormCallbackAPI", props);
 
     // Outputs
     new cdk.CfnOutput(this, "NotificationsTableName", {
