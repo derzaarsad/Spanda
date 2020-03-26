@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM node:12-stretch
 
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait /wait
 RUN chmod +x /wait
@@ -6,3 +6,4 @@ RUN mkdir -p /opt && cd /opt && wget https://github.com/mozilla/geckodriver/rele
 
 ADD . /app
 WORKDIR /app
+CMD /bin/sh
