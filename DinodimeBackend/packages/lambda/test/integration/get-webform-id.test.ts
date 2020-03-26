@@ -62,7 +62,7 @@ describe("integration: get webform id", function() {
   });
 
   it("rejects requests with failing authentication", async () => {
-    users.save(new User(testUsername, testValidEmail, testValidPhone, false));
+    await users.save(new User(testUsername, testValidEmail, testValidPhone, false));
 
     const event = ({
       headers: {
