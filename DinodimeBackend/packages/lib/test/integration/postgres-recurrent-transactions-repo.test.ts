@@ -206,7 +206,7 @@ describe("integration: postgres recurrent transactions repository", function() {
     modifiedRecurrentTransaction.isConfirmed = true;
     let recurrentTransactionsData2: RecurrentTransaction[] = [
       modifiedRecurrentTransaction,
-      new RecurrentTransaction(2, [4, 5, 6], true, null, 1111)
+      new RecurrentTransaction(2, [4, 5, 6], true, null, 1112)
     ];
     await recurrentTransactions.updateArray(recurrentTransactionsData2);
     const modifiedResults = await recurrentTransactions.findByAccountIds([2, 5]);

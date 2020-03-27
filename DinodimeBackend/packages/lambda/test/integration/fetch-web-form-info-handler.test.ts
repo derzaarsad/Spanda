@@ -157,7 +157,7 @@ describe("integration: fetch webform info handler", function() {
 
     const transactions_ = await transactions.findByAccountIds(connection!.bankAccountIds);
     expect(transactions_).to.exist;
-    expect(transactions_.length).to.be.not.empty;
+    expect(transactions_.length).to.eql(1);
     expect(transactions_[0].id).to.exist;
     expect(transactions_[0].accountId).to.equal(connection!.bankAccountIds[0]);
     expect(transactions_[0].absAmount).to.exist;
