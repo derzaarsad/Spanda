@@ -82,12 +82,11 @@ export namespace Transactions {
     }
 
     async findByIds(ids: Array<number>): Promise<Array<Transaction>> {
-
       let candidate: Array<Transaction> = [];
 
       for (let i in ids) {
         const transaction = this.repository[ids[i]];
-        if(!transaction) {
+        if (!transaction) {
           continue;
         }
 
@@ -102,21 +101,20 @@ export namespace Transactions {
 
       let grouped: Transaction[][] = [];
       for (let id in this.repository) {
-        if(this.repository[id].accountId != accountId) {
+        if (this.repository[id].accountId != accountId) {
           continue;
         }
 
         let currentIban = this.repository[id].counterPartIban;
-        if(!currentIban) {
+        if (!currentIban) {
           continue;
         }
 
-        if(indexDictionary[currentIban] == null) {
+        if (indexDictionary[currentIban] == null) {
           indexDictionary[currentIban] = grouped.length;
           grouped.push([]);
           grouped[indexDictionary[currentIban]].push(this.repository[id]);
-        }
-        else {
+        } else {
           grouped[indexDictionary[currentIban]].push(this.repository[id]);
         }
       }
@@ -130,13 +128,8 @@ export namespace Transactions {
     }
   }
 
-  export class PostgreSQLRepository extends PostgresRepository<number, Transaction>
-    implements TransactionsRepository {
-    constructor(
-      pool: Pool | undefined,
-      format: (fmt: string, ...args: any[]) => string,
-      schema: Schema<Transaction>
-    ) {
+  export class PostgreSQLRepository extends PostgresRepository<number, Transaction> implements TransactionsRepository {
+    constructor(pool: Pool | undefined, format: (fmt: string, ...args: any[]) => string, schema: Schema<Transaction>) {
       super(pool, format, schema);
     }
 
@@ -154,9 +147,7 @@ export namespace Transactions {
         types: this.types
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null
-      );
+      return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async findByIds(ids: Array<number>): Promise<Array<Transaction>> {
@@ -167,10 +158,11 @@ export namespace Transactions {
       };
 
       return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? res.rows
-        .map(row => {
-          return this.schema.asObject(row)
-        }) : []
+        res.rowCount > 0
+          ? res.rows.map(row => {
+              return this.schema.asObject(row);
+            })
+          : []
       );
     }
 
@@ -198,8 +190,9 @@ export namespace Transactions {
         types: this.types
       };
 
-      return this.doQuery(params)
-        .then(res => res.rows.map(row => row[0].map((element: any) => this.schema.mapColumns(element))));
+      return this.doQuery(params).then(res =>
+        res.rows.map(row => row[0].map((element: any) => this.schema.mapColumns(element)))
+      );
     }
 
     async saveArray(transactions: Transaction[]): Promise<Transaction[]> {
@@ -211,31 +204,25 @@ export namespace Transactions {
     }
 
     findByIdQuery(id: number) {
+      const accountIdColumn = this.schema.columns["accountId"];
       return this.format(
-        "SELECT * FROM %I WHERE id = %L LIMIT 1",
+        "SELECT * FROM %I WHERE id = %L ORDER BY %s ASC LIMIT 1",
         this.schema.tableName,
-        id.toString()
+        id,
+        accountIdColumn
       );
     }
 
     findByIdsQuery(ids: Array<number>) {
-      return this.format(
-        "SELECT * FROM %I WHERE id in (%L)",
-        this.schema.tableName,
-        ids
-      );
+      return this.format("SELECT * FROM %I WHERE id in (%L)", this.schema.tableName, ids);
     }
 
     findByAccountIdsQuery(accountIds: Array<number>) {
-      return this.format(
-        "SELECT * FROM %I WHERE accountid in (%L)",
-        this.schema.tableName,
-        accountIds
-      );
+      return this.format("SELECT * FROM %I WHERE accountid in (%L)", this.schema.tableName, accountIds);
     }
 
     groupByColumnQuery(accountId: number, attributesIndex: number) {
-      const attribute = this.schema.attributes.split(",")[attributesIndex];
+      const attribute = this.schema.attributes[attributesIndex];
       return this.format(
         "SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM %I WHERE %I=b.%I AND accountid=%L) t ) rw FROM %I b WHERE %I IS NOT NULL GROUP BY %I",
         this.schema.tableName,
@@ -263,15 +250,7 @@ export namespace Transactions {
     saveArrayQuery(transactions: Transaction[]) {
       const tableName = this.schema.tableName;
       const attributes = this.schema.attributes;
-      const values = transactions
-        .map(transaction => {
-          return (
-            "(" +
-            this.schema.asRow(transaction).map(item => this.format("%L", (item === undefined) ? null : item.toString())) +
-            ")"
-          );
-        })
-        .join(", ");
+      const values = transactions.map(transaction => this.format("(%L)", this.schema.asRow(transaction))).join(", ");
 
       return this.format("INSERT INTO %I (%s) VALUES %s", tableName, attributes, values);
     }

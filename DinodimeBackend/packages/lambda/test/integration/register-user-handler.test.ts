@@ -43,7 +43,9 @@ describe("integration: register user handler", function() {
 
     users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
     context = {} as Context;
+  });
 
+  afterEach(async function() {
     await users.deleteAll();
   });
 
@@ -67,7 +69,7 @@ describe("integration: register user handler", function() {
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(400);
-    expect(JSON.parse(result.body).message).to.include("missing user property");
+    expect(JSON.parse(result.body).message).to.include("request body is incomplete");
   });
 
   it("rejects a request with invalid email", async () => {

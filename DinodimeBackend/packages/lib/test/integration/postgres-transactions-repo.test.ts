@@ -18,7 +18,7 @@ describe("integration: postgres transactions repository", function() {
     transactions = new Transactions.PostgreSQLRepository(new Pool(), format, schema);
   });
 
-  beforeEach(async function() {
+  afterEach(async function() {
     await transactions.deleteAll();
   });
 
@@ -48,8 +48,28 @@ describe("integration: postgres transactions repository", function() {
     expect(result).to.eql(transaction);
   });
 
-  it("find by ids", async function() {
+  it("saves and retrieves a transaction with undefined fields", async function() {
+    const transaction = {
+      id: 209864836,
+      accountId: 995070,
+      absAmount: 89.81,
+      isExpense: true,
+      bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
+      purpose: undefined,
+      counterPartName: undefined,
+      counterPartAccountNumber: undefined,
+      counterPartIban: undefined,
+      counterPartBlz: undefined,
+      counterPartBic: undefined,
+      counterPartBankName: undefined
+    };
+    await transactions.save(transaction);
 
+    const result = await transactions.findById(209864836);
+    expect(result).to.eql(transaction);
+  });
+
+  it("find by ids", async function() {
     const transaction1 = {
       id: 22,
       accountId: 69,
@@ -98,7 +118,7 @@ describe("integration: postgres transactions repository", function() {
     await transactions.save(transaction2);
     await transactions.save(transaction3);
 
-    const result = await transactions.findByIds([22,23,24]);
+    const result = await transactions.findByIds([22, 23, 24]);
     expect(result.length).to.equal(3);
     expect(result[0].id).to.equal(22);
     expect(result[1].id).to.equal(23);
@@ -287,7 +307,7 @@ describe("integration: postgres transactions repository", function() {
     ];
 
     await transactions.saveArray(transactionsData);
-    const result = await transactions.findById(transactionsData[0].id);
+    const result = await transactions.findById(transactionsData[1].id);
     expect(result).to.be.not.null;
     expect(result!.id).to.equal(transactionsData[1].id);
     expect(result!.accountId).to.equal(transactionsData[1].accountId);
@@ -362,7 +382,7 @@ describe("integration: postgres transactions repository", function() {
     expect(await transactions.findById(transactionsData[2].id)).to.not.exist;
   });
 
-  it('group by iban column', async function() {
+  it("group by iban column", async function() {
     let transactionsData: Transaction[] = [
       {
         id: 1112,
@@ -441,13 +461,13 @@ describe("integration: postgres transactions repository", function() {
     expect(transactionsGroup.length).to.equal(2);
     expect(transactionsGroup[0].length).to.equal(2);
     expect(transactionsGroup[0][0].accountId).to.equal(2);
-    expect(transactionsGroup[0][0].counterPartIban).to.equal('AU13700807001061110500');
+    expect(transactionsGroup[0][0].counterPartIban).to.equal("AU13700807001061110500");
     expect(transactionsGroup[0][1].accountId).to.equal(2);
-    expect(transactionsGroup[0][1].counterPartIban).to.equal('AU13700807001061110500');
+    expect(transactionsGroup[0][1].counterPartIban).to.equal("AU13700807001061110500");
     expect(transactionsGroup[1].length).to.equal(2);
     expect(transactionsGroup[1][0].accountId).to.equal(2);
-    expect(transactionsGroup[1][0].counterPartIban).to.equal('DE13700800000061110500');
+    expect(transactionsGroup[1][0].counterPartIban).to.equal("DE13700800000061110500");
     expect(transactionsGroup[1][1].accountId).to.equal(2);
-    expect(transactionsGroup[1][1].counterPartIban).to.equal('DE13700800000061110500');
+    expect(transactionsGroup[1][1].counterPartIban).to.equal("DE13700800000061110500");
   });
 });
