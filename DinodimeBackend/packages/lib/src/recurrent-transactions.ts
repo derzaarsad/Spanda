@@ -252,7 +252,13 @@ export namespace RecurrentTransactions {
     }
 
     findByAccountIdsQuery(accountIds: Array<number>) {
-      return this.format("SELECT * FROM %I WHERE accountid in (%L)", this.schema.tableName, accountIds);
+      const idAttribute = this.schema.columns["id"];
+      return this.format(
+        "SELECT * FROM %I WHERE accountid in (%L) ORDER BY %s ASC",
+        this.schema.tableName,
+        accountIds,
+        idAttribute
+      );
     }
 
     groupByColumnQuery(accountId: number, attributesIndex: number) {

@@ -98,7 +98,7 @@ describe("unit: postgres recurrent transactions repository", function() {
   it("renders the find-by-account-id query", async function() {
     const result = recurrentTransactions.findByAccountIdsQuery([2, 5]);
     expect(result).to.be.a("string");
-    expect(result).to.equal("SELECT * FROM recurrenttransactions WHERE accountid in ('2','5')");
+    expect(result).to.equal("SELECT * FROM recurrenttransactions WHERE accountid in ('2','5') ORDER BY id ASC");
   });
 
   it("renders the group-by-column query", async function() {
