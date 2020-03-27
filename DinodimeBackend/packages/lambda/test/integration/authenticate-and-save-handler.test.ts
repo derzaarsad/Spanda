@@ -8,7 +8,7 @@ import { VoidTransport, Authentication } from "dinodime-lib";
 import { authenticateAndSave } from "../../src/controllers/authentication-controller";
 import { CreateFinApiTestInterfaces } from "../test-utility";
 
-describe("authenticate user handler", function() {
+describe("integration: authenticate user handler", function() {
   let logger: winston.Logger;
   let context: Context;
   let testUsername: string;

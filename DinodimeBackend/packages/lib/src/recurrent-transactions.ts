@@ -3,10 +3,10 @@ import { Schema } from "./schema/schema";
 import { Pool } from "pg";
 
 export enum TransactionFrequency {
-    Unknown,
-    Monthly,
-    Quarterly,
-    Yearly
+  Unknown = "Unknown",
+  Monthly = "Monthly",
+  Quarterly = "Quarterly",
+  Yearly = "Yearly"
 }
 
 export class RecurrentTransaction {
@@ -25,18 +25,17 @@ export class RecurrentTransaction {
     counterPartName: string | null,
     id?: number
   ) {
-      this.id = id ? id : NaN;
-      this.accountId = accountId;
-      this.transactionIds = transactionIds;
-      this.isExpense = isExpense;
-      this.isConfirmed = false;
-      this.frequency = TransactionFrequency.Unknown;
-      this.counterPartName = counterPartName;
+    this.id = id ? id : 0;
+    this.accountId = accountId;
+    this.transactionIds = transactionIds;
+    this.isExpense = isExpense;
+    this.isConfirmed = false;
+    this.frequency = TransactionFrequency.Unknown;
+    this.counterPartName = counterPartName;
   }
-};
+}
 
 export namespace RecurrentTransactions {
-
   export interface RecurrentTransactionsRepository extends Repository<number, RecurrentTransaction> {
     findByAccountIds(accountIds: Array<number>): Promise<Array<RecurrentTransaction>>;
     saveArray(recurrentTransactions: Array<RecurrentTransaction>): Promise<Array<RecurrentTransaction>>;
@@ -66,7 +65,7 @@ export namespace RecurrentTransactions {
     }
 
     async saveArray(recurrentTransactions: Array<RecurrentTransaction>) {
-        recurrentTransactions.forEach(recurrentTransaction => this.save(recurrentTransaction));
+      recurrentTransactions.forEach(recurrentTransaction => this.save(recurrentTransaction));
       return recurrentTransactions;
     }
 
@@ -100,12 +99,11 @@ export namespace RecurrentTransactions {
     }
 
     async findByIds(ids: Array<number>): Promise<Array<RecurrentTransaction>> {
-
       let candidate: Array<RecurrentTransaction> = [];
 
       for (let i in ids) {
         const recurrentTransaction = this.repository[ids[i]];
-        if(!recurrentTransaction) {
+        if (!recurrentTransaction) {
           continue;
         }
 
@@ -139,11 +137,13 @@ export namespace RecurrentTransactions {
       return this.doQuery(params).then(() => recurrentTransaction);
     }
 
-    async saveWithoutId(recurrentTransaction: RecurrentTransaction): Promise<RecurrentTransaction> {
+    async saveWithoutId(tx: RecurrentTransaction): Promise<RecurrentTransaction> {
       const params = {
-        text: this.saveWithoutIdQuery(recurrentTransaction)
+        text: this.saveWithoutIdQuery(tx)
       };
-      return this.doQuery(params).then(() => recurrentTransaction);
+      return this.doQuery(params).then(res => {
+        return this.cloneRecurrentTransaction(tx, res.rows[0].id as number);
+      });
     }
 
     async findById(id: number): Promise<RecurrentTransaction | null> {
@@ -153,9 +153,7 @@ export namespace RecurrentTransactions {
         types: this.types
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null
-      );
+      return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async findByIds(ids: Array<number>): Promise<Array<RecurrentTransaction>> {
@@ -166,10 +164,11 @@ export namespace RecurrentTransactions {
       };
 
       return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? res.rows
-        .map(row => {
-          return this.schema.asObject(row)
-        }) : []
+        res.rowCount > 0
+          ? res.rows.map(row => {
+              return this.schema.asObject(row);
+            })
+          : []
       );
     }
 
@@ -197,8 +196,9 @@ export namespace RecurrentTransactions {
         types: this.types
       };
 
-      return this.doQuery(params)
-        .then(res => res.rows.map(row => row[0].map((element: any) => this.schema.mapColumns(element))));
+      return this.doQuery(params).then(res =>
+        res.rows.map(row => row[0].map((element: any) => this.schema.mapColumns(element)))
+      );
     }
 
     async saveArray(recurrentTransactions: RecurrentTransaction[]): Promise<RecurrentTransaction[]> {
@@ -214,10 +214,27 @@ export namespace RecurrentTransactions {
         text: this.saveArrayWithoutIdQuery(recurrentTransactions)
       };
 
-      return this.doQuery(params).then(res => recurrentTransactions);
+      return this.doQuery(params).then(res => {
+        const result = [];
+        for (let i = 0; i < res.rowCount; i++) {
+          const newIndex = res.rows[i].id as number;
+          result.push(this.cloneRecurrentTransaction(recurrentTransactions[i], newIndex));
+        }
+        return result;
+      });
     }
 
     async updateArray(recurrentTransactions: RecurrentTransaction[]): Promise<RecurrentTransaction[]> {
+      if (recurrentTransactions.length === 0) {
+        return recurrentTransactions;
+      }
+
+      const existingTransactions = await this.findByIds(recurrentTransactions.map(tx => tx.id));
+
+      if (existingTransactions.length !== recurrentTransactions.length) {
+        throw new Error("Cannot perform update. Some transactions don't exist.");
+      }
+
       const params = {
         text: this.updateArrayQuery(recurrentTransactions)
       };
@@ -226,31 +243,26 @@ export namespace RecurrentTransactions {
     }
 
     findByIdQuery(id: number) {
-      return this.format(
-        "SELECT * FROM %I WHERE id = %L LIMIT 1",
-        this.schema.tableName,
-        id.toString()
-      );
+      return this.format("SELECT * FROM %I WHERE id = %L LIMIT 1", this.schema.tableName, id.toString());
     }
 
     findByIdsQuery(ids: Array<number>) {
-      return this.format(
-        "SELECT * FROM %I WHERE id in (%L)",
-        this.schema.tableName,
-        ids
-      );
+      const idAttribute = this.schema.columns["id"];
+      return this.format("SELECT * FROM %I WHERE id in (%L) ORDER BY %s ASC", this.schema.tableName, ids, idAttribute);
     }
 
     findByAccountIdsQuery(accountIds: Array<number>) {
+      const idAttribute = this.schema.columns["id"];
       return this.format(
-        "SELECT * FROM %I WHERE accountid in (%L)",
+        "SELECT * FROM %I WHERE accountid in (%L) ORDER BY %s ASC",
         this.schema.tableName,
-        accountIds
+        accountIds,
+        idAttribute
       );
     }
 
     groupByColumnQuery(accountId: number, attributesIndex: number) {
-      const attribute = this.schema.attributes.split(",")[attributesIndex];
+      const attribute = this.schema.attributes[attributesIndex];
       return this.format(
         "SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM %I WHERE %I=b.%I AND accountid=%L) t ) rw FROM %I b WHERE %I IS NOT NULL GROUP BY %I",
         this.schema.tableName,
@@ -277,10 +289,10 @@ export namespace RecurrentTransactions {
 
     saveWithoutIdQuery(recurrentTransaction: RecurrentTransaction) {
       const tableName = this.schema.tableName;
-      const row = this.schema.asRow(recurrentTransaction);
-      const attributes = this.schema.attributes.replace("id,","");
-
-      return this.format("INSERT INTO %I (%s) VALUES (%L)", tableName, attributes, row.slice(1));
+      const attributes = this.schema.attributes.slice(1).join(",");
+      const idAttribute = this.schema.attributes[0];
+      const row = this.schema.asRow(recurrentTransaction).slice(1);
+      return this.format("INSERT INTO %I (%s) VALUES (%L) RETURNING %s", tableName, attributes, row, idAttribute);
     }
 
     saveArrayQuery(recurrentTransactions: RecurrentTransaction[]) {
@@ -290,7 +302,9 @@ export namespace RecurrentTransactions {
         .map(recurrentTransaction => {
           return (
             "(" +
-            this.schema.asRow(recurrentTransaction).map(item => this.format("%L", item != null ? item.toString() : item)) +
+            this.schema
+              .asRow(recurrentTransaction)
+              .map(item => this.format("%L", item != null ? item.toString() : item)) +
             ")"
           );
         })
@@ -301,18 +315,22 @@ export namespace RecurrentTransactions {
 
     saveArrayWithoutIdQuery(recurrentTransactions: RecurrentTransaction[]) {
       const tableName = this.schema.tableName;
-      const attributes = this.schema.attributes.replace("id,","");
+      const idAttribute = this.schema.attributes[0];
+      const attributes = this.schema.attributes.slice(1);
       const values = recurrentTransactions
         .map(recurrentTransaction => {
           return (
             "(" +
-            this.schema.asRow(recurrentTransaction).slice(1).map(item => this.format("%L", item != null ? item.toString() : item)) +
+            this.schema
+              .asRow(recurrentTransaction)
+              .slice(1)
+              .map(item => this.format("%L", item != null ? item.toString() : item)) +
             ")"
           );
         })
         .join(", ");
 
-      return this.format("INSERT INTO %I (%s) VALUES %s", tableName, attributes, values);
+      return this.format("INSERT INTO %I (%s) VALUES %s RETURNING %s", tableName, attributes, values, idAttribute);
     }
 
     updateArrayQuery(recurrentTransactions: RecurrentTransaction[]) {
@@ -322,13 +340,27 @@ export namespace RecurrentTransactions {
         .map(recurrentTransaction => {
           return (
             "(" +
-            this.schema.asRow(recurrentTransaction).map(item => this.format("%L", item != null ? item.toString() : item)) +
+            this.schema
+              .asRow(recurrentTransaction)
+              .map(item => this.format("%L", item != null ? item.toString() : item)) +
             ")"
           );
         })
         .join(", ");
 
-      return this.format("UPDATE %I SET isconfirmed = nv.isconfirmed::boolean FROM ( VALUES %s) as nv (%s) WHERE recurrenttransactions.id = nv.id::int8 AND recurrenttransactions.accountid = nv.accountid::int8", tableName, values, attributes);
+      return this.format(
+        "UPDATE %I SET isconfirmed = nv.isconfirmed::boolean FROM ( VALUES %s) as nv (%s) WHERE recurrenttransactions.id = nv.id::int8 AND recurrenttransactions.accountid = nv.accountid::int8",
+        tableName,
+        values,
+        attributes
+      );
+    }
+
+    private cloneRecurrentTransaction(tx: RecurrentTransaction, id: number) {
+      const result = new RecurrentTransaction(tx.accountId, tx.transactionIds, tx.isExpense, tx.counterPartName, id);
+      result.isConfirmed = tx.isConfirmed;
+      result.frequency = tx.frequency;
+      return result;
     }
   }
 }

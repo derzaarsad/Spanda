@@ -9,7 +9,7 @@ import { VoidTransport, FinAPI, Users, User } from "dinodime-lib";
 import { BankConnections, Transactions } from "dinodime-lib";
 import { Encryptions, CallbackCrypto } from "dinodime-lib";
 
-describe("fetch webform info handler", function() {
+describe("unit: fetch webform info handler", function() {
   let logger: winston.Logger;
   let users: Users.UsersRepository;
   let connections: BankConnections.BankConnectionsRepository;

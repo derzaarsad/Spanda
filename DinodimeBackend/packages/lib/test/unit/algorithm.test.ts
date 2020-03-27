@@ -3,7 +3,7 @@ import { Transaction } from "../../src/transactions";
 import chai from "chai";
 const expect = chai.expect;
 
-describe("Algorithm", function() {
+describe("unit: Algorithm", function() {
   it("Get recurrent transaction", async function() {
     let transactionsData: Transaction[] = [
         {

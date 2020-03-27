@@ -7,7 +7,7 @@ import { isUserAuthenticated } from "../../src/controllers/authentication-contro
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import { VoidTransport, FinAPI } from "dinodime-lib";
 
-describe("isUserAuthenticated handler", function() {
+describe("unit: isUserAuthenticated handler", function() {
   let logger: winston.Logger;
   let context: Context;
 

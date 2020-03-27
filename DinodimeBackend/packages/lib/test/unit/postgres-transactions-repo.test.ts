@@ -7,25 +7,21 @@ import format from "pg-format";
 import { Transaction, Transactions } from "../../src/transactions";
 import { TransactionsSchema } from "../../src/schema/transactions";
 
-describe("postgres transactions repository", function() {
+describe("unit: postgres transactions repository", function() {
   let transactions: Transactions.PostgreSQLRepository;
 
   beforeEach(function() {
-    transactions = new Transactions.PostgreSQLRepository(
-      undefined,
-      format,
-      new TransactionsSchema()
-    );
+    transactions = new Transactions.PostgreSQLRepository(undefined, format, new TransactionsSchema());
   });
 
   it("renders the find-by-id query", async function() {
     const result = transactions.findByIdQuery(1);
     expect(result).to.be.a("string");
-    expect(result).to.equal("SELECT * FROM transactions WHERE id = '1' LIMIT 1");
+    expect(result).to.equal("SELECT * FROM transactions WHERE id = '1' ORDER BY accountid ASC LIMIT 1");
   });
 
   it("renders the find-by-ids query", async function() {
-    const result = transactions.findByIdsQuery([1,2,3]);
+    const result = transactions.findByIdsQuery([1, 2, 3]);
     expect(result).to.be.a("string");
     expect(result).to.equal("SELECT * FROM transactions WHERE id in ('1','2','3')");
   });
@@ -94,7 +90,7 @@ describe("postgres transactions repository", function() {
     const result = transactions.saveArrayQuery(transactionsData);
     expect(result).to.be.a("string");
     expect(result).to.equal(
-      "INSERT INTO transactions (id,accountid,absamount,isexpense,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES ('1112','2','89.871','true','2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank'), ('2233','2','99.81','false','2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank')"
+      "INSERT INTO transactions (id,accountid,absamount,isexpense,bookingdate,purpose,counterpartname,counterpartaccountnumber,counterpartiban,counterpartblz,counterpartbic,counterpartbankname) VALUES ('1112','2','89.871','t','2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank'), ('2233','2','99.81','f','2018-01-01T00:00:00.000Z',' RE. 745259','TueV Bayern','611105','DE13700800000061110500','70080000','DRESDEFF700','Commerzbank vormals Dresdner Bank')"
     );
   });
 
@@ -105,8 +101,10 @@ describe("postgres transactions repository", function() {
   });
 
   it("renders the group-by-column query", async function() {
-    const result = transactions.groupByColumnQuery(2,8);
+    const result = transactions.groupByColumnQuery(2, 8);
     expect(result).to.be.a("string");
-    expect(result).to.equal("SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM transactions WHERE counterpartiban=b.counterpartiban AND accountid='2') t ) rw FROM transactions b WHERE counterpartiban IS NOT NULL GROUP BY counterpartiban");
+    expect(result).to.equal(
+      "SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM transactions WHERE counterpartiban=b.counterpartiban AND accountid='2') t ) rw FROM transactions b WHERE counterpartiban IS NOT NULL GROUP BY counterpartiban"
+    );
   });
 });

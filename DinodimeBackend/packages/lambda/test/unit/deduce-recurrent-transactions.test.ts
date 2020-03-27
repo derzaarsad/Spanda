@@ -10,7 +10,7 @@ import { RecurrentTransactions, Transactions } from "dinodime-lib";
 import { Transaction } from "dinodime-lib";
 import { TransactionFrequency } from "dinodime-lib";
 
-describe("deduce recurrent transactions", function() {
+describe("unit: deduce recurrent transactions", function() {
   let logger: winston.Logger;
   let recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
   let transactions: Transactions.TransactionsRepository;

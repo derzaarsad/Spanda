@@ -8,7 +8,7 @@ import { RuleHandleFactory, UUIDRuleHandleFactory } from "../../src/rule-handle"
 let factory: RuleHandleFactory;
 let handles: InMemoryRuleHandleRepository;
 
-describe("In-memory rule handle repository", () => {
+describe("unit: In-memory rule handle repository", () => {
   beforeEach(() => {
     handles = new InMemoryRuleHandleRepository();
     factory = new UUIDRuleHandleFactory(uuid);

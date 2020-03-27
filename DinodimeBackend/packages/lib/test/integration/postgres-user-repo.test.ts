@@ -7,7 +7,7 @@ import { UsersSchema } from "../../src/schema/users";
 import { Users, User } from "../../src/users";
 import { Pool } from "pg";
 
-describe("postgres users repository", function() {
+describe("integration: postgres users repository", function() {
   let users: Users.PostgreSQLRepository;
 
   before(function() {
@@ -15,7 +15,7 @@ describe("postgres users repository", function() {
     users = new Users.PostgreSQLRepository(new Pool(), format, schema);
   });
 
-  beforeEach(async function() {
+  afterEach(async function() {
     await users.deleteAll();
   });
 
@@ -50,7 +50,7 @@ describe("postgres users repository", function() {
     await users.save(new User("chapu2", "chapu2@mischung.net", "+666 666 666", false));
     await users.save(new User("chapu3", "chapu3@mischung.net", "+666 666 666", false));
 
-    const result = await users.findByIds(["chapu1","chapu2","chapu3"]);
+    const result = await users.findByIds(["chapu1", "chapu2", "chapu3"]);
     expect(result.length).to.equal(3);
     expect(result[0].username).to.equal("chapu1");
     expect(result[1].username).to.equal("chapu2");

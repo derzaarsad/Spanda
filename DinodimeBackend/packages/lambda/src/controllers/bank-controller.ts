@@ -14,7 +14,7 @@ import { User, Users } from "dinodime-lib";
 import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dinodime-lib";
 import { Transaction } from "dinodime-lib";
 import { RecurrentTransaction, RecurrentTransactions } from "dinodime-lib";
-import { Algorithm } from "dinodime-lib"
+import { Algorithm } from "dinodime-lib";
 
 const blzPattern = /^\d{8}$/;
 
@@ -174,7 +174,7 @@ export const getRecurrentTransactions = async (
   try {
     bankConnections = await connections.findByIds(user.bankConnectionIds);
 
-    if(bankConnections.length == 0) {
+    if (bankConnections.length == 0) {
       throw new Error("this user does not have any bank connection");
     }
   } catch (err) {
@@ -182,7 +182,7 @@ export const getRecurrentTransactions = async (
     return CreateSimpleResponse(204, "getting bank connections failed");
   }
 
-  for(let id in bankConnections) {
+  for (let id in bankConnections) {
     accountIds = accountIds.concat(bankConnections[id].bankAccountIds);
   }
 
@@ -202,7 +202,7 @@ export const getRecurrentTransactions = async (
       isConfirmed: el.isConfirmed,
       frequency: el.frequency,
       counterPartName: el.counterPartName
-    }
+    };
   });
 
   return CreateResponse(200, { recurrenttransactions });
@@ -230,11 +230,12 @@ export const updateRecurrentTransactions = async (
   try {
     let userInfo = await getUserInfo(logger, bankInterface, authorization);
     user = await users.findById(userInfo.id);
-    if (!user) {
-      throw new Error("user is not found in the database");
-    }
   } catch (err) {
     logger.log("error", "error authenticating user", err);
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  if (user === null) {
     return CreateSimpleResponse(401, "unauthorized");
   }
 
@@ -274,10 +275,20 @@ export const deduceRecurrentTransactions = async (
   accountId: number
 ): Promise<any> => {
   let ibanGroupedTransactions: Transaction[][] = await transactions.groupByIban(accountId);
-  let deducedRecurrent: RecurrentTransaction[][] = ibanGroupedTransactions.map(ibanGroupedTransaction =>
-    Algorithm.GetRecurrentTransaction(ibanGroupedTransaction).map(res => new RecurrentTransaction(accountId, res.map(el => el.id), res[0].isExpense, res[0].counterPartName == undefined ? null : res[0].counterPartName))
-  );
-  for(let i = 0; i < deducedRecurrent.length; ++i) {
+  let deducedRecurrent: RecurrentTransaction[][] = ibanGroupedTransactions
+    .map(ibanGroupedTransaction =>
+      Algorithm.GetRecurrentTransaction(ibanGroupedTransaction).map(
+        res =>
+          new RecurrentTransaction(
+            accountId,
+            res.map(el => el.id),
+            res[0].isExpense,
+            res[0].counterPartName == undefined ? null : res[0].counterPartName
+          )
+      )
+    )
+    .filter(deduced => deduced.length > 0);
+  for (let i = 0; i < deducedRecurrent.length; ++i) {
     await recurrentTransactions.saveArrayWithoutId(deducedRecurrent[i]);
   }
 };
@@ -334,14 +345,9 @@ export const fetchWebFormInfo = async (
     return CreateInternalErrorResponse("no accountIds available");
   }
 
-  const transactionsDataBankSpecific = await bankInterface.getAllTransactions(
-    authorization,
-    body.accountIds
-  );
+  const transactionsDataBankSpecific = await bankInterface.getAllTransactions(authorization, body.accountIds);
 
-  const transactionsData = transactionsDataBankSpecific.map(transaction =>
-    Transactions.fromFinAPI(transaction)
-  );
+  const transactionsData = transactionsDataBankSpecific.map(transaction => Transactions.fromFinAPI(transaction));
 
   const bankConnection = new BankConnection(body.id, body.bankId);
   bankConnection.bankAccountIds = body.accountIds;
@@ -349,11 +355,7 @@ export const fetchWebFormInfo = async (
   user.bankConnectionIds.push(body.id);
 
   // TODO: rollback on failure
-  return Promise.all([
-    users.save(user),
-    connections.save(bankConnection),
-    transactions.saveArray(transactionsData)
-  ])
+  return Promise.all([users.save(user), connections.save(bankConnection), transactions.saveArray(transactionsData)])
     .then(() => CreateResponse(200, body))
     .catch(err => {
       logger.log("error", "error persisting bank connection data", { cause: err });
