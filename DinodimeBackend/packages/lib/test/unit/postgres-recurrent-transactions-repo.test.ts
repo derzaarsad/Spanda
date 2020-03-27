@@ -27,7 +27,7 @@ describe("unit: postgres recurrent transactions repository", function() {
   it("renders the find-by-ids query", async function() {
     const result = recurrentTransactions.findByIdsQuery([1, 2, 3]);
     expect(result).to.be.a("string");
-    expect(result).to.equal("SELECT * FROM recurrenttransactions WHERE id in ('1','2','3')");
+    expect(result).to.equal("SELECT * FROM recurrenttransactions WHERE id in ('1','2','3') ORDER BY id ASC");
   });
 
   it("renders the save query with an id", async function() {

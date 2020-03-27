@@ -230,11 +230,12 @@ export const updateRecurrentTransactions = async (
   try {
     let userInfo = await getUserInfo(logger, bankInterface, authorization);
     user = await users.findById(userInfo.id);
-    if (!user) {
-      throw new Error("user is not found in the database");
-    }
   } catch (err) {
     logger.log("error", "error authenticating user", err);
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  if (user === null) {
     return CreateSimpleResponse(401, "unauthorized");
   }
 
@@ -274,8 +275,8 @@ export const deduceRecurrentTransactions = async (
   accountId: number
 ): Promise<any> => {
   let ibanGroupedTransactions: Transaction[][] = await transactions.groupByIban(accountId);
-  let deducedRecurrent: RecurrentTransaction[][] = ibanGroupedTransactions.map(
-    ibanGroupedTransaction =>
+  let deducedRecurrent: RecurrentTransaction[][] = ibanGroupedTransactions
+    .map(ibanGroupedTransaction =>
       Algorithm.GetRecurrentTransaction(ibanGroupedTransaction).map(
         res =>
           new RecurrentTransaction(
@@ -285,7 +286,8 @@ export const deduceRecurrentTransactions = async (
             res[0].counterPartName == undefined ? null : res[0].counterPartName
           )
       )
-  ).filter(deduced => deduced.length > 0);
+    )
+    .filter(deduced => deduced.length > 0);
   for (let i = 0; i < deducedRecurrent.length; ++i) {
     await recurrentTransactions.saveArrayWithoutId(deducedRecurrent[i]);
   }
@@ -343,14 +345,9 @@ export const fetchWebFormInfo = async (
     return CreateInternalErrorResponse("no accountIds available");
   }
 
-  const transactionsDataBankSpecific = await bankInterface.getAllTransactions(
-    authorization,
-    body.accountIds
-  );
+  const transactionsDataBankSpecific = await bankInterface.getAllTransactions(authorization, body.accountIds);
 
-  const transactionsData = transactionsDataBankSpecific.map(transaction =>
-    Transactions.fromFinAPI(transaction)
-  );
+  const transactionsData = transactionsDataBankSpecific.map(transaction => Transactions.fromFinAPI(transaction));
 
   const bankConnection = new BankConnection(body.id, body.bankId);
   bankConnection.bankAccountIds = body.accountIds;
@@ -358,11 +355,7 @@ export const fetchWebFormInfo = async (
   user.bankConnectionIds.push(body.id);
 
   // TODO: rollback on failure
-  return Promise.all([
-    users.save(user),
-    connections.save(bankConnection),
-    transactions.saveArray(transactionsData)
-  ])
+  return Promise.all([users.save(user), connections.save(bankConnection), transactions.saveArray(transactionsData)])
     .then(() => CreateResponse(200, body))
     .catch(err => {
       logger.log("error", "error persisting bank connection data", { cause: err });

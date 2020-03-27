@@ -3,14 +3,8 @@ const expect = chai.expect;
 import winston from "winston";
 
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import {
-  User,
-  Users,
-  BankConnections,
-  Transactions,
-  VoidTransport,
-  CallbackCrypto
-} from "dinodime-lib";
+import { FinAPI } from "dinodime-lib";
+import { User, Users, BankConnections, Transactions, VoidTransport, CallbackCrypto } from "dinodime-lib";
 
 import { fetchWebFormInfo } from "../../src/controllers/bank-controller";
 import { CreateFinApiTestInterfaces } from "../test-utility";
@@ -38,25 +32,14 @@ describe("integration: fetch webform info handler", function() {
   expect(process.env.WEBFORM_ID_FOR_FETCH).to.exist;
   expect(process.env.ACCESS_TOKEN_FOR_FETCH).to.exist;
 
-  let dummyInterfaces = CreateFinApiTestInterfaces(
-    process.env.FinAPIClientId!,
-    process.env.FinAPIClientSecret!
-  );
+  let dummyInterfaces = CreateFinApiTestInterfaces(process.env.FinAPIClientId!, process.env.FinAPIClientSecret!);
 
   beforeEach(async function() {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
     users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
-    connections = new BankConnections.PostgreSQLRepository(
-      new Pool(),
-      format,
-      new BankConnectionsSchema()
-    );
-    transactions = new Transactions.PostgreSQLRepository(
-      new Pool(),
-      format,
-      new TransactionsSchema()
-    );
+    connections = new BankConnections.PostgreSQLRepository(new Pool(), format, new BankConnectionsSchema());
+    transactions = new Transactions.PostgreSQLRepository(new Pool(), format, new TransactionsSchema());
 
     context = {} as Context;
     encryptions = new CallbackCrypto();
@@ -101,23 +84,53 @@ describe("integration: fetch webform info handler", function() {
   });
 
   it("adds a connection to the user", async function() {
+    let access_token = "bearer 5jkntkzt5nj53zi99754563nb3b64zb";
+    const encrypted = encryptions.EncryptText(access_token);
     const user = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
-    user.activeWebFormId = parseInt(process.env.WEBFORM_ID_FOR_FETCH!);
+    user.activeWebFormId = 2934;
     user.activeWebFormAuth = encrypted.iv;
     await users.save(user);
+
+    const finapi = ({
+      fetchWebForm: async (authorization: string) => {
+        if (authorization !== access_token) {
+          return {};
+        }
+        return {
+          serviceResponseBody: '{ "id": 1, "bankId": 2, "accountIds": [ 3, 4, 5 ] }'
+        };
+      },
+
+      getAllTransactions: async () => {
+        return [
+          {
+            id: 1112,
+            accountId: 3,
+            amount: -89.871,
+            finapiBookingDate: "2018-01-01 00:00:00.000",
+            purpose: " RE. 745259",
+            counterPartName: "TueV Bayern",
+            counterPartAccountNumber: "611105",
+            counterPartIban: "DE13700800000061110500",
+            counterPartBlz: "70080000",
+            counterPartBic: "DRESDEFF700",
+            counterPartBankName: "Commerzbank vormals Dresdner Bank"
+          }
+        ];
+      }
+    } as unknown) as FinAPI;
 
     const event = ({
       headers: {},
       pathParameters: {
-        webFormAuth: process.env.WEBFORM_ID_FOR_FETCH! + "-" + encrypted.cipherText
+        webFormAuth: "2934-" + encrypted.cipherText
       }
     } as unknown) as APIGatewayProxyEvent;
-
     const result = await fetchWebFormInfo(
       event,
       context,
       logger,
-      dummyInterfaces.bankInterface,
+      finapi,
       users,
       connections,
       transactions,
@@ -136,17 +149,11 @@ describe("integration: fetch webform info handler", function() {
 
     const user_ = await users.findById("chapu");
     expect(user_, "no user found for the given username").to.be.ok;
-    expect(user_!.bankConnectionIds).to.include(
-      bankConnectionId,
-      "the connection ids were not updated"
-    );
+    expect(user_!.bankConnectionIds).to.include(bankConnectionId, "the connection ids were not updated");
 
     const connection = await connections.findById(bankConnectionId);
     expect(connection, "the connection was not created").to.be.ok;
-    expect(connection!.bankAccountIds[0]).to.be.an(
-      "number",
-      "expected the bankAccountIds element to be a number"
-    );
+    expect(connection!.bankAccountIds[0]).to.be.an("number", "expected the bankAccountIds element to be a number");
 
     const transactions_ = await transactions.findByAccountIds(connection!.bankAccountIds);
     expect(transactions_).to.exist;

@@ -225,6 +225,16 @@ export namespace RecurrentTransactions {
     }
 
     async updateArray(recurrentTransactions: RecurrentTransaction[]): Promise<RecurrentTransaction[]> {
+      if (recurrentTransactions.length === 0) {
+        return recurrentTransactions;
+      }
+
+      const existingTransactions = await this.findByIds(recurrentTransactions.map(tx => tx.id));
+
+      if (existingTransactions.length !== recurrentTransactions.length) {
+        throw new Error("Cannot perform update. Some transactions don't exist.");
+      }
+
       const params = {
         text: this.updateArrayQuery(recurrentTransactions)
       };
@@ -237,7 +247,8 @@ export namespace RecurrentTransactions {
     }
 
     findByIdsQuery(ids: Array<number>) {
-      return this.format("SELECT * FROM %I WHERE id in (%L)", this.schema.tableName, ids);
+      const idAttribute = this.schema.columns["id"];
+      return this.format("SELECT * FROM %I WHERE id in (%L) ORDER BY %s ASC", this.schema.tableName, ids, idAttribute);
     }
 
     findByAccountIdsQuery(accountIds: Array<number>) {

@@ -1,4 +1,4 @@
-import { TransactionFrequency, RecurrentTransaction } from "../recurrent-transactions";
+import { RecurrentTransaction } from "../recurrent-transactions";
 import { Schema } from "./schema";
 
 const attributes = ["id", "accountid", "transactionids", "isexpense", "isconfirmed", "frequency", "counterpartname"];
