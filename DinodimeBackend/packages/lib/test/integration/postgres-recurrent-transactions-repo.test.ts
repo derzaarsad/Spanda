@@ -7,11 +7,7 @@ chai.use(chaiAsPromised);
 
 import format from "pg-format";
 import { Pool } from "pg";
-import {
-  RecurrentTransaction,
-  RecurrentTransactions,
-  TransactionFrequency
-} from "../../src/recurrent-transactions";
+import { RecurrentTransaction, RecurrentTransactions } from "../../src/recurrent-transactions";
 import { RecurrentTransactionsSchema } from "../../src/schema/recurrent-transactions";
 
 describe("integration: postgres recurrent transactions repository", function() {
@@ -19,11 +15,7 @@ describe("integration: postgres recurrent transactions repository", function() {
 
   before(function() {
     const schema = new RecurrentTransactionsSchema();
-    recurrentTransactions = new RecurrentTransactions.PostgreSQLRepository(
-      new Pool(),
-      format,
-      schema
-    );
+    recurrentTransactions = new RecurrentTransactions.PostgreSQLRepository(new Pool(), format, schema);
   });
 
   afterEach(async function() {
@@ -46,7 +38,7 @@ describe("integration: postgres recurrent transactions repository", function() {
     expect(result!.transactionIds).to.eql(recurrentTransaction.transactionIds);
     expect(result!.isExpense).to.eql(recurrentTransaction.isExpense);
     expect(result!.isConfirmed).to.eql(recurrentTransaction.isConfirmed);
-    expect(TransactionFrequency[result!.frequency]).to.eql(recurrentTransaction.frequency); // I don't feel right about this because I expect enum to equal enum
+    expect(result!.frequency).to.eql(recurrentTransaction.frequency);
     expect(result!.counterPartName).to.be.null;
   });
 
@@ -67,36 +59,33 @@ describe("integration: postgres recurrent transactions repository", function() {
   });
 
   it("saves and retrieves a recurrent transaction without id", async function() {
-    const recurrentTransaction = new RecurrentTransaction(995070, [1, 2, 3], true, "Dinodime GmbH");
-    await recurrentTransactions.saveWithoutId(recurrentTransaction);
+    const recurrentTransaction = await recurrentTransactions.saveWithoutId(
+      new RecurrentTransaction(995070, [1, 2, 3], true, "Dinodime GmbH")
+    );
 
-    const result = await recurrentTransactions.findById(1);
+    const result = await recurrentTransactions.findById(recurrentTransaction.id);
     expect(result).to.be.not.null;
-    expect(result!.id).to.eql(1);
+    expect(result!.id).to.eql(recurrentTransaction.id);
     expect(result!.accountId).to.eql(recurrentTransaction.accountId);
     expect(result!.transactionIds).to.eql(recurrentTransaction.transactionIds);
     expect(result!.isExpense).to.eql(recurrentTransaction.isExpense);
     expect(result!.isConfirmed).to.eql(recurrentTransaction.isConfirmed);
-    expect(TransactionFrequency[result!.frequency]).to.eql(recurrentTransaction.frequency); // I don't feel right about this because I expect enum to equal enum
-    expect(result!.counterPartName).to.eql("Dinodime GmbH");
+    expect(result!.frequency).to.eql(recurrentTransaction.frequency);
+    expect(result!.counterPartName).to.eql(recurrentTransaction.counterPartName);
 
-    const recurrentTransaction2 = new RecurrentTransaction(
-      885070,
-      [4, 5, 6],
-      false,
-      "Dinodime GmbH"
+    const recurrentTransaction2 = await recurrentTransactions.saveWithoutId(
+      new RecurrentTransaction(885070, [4, 5, 6], false, "Dinodime GmbH")
     );
-    await recurrentTransactions.saveWithoutId(recurrentTransaction2);
 
-    const result2 = await recurrentTransactions.findById(2);
+    const result2 = await recurrentTransactions.findById(recurrentTransaction2.id);
     expect(result2).to.be.not.null;
-    expect(result2!.id).to.eql(2);
+    expect(result2!.id).to.eql(recurrentTransaction2.id);
     expect(result2!.accountId).to.eql(recurrentTransaction2.accountId);
     expect(result2!.transactionIds).to.eql(recurrentTransaction2.transactionIds);
     expect(result2!.isExpense).to.eql(recurrentTransaction2.isExpense);
     expect(result2!.isConfirmed).to.eql(recurrentTransaction2.isConfirmed);
-    expect(TransactionFrequency[result2!.frequency]).to.eql(recurrentTransaction2.frequency); // I don't feel right about this because I expect enum to equal enum
-    expect(result2!.counterPartName).to.eql("Dinodime GmbH");
+    expect(result2!.frequency).to.eql(recurrentTransaction2.frequency);
+    expect(result2!.counterPartName).to.eql(recurrentTransaction2.counterPartName);
   });
 
   it("save with unique id and account id", async function() {
@@ -110,9 +99,7 @@ describe("integration: postgres recurrent transactions repository", function() {
     await expect(recurrentTransactions.save(thirdRecurrentTransaction)).to.eventually.be.fulfilled;
 
     const fourthRecurrentTransaction = new RecurrentTransaction(1, [10, 11, 12], true, null, 1);
-    await expect(
-      recurrentTransactions.save(fourthRecurrentTransaction)
-    ).to.eventually.be.rejectedWith(
+    await expect(recurrentTransactions.save(fourthRecurrentTransaction)).to.eventually.be.rejectedWith(
       'duplicate key value violates unique constraint "recurrenttransactions_pkey"'
     );
   });
@@ -132,7 +119,7 @@ describe("integration: postgres recurrent transactions repository", function() {
     expect(result!.transactionIds).to.eql(recurrentTransactionsData[1].transactionIds);
     expect(result!.isExpense).to.eql(recurrentTransactionsData[1].isExpense);
     expect(result!.isConfirmed).to.eql(recurrentTransactionsData[1].isConfirmed);
-    expect(TransactionFrequency[result!.frequency]).to.eql(recurrentTransactionsData[1].frequency); // I don't feel right about this because I expect enum to equal enum
+    expect(result!.frequency).to.eql(recurrentTransactionsData[1].frequency);
     expect(result!.counterPartName).to.be.null;
 
     const results = await recurrentTransactions.findByAccountIds([2]);
@@ -162,7 +149,7 @@ describe("integration: postgres recurrent transactions repository", function() {
     expect(result!.transactionIds).to.eql(recurrentTransactionsData[0].transactionIds);
     expect(result!.isExpense).to.eql(recurrentTransactionsData[0].isExpense);
     expect(result!.isConfirmed).to.eql(recurrentTransactionsData[0].isConfirmed);
-    expect(TransactionFrequency[result!.frequency]).to.eql(recurrentTransactionsData[0].frequency); // I don't feel right about this because I expect enum to equal enum
+    expect(result!.frequency).to.eql(recurrentTransactionsData[0].frequency);
     expect(result!.counterPartName).to.eql("Dinodime GmbH");
 
     // If the array contains at least one object with the same ids,
@@ -171,9 +158,7 @@ describe("integration: postgres recurrent transactions repository", function() {
       new RecurrentTransaction(5, [1, 2, 3], true, "Dinodime GmbH", 1112),
       new RecurrentTransaction(1, [4, 5, 6], true, null, 1111)
     ];
-    await expect(
-      recurrentTransactions.saveArray(recurrentTransactionsData2)
-    ).to.eventually.be.rejectedWith(
+    await expect(recurrentTransactions.saveArray(recurrentTransactionsData2)).to.eventually.be.rejectedWith(
       'duplicate key value violates unique constraint "recurrenttransactions_pkey"'
     );
     const resultNotExist = await recurrentTransactions.findById(1111);
@@ -190,9 +175,7 @@ describe("integration: postgres recurrent transactions repository", function() {
       new RecurrentTransaction(4, [7, 8, 9], true, null, 4112)
     ];
 
-    await expect(
-      recurrentTransactions.saveArray(recurrentTransactionsData)
-    ).to.eventually.be.rejectedWith(
+    await expect(recurrentTransactions.saveArray(recurrentTransactionsData)).to.eventually.be.rejectedWith(
       'duplicate key value violates unique constraint "recurrenttransactions_pkey"'
     );
     expect(await recurrentTransactions.findById(recurrentTransactionsData[0].id)).to.not.exist;
@@ -214,7 +197,7 @@ describe("integration: postgres recurrent transactions repository", function() {
     expect(result!.transactionIds).to.eql(recurrentTransactionsData[0].transactionIds);
     expect(result!.isExpense).to.eql(recurrentTransactionsData[0].isExpense);
     expect(result!.isConfirmed).to.eql(recurrentTransactionsData[0].isConfirmed);
-    expect(TransactionFrequency[result!.frequency]).to.eql(recurrentTransactionsData[0].frequency); // I don't feel right about this because I expect enum to equal enum
+    expect(result!.frequency).to.eql(recurrentTransactionsData[0].frequency);
     expect(result!.counterPartName).to.eql("Dinodime GmbH");
 
     // Update only modifies existing objects

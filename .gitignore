@@ -1,6 +1,7 @@
 *.swp
 *node_modules
 .aws-sam
+.nyc_output
 *.aws
 SpandaApp/platforms
 SpandaServer/src/routes.ts

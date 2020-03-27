@@ -48,6 +48,27 @@ describe("integration: postgres transactions repository", function() {
     expect(result).to.eql(transaction);
   });
 
+  it("saves and retrieves a transaction with undefined fields", async function() {
+    const transaction = {
+      id: 209864836,
+      accountId: 995070,
+      absAmount: 89.81,
+      isExpense: true,
+      bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
+      purpose: undefined,
+      counterPartName: undefined,
+      counterPartAccountNumber: undefined,
+      counterPartIban: undefined,
+      counterPartBlz: undefined,
+      counterPartBic: undefined,
+      counterPartBankName: undefined
+    };
+    await transactions.save(transaction);
+
+    const result = await transactions.findById(209864836);
+    expect(result).to.eql(transaction);
+  });
+
   it("find by ids", async function() {
     const transaction1 = {
       id: 22,
@@ -286,7 +307,7 @@ describe("integration: postgres transactions repository", function() {
     ];
 
     await transactions.saveArray(transactionsData);
-    const result = await transactions.findById(transactionsData[0].id);
+    const result = await transactions.findById(transactionsData[1].id);
     expect(result).to.be.not.null;
     expect(result!.id).to.equal(transactionsData[1].id);
     expect(result!.accountId).to.equal(transactionsData[1].accountId);

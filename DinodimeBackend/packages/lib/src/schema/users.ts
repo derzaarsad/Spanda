@@ -36,7 +36,7 @@ export class UsersSchema implements Schema<User> {
     this.tableName = tableName;
   }
 
-  attributes = attributes.join(",");
+  attributes = attributes;
 
   columns = asObject(attributes);
 

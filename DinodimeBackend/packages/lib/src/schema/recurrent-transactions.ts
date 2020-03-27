@@ -1,15 +1,7 @@
 import { TransactionFrequency, RecurrentTransaction } from "../recurrent-transactions";
 import { Schema } from "./schema";
 
-const attributes = [
-  "id",
-  "accountid",
-  "transactionids",
-  "isexpense",
-  "isconfirmed",
-  "frequency",
-  "counterpartname"
-];
+const attributes = ["id", "accountid", "transactionids", "isexpense", "isconfirmed", "frequency", "counterpartname"];
 
 const asObject = (row: Array<any>) => {
   return {
@@ -30,7 +22,7 @@ export class RecurrentTransactionsSchema implements Schema<RecurrentTransaction>
     this.tableName = tableName;
   }
 
-  attributes = attributes.join(",");
+  attributes = attributes;
 
   columns = asObject(attributes);
 
@@ -41,7 +33,7 @@ export class RecurrentTransactionsSchema implements Schema<RecurrentTransaction>
       transaction.transactionIds.length === 0 ? null : "{" + transaction.transactionIds.join(",") + "}",
       transaction.isExpense,
       transaction.isConfirmed,
-      TransactionFrequency[transaction.frequency],
+      transaction.frequency,
       transaction.counterPartName
     ];
   }
