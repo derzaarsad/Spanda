@@ -7,7 +7,7 @@
   "types": "out/src/index.d.ts",
   "scripts": {
     "test": "nyc --report-dir=../../coverages/unit/lambda mocha --require ts-node/register test/unit/**/*.ts",
-    "integtest": "nyc --report-dir=../../coverages/integration/lambda mocha --require ts-node/register test/integration/**/*.ts",
+    "integtest": "nyc --report-dir=./coverages mocha --require ts-node/register test/integration/**/*.ts",
     "package": "webpack"
   },
   "nyc": {
