@@ -169,6 +169,13 @@ jobs:
           docker-compose -f packages/lambda/docker-compose.yml build && docker-compose -f packages/lambda/docker-compose.yml up --abort-on-container-exit
         displayName: "Run integration tests"
         continueOnError: true
+      - task: PythonScript@0
+        inputs:
+          scriptSource: 'filePath'
+          scriptPath: '$(System.DefaultWorkingDirectory)/checkFilesExistence.py'
+          arguments: '$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/integtests-lib.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/integtests-lambda.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/integration/lib/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/integration/lambda/cobertura-coverage.xml'
+          failOnStderr: true
+        displayName: "Check Integration Test Results Existence"
       - task: PublishTestResults@2
         displayName: "Publish test results"
         condition: succeededOrFailed()
