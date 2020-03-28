@@ -155,6 +155,13 @@ jobs:
           yarn workspace dinodime-infrastructure run test --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-infrastructure.xml
         displayName: "Run unit tests"
         continueOnError: true
+      - task: PythonScript@0
+        inputs:
+          scriptSource: 'filePath'
+          scriptPath: '$(System.DefaultWorkingDirectory)/checkFilesExistence.py'
+          arguments: '$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/unit-tests-lib.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/unit-tests-lambda.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/unit-tests-infrastructure.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lib/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lambda/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/infrastructure/cobertura-coverage.xml'
+          failOnStderr: true
+        displayName: "Check Unit Test Results Existence"
       - script: |
           echo "Start Integration Test"
           cd $(System.DefaultWorkingDirectory)/DinodimeBackend
@@ -162,18 +169,25 @@ jobs:
           docker-compose -f packages/lambda/docker-compose.yml build && docker-compose -f packages/lambda/docker-compose.yml up --abort-on-container-exit
         displayName: "Run integration tests"
         continueOnError: true
+      - task: PythonScript@0
+        inputs:
+          scriptSource: 'filePath'
+          scriptPath: '$(System.DefaultWorkingDirectory)/checkFilesExistence.py'
+          arguments: '$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/integtests-lib.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/integtests-lambda.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/integration/lib/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/integration/lambda/cobertura-coverage.xml'
+          failOnStderr: true
+        displayName: "Check Integration Test Results Existence"
       - task: PublishTestResults@2
         displayName: "Publish test results"
         condition: succeededOrFailed()
         inputs:
           testRunner: JUnit
           testResultsFiles: "$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/*.xml"
-      - task: Palmmedia.reportgenerator.reportgenerator-build-release-task.reportgenerator@4
-        displayName: ReportGenerator
+      - task: reportgenerator@4
         inputs:
           reports: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lib/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lambda/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/infrastructure/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/integration/lib/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/integration/lambda/cobertura-coverage.xml'
           targetdir: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverage_summary'
           reporttypes: 'Cobertura'
+        displayName: "Create Code Coverage Reports"
       - task: PublishCodeCoverageResults@1
         inputs:
           codeCoverageTool: Cobertura

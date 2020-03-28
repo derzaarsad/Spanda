@@ -9,6 +9,12 @@
     "cdk": "cdk",
     "test": "nyc --report-dir=../../coverages/unit/infrastructure mocha --require ts-node/register test/**/*.ts"
   },
+  "nyc": {
+    "reporter": [
+      "cobertura"
+    ],
+    "all": true
+  },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "^1.22.0",
     "@aws-cdk/aws-lambda": "^1.22.0",
