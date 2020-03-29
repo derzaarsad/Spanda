@@ -5,7 +5,7 @@ const expect = chai.expect;
 
 import { isUserAuthenticated } from "../../src/controllers/authentication-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { VoidTransport, FinAPI, Users, User, FinAPIModel } from "dinodime-lib";
+import { VoidTransport, FinAPI, Users, User } from "dinodime-lib";
 
 describe("unit: isUserAuthenticated handler", function() {
   let logger: winston.Logger;
@@ -21,7 +21,7 @@ describe("unit: isUserAuthenticated handler", function() {
   });
 
   it("verifies an authorized request", async function() {
-    users.save(new User("chapu", "chapu@mischung.net", "+666 666 666", false));
+    await users.save(new User("chapu", "chapu@mischung.net", "+666 666 666", false));
 
     const bankInterface = ({
       userInfo: async () => {
@@ -55,9 +55,17 @@ describe("unit: isUserAuthenticated handler", function() {
   });
 
   it("rejects an unauthorized request", async function() {
+    await users.save(new User("chapu", "chapu@mischung.net", "+666 666 666", false));
+
     const bankInterface = ({
       userInfo: async () => {
-        return "ok";
+        return {
+          id: "chapu",
+          password: "password",
+          email: "chapu@mischung.net",
+          phone: "+666 666 666",
+          isAutoUpdateEnabled: false
+        };
       }
     } as unknown) as FinAPI;
 
@@ -68,7 +76,9 @@ describe("unit: isUserAuthenticated handler", function() {
     expect(result.statusCode).to.equal(401);
   });
 
-  it("rejects with an internal error if user is not found in the database", async function() {
+  it("rejects with unauthorized if userInfo throw an error", async function() {
+    await users.save(new User("chapu", "chapu@mischung.net", "+666 666 666", false));
+
     const bankInterface = ({
       userInfo: async () => {
         throw "nada";
