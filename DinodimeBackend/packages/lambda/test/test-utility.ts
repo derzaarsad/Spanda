@@ -8,31 +8,31 @@ export const CreateUnittestInterfaces = () => {
   let authentication: Authentication = {
     getClientCredentialsToken: async (clientSecrets: ClientSecretsProvider) => {
       return {
-        access_token: "yyz",
-        token_type: "bearer",
+        access_token: "yyz_clientcredentials",
+        token_type: "bearer_clientcredentials",
         expires_in: 3600,
-        scope: "test",
-        refresh_token: "xyz"
+        scope: "test_clientcredentials",
+        refresh_token: "xyz_clientcredentials"
       };
     },
 
     getPasswordToken: async (clientSecrets: ClientSecretsProvider) => {
       return {
-        access_token: "yyz",
-        token_type: "bearer",
+        access_token: "yyz_password",
+        token_type: "bearer_password",
         expires_in: 3600,
-        scope: "test",
-        refresh_token: "xyz"
+        scope: "test_password",
+        refresh_token: "xyz_password"
       };
     },
 
     getRefreshToken: async (clientSecrets: ClientSecretsProvider, refresh_token: string) => {
       return {
-        refresh_token: "xyz",
-        token_type: "bearer",
+        refresh_token: "xyz_refreshtoken",
+        token_type: "bearer_refreshtoken",
         expires_in: 3600,
-        scope: "test",
-        access_token: "yyz"
+        scope: "test_refreshtoken",
+        access_token: "yyz_refreshtoken"
       };
     }
   };
