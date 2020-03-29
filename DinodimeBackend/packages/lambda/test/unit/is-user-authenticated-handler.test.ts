@@ -6,11 +6,13 @@ const expect = chai.expect;
 import { isUserAuthenticated } from "../../src/controllers/authentication-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import { VoidTransport, FinAPI, Users, User } from "dinodime-lib";
+import { CreateUnittestInterfaces } from "../test-utility";
 
 describe("unit: isUserAuthenticated handler", function() {
   let logger: winston.Logger;
   let users: Users.UsersRepository;
   let context: Context;
+  let dummyInterfaces = CreateUnittestInterfaces();
 
   beforeEach(function() {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
@@ -23,25 +25,13 @@ describe("unit: isUserAuthenticated handler", function() {
   it("verifies an authorized request", async function() {
     await users.save(new User("chapu", "chapu@mischung.net", "+666 666 666", false));
 
-    const bankInterface = ({
-      userInfo: async () => {
-        return {
-          id: "chapu",
-          password: "password",
-          email: "chapu@mischung.net",
-          phone: "+666 666 666",
-          isAutoUpdateEnabled: false
-        };
-      }
-    } as unknown) as FinAPI;
-
     const event = ({
       headers: {
         Authorization: "bearer 5325626"
       }
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await isUserAuthenticated(event, context, logger, bankInterface, users);
+    const result = await isUserAuthenticated(event, context, logger, dummyInterfaces.bankInterface, users);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(200);
@@ -57,20 +47,8 @@ describe("unit: isUserAuthenticated handler", function() {
   it("rejects an unauthorized request", async function() {
     await users.save(new User("chapu", "chapu@mischung.net", "+666 666 666", false));
 
-    const bankInterface = ({
-      userInfo: async () => {
-        return {
-          id: "chapu",
-          password: "password",
-          email: "chapu@mischung.net",
-          phone: "+666 666 666",
-          isAutoUpdateEnabled: false
-        };
-      }
-    } as unknown) as FinAPI;
-
     const event = ({ headers: {} } as unknown) as APIGatewayProxyEvent;
-    const result = await isUserAuthenticated(event, context, logger, bankInterface, users);
+    const result = await isUserAuthenticated(event, context, logger, dummyInterfaces.bankInterface, users);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(401);
@@ -79,7 +57,7 @@ describe("unit: isUserAuthenticated handler", function() {
   it("rejects with unauthorized if userInfo throw an error", async function() {
     await users.save(new User("chapu", "chapu@mischung.net", "+666 666 666", false));
 
-    const bankInterface = ({
+    const failingBankInterface = ({
       userInfo: async () => {
         throw "nada";
       }
@@ -91,18 +69,13 @@ describe("unit: isUserAuthenticated handler", function() {
       }
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await isUserAuthenticated(event, context, logger, bankInterface, users);
+    const result = await isUserAuthenticated(event, context, logger, failingBankInterface, users);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(401);
   });
 
   it("rejects with an internal error if user is not found in the database", async function() {
-    const bankInterface = ({
-      userInfo: async () => {
-        return "ok";
-      }
-    } as unknown) as FinAPI;
 
     const event = ({
       headers: {
@@ -110,7 +83,7 @@ describe("unit: isUserAuthenticated handler", function() {
       }
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await isUserAuthenticated(event, context, logger, bankInterface, users);
+    const result = await isUserAuthenticated(event, context, logger, dummyInterfaces.bankInterface, users);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(500);
