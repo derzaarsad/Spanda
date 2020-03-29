@@ -5,18 +5,89 @@ const expect = chai.expect;
 
 import { isUserAuthenticated } from "../../src/controllers/authentication-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { VoidTransport, FinAPI } from "dinodime-lib";
+import { VoidTransport, FinAPI, Users, User, FinAPIModel } from "dinodime-lib";
 
 describe("unit: isUserAuthenticated handler", function() {
   let logger: winston.Logger;
+  let users: Users.UsersRepository;
   let context: Context;
 
   beforeEach(function() {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
+
+    users = new Users.InMemoryRepository();
+
     context = {} as Context;
   });
 
   it("verifies an authorized request", async function() {
+    users.save(new User("chapu", "chapu@mischung.net", "+666 666 666", false));
+
+    const bankInterface = ({
+      userInfo: async () => {
+        return {
+          id: "chapu",
+          password: "password",
+          email: "chapu@mischung.net",
+          phone: "+666 666 666",
+          isAutoUpdateEnabled: false
+        };
+      }
+    } as unknown) as FinAPI;
+
+    const event = ({
+      headers: {
+        Authorization: "bearer 5325626"
+      }
+    } as unknown) as APIGatewayProxyEvent;
+
+    const result = await isUserAuthenticated(event, context, logger, bankInterface, users);
+
+    expect(result).to.be.an("object");
+    expect(result.statusCode).to.equal(200);
+    expect(result.body).to.be.an("string");
+
+    const body = JSON.parse(result.body);
+    expect(body.is_recurrent_transaction_confirmed).to.exist;
+    expect(body.is_allowance_ready).to.exist;
+    expect(body.is_recurrent_transaction_confirmed).to.equal(true);
+    expect(body.is_allowance_ready).to.equal(false);
+  });
+
+  it("rejects an unauthorized request", async function() {
+    const bankInterface = ({
+      userInfo: async () => {
+        return "ok";
+      }
+    } as unknown) as FinAPI;
+
+    const event = ({ headers: {} } as unknown) as APIGatewayProxyEvent;
+    const result = await isUserAuthenticated(event, context, logger, bankInterface, users);
+
+    expect(result).to.be.an("object");
+    expect(result.statusCode).to.equal(401);
+  });
+
+  it("rejects with an internal error if user is not found in the database", async function() {
+    const bankInterface = ({
+      userInfo: async () => {
+        throw "nada";
+      }
+    } as unknown) as FinAPI;
+
+    const event = ({
+      headers: {
+        Authorization: "bearer 5325626"
+      }
+    } as unknown) as APIGatewayProxyEvent;
+
+    const result = await isUserAuthenticated(event, context, logger, bankInterface, users);
+
+    expect(result).to.be.an("object");
+    expect(result.statusCode).to.equal(401);
+  });
+
+  it("rejects with an internal error if user is not found in the database", async function() {
     const bankInterface = ({
       userInfo: async () => {
         return "ok";
@@ -29,25 +100,9 @@ describe("unit: isUserAuthenticated handler", function() {
       }
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await isUserAuthenticated(event, context, logger, bankInterface);
+    const result = await isUserAuthenticated(event, context, logger, bankInterface, users);
 
     expect(result).to.be.an("object");
-    expect(result.statusCode).to.equal(200);
-    expect(result.body).to.be.an("string");
-    expect(result.body).to.equal(JSON.stringify("ok"));
-  });
-
-  it("rejects an unauthorized request", async function() {
-    const bankInterface = ({
-      userInfo: async () => {
-        return "ok";
-      }
-    } as unknown) as FinAPI;
-
-    const event = ({ headers: {} } as unknown) as APIGatewayProxyEvent;
-    const result = await isUserAuthenticated(event, context, logger, bankInterface);
-
-    expect(result).to.be.an("object");
-    expect(result.statusCode).to.equal(401);
+    expect(result.statusCode).to.equal(500);
   });
 });

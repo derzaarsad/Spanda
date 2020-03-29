@@ -20,7 +20,8 @@ export const isUserAuthenticated = async (event: APIGatewayProxyEvent, context: 
       event,
       context,
       logger,
-      services.bankInterface
+      services.bankInterface,
+      services.users
     );
   } catch (err) {
     logger.log("error", "error authorizing", err);
