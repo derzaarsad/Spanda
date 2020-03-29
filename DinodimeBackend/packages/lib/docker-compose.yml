@@ -9,6 +9,7 @@ services:
       - ../../integration-test.env
     volumes:
       - ../../reports:/app/packages/lib/reports
+      - ../../coverages/integration/lib:/app/packages/lib/coverages
     command: sh -c "/wait && cd packages/lib && npm run-script integtest -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integtests-lib.xml"
 
   database:
