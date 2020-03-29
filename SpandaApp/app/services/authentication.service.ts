@@ -120,7 +120,9 @@ export class AuthenticationService implements IAuthentication {
         }).then(res => {
             console.log(res);
             if(res["statusCode"] === 200) {
-                this.storedUser.UserToken = new Token(res["content"]["access_token"], res["content"]["refresh_token"], res["content"]["token_type"]);
+                this.storedUser.UserToken = new Token(res["content"]["token"]["access_token"], res["content"]["token"]["refresh_token"], res["content"]["token"]["token_type"]);
+                this.storedUser.IsRecurrentTransactionConfirmed = res["content"]["is_recurrent_transaction_confirmed"];
+                this.storedUser.IsAllowanceReady = res["content"]["is_allowance_ready"];
                 let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
                 appSettings.setString("storedUser",storedUserJson);
 

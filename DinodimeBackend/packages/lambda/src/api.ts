@@ -68,7 +68,9 @@ export const updateRefreshToken = async (event: APIGatewayProxyEvent, context: C
       context,
       logger,
       services.clientSecrets,
-      services.authentication
+      services.authentication,
+      services.bankInterface,
+      services.users
     );
   } catch (err) {
     logger.log("error", "error refreshing token", err);
