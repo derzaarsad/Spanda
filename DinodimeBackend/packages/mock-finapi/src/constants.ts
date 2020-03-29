@@ -258,7 +258,7 @@ const Constants = {
     id: 1,
     token:
       "03FhQiom8CJUL7rkRgBMCOF9KXlGL9p7kPpW4puMKDD5QbeRm9E9Vzr1xBcokaxZt5PGRscn8HI8xuL8voLkirocxgFIF7wU8B240R5ccSjfPru9vXTBHBEycmBs8Rk2",
-    status: "COMPLETED",
+    status: FinAPIModel.WebForm.StatusEnum.COMPLETED,
     serviceResponseCode: 200,
     serviceResponseBody: encodedImportConnectionResponse
   },
