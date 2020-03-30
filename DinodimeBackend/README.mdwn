@@ -37,7 +37,13 @@ You need to explicitly install the Yarn and the Amazon CDK binaries.
 
 ### Database Migrations
 
-The migrations infrastructure is responsible for initializing the RDS instance with the schema definitions of the data model. It requires a bootstrapping step that prepares an image with the migrations scripts and pushes it to an internal docker repository. The step can be executed by the `bootstrap-migrations.sh` script.
+The migrations infrastructure is responsible for initializing the RDS instance with the schema definitions of the data model. It requires a bootstrapping step that prepares an image with the migrations scripts and pushes it to an internal docker repository. The step can be executed by
+
+```
+yarn workspace dinodime-infrastructure run cdk bootstrap -c awsRegion=${AWS_REGION} -c awsAccount=${AWS_ACCOUNT}
+```
+
+followed by the [bootstrap-migrations.sh](https://github.com/derzaarsad/Spanda/blob/master/DinodimeBackend/bootstrap-migrations.sh) script.
 
 The diagram below examines the workflow and related resources:
 
