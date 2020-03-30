@@ -6,7 +6,7 @@ STACK_NAME=DinodimeServices
 
 source "$0/common_function.sh"
 
-endpointUrl=$(getStackOutput $STACK_NAME WebFormCallbackAPIEndpoint)
+endpointUrl=$(getStackOutput $STACK_NAME MockFinAPIEndpoint)
 queueUrl=$(getStackOutput $STACK_NAME WebFormCompletionsQueueURL)
 
 env ENDPOINT_URL=$endpointUrl \

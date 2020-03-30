@@ -13,5 +13,5 @@ export const importBankConnectionsHandler = async (
   event: APIGatewayProxyEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> => {
-  return CreateResponse(200, configuration.webFormRespose);
+  return CreateResponse(451, configuration.webFormRespose);
 };
