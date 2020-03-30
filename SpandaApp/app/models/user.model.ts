@@ -12,4 +12,10 @@ export class User {
 
     @JsonProperty("UserToken", Token)
     UserToken: Token = undefined;
+
+    @JsonProperty("IsRecurrentTransactionConfirmed", Boolean)
+    IsRecurrentTransactionConfirmed: boolean = true;
+
+    @JsonProperty("IsAllowanceReady", Boolean)
+    IsAllowanceReady: boolean = true;
 }

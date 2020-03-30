@@ -2,6 +2,7 @@ import { Context, APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda
 import winston from "winston";
 import {
   CreateSimpleResponse,
+  CreateInternalErrorResponse,
   CreateResponse,
   HasAuthorization,
   HasMissingProperty,
@@ -57,6 +58,15 @@ const isUserParams = (body: any): body is UserParams => {
   return missingProperty === null;
 };
 
+const getUserInfo = async (
+  logger: winston.Logger,
+  bankInterface: FinAPI,
+  authorization: string
+): Promise<FinAPIModel.User> => {
+  logger.log("info", "authenticating user", { authorization: authorization });
+  return bankInterface.userInfo(authorization);
+};
+
 // pasted from emailregex.com
 const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
@@ -69,7 +79,8 @@ export const isUserAuthenticated = async (
   event: APIGatewayProxyEvent,
   context: Context,
   logger: winston.Logger,
-  bankInterface: FinAPI
+  bankInterface: FinAPI,
+  users: Users.UsersRepository
 ): Promise<APIGatewayProxyResult> => {
   const authorization = HasAuthorization(event.headers);
 
@@ -77,13 +88,21 @@ export const isUserAuthenticated = async (
     return CreateSimpleResponse(401, "unauthorized");
   }
 
-  return bankInterface
-    .userInfo(authorization)
-    .then((response: FinAPIModel.User) => CreateResponse(200, response))
-    .catch(err => {
-      logger.log("error", "error authenticating user", err);
-      return CreateSimpleResponse(401, "unauthorized");
+  try {
+    let userInfo = await getUserInfo(logger, bankInterface, authorization);
+    let user: User | null = await users.findById(userInfo.id);
+    if (!user) {
+      logger.log("error", "error authenticating user", "user is not found in the database.");
+      return CreateInternalErrorResponse("internal server error");
+    }
+    return CreateResponse(200, {
+      is_recurrent_transaction_confirmed: user.isRecurrentTransactionConfirmed,
+      is_allowance_ready: user.isAllowanceReady
     });
+  } catch (err) {
+    logger.log("error", "error authenticating user", err);
+    return CreateSimpleResponse(401, "unauthorized");
+  }
 };
 
 // @Post('/users')
@@ -147,7 +166,7 @@ export const registerUser = async (
       logger.log("debug", "there is a mismatch between server and provider database");
       return CreateSimpleResponse(409, "user already exists");
     } else {
-      return CreateSimpleResponse(500, "could not perform user registration");
+      return CreateInternalErrorResponse("could not perform user registration");
     }
   }
 
@@ -204,7 +223,9 @@ export const updateRefreshToken = async (
   context: Context,
   logger: winston.Logger,
   clientSecrets: ClientSecretsProvider,
-  authentication: Authentication
+  authentication: Authentication,
+  bankInterface: FinAPI,
+  users: Users.UsersRepository
 ): Promise<APIGatewayProxyResult> => {
   logger.log("debug", "received event", event.body);
 
@@ -220,11 +241,33 @@ export const updateRefreshToken = async (
     return CreateSimpleResponse(400, "request body is incomplete");
   }
 
-  return authentication
-    .getRefreshToken(clientSecrets, refreshTokenRequest.refresh_token)
-    .then((response: Token) => CreateResponse(200, response))
-    .catch(err => {
-      logger.log("error", "could not obtain refresh token", { cause: err });
+  let token: Token | null;
+
+  try {
+    token = await authentication.getRefreshToken(clientSecrets, refreshTokenRequest.refresh_token);
+    if(!token) {
+      logger.log("error", "error authenticating user", "acquiring token failed");
       return CreateSimpleResponse(401, "unauthorized");
+    }
+  } catch (err) {
+    logger.log("error", "error authenticating user", err);
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  try {
+    let userInfo = await getUserInfo(logger, bankInterface, token.token_type + " " + token.access_token);
+    let user: User | null = await users.findById(userInfo.id);
+    if (!user) {
+      logger.log("error", "error authenticating user", "user is not found in the database.");
+      return CreateInternalErrorResponse("internal server error");
+    }
+    return CreateResponse(200, {
+      token: token,
+      is_recurrent_transaction_confirmed: user.isRecurrentTransactionConfirmed,
+      is_allowance_ready: user.isAllowanceReady
     });
+  } catch (err) {
+    logger.log("error", "error authenticating user", err);
+    return CreateSimpleResponse(401, "unauthorized");
+  }
 };

@@ -20,7 +20,8 @@ export const isUserAuthenticated = async (event: APIGatewayProxyEvent, context: 
       event,
       context,
       logger,
-      services.bankInterface
+      services.bankInterface,
+      services.users
     );
   } catch (err) {
     logger.log("error", "error authorizing", err);
@@ -67,7 +68,9 @@ export const updateRefreshToken = async (event: APIGatewayProxyEvent, context: C
       context,
       logger,
       services.clientSecrets,
-      services.authentication
+      services.authentication,
+      services.bankInterface,
+      services.users
     );
   } catch (err) {
     logger.log("error", "error refreshing token", err);

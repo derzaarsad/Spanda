@@ -38,7 +38,7 @@ describe("unit: postgres users repository", function() {
     const result = users.saveQuery(user);
     expect(result).to.be.a("string");
     expect(result).to.equal(
-      "INSERT INTO users (username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) VALUES ('chapu','2019-11-11 19:31:50.379+00','0','f','chapu@mischung.net','+666 666 666','f',NULL,NULL,NULL) ON CONFLICT (username) DO UPDATE SET (username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) = ('chapu','2019-11-11 19:31:50.379+00','0','f','chapu@mischung.net','+666 666 666','f',NULL,NULL,NULL) WHERE users.username = 'chapu'"
+      "INSERT INTO users (username,creationdate,allowance,isallowanceready,isrecurrenttransactionconfirmed,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) VALUES ('chapu','2019-11-11 19:31:50.379+00','0','f','t','chapu@mischung.net','+666 666 666','f',NULL,NULL,NULL) ON CONFLICT (username) DO UPDATE SET (username,creationdate,allowance,isallowanceready,isrecurrenttransactionconfirmed,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) = ('chapu','2019-11-11 19:31:50.379+00','0','f','t','chapu@mischung.net','+666 666 666','f',NULL,NULL,NULL) WHERE users.username = 'chapu'"
     );
   });
 
@@ -52,7 +52,7 @@ describe("unit: postgres users repository", function() {
     const result = users.saveQuery(user);
     expect(result).to.be.a("string");
     expect(result).to.equal(
-      "INSERT INTO users (username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) VALUES ('chapu','2019-11-11 19:31:50.379+00','0','f','chapu@mischung.net','+666 666 666','f','{1,2,3}',NULL,NULL) ON CONFLICT (username) DO UPDATE SET (username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) = ('chapu','2019-11-11 19:31:50.379+00','0','f','chapu@mischung.net','+666 666 666','f','{1,2,3}',NULL,NULL) WHERE users.username = 'chapu'"
+      "INSERT INTO users (username,creationdate,allowance,isallowanceready,isrecurrenttransactionconfirmed,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) VALUES ('chapu','2019-11-11 19:31:50.379+00','0','f','t','chapu@mischung.net','+666 666 666','f','{1,2,3}',NULL,NULL) ON CONFLICT (username) DO UPDATE SET (username,creationdate,allowance,isallowanceready,isrecurrenttransactionconfirmed,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) = ('chapu','2019-11-11 19:31:50.379+00','0','f','t','chapu@mischung.net','+666 666 666','f','{1,2,3}',NULL,NULL) WHERE users.username = 'chapu'"
     );
   });
 
