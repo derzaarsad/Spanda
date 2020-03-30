@@ -2,15 +2,12 @@ import chai from "chai";
 const assert = chai.assert;
 const expect = chai.expect;
 
+import { deleteMessages } from "./util";
 import axios, { AxiosInstance } from "axios";
 
 import AWS from "aws-sdk";
 import DynamoDB from "aws-sdk/clients/dynamodb";
-import SQS, {
-  MessageList,
-  DeleteMessageBatchRequest,
-  DeleteMessageBatchResult
-} from "aws-sdk/clients/sqs";
+import SQS, { MessageList } from "aws-sdk/clients/sqs";
 import { AesCrypto, DecryptedNewTransactionsNotification } from "dinodime-lib";
 
 import { v4 as uuid } from "uuid";
@@ -84,29 +81,6 @@ const unpackTransactions = (message: SQS.Message): DecryptedNewTransactionsNotif
   }
 };
 
-const deleteMessages = async (messages?: MessageList): Promise<void> => {
-  if (messages === undefined) {
-    return;
-  }
-
-  const metadata = messages.map(message => {
-    return {
-      Id: message.MessageId!,
-      ReceiptHandle: message.ReceiptHandle!
-    };
-  });
-
-  const request: DeleteMessageBatchRequest = {
-    Entries: metadata,
-    QueueUrl: queueURL
-  };
-
-  const result: DeleteMessageBatchResult = await sqs.deleteMessageBatch(request).promise();
-  if (result.Failed.length > 0) {
-    throw "some messages couldn't be deleted.";
-  }
-};
-
 describe("New transactions notifications stack", async function() {
   it("sends and receives a new transactions notification", async function() {
     this.timeout(20000);
@@ -131,7 +105,7 @@ describe("New transactions notifications stack", async function() {
       })
       .finally(() => {
         console.log("deleting received messages");
-        deleteMessages(messages);
+        deleteMessages(sqs, queueURL, messages);
 
         if (persistedHandle) {
           console.log("deleting rule handle");
