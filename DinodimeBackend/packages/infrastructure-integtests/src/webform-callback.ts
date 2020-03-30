@@ -27,6 +27,8 @@ const endpointURL = env["ENDPOINT_URL"] as string;
 const queueURL = env["QUEUE_URL"] as string;
 
 describe("integration: web form callback", function() {
+  this.timeout(20000);
+
   let logger: winston.Logger;
   let sqs: SQS;
   let users: Users.UsersRepository;
@@ -40,7 +42,11 @@ describe("integration: web form callback", function() {
   before(function() {
     logger = winston.createLogger({
       level: "debug",
-      format: winston.format.json()
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.simple()
+        })
+      ]
     });
 
     sqs = new SQS();
@@ -66,6 +72,8 @@ describe("integration: web form callback", function() {
       encryptions: new CallbackCrypto(),
       bankInterface: new FinAPI(mockFinApiClient)
     };
+
+    logger.info(`Configured test with queue url ${queueURL} and endpoint url ${endpointURL}`);
   });
 
   it("posts an SQS message when the user is authenticated", async () => {
@@ -87,69 +95,23 @@ describe("integration: web form callback", function() {
     expect(callbackResponse).to.be.an("object");
     expect(callbackResponse.statusCode).to.equal(202);
 
-    const params = { QueueUrl: queueURL, AttributeNames: ["All"], WaitTimeSeconds: 3 };
-    let messages: MessageList | undefined;
-
-    await sqs
-      .receiveMessage(params)
+    const messages: MessageList | undefined = await sqs
+      .receiveMessage({ QueueUrl: queueURL, AttributeNames: ["All"], WaitTimeSeconds: 10, MaxNumberOfMessages: 1 })
       .promise()
       .then(result => {
-        logger.info(`Received messages from queue: ${queueURL}`);
-        messages = result.Messages;
-        return messages;
-      })
-      .then(messages => {
-        expect(messages).to.be.ok;
-        expect(messages!.length).to.eq(1);
-      })
-      .finally(() => {
-        if (!messages) {
-          logger.info(`Skipped deleting messages`);
-          return;
-        }
-        logger.info(`Deleting ${messages.length} message(s) from queue ${queueURL}`);
-        deleteMessages(sqs, queueURL, messages);
+        return result.Messages;
       });
-  });
 
-  it("does not post to the SQS message queue when the user is authenticated", async () => {
-    const user = new User("unauthorized", "unauthorized@localhost.de", "+49 99 999999-999", true);
-    logger.info(`Persisting user ${user.username}...`);
-    await users.save(user);
+    logger.info("Received messages", messages);
+    if (!messages) {
+      logger.info(`Skipped deleting messages`);
+    } else {
+      logger.info(`Deleting ${messages.length} message(s) from queue ${queueURL}`);
+      await deleteMessages(sqs, queueURL, messages);
+    }
 
-    const callbackEvent = ({
-      headers: {},
-      pathParameters: {
-        webFormAuth: 42 + "-covfefe"
-      }
-    } as unknown) as APIGatewayProxyEvent;
-
-    const callbackResponse = await webFormCallbackHandler(callbackEvent, context, webFormCallbackHandlerConfiguration);
-    expect(callbackResponse).to.be.an("object");
-    expect(callbackResponse.statusCode).to.equal(202);
-
-    const params = { QueueUrl: queueURL, AttributeNames: ["All"], WaitTimeSeconds: 3 };
-    let messages: MessageList | undefined;
-
-    await sqs
-      .receiveMessage(params)
-      .promise()
-      .then(result => {
-        logger.info(`Received messages from queue: ${queueURL}`);
-        messages = result.Messages;
-        return messages;
-      })
-      .then(messages => {
-        expect(messages).to.be.empty;
-      })
-      .finally(() => {
-        if (!messages) {
-          logger.info(`Skipped deleting messages`);
-          return;
-        }
-        logger.info(`Deleting ${messages.length} message(s) from queue ${queueURL}`);
-        deleteMessages(sqs, queueURL, messages);
-      });
+    expect(messages).to.be.ok;
+    expect(messages!.length).to.eq(1);
   });
 
   afterEach(async function() {

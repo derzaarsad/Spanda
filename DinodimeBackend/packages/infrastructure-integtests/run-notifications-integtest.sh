@@ -4,7 +4,7 @@ SCRIPT="$0"
 DIRNAME=$(dirname "$0")
 STACK_NAME=DinodimeServices
 
-source "$0/common_function.sh"
+source "$DIRNAME/common_functions.sh"
 
 tableName=$(getStackOutput $STACK_NAME NotificationsTableName)
 topicArn=$(getStackOutput $STACK_NAME NotificationsTopicARN)

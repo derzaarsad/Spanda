@@ -4,7 +4,7 @@ SCRIPT="$0"
 DIRNAME=$(dirname "$0")
 STACK_NAME=DinodimeServices
 
-source "$0/common_function.sh"
+source "$DIRNAME/common_functions.sh"
 
 endpointUrl=$(getStackOutput $STACK_NAME MockFinAPIEndpoint)
 queueUrl=$(getStackOutput $STACK_NAME WebFormCompletionsQueueURL)

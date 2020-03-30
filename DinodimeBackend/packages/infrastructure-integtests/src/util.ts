@@ -1,8 +1,12 @@
 import SQS, { MessageList, DeleteMessageBatchRequest, DeleteMessageBatchResult } from "aws-sdk/clients/sqs";
 
-export const deleteMessages = async (sqs: SQS, queueURL: string, messages?: MessageList): Promise<void> => {
+export const deleteMessages = async (
+  sqs: SQS,
+  queueURL: string,
+  messages?: MessageList
+): Promise<DeleteMessageBatchResult> => {
   if (messages === undefined) {
-    return;
+    return Promise.resolve({ Successful: [], Failed: [] });
   }
 
   const metadata = messages.map(message => {
@@ -17,8 +21,5 @@ export const deleteMessages = async (sqs: SQS, queueURL: string, messages?: Mess
     QueueUrl: queueURL
   };
 
-  const result: DeleteMessageBatchResult = await sqs.deleteMessageBatch(request).promise();
-  if (result.Failed.length > 0) {
-    throw "some messages couldn't be deleted.";
-  }
+  return sqs.deleteMessageBatch(request).promise();
 };

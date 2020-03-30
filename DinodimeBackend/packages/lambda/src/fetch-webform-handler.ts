@@ -26,11 +26,7 @@ export interface HandlerConfiguration {
  * Receives Webform completions from an SQS queue and fetches the transactions from the imported
  * bank connections.
  */
-export const fetchWebForm = async (
-  event: SQSEvent,
-  context: Context,
-  configuration: HandlerConfiguration
-) => {
+export const fetchWebForm = async (event: SQSEvent, context: Context, configuration: HandlerConfiguration) => {
   const log = configuration.log;
   const records = event.Records;
 
@@ -91,14 +87,9 @@ export const handleRecord = async (
     return { kind: "failure", error: new Error("no accound IDs available") };
   }
 
-  const transactionsDataBankSpecific = await bankInterface.getAllTransactions(
-    authorization,
-    body.accountIds
-  );
+  const transactionsDataBankSpecific = await bankInterface.getAllTransactions(authorization, body.accountIds);
 
-  const transactionsData = transactionsDataBankSpecific.map(transaction =>
-    Transactions.fromFinAPI(transaction)
-  );
+  const transactionsData = transactionsDataBankSpecific.map(transaction => Transactions.fromFinAPI(transaction));
 
   const bankConnection = new BankConnection(body.id, body.bankId);
   bankConnection.bankAccountIds = body.accountIds;
@@ -106,11 +97,7 @@ export const handleRecord = async (
   user.bankConnectionIds.push(body.id);
 
   // TODO: rollback on failure
-  return Promise.all([
-    users.save(user),
-    connections.save(bankConnection),
-    transactions.saveArray(transactionsData)
-  ])
+  return Promise.all([users.save(user), connections.save(bankConnection), transactions.saveArray(transactionsData)])
     .then(() => {
       const status: Success = { kind: "success" };
       return status;
@@ -121,11 +108,7 @@ export const handleRecord = async (
     });
 };
 
-const handleStatus = async (
-  record: SQSRecord,
-  status: Status,
-  configuration: HandlerConfiguration
-) => {
+const handleStatus = async (record: SQSRecord, status: Status, configuration: HandlerConfiguration) => {
   const log = configuration.log;
   if (status.kind === "failure") {
     log.error("Could not extract transactions data", status.error);

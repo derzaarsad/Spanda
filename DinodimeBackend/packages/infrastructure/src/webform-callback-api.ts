@@ -20,8 +20,14 @@ export class WebFormCallbackAPI extends cdk.Construct {
       endpointExportName: "WebFormCallbackAPIEndpoint"
     });
 
+    const completionsDlq = new sqs.Queue(this, "WebFormCompletionsDLQ");
+
     const completionsQueue = new sqs.Queue(this, "WebFormCompletionsQueue", {
-      visibilityTimeout: cdk.Duration.seconds(300)
+      visibilityTimeout: cdk.Duration.seconds(300),
+      deadLetterQueue: {
+        queue: completionsDlq,
+        maxReceiveCount: 3
+      }
     });
 
     this.createProcessingBackend(completionsQueue, props);
@@ -38,10 +44,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
     this.completionsQueue = completionsQueue;
   }
 
-  private createWebFrontend(
-    completionsQueue: sqs.Queue,
-    props: ServicesProps
-  ): apigw.LambdaIntegration {
+  private createWebFrontend(completionsQueue: sqs.Queue, props: ServicesProps): apigw.LambdaIntegration {
     const env = lambdaEnvironment(props);
     env["QUEUE_URL"] = completionsQueue.queueUrl;
 
@@ -61,7 +64,6 @@ export class WebFormCallbackAPI extends cdk.Construct {
 
     const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-webform-callback"));
     const webFormCallback = lambdaFactory.createLambda("WebFormCallback", handler, "main.handler");
-
     return new apigw.LambdaIntegration(webFormCallback);
   }
 
@@ -85,7 +87,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
       env: env
     });
 
-    const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-webform-callback"));
+    const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-fetch-webform"));
     const processor = lambdaFactory.createLambda("FetchWebForm", handler, "main.handler");
 
     processor.addEventSource(new SqsEventSource(completionsQueue));

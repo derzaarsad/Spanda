@@ -8,15 +8,11 @@ export class Services extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props: ServicesProps) {
     super(scope, id, props);
 
-    const notifications = new NewTransactionsNotifications(
-      this,
-      "DinodimeNewTransactionsNotifications",
-      {
-        decryptionKey: props.finApiProps.finApiDecryptionKey,
-        lambdaDeploymentProps: props.lambdaDeploymentProps,
-        lambdaPermissionProps: props.lambdaPermissionProps
-      }
-    );
+    const notifications = new NewTransactionsNotifications(this, "DinodimeNewTransactionsNotifications", {
+      decryptionKey: props.finApiProps.finApiDecryptionKey,
+      lambdaDeploymentProps: props.lambdaDeploymentProps,
+      lambdaPermissionProps: props.lambdaPermissionProps
+    });
 
     const callbackAPI = new WebFormCallbackAPI(this, "DinodimeWebFormCallbackAPI", props);
 
