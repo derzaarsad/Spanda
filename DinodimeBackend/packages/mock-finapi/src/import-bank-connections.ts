@@ -3,13 +3,13 @@ import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from "aws-lambda
 import { CreateResponse, HasAuthorization as hasAuthorization } from "./lambda-util";
 import * as winston from "winston";
 
-export interface WebFormHandlerConfiguration {
+export interface ImportBankConnectionsHandlerConfiguration {
   webFormRespose: FinAPIModel.ErrorMessage;
   logger: winston.Logger;
 }
 
-export const webFormHandler = async (
-  configuration: WebFormHandlerConfiguration,
+export const importBankConnectionsHandler = async (
+  configuration: ImportBankConnectionsHandlerConfiguration,
   event: APIGatewayProxyEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> => {

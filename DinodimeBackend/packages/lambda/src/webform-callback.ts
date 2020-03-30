@@ -1,75 +1,20 @@
-import winston from "winston";
+import SQS from "aws-sdk/clients/sqs";
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from "aws-lambda";
-import { Users, WebFormCompletion, SQSPublisher } from "dinodime-lib";
-import { CreateSimpleResponse } from "./lambda-util";
+import { AWSSQSPublisher } from "dinodime-lib";
+import { ServiceProvider } from "./service-provider";
+import { HandlerConfiguration, webformCallback } from "./webform-callback-handler";
 
-// Since this can be called by anyone, we don't reveal anything in the response
-const response = CreateSimpleResponse(202, "Accepted");
+const env = process.env;
+const services = new ServiceProvider(env);
+const queueUrl = env["QUEUE_URL"] as string;
+const sqs = new AWSSQSPublisher(new SQS(), queueUrl);
 
-export interface HandlerConfiguration {
-  sqs: SQSPublisher;
-  users: Users.UsersRepository;
-  log: winston.Logger;
-}
-
-/**
- * Receives a webform coordinates as path parameters and puts a WebFormCompletion on an SQS queue.
- */
-export const webformCallback = async (
-  event: APIGatewayProxyEvent,
-  context: Context,
-  configuration: HandlerConfiguration
-): Promise<APIGatewayProxyResult> => {
-  const log = configuration.log;
-  const sqs = configuration.sqs;
-  const users = configuration.users;
-
-  log.debug("Received event", event);
-
-  const pathParameters = event.pathParameters;
-  if (pathParameters === null || !pathParameters.webFormAuth) {
-    log.error("No authorization provided");
-    return response;
-  }
-
-  const webFormAuth = pathParameters.webFormAuth;
-  const tokens = webFormAuth.split("-", 2);
-  if (tokens.length !== 2) {
-    log.error(`Invalid webform authorization received: ${webFormAuth}`);
-    return response;
-  }
-
-  const webFormId = parseInt(tokens[0]);
-  const userSecret = tokens[1];
-
-  if (isNaN(webFormId) || userSecret.length === 0) {
-    log.error(`Invalid webform authorization received: ${webFormAuth}`);
-    return response;
-  }
-
-  const user = await users.findByWebFormId(webFormId);
-  if (user === null || user.activeWebFormId === null || user.activeWebFormAuth === null) {
-    log.error(`No user found for webId ${webFormId} or user has no associated webform auth`);
-    return response;
-  }
-
-  const messageBody: WebFormCompletion = {
-    webFormId: webFormId,
-    userSecret: userSecret
+export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+  const configuration: HandlerConfiguration = {
+    log: services.logger,
+    users: services.users,
+    sqs: sqs
   };
 
-  const sendMessageRequest = {
-    messageBody: messageBody
-  };
-
-  return sqs
-    .publish(sendMessageRequest)
-    .then(() => {
-      log.info("Successfully sent message to topic");
-      return response;
-    })
-    .catch(err => {
-      log.error("Error sending message to topic", err);
-      return response;
-    });
+  return webformCallback(event, context, configuration);
 };

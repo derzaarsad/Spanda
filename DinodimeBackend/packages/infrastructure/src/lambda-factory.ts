@@ -53,8 +53,8 @@ export interface LambdaDeploymentProps {
 
 interface LambdaFactoryProps {
   scope: cdk.Construct;
-  deploymentProps: LambdaDeploymentProps;
-  permissionProps: LambdaPermissionProps;
+  deploymentProps?: LambdaDeploymentProps;
+  permissionProps?: LambdaPermissionProps;
   runtime: lambda.Runtime;
   duration: cdk.Duration;
   executionRole: iam.Role;
@@ -66,8 +66,8 @@ interface LambdaFactoryProps {
  */
 export class LambdaFactory {
   scope: cdk.Construct;
-  deploymentProps: LambdaDeploymentProps;
-  permissionProps: LambdaPermissionProps;
+  deploymentProps?: LambdaDeploymentProps;
+  permissionProps?: LambdaPermissionProps;
   runtime: lambda.Runtime;
   duration: cdk.Duration;
   env: { [key: string]: string };
@@ -82,7 +82,9 @@ export class LambdaFactory {
     this.env = props.env ? props.env : {};
     this.executionRole = props.executionRole;
 
-    this.permissionProps.applyToRole(this.executionRole);
+    if (this.permissionProps) {
+      this.permissionProps.applyToRole(this.executionRole);
+    }
   }
 
   public createLambda(id: string, asset: lambda.AssetCode, handler: string): lambda.Function {
@@ -92,9 +94,9 @@ export class LambdaFactory {
       runtime: this.runtime,
       timeout: this.duration,
       environment: this.env,
-      securityGroups: this.deploymentProps.securityGroups,
-      vpc: this.deploymentProps.vpc,
-      vpcSubnets: this.deploymentProps.subnets,
+      securityGroups: this.deploymentProps ? this.deploymentProps.securityGroups : undefined,
+      vpc: this.deploymentProps ? this.deploymentProps.vpc : undefined,
+      vpcSubnets: this.deploymentProps ? this.deploymentProps.subnets : undefined,
       role: this.executionRole
     });
 

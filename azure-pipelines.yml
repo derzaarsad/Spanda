@@ -144,6 +144,7 @@ jobs:
           yarn install
           yarn run build
           yarn workspace dinodime-lambda run package
+          yarn workspace dinodime-mock-finapi run package
         displayName: "Building CDK Application"
         continueOnError: false
       - script: |

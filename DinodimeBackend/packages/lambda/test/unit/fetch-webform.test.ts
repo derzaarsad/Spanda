@@ -8,7 +8,7 @@ import { WebFormCompletion } from "dinodime-lib";
 import { BankConnections, Transactions } from "dinodime-lib";
 import { Encryptions, CallbackCrypto } from "dinodime-lib";
 import { MockSQSClient } from "dinodime-lib";
-import { handleRecord, HandlerConfiguration } from "../../src/fetch-webform";
+import { handleRecord, HandlerConfiguration } from "../../src/fetch-webform-handler";
 
 const expect = chai.expect;
 

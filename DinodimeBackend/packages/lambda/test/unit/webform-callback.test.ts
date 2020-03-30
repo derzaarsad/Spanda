@@ -3,7 +3,7 @@ import chai from "chai";
 import winston from "winston";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import { VoidTransport, MockSQSPublisher, User, Users } from "dinodime-lib";
-import { HandlerConfiguration, webformCallback } from "../../src/webform-callback";
+import { HandlerConfiguration, webformCallback } from "../../src/webform-callback-handler";
 
 const expect = chai.expect;
 

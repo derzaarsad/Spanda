@@ -19,6 +19,6 @@ var config = function(name) {
   };
 };
 
-var modules = ["import-bank-connections", "transactions", "userinfo"];
+var modules = ["mock-finapi"];
 
 module.exports = modules.map(moduleName => config(moduleName));
