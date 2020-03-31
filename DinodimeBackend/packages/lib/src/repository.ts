@@ -6,6 +6,7 @@ export interface Repository<K, T> {
   save(entity: T): Promise<T>;
   findById(id: K): Promise<T | null>;
   findByIds(ids: Array<K>): Promise<Array<T>>;
+  delete(entity: T): Promise<void>;
   deleteAll(): Promise<void>;
 }
 
@@ -26,6 +27,7 @@ export abstract class PostgresRepository<K, T> implements Repository<K, T> {
   abstract findById(id: K): Promise<T | null>;
   abstract findByIds(ids: Array<K>): Promise<Array<T>>;
   abstract deleteAll(): Promise<void>;
+  abstract delete(entity: T): Promise<void>;
 
   async doQuery(queryConfig: QueryConfig<any[]>): Promise<QueryResult<any>> {
     if (this.pool === undefined) {

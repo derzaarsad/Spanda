@@ -113,6 +113,10 @@ export namespace RecurrentTransactions {
       return candidate;
     }
 
+    async delete(tx: RecurrentTransaction) {
+      delete this.repository[tx.id];
+    }
+
     async deleteAll(): Promise<void> {
       for (let id in this.repository) {
         delete this.repository[id];
@@ -170,6 +174,19 @@ export namespace RecurrentTransactions {
             })
           : []
       );
+    }
+
+    deleteQuery(id: number) {
+      const tableName = this.schema.tableName;
+      const idAttribute = this.schema.columns.id;
+      return this.format("DELETE FROM %I WHERE %I.%I = %L", this.schema.tableName, tableName, idAttribute, id);
+    }
+
+    async delete(tx: RecurrentTransaction): Promise<void> {
+      const params = {
+        text: this.deleteQuery(tx.id)
+      };
+      await this.doQuery(params);
     }
 
     async deleteAll(): Promise<void> {
