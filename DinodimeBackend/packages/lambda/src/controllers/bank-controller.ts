@@ -8,13 +8,13 @@ import {
   CreateInternalErrorResponse
 } from "../lambda-util";
 
-import { Authentication, Encryptions, Transactions } from "dinodime-lib";
-import { BankConnection, BankConnections } from "dinodime-lib";
+import { Authentication, Encryptions, ClientSecretsProvider } from "dinodime-lib";
+import { FinAPI, FinAPIModel } from "dinodime-lib";
 import { User, Users } from "dinodime-lib";
-import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dinodime-lib";
-import { Transaction } from "dinodime-lib";
-import { RecurrentTransaction, RecurrentTransactions } from "dinodime-lib";
 import { Algorithm } from "dinodime-lib";
+import { Transaction, Transactions } from "dinodime-lib";
+import { RecurrentTransaction, RecurrentTransactions } from "dinodime-lib";
+import { BankConnection, BankConnections } from "dinodime-lib";
 
 const blzPattern = /^\d{8}$/;
 

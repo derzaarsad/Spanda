@@ -108,4 +108,16 @@ describe("unit: postgres recurrent transactions repository", function() {
       "SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM recurrenttransactions WHERE isexpense=b.isexpense AND accountid='2') t ) rw FROM recurrenttransactions b WHERE isexpense IS NOT NULL GROUP BY isexpense"
     );
   });
+
+  it("renders the delete one query", async function() {
+    const result = recurrentTransactions.deleteQuery(2);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("DELETE FROM recurrenttransactions WHERE recurrenttransactions.id = '2'");
+  });
+
+  it("renders the delete by account id query", async function() {
+    const result = recurrentTransactions.deleteByAccountIdQuery(3);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("DELETE FROM recurrenttransactions WHERE recurrenttransactions.accountid = '3'");
+  });
 });

@@ -42,6 +42,7 @@ export namespace RecurrentTransactions {
     saveArrayWithoutId(recurrentTransactions: Array<RecurrentTransaction>): Promise<Array<RecurrentTransaction>>;
     saveWithoutId(recurrentTransaction: RecurrentTransaction): Promise<RecurrentTransaction>;
     updateArray(recurrentTransactions: Array<RecurrentTransaction>): Promise<Array<RecurrentTransaction>>;
+    deleteByAccountId(accountId: number): Promise<void>;
   }
 
   export class InMemoryRepository implements RecurrentTransactionsRepository {
@@ -120,6 +121,15 @@ export namespace RecurrentTransactions {
     async deleteAll(): Promise<void> {
       for (let id in this.repository) {
         delete this.repository[id];
+      }
+    }
+
+    async deleteByAccountId(accountId: number) {
+      for (let id in this.repository) {
+        const tx = this.repository[id];
+        if (tx.accountId === accountId) {
+          delete this.repository[id];
+        }
       }
     }
   }
@@ -259,6 +269,13 @@ export namespace RecurrentTransactions {
       return this.doQuery(params).then(res => recurrentTransactions);
     }
 
+    async deleteByAccountId(accountId: number) {
+      const params = {
+        text: this.deleteByAccountIdQuery(accountId)
+      };
+      await this.doQuery(params);
+    }
+
     findByIdQuery(id: number) {
       return this.format("SELECT * FROM %I WHERE id = %L LIMIT 1", this.schema.tableName, id.toString());
     }
@@ -370,6 +387,18 @@ export namespace RecurrentTransactions {
         tableName,
         values,
         attributes
+      );
+    }
+
+    deleteByAccountIdQuery(bankAccountId: number) {
+      const tableName = this.schema.tableName;
+      const bankAccountIdAttribute = this.schema.columns.accountId;
+      return this.format(
+        "DELETE FROM %I WHERE %I.%I = %L",
+        this.schema.tableName,
+        tableName,
+        bankAccountIdAttribute,
+        bankAccountId
       );
     }
 
