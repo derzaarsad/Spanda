@@ -7,6 +7,7 @@ export class User {
   username: string;
   allowance: number;
   isAllowanceReady: boolean;
+  isRecurrentTransactionConfirmed: boolean;
   email: string;
   phone: string;
   isAutoUpdateEnabled: boolean;
@@ -21,6 +22,7 @@ export class User {
     this.phone = phone;
     this.isAutoUpdateEnabled = isAutoUpdateEnabled;
     this.isAllowanceReady = false;
+    this.isRecurrentTransactionConfirmed = true;
     this.bankConnectionIds = [];
     this.activeWebFormId = null;
     this.activeWebFormAuth = null;
@@ -44,6 +46,22 @@ export namespace Users {
     async findById(username: string) {
       const candidate = this.repository[username];
       return candidate ? candidate : null;
+    }
+
+    async findByIds(usernames: Array<string>): Promise<Array<User>> {
+
+      let candidate: Array<User> = [];
+
+      for (let i in usernames) {
+        const username = this.repository[usernames[i]];
+        if(!username) {
+          continue;
+        }
+
+        candidate.push(username);
+      }
+
+      return candidate;
     }
 
     async findByWebFormId(activeWebFormId: number) {
@@ -104,6 +122,10 @@ export namespace Users {
         });
     }
 
+    async findByIds(usernames: Array<string>): Promise<Array<User>> {
+      throw new Error("Method not implemented.");
+    }
+
     async save(user: User) {
       const params = this.encodeUser(user);
 
@@ -134,6 +156,7 @@ export namespace Users {
         username: data["username"]!["S"]!,
         allowance: parseFloat(data["allowance"]!["N"]!),
         isAllowanceReady: data["isAllowanceReady"]!["BOOL"]!,
+        isRecurrentTransactionConfirmed: data["isRecurrentTransactionConfirmed"]!["BOOL"]!,
         creationDate: new Date(data["creationDate"]!["N"]!),
         email: data["email"]!["S"]!,
         phone: data["phone"]!["S"]!,
@@ -150,6 +173,7 @@ export namespace Users {
       const values: DynamoDB.ExpressionAttributeValueMap = {
         allowance: { N: user.allowance.toString() },
         isAllowanceReady: { BOOL: user.isAllowanceReady },
+        isRecurrentTransactionConfirmed: { BOOL: user.isRecurrentTransactionConfirmed },
         email: { S: user.email },
         phone: { S: user.phone },
         isAutoUpdateEnabled: { BOOL: user.isAutoUpdateEnabled },
@@ -183,6 +207,14 @@ export namespace Users {
 
     findByIdQuery(userName: string) {
       return this.format("SELECT * FROM %I WHERE username = %L LIMIT 1", this.schema.tableName, userName);
+    }
+
+    findByIdsQuery(userNames: Array<string>) {
+      return this.format(
+        "SELECT * FROM %I WHERE username in (%L)",
+        this.schema.tableName,
+        userNames
+      );
     }
 
     findByWebFormIdQuery(activeWebFormId: number) {
@@ -226,6 +258,21 @@ export namespace Users {
       };
 
       return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
+    }
+
+    async findByIds(usernames: Array<string>): Promise<Array<User>> {
+      const params = {
+        text: this.findByIdsQuery(usernames),
+        rowMode: "array",
+        types: this.types
+      };
+
+      return this.doQuery(params).then(res =>
+        res.rowCount > 0 ? res.rows
+        .map(row => {
+          return this.schema.asObject(row)
+        }) : []
+      );
     }
 
     async findByWebFormId(activeWebFormId: number) {

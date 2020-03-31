@@ -21,7 +21,7 @@ let crypto: Crypto;
 let handles: RuleHandleRepository;
 let sns: MockSNSPublisher;
 
-describe("SNS forwarding notification callback", () => {
+describe("unit: SNS forwarding notification callback", () => {
   beforeEach(() => {
     const key = "8deec885781c421794ceda8af70a5e63";
 

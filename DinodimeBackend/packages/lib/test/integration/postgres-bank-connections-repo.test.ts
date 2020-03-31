@@ -8,7 +8,7 @@ import { BankConnection } from "../../src/bank-connections";
 import { BankConnections } from "../../src/bank-connections";
 import { BankConnectionsSchema } from "../../src/schema/bank-connections";
 
-describe("postgres bank connections repository", function() {
+describe("integration: postgres bank connections repository", function() {
   let connections: BankConnections.PostgreSQLRepository;
 
   before(function() {
@@ -16,7 +16,7 @@ describe("postgres bank connections repository", function() {
     connections = new BankConnections.PostgreSQLRepository(new Pool(), format, schema);
   });
 
-  beforeEach(async function() {
+  afterEach(async function() {
     await connections.deleteAll();
   });
 
@@ -54,6 +54,22 @@ describe("postgres bank connections repository", function() {
 
     const afterDelete = await connections.findById(2);
     expect(afterDelete).to.be.null;
+  });
+
+  it("find by ids", async function() {
+    await connections.save(new BankConnection(22, 69));
+    await connections.save(new BankConnection(23, 70));
+    await connections.save(new BankConnection(24, 71));
+
+    const result = await connections.findByIds([22, 23, 24]);
+    expect(result.length).to.equal(3);
+    expect(result[0].id).to.equal(22);
+    expect(result[1].id).to.equal(23);
+    expect(result[2].id).to.equal(24);
+
+    expect(result[0].bankId).to.equal(69);
+    expect(result[1].bankId).to.equal(70);
+    expect(result[2].bankId).to.equal(71);
   });
 
   it("overwrites an existing bank connection on save", async function() {

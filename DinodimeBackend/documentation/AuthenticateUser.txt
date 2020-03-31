@@ -1,0 +1,8 @@
+title Authenticate User
+
+User->App:login using username and password
+App->Serverless:authenticateAndSave\n{ username, password }
+Serverless->FinAPI:getPasswordToken\n{ clientSecrets, username, password }
+Serverless<-FinAPI:access_token and refresh_token received
+App<-Serverless:send **Token**
+note over App:Store user information at appSettings

@@ -46,11 +46,7 @@ export class DinodimeAPI extends cdk.Construct {
     // Authenticaction controller
     const users = restAPI.root.addResource("users");
 
-    const isUserAuthenticated = lambdaFactory.createLambda(
-      "IsUserAuthenticated",
-      asset,
-      "main.isUserAuthenticated"
-    );
+    const isUserAuthenticated = lambdaFactory.createLambda("IsUserAuthenticated", asset, "main.isUserAuthenticated");
 
     users.addMethod("GET", new LambdaIntegration(isUserAuthenticated), {
       operationName: "is user authenticated"
@@ -77,11 +73,7 @@ export class DinodimeAPI extends cdk.Construct {
 
     const token = oauth.addResource("token");
 
-    const updateRefreshToken = lambdaFactory.createLambda(
-      "UpdateRefreshToken",
-      asset,
-      "main.updateRefreshToken"
-    );
+    const updateRefreshToken = lambdaFactory.createLambda("UpdateRefreshToken", asset, "main.updateRefreshToken");
 
     token.addMethod("POST", new LambdaIntegration(updateRefreshToken), {
       operationName: "update fefresh token"
@@ -108,11 +100,7 @@ export class DinodimeAPI extends cdk.Construct {
     const callback = webForms.addResource("callback");
     const webFormCallbackResource = callback.addResource("{webFormAuth}");
 
-    const webFormCallback = lambdaFactory.createLambda(
-      "WebFormCallback",
-      asset,
-      "main.webFormCallback"
-    );
+    const webFormCallback = lambdaFactory.createLambda("WebFormCallback", asset, "main.webFormCallback");
 
     webFormCallbackResource.addMethod("POST", new LambdaIntegration(webFormCallback), {
       operationName: "web form callback"
@@ -120,11 +108,7 @@ export class DinodimeAPI extends cdk.Construct {
 
     const webForm = webForms.addResource("{webFormId}");
 
-    const getWebFormInfo = lambdaFactory.createLambda(
-      "GetWebFormInfo",
-      asset,
-      "main.getWebFormInfo"
-    );
+    const getWebFormInfo = lambdaFactory.createLambda("GetWebFormInfo", asset, "main.getWebFormInfo");
 
     webForm.addMethod("GET", new LambdaIntegration(getWebFormInfo), {
       operationName: "get webform info"
@@ -136,6 +120,28 @@ export class DinodimeAPI extends cdk.Construct {
 
     allowance.addMethod("GET", new LambdaIntegration(getAllowance), {
       operationName: "get allowance"
+    });
+
+    const recurrentTransactions = restAPI.root.addResource("recurrentTransactions");
+    const updateRT = recurrentTransactions.addResource("update");
+
+    const getRecurrentTransactions = lambdaFactory.createLambda(
+      "GetRecurrentTransactions",
+      asset,
+      "main.getRecurrentTransactions"
+    );
+    const updateRecurrentTransactions = lambdaFactory.createLambda(
+      "UpdateRecurrentTransactions",
+      asset,
+      "main.updateRecurrentTransactions"
+    );
+
+    recurrentTransactions.addMethod("GET", new LambdaIntegration(getRecurrentTransactions), {
+      operationName: "get recurrent transactions"
+    });
+
+    updateRT.addMethod("POST", new LambdaIntegration(updateRecurrentTransactions), {
+      operationName: "update recurrent transactions"
     });
   }
 }

@@ -6,7 +6,7 @@ import format from "pg-format";
 import { UsersSchema } from "../../src/schema/users";
 import { Users, User } from "../../src/users";
 
-describe("postgres users repository", function() {
+describe("unit: postgres users repository", function() {
   let users: Users.PostgreSQLRepository;
 
   beforeEach(function() {
@@ -17,6 +17,12 @@ describe("postgres users repository", function() {
     const result = users.findByIdQuery("chapu");
     expect(result).to.be.a("string");
     expect(result).to.equal("SELECT * FROM users WHERE username = 'chapu' LIMIT 1");
+  });
+
+  it("renders the find-by-ids query", async function() {
+    const result = users.findByIdsQuery(['chapu1','chapu2','chapu3']);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("SELECT * FROM users WHERE username in ('chapu1','chapu2','chapu3')");
   });
 
   it("renders the find-by-webform query", async function() {
@@ -32,7 +38,7 @@ describe("postgres users repository", function() {
     const result = users.saveQuery(user);
     expect(result).to.be.a("string");
     expect(result).to.equal(
-      "INSERT INTO users (username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) VALUES ('chapu','2019-11-11 19:31:50.379+00','0','f','chapu@mischung.net','+666 666 666','f',NULL,NULL,NULL) ON CONFLICT (username) DO UPDATE SET (username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) = ('chapu','2019-11-11 19:31:50.379+00','0','f','chapu@mischung.net','+666 666 666','f',NULL,NULL,NULL) WHERE users.username = 'chapu'"
+      "INSERT INTO users (username,creationdate,allowance,isallowanceready,isrecurrenttransactionconfirmed,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) VALUES ('chapu','2019-11-11 19:31:50.379+00','0','f','t','chapu@mischung.net','+666 666 666','f',NULL,NULL,NULL) ON CONFLICT (username) DO UPDATE SET (username,creationdate,allowance,isallowanceready,isrecurrenttransactionconfirmed,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) = ('chapu','2019-11-11 19:31:50.379+00','0','f','t','chapu@mischung.net','+666 666 666','f',NULL,NULL,NULL) WHERE users.username = 'chapu'"
     );
   });
 
@@ -52,7 +58,7 @@ describe("postgres users repository", function() {
     const result = users.saveQuery(user);
     expect(result).to.be.a("string");
     expect(result).to.equal(
-      "INSERT INTO users (username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) VALUES ('chapu','2019-11-11 19:31:50.379+00','0','f','chapu@mischung.net','+666 666 666','f','{1,2,3}',NULL,NULL) ON CONFLICT (username) DO UPDATE SET (username,creationdate,allowance,isallowanceready,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) = ('chapu','2019-11-11 19:31:50.379+00','0','f','chapu@mischung.net','+666 666 666','f','{1,2,3}',NULL,NULL) WHERE users.username = 'chapu'"
+      "INSERT INTO users (username,creationdate,allowance,isallowanceready,isrecurrenttransactionconfirmed,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) VALUES ('chapu','2019-11-11 19:31:50.379+00','0','f','t','chapu@mischung.net','+666 666 666','f','{1,2,3}',NULL,NULL) ON CONFLICT (username) DO UPDATE SET (username,creationdate,allowance,isallowanceready,isrecurrenttransactionconfirmed,email,phone,isautoupdateenabled,bankconnectionids,activewebformid,activewebformauth) = ('chapu','2019-11-11 19:31:50.379+00','0','f','t','chapu@mischung.net','+666 666 666','f','{1,2,3}',NULL,NULL) WHERE users.username = 'chapu'"
     );
   });
 

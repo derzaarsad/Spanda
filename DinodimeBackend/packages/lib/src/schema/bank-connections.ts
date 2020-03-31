@@ -13,7 +13,8 @@ const asObject = (row: Array<any>) => {
 
 export class BankConnectionsSchema implements Schema<BankConnection> {
   tableName: string;
-  attributes = attributes.join(",");
+  attributes = attributes;
+  attributeNames = attributes;
   columns = asObject(attributes);
 
   constructor(tableName: string = "bankconnections") {
@@ -24,9 +25,7 @@ export class BankConnectionsSchema implements Schema<BankConnection> {
     return [
       bankConnection.id,
       bankConnection.bankId,
-      bankConnection.bankAccountIds.length === 0
-        ? null
-        : "{" + bankConnection.bankAccountIds.join(",") + "}"
+      bankConnection.bankAccountIds.length === 0 ? null : "{" + bankConnection.bankAccountIds.join(",") + "}"
     ];
   }
 

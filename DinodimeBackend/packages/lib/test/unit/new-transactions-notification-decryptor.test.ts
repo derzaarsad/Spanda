@@ -45,7 +45,7 @@ const cleartextNotification: DecryptedNewTransactionsNotification = {
 const body =
   '{"notificationRuleId":1,"triggerEvent":"NEW_TRANSACTIONS","callbackHandle":"test-user|2abb6653-7f8d-400d-9f79-2fc8fdc73fd6","newTransactions":[{"accountId":1,"bankName":"bankName1","newTransactionsCount":1,"accountName":"1E1zk9iQb+yf69e1F/FDiA==","accountNumber":"8PzDi2xNeA0pdLxX05Sclg==","accountIban":"etPo+olDpnEoxWwskrnG9w==","bankConnectionName":"UlUNL4squISERU10QJdaoC4pP9ByYH4jIAAS1o7N/Aw=","details":"R+Tl4rVcnPFohhuMVO6OscASEw9eEjCFr0oOF72P50Y4dQwkGNNaIKnAfHTciV7MCe4oeWXBS6uCNZKsm1Id0qkYCWO0piyXXbgAQCDLB36EDXyrygdJ99w4QTUMqDi2Uj7UQOy+HC91BCVQOWSdDPIXUrnRYVA7FvyZZk27mIBrFlpses8DK193e1DZiYV3wWBNEBuwf3IoU+Id6iufSUA4aR0mCVVuekkS/MykJfEvrY3MgLTfagEkTkzMnT7q"}]}';
 
-describe("New transactions notifiction decryptor", () => {
+describe("unit: New transactions notifiction decryptor", () => {
   it("decrypts a message body received from API gateway", async function() {
     const decrypted = decryptor.map(JSON.parse(body) as EncryptedNewTransactionsNotification);
     expect(decrypted).is.eql(cleartextNotification);

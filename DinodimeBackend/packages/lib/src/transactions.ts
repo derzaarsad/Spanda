@@ -45,6 +45,7 @@ export namespace Transactions {
     findByAccountIds(accountIds: Array<number>): Promise<Array<Transaction>>;
     saveArray(transactions: Array<Transaction>): Promise<Array<Transaction>>;
     deleteByAccountId(connectionId: number): Promise<void>;
+    groupByIban(accountId: number): Promise<Transaction[][]>;
   }
 
   export class InMemoryRepository implements TransactionsRepository {
@@ -94,6 +95,46 @@ export namespace Transactions {
       }
     }
 
+    async findByIds(ids: Array<number>): Promise<Array<Transaction>> {
+      let candidate: Array<Transaction> = [];
+
+      for (let i in ids) {
+        const transaction = this.repository[ids[i]];
+        if (!transaction) {
+          continue;
+        }
+
+        candidate.push(transaction);
+      }
+
+      return candidate;
+    }
+
+    async groupByIban(accountId: number): Promise<Transaction[][]> {
+      let indexDictionary: { [iban: string]: number } = {};
+
+      let grouped: Transaction[][] = [];
+      for (let id in this.repository) {
+        if (this.repository[id].accountId != accountId) {
+          continue;
+        }
+
+        let currentIban = this.repository[id].counterPartIban;
+        if (!currentIban) {
+          continue;
+        }
+
+        if (indexDictionary[currentIban] == null) {
+          indexDictionary[currentIban] = grouped.length;
+          grouped.push([]);
+          grouped[indexDictionary[currentIban]].push(this.repository[id]);
+        } else {
+          grouped[indexDictionary[currentIban]].push(this.repository[id]);
+        }
+      }
+      return grouped;
+    }
+
     async deleteAll(): Promise<void> {
       for (let id in this.repository) {
         delete this.repository[id];
@@ -123,6 +164,22 @@ export namespace Transactions {
       return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
+    async findByIds(ids: Array<number>): Promise<Array<Transaction>> {
+      const params = {
+        text: this.findByIdsQuery(ids),
+        rowMode: "array",
+        types: this.types
+      };
+
+      return this.doQuery(params).then(res =>
+        res.rowCount > 0
+          ? res.rows.map(row => {
+              return this.schema.asObject(row);
+            })
+          : []
+      );
+    }
+
     async deleteAll(): Promise<void> {
       const params = {
         text: this.deleteAllQuery()
@@ -147,9 +204,9 @@ export namespace Transactions {
       return this.doQuery(params).then(res => res.rows.map(row => this.schema.asObject(row)));
     }
 
-    async groupByIban(): Promise<any> {
+    async groupByIban(accountId: number): Promise<Transaction[][]> {
       const params = {
-        text: this.groupByColumnQuery(8),
+        text: this.groupByColumnQuery(accountId, 8),
         rowMode: "array",
         types: this.types
       };
@@ -176,20 +233,31 @@ export namespace Transactions {
     }
 
     findByIdQuery(id: number) {
-      return this.format("SELECT * FROM %I WHERE id = %L LIMIT 1", this.schema.tableName, id.toString());
+      const accountIdColumn = this.schema.columns["accountId"];
+      return this.format(
+        "SELECT * FROM %I WHERE id = %L ORDER BY %s ASC LIMIT 1",
+        this.schema.tableName,
+        id,
+        accountIdColumn
+      );
+    }
+
+    findByIdsQuery(ids: Array<number>) {
+      return this.format("SELECT * FROM %I WHERE id in (%L)", this.schema.tableName, ids);
     }
 
     findByAccountIdsQuery(accountIds: Array<number>) {
       return this.format("SELECT * FROM %I WHERE accountid in (%L)", this.schema.tableName, accountIds);
     }
 
-    groupByColumnQuery(attributesIndex: number) {
-      const attribute = this.schema.attributes.split(",")[attributesIndex];
+    groupByColumnQuery(accountId: number, attributesIndex: number) {
+      const attribute = this.schema.attributes[attributesIndex];
       return this.format(
-        "SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM %I WHERE %I=b.%I) t ) rw FROM %I b WHERE %I IS NOT NULL GROUP BY %I",
+        "SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM %I WHERE %I=b.%I AND accountid=%L) t ) rw FROM %I b WHERE %I IS NOT NULL GROUP BY %I",
         this.schema.tableName,
         attribute,
         attribute,
+        accountId,
         this.schema.tableName,
         attribute,
         attribute
@@ -223,11 +291,7 @@ export namespace Transactions {
     saveArrayQuery(transactions: Transaction[]) {
       const tableName = this.schema.tableName;
       const attributes = this.schema.attributes;
-      const values = transactions
-        .map(transaction => {
-          return "(" + this.schema.asRow(transaction).map(item => this.format("%L", item.toString())) + ")";
-        })
-        .join(", ");
+      const values = transactions.map(transaction => this.format("(%L)", this.schema.asRow(transaction))).join(", ");
 
       return this.format("INSERT INTO %I (%s) VALUES %s", tableName, attributes, values);
     }

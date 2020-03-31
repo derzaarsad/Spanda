@@ -13,7 +13,7 @@ import {
   Resolved
 } from "dinodime-lib";
 
-describe("get banks by BLZ handler", function() {
+describe("unit: get banks by BLZ handler", function() {
   let logger: winston.Logger;
   let context: Context;
 

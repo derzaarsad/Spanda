@@ -10,7 +10,7 @@ import { Pool } from "pg";
 import { Transaction, Transactions } from "../../src/transactions";
 import { TransactionsSchema } from "../../src/schema/transactions";
 
-describe("postgres transactions repository", function() {
+describe("integration: postgres transactions repository", function() {
   let transactions: Transactions.PostgreSQLRepository;
 
   before(function() {
@@ -18,7 +18,7 @@ describe("postgres transactions repository", function() {
     transactions = new Transactions.PostgreSQLRepository(new Pool(), format, schema);
   });
 
-  beforeEach(async function() {
+  afterEach(async function() {
     await transactions.deleteAll();
   });
 
@@ -126,6 +126,27 @@ describe("postgres transactions repository", function() {
     await expect(transactions.saveArray(transactionsData)).to.eventually.be.fulfilled;
     await transactions.deleteByAccountId(2);
     await expect(transactions.findByAccountIds([2])).to.eventually.be.empty;
+  });
+
+  it("saves and retrieves a transaction with undefined fields", async function() {
+    const transaction = {
+      id: 209864836,
+      accountId: 995070,
+      absAmount: 89.81,
+      isExpense: true,
+      bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
+      purpose: undefined,
+      counterPartName: undefined,
+      counterPartAccountNumber: undefined,
+      counterPartIban: undefined,
+      counterPartBlz: undefined,
+      counterPartBic: undefined,
+      counterPartBankName: undefined
+    };
+    await transactions.save(transaction);
+
+    const result = await transactions.findById(209864836);
+    expect(result).to.eql(transaction);
   });
 
   it("save with unique id and account id", async function() {
@@ -304,7 +325,7 @@ describe("postgres transactions repository", function() {
     ];
 
     await transactions.saveArray(transactionsData);
-    const result = await transactions.findById(transactionsData[0].id);
+    const result = await transactions.findById(transactionsData[1].id);
     expect(result).to.be.not.null;
     expect(result!.id).to.equal(transactionsData[1].id);
     expect(result!.accountId).to.equal(transactionsData[1].accountId);
@@ -394,8 +415,8 @@ describe("postgres transactions repository", function() {
         counterPartBankName: "Commerzbank vormals Dresdner Bank"
       },
       {
-        id: 1112,
-        accountId: 3,
+        id: 1113,
+        accountId: 2,
         absAmount: 99.81,
         isExpense: true,
         bookingDate: new Date("2018-01-02T00:00:00.000Z"),
@@ -409,7 +430,7 @@ describe("postgres transactions repository", function() {
       },
       {
         id: 4112,
-        accountId: 4,
+        accountId: 2,
         absAmount: 64.81,
         isExpense: true,
         bookingDate: new Date("2018-01-03T00:00:00.000Z"),
@@ -422,8 +443,22 @@ describe("postgres transactions repository", function() {
         counterPartBankName: "Commerzbank vormals Dresdner Bank"
       },
       {
-        id: 4112,
-        accountId: 5,
+        id: 4113,
+        accountId: 2,
+        absAmount: 69.81,
+        isExpense: true,
+        bookingDate: new Date("2018-01-03T00:00:00.000Z"),
+        purpose: " RE. 735459",
+        counterPartName: "TueV Bayern",
+        counterPartAccountNumber: "631605",
+        counterPartIban: "DE13700800000061110500",
+        counterPartBlz: "71080070",
+        counterPartBic: "DREEUEFF700",
+        counterPartBankName: "Commerzbank vormals Dresdner Bank"
+      },
+      {
+        id: 4113,
+        accountId: 3,
         absAmount: 69.81,
         isExpense: true,
         bookingDate: new Date("2018-01-03T00:00:00.000Z"),
@@ -438,15 +473,17 @@ describe("postgres transactions repository", function() {
     ];
 
     await transactions.saveArray(transactionsData);
-    const transactionsGroup = await transactions.groupByIban();
+    const transactionsGroup = await transactions.groupByIban(2);
     expect(transactionsGroup.length).to.equal(2);
+    expect(transactionsGroup[0].length).to.equal(2);
     expect(transactionsGroup[0][0].accountId).to.equal(2);
     expect(transactionsGroup[0][0].counterPartIban).to.equal("AU13700807001061110500");
-    expect(transactionsGroup[0][1].accountId).to.equal(3);
+    expect(transactionsGroup[0][1].accountId).to.equal(2);
     expect(transactionsGroup[0][1].counterPartIban).to.equal("AU13700807001061110500");
-    expect(transactionsGroup[1][0].accountId).to.equal(4);
+    expect(transactionsGroup[1].length).to.equal(2);
+    expect(transactionsGroup[1][0].accountId).to.equal(2);
     expect(transactionsGroup[1][0].counterPartIban).to.equal("DE13700800000061110500");
-    expect(transactionsGroup[1][1].accountId).to.equal(5);
+    expect(transactionsGroup[1][1].accountId).to.equal(2);
     expect(transactionsGroup[1][1].counterPartIban).to.equal("DE13700800000061110500");
   });
 });

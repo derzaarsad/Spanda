@@ -114,9 +114,9 @@ jobs:
       - script: |
           pip install selenium
           cd DinodimeBackend
-          result=`python deleteUsers.py $(FinAPIAdminId) $(FinAPIAdminSecret) $(AZURE_TEST_USER_REGISTER) $(AZURE_TEST_USER_LOGIN) $(AZURE_TEST_USER_FETCHWEBFORM)`
+          result=`python deleteUsers.py $(FinAPIAdminId) $(FinAPIAdminSecret) $(AZURE_TEST_USER_REGISTER) $(AZURE_TEST_USER_LOGIN) $(AZURE_TEST_USER_UPDATEREFRESH) $(AZURE_TEST_USER_FETCHWEBFORM)`
           echo "$result"
-          result=`python registerUsers.py $(FinAPIClientId) $(FinAPIClientSecret) $(AZURE_TEST_USER_LOGIN) $(AZURE_TEST_USER_FETCHWEBFORM)`
+          result=`python registerUsers.py $(FinAPIClientId) $(FinAPIClientSecret) $(AZURE_TEST_USER_LOGIN) $(AZURE_TEST_USER_UPDATEREFRESH) $(AZURE_TEST_USER_FETCHWEBFORM)`
           echo "created user $result"
           accessTokenForFetch=`python loginUser.py $(FinAPIClientId) $(FinAPIClientSecret) $(AZURE_TEST_USER_FETCHWEBFORM) $(AZURE_TEST_USER_FETCHWEBFORM)`
           echo "get access token for fetch $accessTokenForFetch"
@@ -128,6 +128,7 @@ jobs:
           rm -rf ./integration-test.env
           echo -e "AZURE_TEST_USER_REGISTER=$(AZURE_TEST_USER_REGISTER)" >> ./integration-test.env
           echo -e "AZURE_TEST_USER_LOGIN=$(AZURE_TEST_USER_LOGIN)" >> ./integration-test.env
+          echo -e "AZURE_TEST_USER_UPDATEREFRESH=$(AZURE_TEST_USER_UPDATEREFRESH)" >> ./integration-test.env
           echo -e "FinAPIClientId=$(FinAPIClientId)" >> ./integration-test.env
           echo -e "FinAPIClientSecret=$(FinAPIClientSecret)" >> ./integration-test.env
           echo -e "WEBFORM_ID_FOR_FETCH=$webformIdForFetch" >> ./integration-test.env
@@ -135,8 +136,8 @@ jobs:
           echo -e "WAIT_HOSTS=database:5432" >> ./integration-test.env
           echo -e "PGHOST=database" >> ./integration-test.env
           echo -e "PGUSER=postgres" >> ./integration-test.env
-          echo -e "PGPASSWORD=" >> ./integration-test.env
           echo -e "PGDATABASE=postgres" >> ./integration-test.env
+          echo -e "POSTGRES_HOST_AUTH_METHOD=trust" >> ./integration-test.env
         displayName: "integration test preparation"
         continueOnError: false
       - script: |
@@ -156,18 +157,43 @@ jobs:
           yarn workspace dinodime-infrastructure run test --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/unit-tests-infrastructure.xml
         displayName: "Run unit tests"
         continueOnError: true
+      - task: PythonScript@0
+        inputs:
+          scriptSource: 'filePath'
+          scriptPath: '$(System.DefaultWorkingDirectory)/checkFilesExistence.py'
+          arguments: '$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/unit-tests-lib.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/unit-tests-lambda.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/unit-tests-infrastructure.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lib/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lambda/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/infrastructure/cobertura-coverage.xml'
+          failOnStderr: true
+        displayName: "Check Unit Test Results Existence"
       - script: |
           echo "Start Integration Test"
           cd $(System.DefaultWorkingDirectory)/DinodimeBackend
-          docker-compose -f packages/lib/docker-compose.yml build && docker-compose -f packages/lib/docker-compose.yml up --abort-on-container-exit 
+          docker-compose -f packages/lib/docker-compose.yml build && docker-compose -f packages/lib/docker-compose.yml up --abort-on-container-exit
           docker-compose -f packages/lambda/docker-compose.yml build && docker-compose -f packages/lambda/docker-compose.yml up --abort-on-container-exit
         displayName: "Run integration tests"
         continueOnError: true
+      - task: PythonScript@0
+        inputs:
+          scriptSource: 'filePath'
+          scriptPath: '$(System.DefaultWorkingDirectory)/checkFilesExistence.py'
+          arguments: '$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/integtests-lib.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/integtests-lambda.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/integration/lib/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/integration/lambda/cobertura-coverage.xml'
+          failOnStderr: true
+        displayName: "Check Integration Test Results Existence"
       - task: PublishTestResults@2
         displayName: "Publish test results"
         condition: succeededOrFailed()
         inputs:
           testRunner: JUnit
           testResultsFiles: "$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/*.xml"
+      - task: reportgenerator@4
+        inputs:
+          reports: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lib/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/lambda/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/unit/infrastructure/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/integration/lib/cobertura-coverage.xml;$(System.DefaultWorkingDirectory)/DinodimeBackend/coverages/integration/lambda/cobertura-coverage.xml'
+          targetdir: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverage_summary'
+          reporttypes: 'Cobertura'
+        displayName: "Create Code Coverage Reports"
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverage_summary/Cobertura.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/DinodimeBackend/coverage_summary'
       - publish: $(System.DefaultWorkingDirectory)/DinodimeBackend
         artifact: SamApp

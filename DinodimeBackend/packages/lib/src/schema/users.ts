@@ -6,6 +6,7 @@ const attributes = [
   "creationdate",
   "allowance",
   "isallowanceready",
+  "isrecurrenttransactionconfirmed",
   "email",
   "phone",
   "isautoupdateenabled",
@@ -20,12 +21,13 @@ const asObject = (row: Array<any>) => {
     creationDate: row[1],
     allowance: row[2],
     isAllowanceReady: row[3],
-    email: row[4],
-    phone: row[5],
-    isAutoUpdateEnabled: row[6],
-    bankConnectionIds: row[7] ? row[7] : [],
-    activeWebFormId: row[8],
-    activeWebFormAuth: row[9]
+    isRecurrentTransactionConfirmed: row[4],
+    email: row[5],
+    phone: row[6],
+    isAutoUpdateEnabled: row[7],
+    bankConnectionIds: row[8] ? row[8] : [],
+    activeWebFormId: row[9],
+    activeWebFormAuth: row[10]
   };
 };
 
@@ -36,7 +38,7 @@ export class UsersSchema implements Schema<User> {
     this.tableName = tableName;
   }
 
-  attributes = attributes.join(",");
+  attributes = attributes;
 
   columns = asObject(attributes);
 
@@ -46,6 +48,7 @@ export class UsersSchema implements Schema<User> {
       user.creationDate,
       user.allowance,
       user.isAllowanceReady,
+      user.isRecurrentTransactionConfirmed,
       user.email,
       user.phone,
       user.isAutoUpdateEnabled,
@@ -65,6 +68,7 @@ export class UsersSchema implements Schema<User> {
       creationDate: el[this.columns.creationDate],
       allowance: el[this.columns.allowance],
       isAllowanceReady: el[this.columns.isAllowanceReady],
+      isRecurrentTransactionConfirmed: el[this.columns.isRecurrentTransactionConfirmed],
       email: el[this.columns.email],
       phone: el[this.columns.phone],
       isAutoUpdateEnabled: el[this.columns.isAutoUpdateEnabled],

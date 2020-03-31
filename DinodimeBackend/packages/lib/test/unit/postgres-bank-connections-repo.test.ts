@@ -7,7 +7,7 @@ import { BankConnection } from "../../src/bank-connections";
 import { BankConnections } from "../../src/bank-connections";
 import { BankConnectionsSchema } from "../../src/schema/bank-connections";
 
-describe("postgres bank connections repository", function() {
+describe("unit: postgres bank connections repository", function() {
   let connections: BankConnections.PostgreSQLRepository;
 
   beforeEach(function() {
@@ -19,6 +19,12 @@ describe("postgres bank connections repository", function() {
     const result = connections.findByIdQuery(1);
     expect(result).to.be.a("string");
     expect(result).to.equal("SELECT * FROM bankconnections WHERE id = '1' LIMIT 1");
+  });
+
+  it("renders the find-by-ids query", async function() {
+    const result = connections.findByIdsQuery([1,2,3]);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("SELECT * FROM bankconnections WHERE id in ('1','2','3')");
   });
 
   it("renders the save query with an emtpy account ids", async function() {

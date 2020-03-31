@@ -1,5 +1,5 @@
 import { Authentication, Basic } from "dinodime-lib";
-import { BankConnections, Users, Transactions } from "dinodime-lib";
+import { BankConnections, Users, Transactions, RecurrentTransactions } from "dinodime-lib";
 import { ClientSecretsProvider, Resolved } from "dinodime-lib";
 import { Encryptions, CallbackCrypto } from "dinodime-lib";
 import { FinAPI } from "dinodime-lib";
@@ -17,6 +17,7 @@ export class ServiceProvider {
   readonly bankInterface: FinAPI;
   readonly users: Users.UsersRepository;
   readonly connections: BankConnections.BankConnectionsRepository;
+  readonly recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
   readonly encryptions: Encryptions;
   transactions: Transactions.TransactionsRepository;
   logger: winston.Logger;
@@ -59,6 +60,7 @@ export class ServiceProvider {
     this.bankInterface = new FinAPI(httpClient);
     this.users = storageBackend.users;
     this.connections = storageBackend.connections;
+    this.recurrentTransactions = storageBackend.recurrentTransactions;
     this.transactions = storageBackend.transactions;
     this.encryptions = new CallbackCrypto();
     this.logger = this.createLogger(env);

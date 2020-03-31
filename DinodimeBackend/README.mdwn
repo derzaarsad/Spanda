@@ -37,7 +37,13 @@ You need to explicitly install the Yarn and the Amazon CDK binaries.
 
 ### Database Migrations
 
-The migrations infrastructure is responsible for initializing the RDS instance with the schema definitions of the data model. It requires a bootstrapping step that prepares an image with the migrations scripts and pushes it to an internal docker repository. The step can be executed by the `bootstrap-migrations.sh` script.
+The migrations infrastructure is responsible for initializing the RDS instance with the schema definitions of the data model. It requires a bootstrapping step that prepares an image with the migrations scripts and pushes it to an internal docker repository. The step can be executed by
+
+```
+yarn workspace dinodime-infrastructure run cdk bootstrap -c awsRegion=${AWS_REGION} -c awsAccount=${AWS_ACCOUNT}
+```
+
+followed by the [bootstrap-migrations.sh](https://github.com/derzaarsad/Spanda/blob/master/DinodimeBackend/bootstrap-migrations.sh) script.
 
 The diagram below examines the workflow and related resources:
 
@@ -88,3 +94,20 @@ Alternatively, you can initiate an SSH session direct from the browser by clicki
 [4]: https://www.typescriptlang.org/docs/handbook/project-references.html
 [5]: https://webpack.js.org/
 [6]: https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html#install-plugin-macos
+
+### Execute integration test locally
+
+Docker is required to execute integration locally. Before executing the docker command, some preparation has to be done to make sure that the FinAPI sandbox contains the needed data. This preparation can be seen in the [azure-pipelines.yml](https://github.com/derzaarsad/Spanda/blob/master/azure-pipelines.yml) at task "integration test preparation".
+
+After the preparation is made, it is recommended to cleanup the existing relevant docker images. The following commands remove **all** existing docker containers and images in the local computer:
+
+```
+docker rm -vf $(docker ps -a -q)
+docker rmi -f $(docker images -a -q)
+```
+
+The integration test can be executed using the following command:
+
+```
+docker-compose -f packages/lib/docker-compose.yml build && docker-compose -f packages/lib/docker-compose.yml up --abort-on-container-exit
+```

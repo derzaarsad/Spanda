@@ -29,6 +29,10 @@ export namespace Algorithm {
             var matchGroupIndex = -1;
             var lastScore = 0.0;
             for(var k = 0; k < grouped.length; ++k) {
+
+                if(grouped[k][0].isExpense != transactionsData[i].isExpense) {
+                    continue;
+                }
     
                 const out = getScoreMean(grouped[k], transactionsData[i]);
                 if((out > 0.5) && (out > lastScore)) {
@@ -44,7 +48,7 @@ export namespace Algorithm {
             grouped[matchGroupIndex].push(transactionsData[i]);
         }
     
-        return grouped;
+        return grouped.filter(item => item.length > 1);
     }
     
     export const GetDominantIncome = (transactionsData: Transaction[]): Transaction => {

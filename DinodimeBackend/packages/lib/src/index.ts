@@ -43,11 +43,19 @@ export { NotificationCallback, NewTransactionsSNSPublisher } from "./notificatio
 export { User, Users } from "./users";
 export { BankConnection, BankConnections } from "./bank-connections";
 export { Transaction, Transactions } from "./transactions";
+export {
+  RecurrentTransaction,
+  RecurrentTransactions,
+  TransactionFrequency
+} from "./recurrent-transactions";
+
+export { Algorithm } from "./algorithm";
 
 export { Schema } from "./schema/schema";
 export { UsersSchema } from "./schema/users";
 export { BankConnectionsSchema } from "./schema/bank-connections";
 export { TransactionsSchema } from "./schema/transactions";
+export { RecurrentTransactionsSchema } from "./schema/recurrent-transactions";
 
 export { FinAPI } from "./region-specific/de/finapi";
 export { Model as FinAPIModel } from "./region-specific/de/model";

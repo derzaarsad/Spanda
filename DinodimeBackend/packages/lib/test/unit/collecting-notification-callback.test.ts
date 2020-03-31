@@ -6,7 +6,7 @@ import { EncryptedNewTransactionsNotification } from "../../src/finapi-notificat
 import { Accumulator } from "../../src/notification-callback";
 import { AesCrypto } from "../../src/crypto";
 
-describe("Collecting notification callback", () => {
+describe("unit: Collecting notification callback", () => {
   it("collect incoming notifications", async () => {
     const payload = {
       notificationRuleId: 1,

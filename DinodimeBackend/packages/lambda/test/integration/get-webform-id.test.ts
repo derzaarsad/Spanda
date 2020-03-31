@@ -1,15 +1,19 @@
 import chai from "chai";
 const expect = chai.expect;
 import winston from "winston";
+import axios, { AxiosInstance } from "axios";
 
-import { Builder, By, until } from "selenium-webdriver";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import { User, Users, VoidTransport, CallbackCrypto, Encryptions } from "dinodime-lib";
 
 import { getWebformId } from "../../src/controllers/bank-controller";
 import { CreateFinApiTestInterfaces } from "../test-utility";
 
-describe("get webform id", function() {
+import { Pool } from "pg";
+import format from "pg-format";
+import { UsersSchema } from "dinodime-lib";
+
+describe("integration: get webform id", function() {
   this.timeout(10000); // Selenium browser takes so much time.
 
   let logger: winston.Logger;
@@ -19,6 +23,7 @@ describe("get webform id", function() {
   let testPassword: string;
   let testValidEmail: string;
   let testValidPhone: string;
+  let http: AxiosInstance;
 
   expect(process.env.AZURE_TEST_USER_LOGIN).to.exist;
   expect(process.env.FinAPIClientId).to.exist;
@@ -30,7 +35,15 @@ describe("get webform id", function() {
   );
   let encryptions: Encryptions;
 
-  beforeEach(function() {
+  this.beforeAll(async function() {
+    http = axios.create({
+      baseURL: "https://sandbox.finapi.io",
+      timeout: 3000,
+      headers: { Accept: "application/json" }
+    });
+  });
+
+  beforeEach(async function() {
     testUsername = process.env.AZURE_TEST_USER_LOGIN!;
     testPassword = process.env.AZURE_TEST_USER_LOGIN!;
     testValidEmail = "chapu@chapu.com";
@@ -38,14 +51,18 @@ describe("get webform id", function() {
 
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
-    users = new Users.InMemoryRepository();
+    users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
     encryptions = new CallbackCrypto();
 
     context = {} as Context;
   });
 
+  afterEach(async function() {
+    await users.deleteAll();
+  });
+
   it("rejects requests with failing authentication", async () => {
-    users.save(new User(testUsername, testValidEmail, testValidPhone, false));
+    await users.save(new User(testUsername, testValidEmail, testValidPhone, false));
 
     const event = ({
       headers: {
@@ -168,16 +185,27 @@ describe("get webform id", function() {
     expect(result.statusCode).to.equal(200);
     expect(JSON.parse(result.body).location).to.be.an("string");
     expect(JSON.parse(result.body).webFormAuth).to.be.an("string");
-    console.log(JSON.parse(result.body).location);
 
-    let driver = await new Builder().forBrowser("firefox").build();
-    try {
-      await driver.get(JSON.parse(result.body).location);
-      await driver.findElement(By.id("btnSubmit")).click();
-      await driver.wait(until.elementsLocated(By.id("exitWithoutRedirect")), 1000);
-    } finally {
-      await driver.quit();
-    }
+    const location = JSON.parse(result.body).location as string;
+    const slash = location.lastIndexOf("/");
+    const token = location.substring(slash + 1);
+    console.log(`location: ${location}; token: ${token}`);
+
+    await http.post("/webForm", {
+      webFormToken: token,
+      agbVersion: "v1.3",
+      changeCredentials: null,
+      changeTwoStepProcedure: null,
+      loginCredentials: [],
+      storeSecrets: false,
+      accountReferences: null,
+      twoStepProcedureId: null,
+      storeTwoStepProcedure: false,
+      decoupledCallback: false,
+      msaHash: null,
+      msaChallengeResponse: null,
+      sepaRequestChallengeResponse: null
+    });
 
     //expect(JSON.parse(result.body).location).to.equal('testlocation');
     expect(JSON.parse(result.body).webFormAuth.split("-").length).to.equal(2);

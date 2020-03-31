@@ -26,6 +26,22 @@ export namespace BankConnections {
       return this.repository[id];
     }
 
+    async findByIds(ids: Array<number>): Promise<Array<BankConnection>> {
+
+      let candidate: Array<BankConnection> = [];
+
+      for (let i in ids) {
+        const bankConnection = this.repository[ids[i]];
+        if(!bankConnection) {
+          continue;
+        }
+
+        candidate.push(bankConnection);
+      }
+
+      return candidate;
+    }
+
     async save(bankConnection: BankConnection) {
       this.repository[bankConnection.id] = bankConnection;
       return bankConnection;
@@ -112,6 +128,10 @@ export namespace BankConnections {
         });
     }
 
+    async findByIds(ids: Array<number>): Promise<Array<BankConnection>> {
+      throw new Error("Method not implemented.");
+    }
+
     async save(bankConnection: BankConnection): Promise<BankConnection> {
       const params = this.encodeBankConnection(bankConnection, "NONE");
       return this.client
@@ -155,6 +175,14 @@ export namespace BankConnections {
       );
     }
 
+    findByIdsQuery(ids: Array<number>) {
+      return this.format(
+        "SELECT * FROM %I WHERE id in (%L)",
+        this.schema.tableName,
+        ids
+      );
+    }
+
     deleteAllQuery() {
       return this.format("DELETE FROM %I", this.schema.tableName);
     }
@@ -187,6 +215,21 @@ export namespace BankConnections {
       };
 
       return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
+    }
+
+    async findByIds(ids: Array<number>): Promise<Array<BankConnection>> {
+      const params = {
+        text: this.findByIdsQuery(ids),
+        rowMode: "array",
+        types: this.types
+      };
+
+      return this.doQuery(params).then(res =>
+        res.rowCount > 0 ? res.rows
+        .map(row => {
+          return this.schema.asObject(row)
+        }) : []
+      );
     }
 
     async save(bankConnection: BankConnection) {

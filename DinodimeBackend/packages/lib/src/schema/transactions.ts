@@ -23,13 +23,13 @@ const asObject = (row: Array<any>) => {
     absAmount: row[2],
     isExpense: row[3],
     bookingDate: row[4],
-    purpose: row[5],
-    counterPartName: row[6],
-    counterPartAccountNumber: row[7],
-    counterPartIban: row[8],
-    counterPartBlz: row[9],
-    counterPartBic: row[10],
-    counterPartBankName: row[11]
+    purpose: row[5] !== null ? row[5] : undefined,
+    counterPartName: row[6] !== null ? row[6] : undefined,
+    counterPartAccountNumber: row[7] !== null ? row[7] : undefined,
+    counterPartIban: row[8] !== null ? row[8] : undefined,
+    counterPartBlz: row[9] !== null ? row[9] : undefined,
+    counterPartBic: row[10] !== null ? row[10] : undefined,
+    counterPartBankName: row[11] !== null ? row[11] : undefined
   };
 };
 
@@ -40,7 +40,7 @@ export class TransactionsSchema implements Schema<Transaction> {
     this.tableName = tableName;
   }
 
-  attributes = attributes.join(",");
+  attributes = attributes;
 
   columns = asObject(attributes);
 
@@ -51,13 +51,13 @@ export class TransactionsSchema implements Schema<Transaction> {
       transaction.absAmount,
       transaction.isExpense,
       transaction.bookingDate.toISOString(),
-      transaction.purpose,
-      transaction.counterPartName,
-      transaction.counterPartAccountNumber,
-      transaction.counterPartIban,
-      transaction.counterPartBlz,
-      transaction.counterPartBic,
-      transaction.counterPartBankName
+      transaction.purpose !== undefined ? transaction.purpose : null,
+      transaction.counterPartName !== undefined ? transaction.counterPartName : null,
+      transaction.counterPartAccountNumber !== undefined ? transaction.counterPartAccountNumber : null,
+      transaction.counterPartIban !== undefined ? transaction.counterPartIban : null,
+      transaction.counterPartBlz !== undefined ? transaction.counterPartBlz : null,
+      transaction.counterPartBic !== undefined ? transaction.counterPartBic : null,
+      transaction.counterPartBankName !== undefined ? transaction.counterPartBankName : null
     ];
   }
 

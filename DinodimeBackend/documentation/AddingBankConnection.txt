@@ -1,0 +1,35 @@
+title Adding bank connection
+
+User->App:choose a bank and click add connection button
+App->Serverless:getWebformIdAndToken\n{ bankId, access_token }
+Serverless->FinAPI:get UserInfo\n{ access_token }
+Serverless<-FinAPI:UserInfo received
+note over Serverless:Find the user in database
+Serverless->FinAPI:importConnection\n{ bankId, access_token }
+Serverless<-FinAPI:**webFormId** and **URL location** received
+note over Serverless:Save **webFormId** in the user database
+note over Serverless:Encrypt access_token using crypto
+note over Serverless:Save the **decryption key** in the user database
+note over Serverless:Form **webFormAuth** = **"webFormId-encryptedAccessToken"**
+App<-Serverless:Send **URL location** and **webFormAuth**
+User<-App:Show **URLlocation?callbackUrl=ServerlessURL/webFormCallback/webFormAuth** in the browser
+User->App:Input bank credentials in the browser
+App->FinAPI:Submit bank credentials
+FinAPI-->Serverless:webFormCallback is called\n{ **webFormAuth** }
+note over Serverless:Split **webFormAuth** into **webFormId** and **encryptedAccessToken**
+note over Serverless:Find user by **webFormId** in the database
+note over Serverless:Decrypt **encryptedAccessToken** into access_token using the **decryption key** from the user database
+Serverless->FinAPI:call fetchWebForm
+Serverless<-FinAPI:**serviceResponseBody** received
+note over Serverless:Fetch **accountIds** from **serviceResponseBody**
+Serverless->FinAPI:get **transactionsData** using **accountIds**
+Serverless<-FinAPI:**transactionsData** received
+note over Serverless:Store **accountIds** and **transactionsData** in the database
+note over Serverless:Identify **reccurrentTransactions**: **monthlyTransactions**, **quarterlyTransactions** and **yearlyTransactions** and store in the database as "not confirmed"
+note over Serverless:Change user state **reccurrentTransactionsReady** to true
+App<--Serverless:Push **monthlyTransactions**, **quarterlyTransactions** and **yearlyTransactions** for validation process
+User<-App:Show validity windows for Subscriptions
+User->App:User validates Subscriptions
+App->Serverless:setSubscriptionsInfo\n{ subscriptions, access_token }
+note over Serverless:Change user state **reccurrentTransactionsReady** to false
+note over Serverless:Set all relevant subscriptions into "confirmed" and remove all "not confirmed" **recurrentTransactions**

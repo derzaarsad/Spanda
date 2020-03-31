@@ -1,6 +1,6 @@
 export default {
     MENU: 'Menu',
-    ALLOWANCE: 'Uand Saku',
+    ALLOWANCE: 'Uang Saku',
     TRANSACTIONS: 'Transaksi',
     LOGOUT: 'Keluar',
     login_page: {

@@ -9,9 +9,12 @@ services:
       - ../../integration-test.env
     volumes:
       - ../../reports:/app/packages/lib/reports
+      - ../../coverages/integration/lib:/app/packages/lib/coverages
     command: sh -c "/wait && cd packages/lib && npm run-script integtest -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integtests-lib.xml"
 
   database:
     image: postgres:12
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - ../../migrations/postgres/sql:/docker-entrypoint-initdb.d

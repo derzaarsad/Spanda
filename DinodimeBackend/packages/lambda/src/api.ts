@@ -18,7 +18,8 @@ export const isUserAuthenticated = async (event: APIGatewayProxyEvent, context: 
       event,
       context,
       logger,
-      services.bankInterface
+      services.bankInterface,
+      services.users
     );
   } catch (err) {
     logger.log("error", "error authorizing", err);
@@ -65,7 +66,9 @@ export const updateRefreshToken = async (event: APIGatewayProxyEvent, context: C
       context,
       logger,
       services.clientSecrets,
-      services.authentication
+      services.authentication,
+      services.bankInterface,
+      services.users
     );
   } catch (err) {
     logger.log("error", "error refreshing token", err);
@@ -116,6 +119,39 @@ export const webFormCallback = async (event: APIGatewayProxyEvent, context: Cont
     return CreateSimpleResponse(200, "the function is called!");
   } catch (err) {
     logger.log("error", "error importing bank connection", err);
+    return CreateInternalErrorResponse(err);
+  }
+};
+
+export const getRecurrentTransactions = async (event: APIGatewayProxyEvent, context: Context) => {
+  try {
+    return bankController.getRecurrentTransactions(
+      event,
+      context,
+      logger,
+      services.bankInterface,
+      services.users,
+      services.connections,
+      services.recurrentTransactions
+    );
+  } catch (err) {
+    logger.log("error", "error get recurrent transactions", err);
+    return CreateInternalErrorResponse(err);
+  }
+};
+
+export const updateRecurrentTransactions = async (event: APIGatewayProxyEvent, context: Context) => {
+  try {
+    return bankController.updateRecurrentTransactions(
+      event,
+      context,
+      logger,
+      services.bankInterface,
+      services.users,
+      services.recurrentTransactions
+    );
+  } catch (err) {
+    logger.log("error", "error get recurrent transactions", err);
     return CreateInternalErrorResponse(err);
   }
 };
