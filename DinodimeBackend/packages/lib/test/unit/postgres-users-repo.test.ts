@@ -36,6 +36,12 @@ describe("postgres users repository", function() {
     );
   });
 
+  it("renders the delete single user query", async function() {
+    const result = users.deleteQuery("chapu");
+    expect(result).to.be.a("string");
+    expect(result).to.equal("DELETE FROM users WHERE users.username = 'chapu'");
+  });
+
   it("renders the save query with non-empty account ids", async function() {
     const user = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
     user.creationDate = new Date("2019-11-11T19:31:50.379+00:00");

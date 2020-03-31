@@ -48,6 +48,86 @@ describe("postgres transactions repository", function() {
     expect(result).to.eql(transaction);
   });
 
+  it("deletes a single transaction", async function() {
+    const transaction = {
+      id: 209864836,
+      accountId: 995070,
+      absAmount: 89.81,
+      isExpense: true,
+      bookingDate: new Date("2019-11-11T19:31:50.379+00:00"),
+      purpose: " RE. 745259",
+      counterPartName: "TueV Bayern",
+      counterPartAccountNumber: "611105",
+      counterPartIban: "DE13700800000061110500",
+      counterPartBlz: "70080000",
+      counterPartBic: "DRESDEFF700",
+      counterPartBankName: "Commerzbank vormals Dresdner Bank"
+    };
+    await transactions.save(transaction);
+
+    const beforeDelete = await transactions.findById(209864836);
+    expect(beforeDelete).to.eql(transaction);
+
+    await transactions.delete(transaction);
+
+    const afterDelete = await transactions.findById(209864836);
+    expect(afterDelete).to.be.null;
+  });
+
+  it("deletes transactions by account id", async function() {
+    /*
+     * If save fails, everything is not saved
+     */
+    let transactionsData: Transaction[] = [
+      {
+        id: 1112,
+        accountId: 2,
+        absAmount: 89.871,
+        isExpense: true,
+        bookingDate: new Date("2018-01-01T00:00:00.000Z"),
+        purpose: " RE. 745259",
+        counterPartName: "TueV Bayern",
+        counterPartAccountNumber: "611105",
+        counterPartIban: "DE13700800000061110500",
+        counterPartBlz: "70080000",
+        counterPartBic: "DRESDEFF700",
+        counterPartBankName: "Commerzbank vormals Dresdner Bank"
+      },
+      {
+        id: 1113,
+        accountId: 2,
+        absAmount: 99.81,
+        isExpense: true,
+        bookingDate: new Date("2018-01-02T00:00:00.000Z"),
+        purpose: " RE. 745459",
+        counterPartName: "TueV Bayern",
+        counterPartAccountNumber: "611605",
+        counterPartIban: "DE13700800001061110500",
+        counterPartBlz: "70080070",
+        counterPartBic: "DREEDEFF700",
+        counterPartBankName: "Commerzbank vormals Dresdner Bank"
+      },
+      {
+        id: 4112,
+        accountId: 4,
+        absAmount: 69.81,
+        isExpense: true,
+        bookingDate: new Date("2018-01-03T00:00:00.000Z"),
+        purpose: " RE. 735459",
+        counterPartName: "TueV Bayern",
+        counterPartAccountNumber: "631605",
+        counterPartIban: "DE13700807001061110500",
+        counterPartBlz: "71080070",
+        counterPartBic: "DREEUEFF700",
+        counterPartBankName: "Commerzbank vormals Dresdner Bank"
+      }
+    ];
+
+    await expect(transactions.saveArray(transactionsData)).to.eventually.be.fulfilled;
+    await transactions.deleteByAccountId(2);
+    await expect(transactions.findByAccountIds([2])).to.eventually.be.empty;
+  });
+
   it("save with unique id and account id", async function() {
     const firstTransaction = {
       id: 1,
@@ -169,9 +249,7 @@ describe("postgres transactions repository", function() {
     expect(result!.accountId).to.equal(transactionsData[1].accountId);
     expect(result!.absAmount).to.equal(transactionsData[1].absAmount);
     expect(result!.isExpense).to.equal(transactionsData[1].isExpense);
-    expect(result!.bookingDate.getTime()).to.equal(
-      new Date(transactionsData[1].bookingDate).getTime()
-    );
+    expect(result!.bookingDate.getTime()).to.equal(new Date(transactionsData[1].bookingDate).getTime());
     expect(result!.purpose).to.equal(transactionsData[1].purpose);
     expect(result!.counterPartName).to.equal(transactionsData[1].counterPartName);
     expect(result!.counterPartAccountNumber).to.equal(transactionsData[1].counterPartAccountNumber);
@@ -232,9 +310,7 @@ describe("postgres transactions repository", function() {
     expect(result!.accountId).to.equal(transactionsData[1].accountId);
     expect(result!.absAmount).to.equal(transactionsData[1].absAmount);
     expect(result!.isExpense).to.equal(transactionsData[1].isExpense);
-    expect(result!.bookingDate.getTime()).to.equal(
-      new Date(transactionsData[1].bookingDate).getTime()
-    );
+    expect(result!.bookingDate.getTime()).to.equal(new Date(transactionsData[1].bookingDate).getTime());
     expect(result!.purpose).to.equal(transactionsData[1].purpose);
     expect(result!.counterPartName).to.equal(transactionsData[1].counterPartName);
     expect(result!.counterPartAccountNumber).to.equal(transactionsData[1].counterPartAccountNumber);
@@ -301,7 +377,7 @@ describe("postgres transactions repository", function() {
     expect(await transactions.findById(transactionsData[2].id)).to.not.exist;
   });
 
-  it('group by iban column', async function() {
+  it("group by iban column", async function() {
     let transactionsData: Transaction[] = [
       {
         id: 1112,
@@ -365,12 +441,12 @@ describe("postgres transactions repository", function() {
     const transactionsGroup = await transactions.groupByIban();
     expect(transactionsGroup.length).to.equal(2);
     expect(transactionsGroup[0][0].accountId).to.equal(2);
-    expect(transactionsGroup[0][0].counterPartIban).to.equal('AU13700807001061110500');
+    expect(transactionsGroup[0][0].counterPartIban).to.equal("AU13700807001061110500");
     expect(transactionsGroup[0][1].accountId).to.equal(3);
-    expect(transactionsGroup[0][1].counterPartIban).to.equal('AU13700807001061110500');
+    expect(transactionsGroup[0][1].counterPartIban).to.equal("AU13700807001061110500");
     expect(transactionsGroup[1][0].accountId).to.equal(4);
-    expect(transactionsGroup[1][0].counterPartIban).to.equal('DE13700800000061110500');
+    expect(transactionsGroup[1][0].counterPartIban).to.equal("DE13700800000061110500");
     expect(transactionsGroup[1][1].accountId).to.equal(5);
-    expect(transactionsGroup[1][1].counterPartIban).to.equal('DE13700800000061110500');
+    expect(transactionsGroup[1][1].counterPartIban).to.equal("DE13700800000061110500");
   });
 });

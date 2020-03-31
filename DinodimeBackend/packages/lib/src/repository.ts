@@ -5,6 +5,7 @@ import types from "./schema/types";
 export interface Repository<K, T> {
   save(entity: T): Promise<T>;
   findById(id: K): Promise<T | null>;
+  delete(entity: T): Promise<void>;
   deleteAll(): Promise<void>;
 }
 
@@ -14,11 +15,7 @@ export abstract class PostgresRepository<K, T> implements Repository<K, T> {
   schema: Schema<T>;
   types: typeof types;
 
-  constructor(
-    pool: Pool | undefined,
-    format: (fmt: string, ...args: any[]) => string,
-    schema: Schema<T>
-  ) {
+  constructor(pool: Pool | undefined, format: (fmt: string, ...args: any[]) => string, schema: Schema<T>) {
     this.pool = pool;
     this.format = format;
     this.schema = schema;
@@ -27,6 +24,7 @@ export abstract class PostgresRepository<K, T> implements Repository<K, T> {
 
   abstract save(entity: T): Promise<T>;
   abstract findById(id: K): Promise<T | null>;
+  abstract delete(entity: T): Promise<void>;
   abstract deleteAll(): Promise<void>;
 
   async doQuery(queryConfig: QueryConfig<any[]>): Promise<QueryResult<any>> {

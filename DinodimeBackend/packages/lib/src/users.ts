@@ -15,12 +15,7 @@ export class User {
   activeWebFormAuth: string | null;
   creationDate: Date;
 
-  constructor(
-    username: string,
-    email: string,
-    phone: string,
-    isAutoUpdateEnabled: boolean = false
-  ) {
+  constructor(username: string, email: string, phone: string, isAutoUpdateEnabled: boolean = false) {
     this.username = username;
     this.email = email;
     this.phone = phone;
@@ -60,6 +55,10 @@ export namespace Users {
       }
 
       return null;
+    }
+
+    async delete(user: User) {
+      delete this.repository[user.username];
     }
 
     async save(user: User) {
@@ -118,6 +117,10 @@ export namespace Users {
       throw new Error("Method not implemented.");
     }
 
+    async delete(user: User) {
+      throw new Error("Method not implemented.");
+    }
+
     async deleteAll(): Promise<void> {
       throw new Error("Method not implemented.");
     }
@@ -137,8 +140,7 @@ export namespace Users {
         isAutoUpdateEnabled: data["isAutoUpdateEnabled"]!["BOOL"]!,
         activeWebFormAuth: activeWebFormId !== undefined ? activeWebFormAuth["S"]! : null,
         activeWebFormId: activeWebFormAuth !== undefined ? parseInt(activeWebFormId["N"]!) : null,
-        bankConnectionIds:
-          bankConnectionIds !== undefined ? bankConnectionIds["NS"]!.map(id => parseInt(id)) : []
+        bankConnectionIds: bankConnectionIds !== undefined ? bankConnectionIds["NS"]!.map(id => parseInt(id)) : []
       };
 
       return user;
@@ -174,34 +176,27 @@ export namespace Users {
     }
   }
 
-  export class PostgreSQLRepository extends PostgresRepository<string, User>
-    implements UsersRepository {
-    constructor(
-      pool: Pool | undefined,
-      format: (fmt: string, ...args: any[]) => string,
-      schema: Schema<User>
-    ) {
+  export class PostgreSQLRepository extends PostgresRepository<string, User> implements UsersRepository {
+    constructor(pool: Pool | undefined, format: (fmt: string, ...args: any[]) => string, schema: Schema<User>) {
       super(pool, format, schema);
     }
 
     findByIdQuery(userName: string) {
-      return this.format(
-        "SELECT * FROM %I WHERE username = %L LIMIT 1",
-        this.schema.tableName,
-        userName
-      );
+      return this.format("SELECT * FROM %I WHERE username = %L LIMIT 1", this.schema.tableName, userName);
     }
 
     findByWebFormIdQuery(activeWebFormId: number) {
-      return this.format(
-        "SELECT * FROM %I WHERE activewebformid = %L LIMIT 1",
-        this.schema.tableName,
-        activeWebFormId
-      );
+      return this.format("SELECT * FROM %I WHERE activewebformid = %L LIMIT 1", this.schema.tableName, activeWebFormId);
     }
 
     deleteAllQuery() {
       return this.format("DELETE FROM %I", this.schema.tableName);
+    }
+
+    deleteQuery(userName: string) {
+      const tableName = this.schema.tableName;
+      const idAttribute = this.schema.columns.username;
+      return this.format("DELETE FROM %I WHERE %I.%I = %L", this.schema.tableName, tableName, idAttribute, userName);
     }
 
     saveQuery(user: User) {
@@ -230,9 +225,7 @@ export namespace Users {
         rowMode: "array"
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null
-      );
+      return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async findByWebFormId(activeWebFormId: number) {
@@ -241,9 +234,7 @@ export namespace Users {
         rowMode: "array"
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null
-      );
+      return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async save(user: User) {
@@ -252,6 +243,14 @@ export namespace Users {
       };
 
       return this.doQuery(params).then(() => user);
+    }
+
+    async delete(user: User) {
+      const params = {
+        text: this.deleteQuery(user.username)
+      };
+
+      return this.doQuery(params).then(() => undefined);
     }
 
     async deleteAll() {

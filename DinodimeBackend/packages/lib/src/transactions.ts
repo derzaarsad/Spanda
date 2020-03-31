@@ -44,6 +44,7 @@ export namespace Transactions {
   export interface TransactionsRepository extends Repository<number, Transaction> {
     findByAccountIds(accountIds: Array<number>): Promise<Array<Transaction>>;
     saveArray(transactions: Array<Transaction>): Promise<Array<Transaction>>;
+    deleteByAccountId(connectionId: number): Promise<void>;
   }
 
   export class InMemoryRepository implements TransactionsRepository {
@@ -80,6 +81,19 @@ export namespace Transactions {
       return candidate ? candidate : null;
     }
 
+    async delete(transaction: Transaction): Promise<void> {
+      delete this.repository[transaction.id];
+    }
+
+    async deleteByAccountId(accountId: number): Promise<void> {
+      for (let id in this.repository) {
+        const tx = this.repository[id];
+        if (tx.accountId === accountId) {
+          delete this.repository[id];
+        }
+      }
+    }
+
     async deleteAll(): Promise<void> {
       for (let id in this.repository) {
         delete this.repository[id];
@@ -87,13 +101,8 @@ export namespace Transactions {
     }
   }
 
-  export class PostgreSQLRepository extends PostgresRepository<number, Transaction>
-    implements TransactionsRepository {
-    constructor(
-      pool: Pool | undefined,
-      format: (fmt: string, ...args: any[]) => string,
-      schema: Schema<Transaction>
-    ) {
+  export class PostgreSQLRepository extends PostgresRepository<number, Transaction> implements TransactionsRepository {
+    constructor(pool: Pool | undefined, format: (fmt: string, ...args: any[]) => string, schema: Schema<Transaction>) {
       super(pool, format, schema);
     }
 
@@ -111,14 +120,19 @@ export namespace Transactions {
         types: this.types
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null
-      );
+      return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async deleteAll(): Promise<void> {
       const params = {
         text: this.deleteAllQuery()
+      };
+      await this.doQuery(params);
+    }
+
+    async delete(tx: Transaction): Promise<void> {
+      const params = {
+        text: this.deleteQuery(tx.id)
       };
       await this.doQuery(params);
     }
@@ -140,8 +154,9 @@ export namespace Transactions {
         types: this.types
       };
 
-      return this.doQuery(params)
-        .then(res => res.rows.map(row => row[0].map((element: any) => this.schema.mapColumns(element))));
+      return this.doQuery(params).then(res =>
+        res.rows.map(row => row[0].map((element: any) => this.schema.mapColumns(element)))
+      );
     }
 
     async saveArray(transactions: Transaction[]): Promise<Transaction[]> {
@@ -152,20 +167,20 @@ export namespace Transactions {
       return this.doQuery(params).then(res => transactions);
     }
 
+    async deleteByAccountId(accountId: number) {
+      const params = {
+        text: this.deleteByAccountIdQuery(accountId)
+      };
+
+      return this.doQuery(params).then(() => undefined);
+    }
+
     findByIdQuery(id: number) {
-      return this.format(
-        "SELECT * FROM %I WHERE id = %L LIMIT 1",
-        this.schema.tableName,
-        id.toString()
-      );
+      return this.format("SELECT * FROM %I WHERE id = %L LIMIT 1", this.schema.tableName, id.toString());
     }
 
     findByAccountIdsQuery(accountIds: Array<number>) {
-      return this.format(
-        "SELECT * FROM %I WHERE accountid in (%L)",
-        this.schema.tableName,
-        accountIds
-      );
+      return this.format("SELECT * FROM %I WHERE accountid in (%L)", this.schema.tableName, accountIds);
     }
 
     groupByColumnQuery(attributesIndex: number) {
@@ -179,6 +194,18 @@ export namespace Transactions {
         attribute,
         attribute
       );
+    }
+
+    deleteByAccountIdQuery(accountId: number) {
+      const tableName = this.schema.tableName;
+      const idAttribute = this.schema.columns.accountId;
+      return this.format("DELETE FROM %I WHERE %I.%I = %L", this.schema.tableName, tableName, idAttribute, accountId);
+    }
+
+    deleteQuery(id: number) {
+      const tableName = this.schema.tableName;
+      const idAttribute = this.schema.columns.id;
+      return this.format("DELETE FROM %I WHERE %I.%I = %L", this.schema.tableName, tableName, idAttribute, id);
     }
 
     deleteAllQuery() {
@@ -198,11 +225,7 @@ export namespace Transactions {
       const attributes = this.schema.attributes;
       const values = transactions
         .map(transaction => {
-          return (
-            "(" +
-            this.schema.asRow(transaction).map(item => this.format("%L", item.toString())) +
-            ")"
-          );
+          return "(" + this.schema.asRow(transaction).map(item => this.format("%L", item.toString())) + ")";
         })
         .join(", ");
 

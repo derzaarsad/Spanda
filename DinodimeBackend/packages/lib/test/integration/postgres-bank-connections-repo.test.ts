@@ -43,6 +43,19 @@ describe("postgres bank connections repository", function() {
     expect(result).to.eql(connection);
   });
 
+  it("deletes a single connection", async function() {
+    const connection = new BankConnection(2, 69);
+    await connections.save(connection);
+
+    const beforeDelete = await connections.findById(2);
+    expect(beforeDelete).to.eql(connection);
+
+    await connections.delete(connection);
+
+    const afterDelete = await connections.findById(2);
+    expect(afterDelete).to.be.null;
+  });
+
   it("overwrites an existing bank connection on save", async function() {
     const connection = new BankConnection(2, 69);
     connection.bankAccountIds.push(1);

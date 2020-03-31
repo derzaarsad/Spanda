@@ -11,11 +11,7 @@ describe("postgres transactions repository", function() {
   let transactions: Transactions.PostgreSQLRepository;
 
   beforeEach(function() {
-    transactions = new Transactions.PostgreSQLRepository(
-      undefined,
-      format,
-      new TransactionsSchema()
-    );
+    transactions = new Transactions.PostgreSQLRepository(undefined, format, new TransactionsSchema());
   });
 
   it("renders the find-by-id query", async function() {
@@ -101,6 +97,20 @@ describe("postgres transactions repository", function() {
   it("renders the group-by-column query", async function() {
     const result = transactions.groupByColumnQuery(8);
     expect(result).to.be.a("string");
-    expect(result).to.equal("SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM transactions WHERE counterpartiban=b.counterpartiban) t ) rw FROM transactions b WHERE counterpartiban IS NOT NULL GROUP BY counterpartiban");
+    expect(result).to.equal(
+      "SELECT ( SELECT array_to_json(array_agg(t)) from (SELECT * FROM transactions WHERE counterpartiban=b.counterpartiban) t ) rw FROM transactions b WHERE counterpartiban IS NOT NULL GROUP BY counterpartiban"
+    );
+  });
+
+  it("renders the delete query", async function() {
+    const result = transactions.deleteQuery(666);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("DELETE FROM transactions WHERE transactions.id = '666'");
+  });
+
+  it("renders the delete by account id query", async function() {
+    const result = transactions.deleteByAccountIdQuery(666);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("DELETE FROM transactions WHERE transactions.accountid = '666'");
   });
 });

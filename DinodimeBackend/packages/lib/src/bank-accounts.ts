@@ -28,8 +28,14 @@ export namespace BankAccounts {
       return bankAccount;
     }
 
-    deleteAll(): Promise<void> {
-      throw new Error("Method not implemented.");
+    async delete(bankAccount: BankAccount) {
+      delete this.repository[bankAccount.id];
+    }
+
+    async deleteAll() {
+      for (let key in this.repository) {
+        delete this.repository[key];
+      }
     }
   }
 
@@ -52,10 +58,7 @@ export namespace BankAccounts {
       };
     }
 
-    private encodeBankAccount(
-      bankAccount: BankAccount,
-      returnValues: string
-    ): DynamoDB.UpdateItemInput {
+    private encodeBankAccount(bankAccount: BankAccount, returnValues: string): DynamoDB.UpdateItemInput {
       let expression = "SET #BC = :bc, #A = :a, #I = :i, #C = :c";
 
       const attributes = {
@@ -115,6 +118,10 @@ export namespace BankAccounts {
     }
 
     deleteAll(): Promise<void> {
+      throw new Error("Method not implemented.");
+    }
+
+    delete(bankAccount: BankAccount): Promise<void> {
       throw new Error("Method not implemented.");
     }
   }

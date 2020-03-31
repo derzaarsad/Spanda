@@ -33,6 +33,19 @@ describe("postgres users repository", function() {
     expect(result).to.eql(user);
   });
 
+  it("deletes a single user a user", async function() {
+    const user = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
+    user.creationDate = new Date("2019-11-11T19:31:50.379+00:00");
+
+    await users.save(user);
+    const beforeDelete = await users.findById("chapu");
+    expect(beforeDelete).to.eql(user);
+
+    await users.delete(user);
+    const afterDelete = await users.findById("chapu");
+    expect(afterDelete).to.be.null;
+  });
+
   it("stores and retrieves a user with bank connections", async function() {
     const user = new User("chapu", "chapu@mischung.net", "+666 666 666", false);
     user.creationDate = new Date("2019-11-11T19:31:50.379+00:00");

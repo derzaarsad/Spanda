@@ -31,6 +31,10 @@ export namespace BankConnections {
       return bankConnection;
     }
 
+    async delete(bankConnection: BankConnection) {
+      delete this.repository[bankConnection.id];
+    }
+
     async deleteAll() {
       for (let id in this.repository) {
         delete this.repository[id];
@@ -57,10 +61,7 @@ export namespace BankConnections {
       };
     }
 
-    private encodeBankConnection(
-      bankConnection: BankConnection,
-      returnValues: string
-    ): DynamoDB.UpdateItemInput {
+    private encodeBankConnection(bankConnection: BankConnection, returnValues: string): DynamoDB.UpdateItemInput {
       let expression = "SET #B = :b";
 
       const attributes: DynamoDB.ExpressionAttributeNameMap = {
@@ -122,6 +123,10 @@ export namespace BankConnections {
     deleteAll(): Promise<void> {
       throw new Error("Method not implemented.");
     }
+
+    delete(bankConnection: BankConnection): Promise<void> {
+      throw new Error("Method not implemented.");
+    }
   }
 
   export class PostgreSQLRepository extends PostgresRepository<number, BankConnection>
@@ -135,10 +140,18 @@ export namespace BankConnections {
     }
 
     findByIdQuery(id: number) {
+      return this.format("SELECT * FROM %I WHERE id = %L LIMIT 1", this.schema.tableName, id.toString());
+    }
+
+    deleteQuery(bankConnectionId: number) {
+      const tableName = this.schema.tableName;
+      const idAttribute = this.schema.columns.id;
       return this.format(
-        "SELECT * FROM %I WHERE id = %L LIMIT 1",
+        "DELETE FROM %I WHERE %I.%I = %L",
         this.schema.tableName,
-        id.toString()
+        tableName,
+        idAttribute,
+        bankConnectionId
       );
     }
 
@@ -173,9 +186,7 @@ export namespace BankConnections {
         types: types
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null
-      );
+      return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async save(bankConnection: BankConnection) {
@@ -191,6 +202,14 @@ export namespace BankConnections {
         .finally(() => {
           client.release();
         });
+    }
+
+    async delete(bankConnection: BankConnection) {
+      const params = {
+        text: this.deleteQuery(bankConnection.id)
+      };
+
+      await this.doQuery(params);
     }
 
     async deleteAll() {

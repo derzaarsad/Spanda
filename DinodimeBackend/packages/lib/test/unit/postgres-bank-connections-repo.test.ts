@@ -48,4 +48,10 @@ describe("postgres bank connections repository", function() {
     expect(result).to.be.a("string");
     expect(result).to.equal("DELETE FROM bankconnections");
   });
+
+  it("renders the delete query", async function() {
+    const result = connections.deleteQuery(666);
+    expect(result).to.be.a("string");
+    expect(result).to.equal("DELETE FROM bankconnections WHERE bankconnections.id = '666'");
+  });
 });
