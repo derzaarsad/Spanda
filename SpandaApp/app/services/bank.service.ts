@@ -29,6 +29,16 @@ export class BankService {
         return [this.authenticationService.getBackendUrl() + "/recurrentTransactions", headerOptions ];
     }
 
+    __updateRecurrentTransactions__(recurrenttransactions: Array<RecurrentTransaction>): [string, any, any] {
+
+        let headerOptions = {
+            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
+            "Content-Type": "application/json"
+        };
+
+        return [this.authenticationService.getBackendUrl() + "/recurrentTransactions/update", { recurrenttransactions: recurrenttransactions }, headerOptions ];
+    }
+
     __getWebformIdAndToken__(bank: Bank): [string, any, any] {
 
         let headerOptions = {
@@ -127,6 +137,27 @@ export class BankService {
             console.log("WebForm Invalid");
             console.log(err);
             return undefined;
+        });
+    }
+
+    /*
+     * return [ Id , Access Token, Status ]
+     */
+    updateRecurrentTransactions(recurrenttransactions: Array<RecurrentTransaction>): Promise<boolean> {
+        let request = this.__updateRecurrentTransactions__(recurrenttransactions);
+        return Https.request({
+            url: request[0],
+            method: 'POST',
+            body: request[1],
+            headers: request[2],
+            timeout: 10
+        }).then(res => {
+            console.log(res);
+            return (res.statusCode != 200);
+        }, err => {
+            console.log("Update Recurrent Transaction Failed");
+            console.log(err);
+            return false;
         });
     }
 

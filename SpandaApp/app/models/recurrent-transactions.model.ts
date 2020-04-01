@@ -15,8 +15,8 @@ export class RecurrentTransaction {
     @JsonProperty("IsConfirmed", Boolean)
     IsConfirmed: boolean = undefined;
 
-    @JsonProperty("Frequency", Number)
-    Frequency: number = undefined;
+    @JsonProperty("Frequency", String)
+    Frequency: string = undefined;
 
     @JsonProperty("CounterPartName", String)
     CounterPartName: string = undefined;

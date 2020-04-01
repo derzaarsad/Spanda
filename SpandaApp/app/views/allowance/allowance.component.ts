@@ -7,6 +7,7 @@ import { IAuthentication,AUTH_SERVICE_IMPL } from "~/services/authentication.ser
 import { BankService } from "~/services/bank.service"
 import { AnimationCurve } from 'ui/enums';
 import * as dialogs from "tns-core-modules/ui/dialogs";
+import { RecurrentTransaction } from "~/models/recurrent-transactions.model";
 
 @Component({
     selector: "allowance",
@@ -33,6 +34,7 @@ export class AllowanceComponent implements OnInit {
         if(!this.authenticationService.getStoredUser().IsRecurrentTransactionConfirmed) {
             this.bankService.getRecurrentTransactions().then(res => {
                 console.log(res);
+                let updatedRecurrentTransactions: Array<RecurrentTransaction> = [];
                 for(let item in res){
                     dialogs.action({
                         message: "Do you " + (res[item].IsExpense ? "spend" : "receive") + " money "
@@ -42,15 +44,19 @@ export class AllowanceComponent implements OnInit {
                     }).then(result => {
                         console.log("Dialog result " + res[item].CounterPartName + ": " + result);
                         if(result == "Yes, every month"){
-                            //Do action1
+                            res[item].Frequency = "Monthly";
                         }else if(result == "Yes, every 3 months"){
-                            //Do action2
+                            res[item].Frequency = "Quarterly";
                         }else if(result == "Yes, every year"){
-                            //Do action2
+                            res[item].Frequency = "Yearly";
+                        }
+                        updatedRecurrentTransactions.push(res[item]);
+                        if(updatedRecurrentTransactions.length === res.length) {
+                            console.log(updatedRecurrentTransactions);
+                            this.bankService.updateRecurrentTransactions(updatedRecurrentTransactions);
                         }
                     });
                 }
-                // TODO: Set Recurrent Transactions
             });
         }
 
