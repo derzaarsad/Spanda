@@ -43,6 +43,7 @@ export class AllowanceComponent implements OnInit {
                         actions: ["Yes, every month", "Yes, every 3 months", "Yes, every year"]
                     }).then(result => {
                         console.log("Dialog result " + res[item].CounterPartName + ": " + result);
+                        res[item].IsConfirmed = true;
                         if(result == "Yes, every month"){
                             res[item].Frequency = "Monthly";
                         }else if(result == "Yes, every 3 months"){
