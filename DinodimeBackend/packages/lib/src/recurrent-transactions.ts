@@ -232,6 +232,8 @@ export namespace RecurrentTransactions {
       const existingTransactions = await this.findByIds(recurrentTransactions.map(tx => tx.id));
 
       if (existingTransactions.length !== recurrentTransactions.length) {
+        console.log("existingTransactions");
+        console.log(existingTransactions);
         throw new Error("Cannot perform update. Some transactions don't exist.");
       }
 

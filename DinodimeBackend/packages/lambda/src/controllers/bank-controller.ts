@@ -260,6 +260,7 @@ export const updateRecurrentTransactions = async (
   });
 
   try {
+    console.log("Received recurrent transactions");
     console.log(recurrenttransactions);
     await recurrentTransactions.updateArray(recurrenttransactions);
   } catch (err) {
