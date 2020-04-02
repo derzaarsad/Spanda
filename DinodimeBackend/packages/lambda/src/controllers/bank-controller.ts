@@ -210,7 +210,7 @@ export const getRecurrentTransactions = async (
 
 // @Post('/recurrentTransactions/update')
 // @Header('Authorization') authorization: string,
-// @BodyProp() recurrenttransactions: [])
+// @BodyProp() recurrenttransactions: []) 
 export const updateRecurrentTransactions = async (
   event: APIGatewayProxyEvent,
   context: Context,
