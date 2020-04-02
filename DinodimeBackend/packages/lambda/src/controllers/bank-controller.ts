@@ -250,6 +250,8 @@ export const updateRecurrentTransactions = async (
     return CreateSimpleResponse(400, "invalid request");
   }
 
+  console.log("Received JSON");
+  console.log(params);
   const recurrentArray: Array<any> = params.recurrenttransactions;
 
   const recurrenttransactions = recurrentArray.map(el => {
