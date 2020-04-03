@@ -21,12 +21,12 @@ export interface DeleteUserDataHandlerConfiguration {
   logger: winston.Logger;
 }
 
-export const deleteUserData = async (
+export const deleteUserDataHandler = async (
   configuration: DeleteUserDataHandlerConfiguration,
   event: APIGatewayProxyEvent,
   context: Context
 ) => {
-  const { logger, users, bankConnections, transactions, recurrentTransactions, bankInterface } = configuration;
+  const { logger, users, bankConnections, transactions, recurrentTransactions } = configuration;
   logger.log("debug", "received event", event);
 
   const authorization = HasAuthorization(event.headers);
