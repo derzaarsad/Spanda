@@ -21,6 +21,7 @@ var config = function(name) {
 
 var modules = [
   "api",
+  "admin-api",
   "notifications-callback",
   "describe-db-instance",
   "webform-callback",

@@ -3,7 +3,7 @@ import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import { CreateSimpleResponse, HasAuthorization, CreateInternalErrorResponse } from "./lambda-util";
 
 import { getUserInfo } from "./userinfo";
-import { Authentication, ClientSecretsProvider } from "dinodime-lib";
+import { Authentication } from "dinodime-lib";
 import { FinAPI } from "dinodime-lib";
 import { User, Users } from "dinodime-lib";
 import { Transactions } from "dinodime-lib";
@@ -11,10 +11,9 @@ import { RecurrentTransactions } from "dinodime-lib";
 import { BankConnection, BankConnections } from "dinodime-lib";
 
 export interface DeleteUserDataHandlerConfiguration {
-  clientSecrets: ClientSecretsProvider;
   authentication: Authentication;
-  bankInterface: FinAPI;
   users: Users.UsersRepository;
+  bankInterface: FinAPI;
   bankConnections: BankConnections.BankConnectionsRepository;
   transactions: Transactions.TransactionsRepository;
   recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
@@ -27,7 +26,6 @@ export const deleteUserDataHandler = async (
   context: Context
 ) => {
   const { logger, users, bankConnections, transactions, recurrentTransactions } = configuration;
-  logger.log("debug", "received event", event);
 
   const authorization = HasAuthorization(event.headers);
 
@@ -80,5 +78,6 @@ export const deleteUserDataHandler = async (
     return CreateInternalErrorResponse("error removing bank data");
   }
 
+  logger.info(`Banking data for username ${user.username} deleted susccesfully`);
   return CreateSimpleResponse(200, "ok");
 };

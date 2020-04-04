@@ -3,9 +3,10 @@ import * as lambda from "@aws-cdk/aws-lambda";
 import * as apigw from "@aws-cdk/aws-apigateway";
 import * as iam from "@aws-cdk/aws-iam";
 import * as path from "path";
+
 import { Duration } from "@aws-cdk/core";
 import { LambdaIntegration } from "@aws-cdk/aws-apigateway";
-import { LambdaFactory, LambdaDeploymentProps, LambdaPermissionProps } from "./lambda-factory";
+import { LambdaFactory } from "./lambda-factory";
 
 export interface MockFinApiProps extends cdk.StackProps {
   lambdaEnvironment: { [key: string]: string };

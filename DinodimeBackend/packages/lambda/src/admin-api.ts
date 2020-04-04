@@ -2,7 +2,6 @@ import { APIGatewayProxyEvent, Context } from "aws-lambda";
 
 import { CreateInternalErrorResponse, CreateSimpleResponse } from "./lambda-util";
 import { ServiceProvider } from "./service-provider";
-import { deleteUserData as } from "./admin-api";
 import { deleteUserDataHandler } from "./admin-api-handler";
 
 const services = new ServiceProvider(process.env);

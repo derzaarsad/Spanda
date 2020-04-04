@@ -9,7 +9,8 @@ import { PostgresDeploymentProps } from "../src/postgres-deployment-props";
 import { ServicesProps } from "../src/services-props";
 import { DatabaseMigrationsRepository } from "../src/db-migrations-repo";
 import { LambdaPermissionProps } from "../src/lambda-factory";
-import { MockFinApiProps, MockFinApi } from "../src/mock-finapi";
+import { MockFinApi } from "../src/mock-finapi";
+import { AdminApi } from "../src/admin-api";
 
 const app = new cdk.App();
 
@@ -87,3 +88,5 @@ const servicesProps: ServicesProps = {
 new Services(app, "DinodimeServices", servicesProps);
 
 new MockFinApi(app, "MockFinAPI");
+
+new AdminApi(app, "DinodimeAdminAPI", servicesProps);
