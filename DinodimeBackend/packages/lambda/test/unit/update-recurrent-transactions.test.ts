@@ -212,7 +212,11 @@ describe("unit: update recurrent transactions", function() {
         })
       } as unknown) as APIGatewayProxyEvent;
     
-    await users.save(new User("chapu","",""));
+    {
+      let user = new User("chapu","","");
+      user.isRecurrentTransactionConfirmed = false;
+      await users.save(user);
+    }
     await recurrentTransactions.saveArray([
         new RecurrentTransaction(1, [1,2,3], true, "Dinodime GmbH", 1),
         new RecurrentTransaction(1, [3,4,5], true, "Dinodime GmbH 2", 2)
@@ -244,5 +248,10 @@ describe("unit: update recurrent transactions", function() {
     expect(modifiedResult2!.isConfirmed).to.equal(true);
     expect(modifiedResult!.frequency).to.equal(TransactionFrequency.Monthly);
     expect(modifiedResult2!.frequency).to.equal(TransactionFrequency.Yearly);
+
+    {
+      const user = await users.findById("chapu");
+      expect(user!.isRecurrentTransactionConfirmed).to.equal(true);
+    }
   });
 });

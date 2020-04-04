@@ -250,8 +250,6 @@ export const updateRecurrentTransactions = async (
     return CreateSimpleResponse(400, "invalid request");
   }
 
-  console.log("Received JSON");
-  console.log(params);
   const recurrentArray: Array<any> = params.recurrenttransactions;
 
   const recurrenttransactions = recurrentArray.map(el => {
@@ -262,15 +260,21 @@ export const updateRecurrentTransactions = async (
   });
 
   try {
-    console.log("Received recurrent transactions");
-    console.log(recurrenttransactions);
     await recurrentTransactions.updateArray(recurrenttransactions);
   } catch (err) {
     logger.log("error", "error updating recurrent transactions", err);
     return CreateSimpleResponse(204, "updating recurrent transactions failed");
   }
 
-  return CreateResponse(200, { message: "success" });
+  user.isRecurrentTransactionConfirmed = true;
+
+  return users
+  .save(user)
+  .then(() => CreateResponse(200, { message: "success" }))
+  .catch(err => {
+    logger.log("error", "error importing connection", { cause: err });
+    return CreateSimpleResponse(500, "error updating the user");
+  });
 };
 
 export const deduceRecurrentTransactions = async (
