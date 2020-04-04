@@ -12,6 +12,7 @@ import { LambdaFactory } from "./lambda-factory";
 export class WebFormCallbackAPI extends cdk.Construct {
   readonly restAPI: apigw.RestApi;
   readonly completionsQueue: sqs.Queue;
+  readonly completionsDLQ: sqs.Queue;
 
   constructor(scope: cdk.Construct, id: string, props: ServicesProps) {
     super(scope, id);
@@ -20,12 +21,12 @@ export class WebFormCallbackAPI extends cdk.Construct {
       endpointExportName: "WebFormCallbackAPIEndpoint"
     });
 
-    const completionsDlq = new sqs.Queue(this, "WebFormCompletionsDLQ");
+    this.completionsDLQ = new sqs.Queue(this, "WebFormCompletionsDLQ");
 
     const completionsQueue = new sqs.Queue(this, "WebFormCompletionsQueue", {
       visibilityTimeout: cdk.Duration.seconds(300),
       deadLetterQueue: {
-        queue: completionsDlq,
+        queue: this.completionsDLQ,
         maxReceiveCount: 3
       }
     });

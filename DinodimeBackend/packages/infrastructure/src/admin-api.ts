@@ -39,5 +39,9 @@ export class AdminApi extends cdk.Stack {
     dataResource.addMethod("DELETE", new LambdaIntegration(deleteMethod), {
       operationName: "delete user data"
     });
+
+    new cdk.CfnOutput(this, "AdminEndpointURL", {
+      value: restAPI.url
+    });
   }
 }

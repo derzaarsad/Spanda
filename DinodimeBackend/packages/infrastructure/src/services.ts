@@ -31,8 +31,16 @@ export class Services extends cdk.Stack {
       value: notifications.notificationsTopic.topicArn
     });
 
+    new cdk.CfnOutput(this, "CallbackEndpointURL", {
+      value: callbackAPI.restAPI.url
+    });
+
     new cdk.CfnOutput(this, "WebFormCompletionsQueueURL", {
       value: callbackAPI.completionsQueue.queueUrl
+    });
+
+    new cdk.CfnOutput(this, "WebFormCompletionsDLQURL", {
+      value: callbackAPI.completionsDLQ.queueUrl
     });
   }
 }
