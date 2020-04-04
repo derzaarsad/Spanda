@@ -1,5 +1,12 @@
 import {JsonObject, JsonProperty} from "json2typescript";
 
+export enum TransactionFrequency {
+  Unknown = "Unknown",
+  Monthly = "Monthly",
+  Quarterly = "Quarterly",
+  Yearly = "Yearly"
+}
+
 @JsonObject("RecurrentTransaction")
 export class RecurrentTransaction {
 
@@ -15,8 +22,8 @@ export class RecurrentTransaction {
     @JsonProperty("IsConfirmed", Boolean)
     IsConfirmed: boolean = undefined;
 
-    @JsonProperty("Frequency", String)
-    Frequency: string = undefined;
+    @JsonProperty("Frequency", TransactionFrequency)
+    Frequency: TransactionFrequency = undefined;
 
     @JsonProperty("CounterPartName", String)
     CounterPartName: string = undefined;

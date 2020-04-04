@@ -255,9 +255,9 @@ export const updateRecurrentTransactions = async (
   const recurrentArray: Array<any> = params.recurrenttransactions;
 
   const recurrenttransactions = recurrentArray.map(el => {
-    let ret = new RecurrentTransaction(el.accountId, [], el.isExpense, el.counterPartName, el.id);
-    ret.isConfirmed = el.isConfirmed;
-    ret.frequency = el.frequency;
+    let ret = new RecurrentTransaction(el.AccountId, [], el.IsExpense, el.CounterPartName, el.Id);
+    ret.isConfirmed = el.IsConfirmed;
+    ret.frequency = el.Frequency;
     return ret;
   });
 

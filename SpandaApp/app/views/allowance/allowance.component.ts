@@ -7,7 +7,7 @@ import { IAuthentication,AUTH_SERVICE_IMPL } from "~/services/authentication.ser
 import { BankService } from "~/services/bank.service"
 import { AnimationCurve } from 'ui/enums';
 import * as dialogs from "tns-core-modules/ui/dialogs";
-import { RecurrentTransaction } from "~/models/recurrent-transactions.model";
+import { RecurrentTransaction, TransactionFrequency } from "~/models/recurrent-transactions.model";
 
 @Component({
     selector: "allowance",
@@ -45,11 +45,11 @@ export class AllowanceComponent implements OnInit {
                         console.log("Dialog result " + res[item].CounterPartName + ": " + result);
                         res[item].IsConfirmed = true;
                         if(result == "Yes, every month"){
-                            res[item].Frequency = "Monthly";
+                            res[item].Frequency = TransactionFrequency.Monthly;
                         }else if(result == "Yes, every 3 months"){
-                            res[item].Frequency = "Quarterly";
+                            res[item].Frequency = TransactionFrequency.Quarterly;
                         }else if(result == "Yes, every year"){
-                            res[item].Frequency = "Yearly";
+                            res[item].Frequency = TransactionFrequency.Yearly;
                         }
                         updatedRecurrentTransactions.push(res[item]);
                         if(updatedRecurrentTransactions.length === res.length) {
