@@ -210,7 +210,7 @@ export const getRecurrentTransactions = async (
 
 // @Post('/recurrentTransactions/update')
 // @Header('Authorization') authorization: string,
-// @BodyProp() recurrenttransactions: [])
+// @BodyProp() recurrenttransactions: []) 
 export const updateRecurrentTransactions = async (
   event: APIGatewayProxyEvent,
   context: Context,
@@ -253,9 +253,9 @@ export const updateRecurrentTransactions = async (
   const recurrentArray: Array<any> = params.recurrenttransactions;
 
   const recurrenttransactions = recurrentArray.map(el => {
-    let ret = new RecurrentTransaction(el.accountId, [], el.isExpense, el.counterPartName, el.id);
-    ret.isConfirmed = el.isConfirmed;
-    ret.frequency = el.frequency;
+    let ret = new RecurrentTransaction(el.AccountId, [], el.IsExpense, el.CounterPartName, el.Id);
+    ret.isConfirmed = el.IsConfirmed;
+    ret.frequency = el.Frequency;
     return ret;
   });
 
@@ -266,7 +266,15 @@ export const updateRecurrentTransactions = async (
     return CreateSimpleResponse(204, "updating recurrent transactions failed");
   }
 
-  return CreateResponse(200, { message: "success" });
+  user.isRecurrentTransactionConfirmed = true;
+
+  return users
+  .save(user)
+  .then(() => CreateResponse(200, { message: "success" }))
+  .catch(err => {
+    logger.log("error", "error importing connection", { cause: err });
+    return CreateSimpleResponse(500, "error updating the user");
+  });
 };
 
 export const deduceRecurrentTransactions = async (

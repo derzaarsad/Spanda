@@ -3,6 +3,7 @@ import * as Https from 'nativescript-https';
 import { Bank } from "~/models/bank.model";
 import { IAuthentication, AUTH_SERVICE_IMPL } from "~/services/authentication.service";
 import { Token } from "~/models/token.model";
+import { RecurrentTransaction } from "~/models/recurrent-transactions.model";
 
 @Injectable()
 export class BankService {
@@ -16,6 +17,26 @@ export class BankService {
         };
 
         return [this.authenticationService.getBackendUrl() + "/banks/" + blz, headerOptions ];
+    }
+
+    __getRecurrentTransactions__() : [string,any] {
+
+        let headerOptions = {
+            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
+            "Content-Type": "application/json"
+        };
+
+        return [this.authenticationService.getBackendUrl() + "/recurrentTransactions", headerOptions ];
+    }
+
+    __updateRecurrentTransactions__(recurrenttransactions: Array<RecurrentTransaction>): [string, any, any] {
+
+        let headerOptions = {
+            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
+            "Content-Type": "application/json"
+        };
+
+        return [this.authenticationService.getBackendUrl() + "/recurrentTransactions/update", { recurrenttransactions: recurrenttransactions }, headerOptions ];
     }
 
     __getWebformIdAndToken__(bank: Bank): [string, any, any] {
@@ -64,6 +85,36 @@ export class BankService {
         });
     }
 
+    getRecurrentTransactions() : Promise<Array<RecurrentTransaction>> {
+        let request = this.__getRecurrentTransactions__();
+        return Https.request({
+            url: request[0],
+            method: 'GET',
+            headers: request[1],
+            timeout: 10
+        }).then(res => {
+            let recurrentTransactions: Array<RecurrentTransaction> = [];
+            console.log(res);
+            for(let item in res["content"]["recurrenttransactions"]){
+                let r: RecurrentTransaction = new RecurrentTransaction();
+                r.Id = res["content"]["recurrenttransactions"][item]["id"];
+                r.AccountId = res["content"]["recurrenttransactions"][item]["accountId"];
+                r.IsExpense = res["content"]["recurrenttransactions"][item]["isExpense"];
+                r.IsConfirmed = res["content"]["recurrenttransactions"][item]["isConfirmed"];
+                r.Frequency = res["content"]["recurrenttransactions"][item]["frequency"];
+                r.CounterPartName = res["content"]["recurrenttransactions"][item]["counterPartName"];
+                recurrentTransactions.push(r);
+            }
+
+            return recurrentTransactions;
+        })
+        .catch((err) => {
+            console.log("Recurrent transactions acquisition failed!");
+            console.log(err);
+            return undefined;
+        });
+    }
+
     /*
      * return [ Id , Access Token, Status ]
      */
@@ -86,6 +137,27 @@ export class BankService {
             console.log("WebForm Invalid");
             console.log(err);
             return undefined;
+        });
+    }
+
+    /*
+     * return [ Id , Access Token, Status ]
+     */
+    updateRecurrentTransactions(recurrenttransactions: Array<RecurrentTransaction>): Promise<boolean> {
+        let request = this.__updateRecurrentTransactions__(recurrenttransactions);
+        return Https.request({
+            url: request[0],
+            method: 'POST',
+            body: request[1],
+            headers: request[2],
+            timeout: 10
+        }).then(res => {
+            console.log(res);
+            return (res.statusCode != 200);
+        }, err => {
+            console.log("Update Recurrent Transaction Failed");
+            console.log(err);
+            return false;
         });
     }
 

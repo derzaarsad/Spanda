@@ -123,12 +123,12 @@ describe("unit: update recurrent transactions", function() {
       body: JSON.stringify({
         recurrenttransactions: [
           {
-            id: 1,
-            accountId: 1,
-            isExpense: true,
-            isConfirmed: true,
-            frequency: TransactionFrequency.Unknown,
-            counterPartName: "Dinodime GmbH"
+            Id: 1,
+            AccountId: 1,
+            IsExpense: true,
+            IsConfirmed: true,
+            Frequency: TransactionFrequency.Unknown,
+            CounterPartName: "Dinodime GmbH"
           }
         ]
       })
@@ -157,26 +157,30 @@ describe("unit: update recurrent transactions", function() {
       body: JSON.stringify({
         recurrenttransactions: [
           {
-            id: 1,
-            accountId: 1,
-            isExpense: true,
-            isConfirmed: true,
-            frequency: TransactionFrequency.Unknown,
-            counterPartName: "Dinodime GmbH"
+            Id: 1,
+            AccountId: 1,
+            IsExpense: true,
+            IsConfirmed: true,
+            Frequency: TransactionFrequency.Monthly,
+            CounterPartName: "Dinodime GmbH"
           },
           {
-            id: 2,
-            accountId: 1,
-            isExpense: true,
-            isConfirmed: true,
-            frequency: TransactionFrequency.Unknown,
-            counterPartName: "Dinodime GmbH 2"
+            Id: 2,
+            AccountId: 1,
+            IsExpense: true,
+            IsConfirmed: true,
+            Frequency: TransactionFrequency.Yearly,
+            CounterPartName: "Dinodime GmbH 2"
           }
         ]
       })
     } as unknown) as APIGatewayProxyEvent;
 
-    await users.save(new User("chapu", "", ""));
+    {
+      let user = new User("chapu", "", "");
+      user.isRecurrentTransactionConfirmed = false;
+      await users.save(user);
+    }
     await recurrentTransactions.saveArray([
       new RecurrentTransaction(1, [1, 2, 3], true, "Dinodime GmbH", 1),
       new RecurrentTransaction(1, [3, 4, 5], true, "Dinodime GmbH 2", 2)
@@ -186,6 +190,8 @@ describe("unit: update recurrent transactions", function() {
     const initialResult2 = await recurrentTransactions.findById(2);
     expect(initialResult!.isConfirmed).to.equal(false);
     expect(initialResult2!.isConfirmed).to.equal(false);
+    expect(initialResult!.frequency).to.equal(TransactionFrequency.Unknown);
+    expect(initialResult2!.frequency).to.equal(TransactionFrequency.Unknown);
 
     const result = await updateRecurrentTransactions(event, context, logger, finapi, users, recurrentTransactions);
 
@@ -197,5 +203,12 @@ describe("unit: update recurrent transactions", function() {
     const modifiedResult2 = await recurrentTransactions.findById(2);
     expect(modifiedResult!.isConfirmed).to.equal(true);
     expect(modifiedResult2!.isConfirmed).to.equal(true);
+    expect(modifiedResult!.frequency).to.equal(TransactionFrequency.Monthly);
+    expect(modifiedResult2!.frequency).to.equal(TransactionFrequency.Yearly);
+
+    {
+      const user = await users.findById("chapu");
+      expect(user!.isRecurrentTransactionConfirmed).to.equal(true);
+    }
   });
 });

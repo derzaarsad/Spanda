@@ -78,6 +78,7 @@ export namespace RecurrentTransactions {
     async updateArray(recurrentTransactions: Array<RecurrentTransaction>) {
       recurrentTransactions.forEach(recurrentTransaction => {
         this.repository[recurrentTransaction.id].isConfirmed = recurrentTransaction.isConfirmed;
+        this.repository[recurrentTransaction.id].frequency = recurrentTransaction.frequency;
       });
       return recurrentTransactions;
     }
@@ -383,7 +384,7 @@ export namespace RecurrentTransactions {
         .join(", ");
 
       return this.format(
-        "UPDATE %I SET isconfirmed = nv.isconfirmed::boolean FROM ( VALUES %s) as nv (%s) WHERE recurrenttransactions.id = nv.id::int8 AND recurrenttransactions.accountid = nv.accountid::int8",
+        "UPDATE %I SET isconfirmed = nv.isconfirmed::boolean, frequency = nv.frequency::transactionfrequency FROM ( VALUES %s) as nv (%s) WHERE recurrenttransactions.id = nv.id::int8 AND recurrenttransactions.accountid = nv.accountid::int8",
         tableName,
         values,
         attributes
