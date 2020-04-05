@@ -5,6 +5,7 @@
   "main": "out/src/index.js",
   "module": "out/src/index.mjs",
   "types": "out/src/index.d.ts",
+  "description": "This module contains a mock finAPI implementation delivering the bank details of a single demo technical user. See constants.ts for more details.",
   "scripts": {
     "package": "webpack"
   },

@@ -1,7 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as iam from "@aws-cdk/aws-iam";
-import * as kms from "@aws-cdk/aws-kms";
 import * as sm from "@aws-cdk/aws-secretsmanager";
 
 import { InfrastructureProps } from "./infrastructure-props";
@@ -127,10 +126,7 @@ export class Infrastructure extends cdk.Stack {
     return { subnets: this.vpc.publicSubnets };
   }
 
-  private initializeBastionHostsConfig(
-    subnets: ec2.ISubnet[],
-    bastionSecurityGroup: ec2.SecurityGroup
-  ) {
+  private initializeBastionHostsConfig(subnets: ec2.ISubnet[], bastionSecurityGroup: ec2.SecurityGroup) {
     const amiLookup = new ec2.LookupMachineImage({
       name: "amzn2-ami-hvm-*-x86_64-gp2",
       owners: ["amazon"]

@@ -1,37 +1,57 @@
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from "aws-lambda";
 import { createLogger } from "./lambda-util";
-import { TranscationsHandlerConfiguration, transactionsHandler } from "./transactions";
-import { UserInfoConfiguration, userInfoHandler } from "./userinfo";
-import { WebFormHandlerConfiguration, webFormHandler } from "./webform";
-import { ImportBankConnectionsHandlerConfiguration, importBankConnectionsHandler } from "./import-bank-connections";
+import { transactionsHandler } from "./transactions";
+import { getTokenHandler } from "./authorization";
+import { userInfoHandler } from "./users";
+import { createUserHandler } from "./users";
+import { webFormHandler } from "./webform";
+import { importBankConnectionsHandler } from "./import-bank-connections";
 import Constants from "./constants";
 
 const logger = createLogger(process.env);
 
-const transactionsHandlerConfiguration: TranscationsHandlerConfiguration = {
+const transactionsHandlerConfiguration = {
   transactionsPerAccountId: Constants.transactionsPerAccountId,
   logger: logger
 };
 
-const userInfoHandlerConfiguration: UserInfoConfiguration = {
+const userInfoHandlerConfiguration = {
   authenticatedUser: Constants.authenticatedUser,
   authenticatedUserToken: Constants.authenticatedUserToken,
   logger: logger
 };
 
-const webFormHandlerConfiguration: WebFormHandlerConfiguration = {
+const webFormHandlerConfiguration = {
   webFormResponse: Constants.webFormResponse,
   logger: logger
 };
 
-const importBankConnectionsHandlerConfiguration: ImportBankConnectionsHandlerConfiguration = {
+const importBankConnectionsHandlerConfiguration = {
   webFormRespose: Constants.webFormRedirectResponse,
   logger: logger
 };
 
-export const transactions = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+const createUserHandlerConfiguration = {
+  authenticatedUser: Constants.authenticatedUser,
+  logger: logger
+};
+
+const getTokenHandlerConfiguration = {
+  authenticatedUser: Constants.authenticatedUser,
+  authenticatedUserToken: Constants.authenticatedUserToken,
+  logger: logger
+};
+
+export const getToken = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
   logger.debug("Received event", event);
-  const response = transactionsHandler(transactionsHandlerConfiguration, event, context);
+  const response = getTokenHandler(getTokenHandlerConfiguration, event, context);
+  logger.debug("Responding with", response);
+  return response;
+};
+
+export const createUser = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+  logger.debug("Received event", event);
+  const response = createUserHandler(createUserHandlerConfiguration, event, context);
   logger.debug("Responding with", response);
   return response;
 };
@@ -56,6 +76,13 @@ export const importBankConnections = async (
 ): Promise<APIGatewayProxyResult> => {
   logger.debug("Received event", event);
   const response = importBankConnectionsHandler(importBankConnectionsHandlerConfiguration, event, context);
+  logger.debug("Responding with", response);
+  return response;
+};
+
+export const transactions = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+  logger.debug("Received event", event);
+  const response = transactionsHandler(transactionsHandlerConfiguration, event, context);
   logger.debug("Responding with", response);
   return response;
 };

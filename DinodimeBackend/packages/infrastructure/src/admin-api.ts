@@ -32,7 +32,7 @@ export class AdminApi extends cdk.Stack {
       env: lambdaEnvironment(props)
     });
 
-    const asset = lambda.Code.asset(path.join("..", "admin-api", "dist", "lambda-admin-api"));
+    const asset = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-admin-api"));
 
     const dataResource = restAPI.root.addResource("data");
     const deleteMethod = lambdaFactory.createLambda("delete-user-data ", asset, "main.deleteUserData");

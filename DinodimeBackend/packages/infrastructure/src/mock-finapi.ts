@@ -22,6 +22,8 @@ export class MockFinApi extends cdk.Stack {
       assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com")
     });
 
+    role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"));
+
     const lambdaFactory = new LambdaFactory({
       scope: this,
       runtime: lambda.Runtime.NODEJS_12_X,
@@ -32,10 +34,21 @@ export class MockFinApi extends cdk.Stack {
 
     const asset = lambda.Code.asset(path.join("..", "mock-finapi", "dist", "lambda-mock-finapi"));
 
+    const oauth = restAPI.root.addResource("oauth");
+    const token = oauth.addResource("token");
+    const getToken = lambdaFactory.createLambda("getToken", asset, "main.getToken");
+    token.addMethod("POST", new LambdaIntegration(getToken), {
+      operationName: "get token"
+    });
+
     const users = restAPI.root.addResource("users");
     const userInfo = lambdaFactory.createLambda("userinfo", asset, "main.userinfo");
     users.addMethod("GET", new LambdaIntegration(userInfo), {
       operationName: "get user info"
+    });
+    const createUser = lambdaFactory.createLambda("createUser", asset, "main.createUser");
+    users.addMethod("POST", new LambdaIntegration(createUser), {
+      operationName: "create user"
     });
 
     const bankConnections = restAPI.root.addResource("bankConnections");

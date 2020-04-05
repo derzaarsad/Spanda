@@ -10,6 +10,7 @@ import {
 } from "../lambda-util";
 
 import { getUserInfo } from "../userinfo";
+import { isUserParams } from "../user-params";
 import { Authentication, Token } from "dinodime-lib";
 import { User, Users } from "dinodime-lib";
 import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dinodime-lib";
@@ -23,17 +24,8 @@ type PasswordCredentialParams = {
   password: string;
 };
 
-type UserParams = {
-  id: string;
-  password: string;
-  email: string;
-  phone: string;
-  isAutoUpdateEnabled: boolean;
-};
-
 const expectedPasswordCredentialProperties = ["username", "password"];
 const expectedRefreshTokenProperties = ["refresh_token"];
-const expectedUserProperties = ["id", "password", "email", "phone", "isAutoUpdateEnabled"];
 
 const isRefreshTokenParams = (body: any): body is RefreshTokenParams => {
   if (body === null) {
@@ -48,14 +40,6 @@ const isPasswordCredentialParams = (body: any): body is PasswordCredentialParams
     return false;
   }
   const missingProperty = HasMissingProperty(body, expectedPasswordCredentialProperties);
-  return missingProperty === null;
-};
-
-const isUserParams = (body: any): body is UserParams => {
-  if (body === null) {
-    return false;
-  }
-  const missingProperty = HasMissingProperty(body, expectedUserProperties);
   return missingProperty === null;
 };
 
