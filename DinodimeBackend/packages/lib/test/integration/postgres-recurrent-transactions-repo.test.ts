@@ -28,7 +28,7 @@ describe("integration: postgres recurrent transactions repository", function() {
   });
 
   it("saves and retrieves a recurrent transaction", async function() {
-    const recurrentTransaction = new RecurrentTransaction(995070, [1, 2, 3], true, null, 209864836);
+    const recurrentTransaction = new RecurrentTransaction(995070, [1, 2, 3], 1023, true, null, 209864836);
     await recurrentTransactions.save(recurrentTransaction);
 
     const result = await recurrentTransactions.findById(209864836);
@@ -36,6 +36,7 @@ describe("integration: postgres recurrent transactions repository", function() {
     expect(result!.id).to.eql(recurrentTransaction.id);
     expect(result!.accountId).to.eql(recurrentTransaction.accountId);
     expect(result!.transactionIds).to.eql(recurrentTransaction.transactionIds);
+    expect(result!.absAmount).to.eql(recurrentTransaction.absAmount);
     expect(result!.isExpense).to.eql(recurrentTransaction.isExpense);
     expect(result!.isConfirmed).to.eql(recurrentTransaction.isConfirmed);
     expect(result!.frequency).to.eql(recurrentTransaction.frequency);
@@ -43,9 +44,9 @@ describe("integration: postgres recurrent transactions repository", function() {
   });
 
   it("find by ids", async function() {
-    await recurrentTransactions.save(new RecurrentTransaction(69, [1, 2, 3], true, null, 22));
-    await recurrentTransactions.save(new RecurrentTransaction(70, [1, 2, 3], true, null, 23));
-    await recurrentTransactions.save(new RecurrentTransaction(71, [1, 2, 3], true, null, 24));
+    await recurrentTransactions.save(new RecurrentTransaction(69, [1, 2, 3], 1023, true, null, 22));
+    await recurrentTransactions.save(new RecurrentTransaction(70, [1, 2, 3], 1023, true, null, 23));
+    await recurrentTransactions.save(new RecurrentTransaction(71, [1, 2, 3], 1023, true, null, 24));
 
     const result = await recurrentTransactions.findByIds([22, 23, 24]);
     expect(result.length).to.equal(3);
@@ -60,7 +61,7 @@ describe("integration: postgres recurrent transactions repository", function() {
 
   it("saves and retrieves a recurrent transaction without id", async function() {
     const recurrentTransaction = await recurrentTransactions.saveWithoutId(
-      new RecurrentTransaction(995070, [1, 2, 3], true, "Dinodime GmbH")
+      new RecurrentTransaction(995070, [1, 2, 3], 1023, true, "Dinodime GmbH")
     );
 
     const result = await recurrentTransactions.findById(recurrentTransaction.id);
@@ -68,13 +69,14 @@ describe("integration: postgres recurrent transactions repository", function() {
     expect(result!.id).to.eql(recurrentTransaction.id);
     expect(result!.accountId).to.eql(recurrentTransaction.accountId);
     expect(result!.transactionIds).to.eql(recurrentTransaction.transactionIds);
+    expect(result!.absAmount).to.eql(recurrentTransaction.absAmount);
     expect(result!.isExpense).to.eql(recurrentTransaction.isExpense);
     expect(result!.isConfirmed).to.eql(recurrentTransaction.isConfirmed);
     expect(result!.frequency).to.eql(recurrentTransaction.frequency);
     expect(result!.counterPartName).to.eql(recurrentTransaction.counterPartName);
 
     const recurrentTransaction2 = await recurrentTransactions.saveWithoutId(
-      new RecurrentTransaction(885070, [4, 5, 6], false, "Dinodime GmbH")
+      new RecurrentTransaction(885070, [4, 5, 6], 1023, false, "Dinodime GmbH")
     );
 
     const result2 = await recurrentTransactions.findById(recurrentTransaction2.id);
@@ -82,6 +84,7 @@ describe("integration: postgres recurrent transactions repository", function() {
     expect(result2!.id).to.eql(recurrentTransaction2.id);
     expect(result2!.accountId).to.eql(recurrentTransaction2.accountId);
     expect(result2!.transactionIds).to.eql(recurrentTransaction2.transactionIds);
+    expect(result2!.absAmount).to.eql(recurrentTransaction2.absAmount);
     expect(result2!.isExpense).to.eql(recurrentTransaction2.isExpense);
     expect(result2!.isConfirmed).to.eql(recurrentTransaction2.isConfirmed);
     expect(result2!.frequency).to.eql(recurrentTransaction2.frequency);
@@ -89,16 +92,16 @@ describe("integration: postgres recurrent transactions repository", function() {
   });
 
   it("save with unique id and account id", async function() {
-    const firstRecurrentTransaction = new RecurrentTransaction(1, [1, 2, 3], true, null, 1);
+    const firstRecurrentTransaction = new RecurrentTransaction(1, [1, 2, 3], 1023, true, null, 1);
     await recurrentTransactions.save(firstRecurrentTransaction);
 
-    const secondRecurrentTransaction = new RecurrentTransaction(2, [4, 5, 6], true, null, 1);
+    const secondRecurrentTransaction = new RecurrentTransaction(2, [4, 5, 6], 1023, true, null, 1);
     await expect(recurrentTransactions.save(secondRecurrentTransaction)).to.eventually.be.fulfilled;
 
-    const thirdRecurrentTransaction = new RecurrentTransaction(1, [7, 8, 9], true, null, 2);
+    const thirdRecurrentTransaction = new RecurrentTransaction(1, [7, 8, 9], 1023, true, null, 2);
     await expect(recurrentTransactions.save(thirdRecurrentTransaction)).to.eventually.be.fulfilled;
 
-    const fourthRecurrentTransaction = new RecurrentTransaction(1, [10, 11, 12], true, null, 1);
+    const fourthRecurrentTransaction = new RecurrentTransaction(1, [10, 11, 12], 1023, true, null, 1);
     await expect(recurrentTransactions.save(fourthRecurrentTransaction)).to.eventually.be.rejectedWith(
       'duplicate key value violates unique constraint "recurrenttransactions_pkey"'
     );
@@ -106,9 +109,9 @@ describe("integration: postgres recurrent transactions repository", function() {
 
   it("save multiple recurrent transactions with different id", async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
-      new RecurrentTransaction(2, [1, 2, 3], true, null, 1112),
-      new RecurrentTransaction(2, [4, 5, 6], true, null, 2233),
-      new RecurrentTransaction(5, [7, 8, 9], true, null, 4112)
+      new RecurrentTransaction(2, [1, 2, 3], 1023, true, null, 1112),
+      new RecurrentTransaction(2, [4, 5, 6], 1023, true, null, 2233),
+      new RecurrentTransaction(5, [7, 8, 9], 1023, true, null, 4112)
     ];
 
     await recurrentTransactions.saveArray(recurrentTransactionsData);
@@ -137,26 +140,22 @@ describe("integration: postgres recurrent transactions repository", function() {
 
   it("save multiple recurrent transactions with different account id", async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
-      new RecurrentTransaction(5, [1, 2, 3], true, "Dinodime GmbH", 1112),
-      new RecurrentTransaction(2, [4, 5, 6], true, null, 1112)
+      new RecurrentTransaction(5, [1, 2, 3], 1023, true, "Dinodime GmbH", 1112),
+      new RecurrentTransaction(2, [4, 5, 6], 1023, true, null, 1112)
     ];
 
     await recurrentTransactions.saveArray(recurrentTransactionsData);
-    const result = await recurrentTransactions.findById(recurrentTransactionsData[1].id);
+    const result = await recurrentTransactions.findByIds([1112]);
     expect(result).to.be.not.null;
-    expect(result!.id).to.eql(recurrentTransactionsData[0].id);
-    expect(result!.accountId).to.eql(recurrentTransactionsData[0].accountId);
-    expect(result!.transactionIds).to.eql(recurrentTransactionsData[0].transactionIds);
-    expect(result!.isExpense).to.eql(recurrentTransactionsData[0].isExpense);
-    expect(result!.isConfirmed).to.eql(recurrentTransactionsData[0].isConfirmed);
-    expect(result!.frequency).to.eql(recurrentTransactionsData[0].frequency);
-    expect(result!.counterPartName).to.eql("Dinodime GmbH");
+    expect(result.length).to.eql(2);
+    expect(result![0].id).to.eql(result![1].id);
+    expect(result![0].accountId).to.not.eql(result![1].accountId);
 
     // If the array contains at least one object with the same ids,
     // save is rejected and the other objects are not saved
     let recurrentTransactionsData2: RecurrentTransaction[] = [
-      new RecurrentTransaction(5, [1, 2, 3], true, "Dinodime GmbH", 1112),
-      new RecurrentTransaction(1, [4, 5, 6], true, null, 1111)
+      new RecurrentTransaction(5, [1, 2, 3], 1023, true, "Dinodime GmbH", 1112),
+      new RecurrentTransaction(1, [4, 5, 6], 1023, true, null, 1111)
     ];
     await expect(recurrentTransactions.saveArray(recurrentTransactionsData2)).to.eventually.be.rejectedWith(
       'duplicate key value violates unique constraint "recurrenttransactions_pkey"'
@@ -170,9 +169,9 @@ describe("integration: postgres recurrent transactions repository", function() {
      * If save fails, everything is not saved
      */
     let recurrentTransactionsData: RecurrentTransaction[] = [
-      new RecurrentTransaction(2, [1, 2, 3], true, null, 1112),
-      new RecurrentTransaction(2, [4, 5, 6], true, null, 1112),
-      new RecurrentTransaction(4, [7, 8, 9], true, null, 4112)
+      new RecurrentTransaction(2, [1, 2, 3], 1023, true, null, 1112),
+      new RecurrentTransaction(2, [4, 5, 6], 1023, true, null, 1112),
+      new RecurrentTransaction(4, [7, 8, 9], 1023, true, null, 4112)
     ];
 
     await expect(recurrentTransactions.saveArray(recurrentTransactionsData)).to.eventually.be.rejectedWith(
@@ -185,8 +184,8 @@ describe("integration: postgres recurrent transactions repository", function() {
 
   it("update multiple recurrent transactions", async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
-      new RecurrentTransaction(5, [1, 2, 3], true, "Dinodime GmbH", 1113),
-      new RecurrentTransaction(2, [4, 5, 6], true, null, 1112)
+      new RecurrentTransaction(5, [1, 2, 3], 1023, true, "Dinodime GmbH", 1113),
+      new RecurrentTransaction(2, [4, 5, 6], 1023, true, null, 1112)
     ];
 
     await recurrentTransactions.saveArray(recurrentTransactionsData);
@@ -195,6 +194,7 @@ describe("integration: postgres recurrent transactions repository", function() {
     expect(result!.id).to.eql(recurrentTransactionsData[0].id);
     expect(result!.accountId).to.eql(recurrentTransactionsData[0].accountId);
     expect(result!.transactionIds).to.eql(recurrentTransactionsData[0].transactionIds);
+    expect(result!.absAmount).to.eql(recurrentTransactionsData[0].absAmount);
     expect(result!.isExpense).to.eql(recurrentTransactionsData[0].isExpense);
     expect(result!.isConfirmed).to.eql(recurrentTransactionsData[0].isConfirmed);
     expect(result!.frequency).to.eql(recurrentTransactionsData[0].frequency);
@@ -206,7 +206,7 @@ describe("integration: postgres recurrent transactions repository", function() {
     modifiedRecurrentTransaction.isConfirmed = true;
     let recurrentTransactionsData2: RecurrentTransaction[] = [
       modifiedRecurrentTransaction,
-      new RecurrentTransaction(2, [4, 5, 6], true, null, 1112)
+      new RecurrentTransaction(2, [4, 5, 6], 1023, true, null, 1112)
     ];
     await recurrentTransactions.updateArray(recurrentTransactionsData2);
     const modifiedResults = await recurrentTransactions.findByAccountIds([2, 5]);
@@ -221,11 +221,11 @@ describe("integration: postgres recurrent transactions repository", function() {
 
   it("group by isExpense column", async function() {
     let recurrentTransactionsData: RecurrentTransaction[] = [
-      new RecurrentTransaction(2, [1, 2, 3], true, null),
-      new RecurrentTransaction(2, [4, 5, 6], false, null),
-      new RecurrentTransaction(2, [7, 8, 9], true, null),
-      new RecurrentTransaction(2, [10, 11, 12], false, null),
-      new RecurrentTransaction(3, [10, 11, 12], false, null)
+      new RecurrentTransaction(2, [1, 2, 3], 1023, true, null),
+      new RecurrentTransaction(2, [4, 5, 6], 1024, false, null),
+      new RecurrentTransaction(2, [7, 8, 9], 1025, true, null),
+      new RecurrentTransaction(2, [10, 11, 12], 1026, false, null),
+      new RecurrentTransaction(3, [10, 11, 12], 1027, false, null)
     ];
 
     await recurrentTransactions.saveArrayWithoutId(recurrentTransactionsData);
@@ -233,16 +233,20 @@ describe("integration: postgres recurrent transactions repository", function() {
     expect(recurrentTransactionsGroup.length).to.equal(2);
     expect(recurrentTransactionsGroup[0].length).to.equal(2);
     expect(recurrentTransactionsGroup[0][0].accountId).to.equal(2);
+    expect(recurrentTransactionsGroup[0][0].absAmount).to.equal(1024);
     expect(recurrentTransactionsGroup[0][0].isExpense).to.equal(false);
     expect(recurrentTransactionsGroup[0][0].transactionIds).to.eql([4, 5, 6]);
     expect(recurrentTransactionsGroup[0][1].accountId).to.equal(2);
+    expect(recurrentTransactionsGroup[0][1].absAmount).to.equal(1026);
     expect(recurrentTransactionsGroup[0][1].isExpense).to.equal(false);
     expect(recurrentTransactionsGroup[0][1].transactionIds).to.eql([10, 11, 12]);
     expect(recurrentTransactionsGroup[1].length).to.equal(2);
     expect(recurrentTransactionsGroup[1][0].accountId).to.equal(2);
+    expect(recurrentTransactionsGroup[1][0].absAmount).to.equal(1023);
     expect(recurrentTransactionsGroup[1][0].isExpense).to.equal(true);
     expect(recurrentTransactionsGroup[1][0].transactionIds).to.eql([1, 2, 3]);
     expect(recurrentTransactionsGroup[1][1].accountId).to.equal(2);
+    expect(recurrentTransactionsGroup[1][1].absAmount).to.equal(1025);
     expect(recurrentTransactionsGroup[1][1].isExpense).to.equal(true);
     expect(recurrentTransactionsGroup[1][1].transactionIds).to.eql([7, 8, 9]);
   });

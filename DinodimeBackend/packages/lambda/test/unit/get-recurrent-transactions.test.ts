@@ -34,12 +34,12 @@ describe("unit: get recurrent transactions", function() {
 
     // adding recurrent transactions
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(10, [1,2,3], true, "Dinodime1 GmbH"),
-        new RecurrentTransaction(11, [4,5,6], true, "Dinodime2 GmbH"),
-        new RecurrentTransaction(13, [1,2,3], true, "Dinodime3 GmbH"),
-        new RecurrentTransaction(14, [4,5,6], true, "Dinodime4 GmbH"),
-        new RecurrentTransaction(16, [1,2,3], true, "Dinodime5 GmbH"),
-        new RecurrentTransaction(17, [4,5,6], true, "Dinodime6 GmbH")
+        new RecurrentTransaction(10, [1,2,3], 1023, true, "Dinodime1 GmbH"),
+        new RecurrentTransaction(11, [4,5,6], 1023, true, "Dinodime2 GmbH"),
+        new RecurrentTransaction(13, [1,2,3], 1023, true, "Dinodime3 GmbH"),
+        new RecurrentTransaction(14, [4,5,6], 1023, true, "Dinodime4 GmbH"),
+        new RecurrentTransaction(16, [1,2,3], 1023, true, "Dinodime5 GmbH"),
+        new RecurrentTransaction(17, [4,5,6], 1023, true, "Dinodime6 GmbH")
     ];
     await recurrentTransactions.saveArrayWithoutId(recurrentTransactionsData);
 
@@ -86,12 +86,12 @@ describe("unit: get recurrent transactions", function() {
 
     // adding recurrent transactions
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(10, [1,2,3], true, "Dinodime1 GmbH"),
-        new RecurrentTransaction(11, [4,5,6], true, "Dinodime2 GmbH"),
-        new RecurrentTransaction(13, [1,2,3], true, "Dinodime3 GmbH"),
-        new RecurrentTransaction(14, [4,5,6], true, "Dinodime4 GmbH"),
-        new RecurrentTransaction(16, [1,2,3], true, "Dinodime5 GmbH"),
-        new RecurrentTransaction(17, [4,5,6], true, "Dinodime6 GmbH")
+        new RecurrentTransaction(10, [1,2,3], 1023, true, "Dinodime1 GmbH"),
+        new RecurrentTransaction(11, [4,5,6], 1023, true, "Dinodime2 GmbH"),
+        new RecurrentTransaction(13, [1,2,3], 1023, true, "Dinodime3 GmbH"),
+        new RecurrentTransaction(14, [4,5,6], 1023, true, "Dinodime4 GmbH"),
+        new RecurrentTransaction(16, [1,2,3], 1023, true, "Dinodime5 GmbH"),
+        new RecurrentTransaction(17, [4,5,6], 1023, true, "Dinodime6 GmbH")
     ];
     await recurrentTransactions.saveArrayWithoutId(recurrentTransactionsData);
 
@@ -128,12 +128,12 @@ describe("unit: get recurrent transactions", function() {
 
     // adding recurrent transactions
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(10, [1,2,3], true, "Dinodime1 GmbH"),
-        new RecurrentTransaction(11, [4,5,6], true, "Dinodime2 GmbH"),
-        new RecurrentTransaction(13, [1,2,3], true, "Dinodime3 GmbH"),
-        new RecurrentTransaction(14, [4,5,6], true, "Dinodime4 GmbH"),
-        new RecurrentTransaction(16, [1,2,3], true, "Dinodime5 GmbH"),
-        new RecurrentTransaction(17, [4,5,6], true, "Dinodime6 GmbH")
+        new RecurrentTransaction(10, [1,2,3], 1023, true, "Dinodime1 GmbH"),
+        new RecurrentTransaction(11, [4,5,6], 1023, true, "Dinodime2 GmbH"),
+        new RecurrentTransaction(13, [1,2,3], 1023, true, "Dinodime3 GmbH"),
+        new RecurrentTransaction(14, [4,5,6], 1023, true, "Dinodime4 GmbH"),
+        new RecurrentTransaction(16, [1,2,3], 1023, true, "Dinodime5 GmbH"),
+        new RecurrentTransaction(17, [4,5,6], 1023, true, "Dinodime6 GmbH")
     ];
     await recurrentTransactions.saveArrayWithoutId(recurrentTransactionsData);
 
@@ -218,12 +218,12 @@ describe("unit: get recurrent transactions", function() {
 
     // adding recurrent transactions
     let recurrentTransactionsData: RecurrentTransaction[] = [
-        new RecurrentTransaction(10, [1,2,3], true, "Dinodime1 GmbH"),
-        new RecurrentTransaction(11, [4,5,6], true, "Dinodime2 GmbH"),
-        new RecurrentTransaction(13, [1,2,3], true, "Dinodime3 GmbH"),
-        new RecurrentTransaction(14, [4,5,6], true, "Dinodime4 GmbH"),
-        new RecurrentTransaction(16, [1,2,3], true, "Dinodime5 GmbH"),
-        new RecurrentTransaction(17, [4,5,6], true, "Dinodime6 GmbH")
+        new RecurrentTransaction(10, [1,2,3], 1023, true, "Dinodime1 GmbH"),
+        new RecurrentTransaction(11, [4,5,6], 1023, true, "Dinodime2 GmbH"),
+        new RecurrentTransaction(13, [1,2,3], 1023, true, "Dinodime3 GmbH"),
+        new RecurrentTransaction(14, [4,5,6], 1023, true, "Dinodime4 GmbH"),
+        new RecurrentTransaction(16, [1,2,3], 1023, true, "Dinodime5 GmbH"),
+        new RecurrentTransaction(17, [4,5,6], 1023, true, "Dinodime6 GmbH")
     ];
     await recurrentTransactions.saveArrayWithoutId(recurrentTransactionsData);
 
@@ -267,6 +267,7 @@ describe("unit: get recurrent transactions", function() {
     expect(body.recurrenttransactions.length).to.equal(6);
     expect(body.recurrenttransactions[0].id).to.exist;
     expect(body.recurrenttransactions[0].accountId).to.exist;
+    expect(body.recurrenttransactions[0].absAmount).to.exist;
     expect(body.recurrenttransactions[0].isExpense).to.exist;
     expect(body.recurrenttransactions[0].isConfirmed).to.exist;
     expect(body.recurrenttransactions[0].frequency).to.exist;
