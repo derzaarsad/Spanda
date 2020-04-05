@@ -37,7 +37,7 @@ export class AllowanceComponent implements OnInit {
                 let updatedRecurrentTransactions: Array<RecurrentTransaction> = [];
                 for(let item in res){
                     dialogs.action({
-                        message: "Do you " + (res[item].IsExpense ? "spend" : "receive") + " money "
+                        message: "Do you " + (res[item].IsExpense ? "spend " : "receive ") + res[item].AbsAmount + "€ "
                         + (res[item].IsExpense ? "for" : "from") + " " + res[item].CounterPartName,
                         cancelButtonText: "Not regularly",
                         actions: ["Yes, every month", "Yes, every 3 months", "Yes, every year"]
