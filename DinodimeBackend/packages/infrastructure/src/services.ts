@@ -11,36 +11,40 @@ export class Services extends cdk.Stack {
     const notifications = new NewTransactionsNotifications(this, "DinodimeNewTransactionsNotifications", {
       decryptionKey: props.finApiProps.finApiDecryptionKey,
       lambdaDeploymentProps: props.lambdaDeploymentProps,
-      lambdaPermissionProps: props.lambdaPermissionProps
+      lambdaPermissionProps: props.lambdaPermissionProps,
     });
 
     const callbackAPI = new WebFormCallbackAPI(this, "DinodimeWebFormCallbackAPI", props);
 
-    new DinodimeAPI(this, "DinodimeAPI", props);
+    const api = new DinodimeAPI(this, "DinodimeAPI", props);
 
     // Outputs
+    new cdk.CfnOutput(this, "APIEndpointURL", {
+      value: api.restAPI.url,
+    });
+
     new cdk.CfnOutput(this, "NotificationsTableName", {
-      value: notifications.table.tableName
+      value: notifications.table.tableName,
     });
 
     new cdk.CfnOutput(this, "NotificationsQueueURL", {
-      value: notifications.notificationsQueue.queueUrl
+      value: notifications.notificationsQueue.queueUrl,
     });
 
     new cdk.CfnOutput(this, "NotificationsTopicARN", {
-      value: notifications.notificationsTopic.topicArn
+      value: notifications.notificationsTopic.topicArn,
     });
 
     new cdk.CfnOutput(this, "CallbackEndpointURL", {
-      value: callbackAPI.restAPI.url
+      value: callbackAPI.restAPI.url,
     });
 
     new cdk.CfnOutput(this, "WebFormCompletionsQueueURL", {
-      value: callbackAPI.completionsQueue.queueUrl
+      value: callbackAPI.completionsQueue.queueUrl,
     });
 
     new cdk.CfnOutput(this, "WebFormCompletionsDLQURL", {
-      value: callbackAPI.completionsDLQ.queueUrl
+      value: callbackAPI.completionsDLQ.queueUrl,
     });
   }
 }

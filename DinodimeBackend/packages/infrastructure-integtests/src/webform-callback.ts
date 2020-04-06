@@ -67,6 +67,15 @@ describe("integration: web form callback", function() {
     expect(messages).to.be.ok;
     expect(messages!.length).to.be.empty;
   });
+  
+  beforeEach(async function() {
+    const config: AxiosRequestConfig = {
+      headers: {
+        Authorization: "Bearer abc.def.xyz"
+      }
+    };
+    await axios.delete(`${adminEndpointUrl}/data`, config);
+  });
 
   afterEach(async function() {
     const config: AxiosRequestConfig = {

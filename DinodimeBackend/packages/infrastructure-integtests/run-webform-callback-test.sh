@@ -7,12 +7,14 @@ source "$DIRNAME/common_functions.sh"
 
 # adminapi
 
-endpointUrl=$(getStackOutput DinodimeServices CallbackEndpointURL)
+apiEndpointUrl=$(getStackOutput DinodimeServices APIEndpointURL)
+callbackEndpointUrl=$(getStackOutput DinodimeServices CallbackEndpointURL)
 queueUrl=$(getStackOutput DinodimeServices WebFormCompletionsQueueURL)
 dlqUrl=$(getStackOutput DinodimeServices WebFormCompletionsDLQURL)
-adminUrl=$(getStackOutput DinodimeAdminAPI AdminEndpointURL)
+adminUrl=$(getStackOutput DinodimeServices AdminEndpointURL)
 
-env ENDPOINT_URL=$endpointUrl \
+env API_ENDPOINT_URL=$apiEndpointUrl \
+  CALLBACK_ENDPOINT_URL=$callbackEndpointUrl \
   QUEUE_URL=$queueUrl \
   DLQ_URL=$dlqUrl \
   ADMIN_URL=$adminUrl \
