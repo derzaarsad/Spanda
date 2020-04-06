@@ -13,6 +13,7 @@ export class RecurrentTransaction {
   id: number;
   accountId: number;
   transactionIds: number[];
+  absAmount: number;
   isExpense: boolean;
   isConfirmed: boolean;
   frequency: TransactionFrequency;
@@ -21,6 +22,7 @@ export class RecurrentTransaction {
   constructor(
     accountId: number,
     transactionIds: number[],
+    absAmount: number,
     isExpense: boolean,
     counterPartName: string | null,
     id?: number
@@ -28,6 +30,7 @@ export class RecurrentTransaction {
     this.id = id ? id : 0;
     this.accountId = accountId;
     this.transactionIds = transactionIds;
+    this.absAmount = absAmount;
     this.isExpense = isExpense;
     this.isConfirmed = false;
     this.frequency = TransactionFrequency.Unknown;
@@ -192,7 +195,7 @@ export namespace RecurrentTransactions {
 
     async groupByIsExpense(accountId: number): Promise<RecurrentTransaction[][]> {
       const params = {
-        text: this.groupByColumnQuery(accountId, 3),
+        text: this.groupByColumnQuery(accountId, 4),
         rowMode: "array",
         types: this.types
       };
@@ -358,7 +361,7 @@ export namespace RecurrentTransactions {
     }
 
     private cloneRecurrentTransaction(tx: RecurrentTransaction, id: number) {
-      const result = new RecurrentTransaction(tx.accountId, tx.transactionIds, tx.isExpense, tx.counterPartName, id);
+      const result = new RecurrentTransaction(tx.accountId, tx.transactionIds, tx.absAmount, tx.isExpense, tx.counterPartName, id);
       result.isConfirmed = tx.isConfirmed;
       result.frequency = tx.frequency;
       return result;

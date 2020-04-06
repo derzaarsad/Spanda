@@ -154,6 +154,7 @@ describe("unit: update recurrent transactions", function() {
                 {
                     Id: 1,
                     AccountId: 1,
+                    AbsAmount: 1023,
                     IsExpense: true,
                     IsConfirmed: true,
                     Frequency: TransactionFrequency.Unknown,
@@ -195,6 +196,7 @@ describe("unit: update recurrent transactions", function() {
                 {
                     Id: 1,
                     AccountId: 1,
+                    AbsAmount: 1023,
                     IsExpense: true,
                     IsConfirmed: true,
                     Frequency: TransactionFrequency.Monthly,
@@ -203,6 +205,7 @@ describe("unit: update recurrent transactions", function() {
                 {
                     Id: 2,
                     AccountId: 1,
+                    AbsAmount: 1024,
                     IsExpense: true,
                     IsConfirmed: true,
                     Frequency: TransactionFrequency.Yearly,
@@ -218,8 +221,8 @@ describe("unit: update recurrent transactions", function() {
       await users.save(user);
     }
     await recurrentTransactions.saveArray([
-        new RecurrentTransaction(1, [1,2,3], true, "Dinodime GmbH", 1),
-        new RecurrentTransaction(1, [3,4,5], true, "Dinodime GmbH 2", 2)
+        new RecurrentTransaction(1, [1,2,3], 1023, true, "Dinodime GmbH", 1),
+        new RecurrentTransaction(1, [3,4,5], 1024, true, "Dinodime GmbH 2", 2)
     ]);
 
     const initialResult = await recurrentTransactions.findById(1);
@@ -248,6 +251,8 @@ describe("unit: update recurrent transactions", function() {
     expect(modifiedResult2!.isConfirmed).to.equal(true);
     expect(modifiedResult!.frequency).to.equal(TransactionFrequency.Monthly);
     expect(modifiedResult2!.frequency).to.equal(TransactionFrequency.Yearly);
+    expect(modifiedResult!.absAmount).to.equal(1023);
+    expect(modifiedResult2!.absAmount).to.equal(1024);
 
     {
       const user = await users.findById("chapu");
