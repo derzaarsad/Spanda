@@ -36,8 +36,8 @@ export class DummyAuthenticationService implements IAuthentication {
     removeAllUserAuthentication(): void {
     }
 
-    register(username: string, password: string) : Promise<boolean> {
-        return Promise.resolve(true);
+    register(username: string, password: string) : Promise<[boolean,string]> {
+        return Promise.resolve([true,""]);
     }
 
     resetPassword(textSTr: string) : any {

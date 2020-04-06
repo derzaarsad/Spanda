@@ -19,7 +19,7 @@ export interface IAuthentication {
     setNewRefreshAndAccessToken() : Promise<boolean>;
     isUserAuthenticated(access_token: string, token_type: string) : Promise<boolean>;
     removeAllUserAuthentication(): void;
-    register(username: string, password: string) : Promise<boolean>;
+    register(username: string, password: string) : Promise<[boolean,string]>;
 
     resetPassword(textSTr: string) : any;
 }
@@ -170,7 +170,7 @@ export class AuthenticationService implements IAuthentication {
         appSettings.remove("storedUser");
     }
 
-    register(username: string, password: string) : Promise<boolean> {
+    register(username: string, password: string) : Promise<[boolean,string]> {
         let request = this.__register__(username, password);
         return Https.request({
             url: request[0],
@@ -179,11 +179,8 @@ export class AuthenticationService implements IAuthentication {
             headers: request[2],
             timeout: 10
         }).then(res => {
-            
-            console.log("registration successful");
             console.log(res);
-
-            return (res["statusCode"] === 201) ? true : false;
+            return [((res["statusCode"] === 201) ? true : false), res.content["message"]];
         });
     }
 
