@@ -6,7 +6,7 @@ import {
   CreateResponse,
   HasAuthorization,
   HasMissingProperty,
-  CreateAuthHeader
+  CreateAuthHeader,
 } from "../lambda-util";
 
 import { Authentication, Token } from "dinodime-lib";
@@ -97,7 +97,7 @@ export const isUserAuthenticated = async (
     }
     return CreateResponse(200, {
       is_recurrent_transaction_confirmed: user.isRecurrentTransactionConfirmed,
-      is_allowance_ready: user.isAllowanceReady
+      is_allowance_ready: user.isAllowanceReady,
     });
   } catch (err) {
     logger.log("error", "error authenticating user", err);
@@ -120,8 +120,6 @@ export const registerUser = async (
   bankInterface: FinAPI,
   users: Users.UsersRepository
 ): Promise<APIGatewayProxyResult> => {
-  logger.log("debug", "received event", event.body);
-
   let body = event.body;
   if (body === null) {
     return CreateSimpleResponse(400, "empty body received");
@@ -146,7 +144,7 @@ export const registerUser = async (
   try {
     authorization = await authentication
       .getClientCredentialsToken(clientSecrets)
-      .then(token => CreateAuthHeader(token));
+      .then((token) => CreateAuthHeader(token));
   } catch (err) {
     logger.log("error", "error while authorizing against bank interface", { cause: err });
     return CreateSimpleResponse(401, "could not obtain an authentication token");
@@ -190,8 +188,6 @@ export const authenticateAndSave = async (
   clientSecrets: ClientSecretsProvider,
   authentication: Authentication
 ): Promise<APIGatewayProxyResult> => {
-  logger.log("debug", "received event", event);
-
   let body = event.body;
   if (body === null) {
     return CreateSimpleResponse(400, "empty body received");
@@ -210,7 +206,7 @@ export const authenticateAndSave = async (
   return authentication
     .getPasswordToken(clientSecrets, username, password)
     .then((response: Token) => CreateResponse(200, response))
-    .catch(err => {
+    .catch((err) => {
       logger.log("error", "could not obtain password token for user " + username, { cause: err });
       return CreateSimpleResponse(401, "unauthorized");
     });
@@ -227,8 +223,6 @@ export const updateRefreshToken = async (
   bankInterface: FinAPI,
   users: Users.UsersRepository
 ): Promise<APIGatewayProxyResult> => {
-  logger.log("debug", "received event", event.body);
-
   let body = event.body;
   if (body === null) {
     return CreateSimpleResponse(400, "empty body received");
@@ -245,7 +239,7 @@ export const updateRefreshToken = async (
 
   try {
     token = await authentication.getRefreshToken(clientSecrets, refreshTokenRequest.refresh_token);
-    if(!token) {
+    if (!token) {
       logger.log("error", "error authenticating user", "acquiring token failed");
       return CreateSimpleResponse(401, "unauthorized");
     }
@@ -264,7 +258,7 @@ export const updateRefreshToken = async (
     return CreateResponse(200, {
       token: token,
       is_recurrent_transaction_confirmed: user.isRecurrentTransactionConfirmed,
-      is_allowance_ready: user.isAllowanceReady
+      is_allowance_ready: user.isAllowanceReady,
     });
   } catch (err) {
     logger.log("error", "error authenticating user", err);
