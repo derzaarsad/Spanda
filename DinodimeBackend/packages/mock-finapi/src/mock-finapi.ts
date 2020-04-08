@@ -12,34 +12,36 @@ const logger = createLogger(process.env);
 
 const transactionsHandlerConfiguration = {
   transactionsPerAccountId: Constants.transactionsPerAccountId,
-  logger: logger
+  logger: logger,
 };
 
 const userInfoHandlerConfiguration = {
   authenticatedUser: Constants.authenticatedUser,
   authenticatedUserToken: Constants.authenticatedUserToken,
-  logger: logger
+  logger: logger,
 };
 
 const webFormHandlerConfiguration = {
   webFormResponse: Constants.webFormResponse,
-  logger: logger
+  logger: logger,
 };
 
 const importBankConnectionsHandlerConfiguration = {
   webFormRespose: Constants.webFormRedirectResponse,
-  logger: logger
+  logger: logger,
 };
 
 const createUserHandlerConfiguration = {
   authenticatedUser: Constants.authenticatedUser,
-  logger: logger
+  logger: logger,
 };
 
 const getTokenHandlerConfiguration = {
+  clientCredentials: Constants.clientCredentials,
+  clientToken: Constants.clientToken,
   authenticatedUser: Constants.authenticatedUser,
   authenticatedUserToken: Constants.authenticatedUserToken,
-  logger: logger
+  logger: logger,
 };
 
 export const getToken = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {

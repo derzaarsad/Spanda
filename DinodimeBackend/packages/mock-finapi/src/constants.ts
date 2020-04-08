@@ -1,5 +1,10 @@
 import { FinAPIModel } from "dinodime-lib";
 
+export interface ClientCredentials {
+  clientId: string;
+  clientSecret: string;
+}
+
 const importConnectionResponse = {
   id: 1,
   bankId: 277672,
@@ -14,13 +19,13 @@ const importConnectionResponse = {
     result: "INTERNAL_SERVER_ERROR",
     errorMessage: "Internal server error",
     errorType: "TECHNICAL",
-    timestamp: "2018-01-01 00:00:00.000"
+    timestamp: "2018-01-01 00:00:00.000",
   },
   lastAutoUpdate: {
     result: "INTERNAL_SERVER_ERROR",
     errorMessage: "Internal server error",
     errorType: "TECHNICAL",
-    timestamp: "2018-01-01 00:00:00.000"
+    timestamp: "2018-01-01 00:00:00.000",
   },
   ibanOnlyMoneyTransferSupported: true,
   ibanOnlyDirectDebitSupported: true,
@@ -31,8 +36,8 @@ const importConnectionResponse = {
       procedureId: "955",
       procedureName: "mobileTAN",
       procedureChallengeType: "TEXT",
-      implicitExecute: true
-    }
+      implicitExecute: true,
+    },
   ],
   interfaces: [
     {
@@ -40,8 +45,8 @@ const importConnectionResponse = {
       loginCredentials: [
         {
           label: "Customer ID",
-          value: "string"
-        }
+          value: "string",
+        },
       ],
       defaultTwoStepProcedureId: "955",
       twoStepProcedures: [
@@ -49,26 +54,26 @@ const importConnectionResponse = {
           procedureId: "955",
           procedureName: "mobileTAN",
           procedureChallengeType: "TEXT",
-          implicitExecute: true
-        }
+          implicitExecute: true,
+        },
       ],
       aisConsent: {
         status: "PRESENT",
-        expiresAt: "2019-07-20 09:05:10.546"
+        expiresAt: "2019-07-20 09:05:10.546",
       },
       lastManualUpdate: {
         result: "INTERNAL_SERVER_ERROR",
         errorMessage: "Internal server error",
         errorType: "TECHNICAL",
-        timestamp: "2018-01-01 00:00:00.000"
+        timestamp: "2018-01-01 00:00:00.000",
       },
       lastAutoUpdate: {
         result: "INTERNAL_SERVER_ERROR",
         errorMessage: "Internal server error",
         errorType: "TECHNICAL",
-        timestamp: "2018-01-01 00:00:00.000"
-      }
-    }
+        timestamp: "2018-01-01 00:00:00.000",
+      },
+    },
   ],
   accountIds: [1, 2, 3],
   owners: [
@@ -83,8 +88,8 @@ const importConnectionResponse = {
       country: "Deutschland",
       city: "München",
       street: "Musterstraße",
-      houseNumber: "99"
-    }
+      houseNumber: "99",
+    },
   ],
   bank: {
     id: 277672,
@@ -110,30 +115,30 @@ const importConnectionResponse = {
         interface: "FINTS_SERVER",
         tppAuthenticationGroup: {
           id: 1,
-          name: "AirBank XS2A CZ"
+          name: "AirBank XS2A CZ",
         },
         loginCredentials: [
           {
             label: "Nutzerkennung",
             isSecret: true,
-            isVolatile: true
-          }
+            isVolatile: true,
+          },
         ],
         properties: ["REDIRECT_APPROACH"],
         loginHint: "Bitte geben Sie nur die ersten fünf Stellen Ihrer PIN ein.",
         health: 100,
         lastCommunicationAttempt: "2018-01-01 00:00:00.000",
-        lastSuccessfulCommunication: "2018-01-01 00:00:00.000"
-      }
+        lastSuccessfulCommunication: "2018-01-01 00:00:00.000",
+      },
     ],
     bankGroup: {
       id: 1,
-      name: "FinAPI Test Bank Group"
+      name: "FinAPI Test Bank Group",
     },
     lastCommunicationAttempt: "2018-01-01 00:00:00.000",
-    lastSuccessfulCommunication: "2018-01-01 00:00:00.000"
+    lastSuccessfulCommunication: "2018-01-01 00:00:00.000",
   },
-  furtherLoginNotRecommended: true
+  furtherLoginNotRecommended: true,
 };
 
 const encodedImportConnectionResponse = JSON.stringify(importConnectionResponse);
@@ -171,7 +176,7 @@ const transactionsPerAccountId = {
           parentId: 373,
           parentName: "Freizeit, Hobbys & Soziales",
           isCustom: true,
-          children: [1, 2, 3]
+          children: [1, 2, 3],
         },
         labels: [],
         isPotentialDuplicate: true,
@@ -183,24 +188,24 @@ const transactionsPerAccountId = {
           invoiceNumber: "INV2-KXVU-7Z64-DT6W-MG2X",
           fee: -0.99,
           net: 9.99,
-          auctionSite: "eBay"
+          auctionSite: "eBay",
         },
         endToEndReference: "001100550526",
         compensationAmount: -1.11,
         originalAmount: -9.99,
         differentDebitor: "DIFD70204",
-        differentCreditor: "DIFC98450"
-      }
+        differentCreditor: "DIFC98450",
+      },
     ],
     paging: {
       page: 1,
       perPage: 20,
       pageCount: 1,
-      totalCount: 1
+      totalCount: 1,
     },
     income: 0,
     spending: 0,
-    balance: 0
+    balance: 0,
   },
   2: {
     transactions: [],
@@ -208,11 +213,11 @@ const transactionsPerAccountId = {
       page: 1,
       perPage: 20,
       pageCount: 1,
-      totalCount: 0
+      totalCount: 0,
     },
     income: 0,
     spending: 0,
-    balance: 0
+    balance: 0,
   },
   3: {
     transactions: [],
@@ -220,15 +225,22 @@ const transactionsPerAccountId = {
       page: 1,
       perPage: 20,
       pageCount: 1,
-      totalCount: 0
+      totalCount: 0,
     },
     income: 0,
     spending: 0,
-    balance: 0
-  }
+    balance: 0,
+  },
 };
 
 const Constants = {
+  clientCredentials: {
+    clientId: "70653d96-7cc6-4a9a-99d8-d41dc2f00564",
+    clientSecret: "4943fb3e-2c9b-4862-80b1-b22f5b7d1e82",
+  },
+
+  clientToken: "abc.def.xyz",
+
   authenticatedUserToken: "abc.def.xyz",
 
   authenticatedUser: {
@@ -236,7 +248,7 @@ const Constants = {
     password: "XXXXX",
     email: "demo@localhost.de",
     phone: "+49 99 999999-999",
-    isAutoUpdateEnabled: true
+    isAutoUpdateEnabled: true,
   },
 
   webFormRedirectResponse: {
@@ -244,14 +256,14 @@ const Constants = {
       {
         message: "909408",
         code: FinAPIModel.ErrorDetails.CodeEnum.WEBFORMREQUIRED,
-        type: FinAPIModel.ErrorDetails.TypeEnum.BUSINESS
-      }
+        type: FinAPIModel.ErrorDetails.TypeEnum.BUSINESS,
+      },
     ],
     date: "2020-03-29 18:22:29.983",
     requestId: "selfgen-de387543-ed50-4a2f-a1ec-68e0abf48580",
     endpoint: "POST /api/v1/bankConnections/import",
     authContext: "3461/966184",
-    bank: "00000000 - FinAPI Test Bank"
+    bank: "00000000 - FinAPI Test Bank",
   },
 
   webFormResponse: {
@@ -260,10 +272,10 @@ const Constants = {
       "03FhQiom8CJUL7rkRgBMCOF9KXlGL9p7kPpW4puMKDD5QbeRm9E9Vzr1xBcokaxZt5PGRscn8HI8xuL8voLkirocxgFIF7wU8B240R5ccSjfPru9vXTBHBEycmBs8Rk2",
     status: FinAPIModel.WebForm.StatusEnum.COMPLETED,
     serviceResponseCode: 200,
-    serviceResponseBody: encodedImportConnectionResponse
+    serviceResponseBody: encodedImportConnectionResponse,
   },
 
-  transactionsPerAccountId: transactionsPerAccountId
+  transactionsPerAccountId: transactionsPerAccountId,
 };
 
 export default Constants;

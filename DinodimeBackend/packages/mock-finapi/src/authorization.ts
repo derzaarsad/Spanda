@@ -1,6 +1,7 @@
 import * as querystring from "querystring";
 import * as winston from "winston";
 
+import { ClientCredentials } from "./constants";
 import { FinAPIModel } from "dinodime-lib";
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from "aws-lambda";
 import { CreateResponse } from "./lambda-util";
@@ -12,6 +13,8 @@ const unauthorized = CreateResponse(401, "unauthorized");
 const badRequest = CreateResponse(400, "bad request");
 
 export interface GetTokenHandlerConfiguration {
+  clientCredentials: ClientCredentials;
+  clientToken: string;
   authenticatedUser: FinAPIModel.User;
   authenticatedUserToken: string;
   logger: winston.Logger;
@@ -22,16 +25,24 @@ export const getTokenHandler = async (
   event: APIGatewayProxyEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> => {
-  const { logger, authenticatedUser, authenticatedUserToken } = configuration;
+  const { logger, authenticatedUser, authenticatedUserToken, clientCredentials } = configuration;
 
-  const accessToken: FinAPIModel.AccessToken = {
+  const clientToken: FinAPIModel.AccessToken = {
     expiresIn: 0,
     accessToken: authenticatedUserToken,
     scope: scope,
-    tokenType: tokenType
+    tokenType: tokenType,
   };
 
-  const success = CreateResponse(200, accessToken);
+  const userToken: FinAPIModel.AccessToken = {
+    expiresIn: 0,
+    accessToken: authenticatedUserToken,
+    scope: scope,
+    tokenType: tokenType,
+  };
+
+  const userSuccess = CreateResponse(200, userToken);
+  const clientSuccess = CreateResponse(200, clientToken);
 
   const body = event.body;
 
@@ -49,6 +60,8 @@ export const getTokenHandler = async (
   const refreshToken = parameters["refresh_token"] as string;
   const username = parameters["username"] as string;
   const password = parameters["password"] as string;
+  const clientId = parameters["client_id"] as string;
+  const clientSecret = parameters["client_secret"] as string;
 
   if (!grantType) {
     return badRequest;
@@ -57,13 +70,21 @@ export const getTokenHandler = async (
   if (grantType === "refresh_token" && refreshToken) {
     logger.debug("getting a refresh token");
     if (refreshToken === authenticatedUserToken) {
-      return success;
+      return userSuccess;
     } else {
       return unauthorized;
     }
   } else if (grantType === "password" && username && password) {
+    logger.debug("getting a password");
     if (username === authenticatedUser.id && password === authenticatedUser.password) {
-      return success;
+      return userSuccess;
+    } else {
+      return unauthorized;
+    }
+  } else if (grantType === "client_credentials" && clientId && clientSecret) {
+    logger.debug("getting client secrets");
+    if (clientId === clientCredentials.clientId && clientSecret === clientCredentials.clientSecret) {
+      return clientSuccess;
     } else {
       return unauthorized;
     }
