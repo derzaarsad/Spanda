@@ -5,5 +5,9 @@
     <TextField class="input" [(ngModel)]="SearchedBlz" hint="Enter a BLZ..."></TextField>
     <Button text="Search" (tap)="onSearch()" ></Button>
     <Button [text]="'Add ' + bank.Name" (tap)="onAddAccount()" *ngIf="EnableBank" ></Button>
+    <WebView *ngIf="enableBank" [src]="webViewSrc"
+         (loadStarted)="onLoadStarted($event)"
+         (loadFinished)="onLoadFinished($event)">
+    </WebView>
 </StackLayout>
 </FlexboxLayout>
