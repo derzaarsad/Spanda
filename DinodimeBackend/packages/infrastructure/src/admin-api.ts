@@ -19,7 +19,7 @@ export class AdminApi extends cdk.Stack {
     const restAPI = new apigw.RestApi(this, "AdminAPI");
 
     const role = new iam.Role(this, "AdminAPIMethodLambdaRole", {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com")
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
     });
 
     const lambdaFactory = new LambdaFactory({
@@ -29,19 +29,26 @@ export class AdminApi extends cdk.Stack {
       deploymentProps: props.lambdaDeploymentProps,
       permissionProps: props.lambdaPermissionProps,
       executionRole: role,
-      env: lambdaEnvironment(props)
+      env: lambdaEnvironment(props),
+      withTracing: true,
     });
 
     const asset = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-admin-api"));
 
     const dataResource = restAPI.root.addResource("data");
-    const deleteMethod = lambdaFactory.createLambda("delete-user-data ", asset, "main.deleteUserData");
-    dataResource.addMethod("DELETE", new LambdaIntegration(deleteMethod), {
-      operationName: "delete user data"
+    const deleteDataMethod = lambdaFactory.createLambda("delete-user-data ", asset, "main.deleteUserData");
+    dataResource.addMethod("DELETE", new LambdaIntegration(deleteDataMethod), {
+      operationName: "delete user data",
+    });
+
+    const userResource = restAPI.root.addResource("user");
+    const deleteUserMethod = lambdaFactory.createLambda("delete-user ", asset, "main.deleteUser");
+    userResource.addMethod("DELETE", new LambdaIntegration(deleteUserMethod), {
+      operationName: "delete user",
     });
 
     new cdk.CfnOutput(this, "AdminEndpointURL", {
-      value: restAPI.url
+      value: restAPI.url,
     });
   }
 }
