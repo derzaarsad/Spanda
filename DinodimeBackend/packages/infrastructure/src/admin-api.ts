@@ -36,6 +36,12 @@ export class AdminApi extends cdk.Stack {
     const asset = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-admin-api"));
 
     const dataResource = restAPI.root.addResource("data");
+
+    const getUserDataMethod = lambdaFactory.createLambda("get-user-data ", asset, "main.getUserData");
+    dataResource.addMethod("GET", new LambdaIntegration(getUserDataMethod), {
+      operationName: "get user data",
+    });
+
     const deleteDataMethod = lambdaFactory.createLambda("delete-user-data ", asset, "main.deleteUserData");
     dataResource.addMethod("DELETE", new LambdaIntegration(deleteDataMethod), {
       operationName: "delete user data",
