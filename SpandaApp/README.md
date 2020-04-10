@@ -2,6 +2,8 @@
 
 ## Android
 
+Get google-services.json from the server firebase and copy it in `SpandaApp/app/App_Resources/Android/`,
+
 Go to ~/Android/Sdk/emulator
 
 ```bash
@@ -14,7 +16,15 @@ After the emulator is on, go to SpandaApp folder and add android using:
 tns platform add android
 ```
 
-Get google-services.json from the server firebase and copy it in `./app/App_Resources/Android/`, install NativeScript plugin for Firebase:
+Finally, run the app using:
+
+```bash
+tns run android --env.environmentJson="{\"stage\":\"prototype\",\"backendUrl\":\"<backendUrl>\"}"
+```
+
+## Firebase
+
+Install NativeScript plugin for Firebase:
 
 ```bash
 tns plugin add nativescript-plugin-firebase
@@ -31,11 +41,7 @@ prompt: Are you using Firebase Cloud Messaging? (y/n): (n) y
 prompt: Do you want to save the selected configuration. Reinstalling the dependency will reuse the setup from: firebase.nativescript.json. CI will be easier. (y/n): (y)
 ```
 
-This process generate a ./firebase.nativescript.json file. Finally, run the app using:
-
-```bash
-tns run android --env.environmentJson="{\"stage\":\"prototype\",\"backendUrl\":\"<backendUrl>\"}"
-```
+This process generate a ./firebase.nativescript.json file.
 
 
 Source:
