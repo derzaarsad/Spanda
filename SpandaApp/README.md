@@ -2,8 +2,6 @@
 
 ## Android
 
-Get google-services.json from the server firebase and copy it in `SpandaApp/app/App_Resources/Android/`,
-
 Go to ~/Android/Sdk/emulator
 
 ```bash
@@ -15,6 +13,8 @@ After the emulator is on, go to SpandaApp folder and add android using:
 ```bash
 tns platform add android
 ```
+
+Get google-services.json from the server firebase and copy it in `./app/App_Resources/Android/`,
 
 Finally, run the app using:
 
