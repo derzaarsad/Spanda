@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, Context } from "aws-lambda";
 
 import { CreateInternalErrorResponse, CreateSimpleResponse } from "./lambda-util";
 import { ServiceProvider } from "./service-provider";
-import { addUserHandler, deleteUserHandler, deleteUserDataHandler } from "./admin-api-handler";
+import { addUserHandler, deleteUserHandler, deleteUserDataHandler, getUserDataHandler } from "./admin-api-handler";
 
 const services = new ServiceProvider(process.env);
 const logger = services.logger;
@@ -22,6 +22,18 @@ export const deleteUserData = async (event: APIGatewayProxyEvent, context: Conte
   logger.debug("Received event", event);
   try {
     const response = await deleteUserDataHandler(configuration, event, context);
+    logger.debug("Responding with", response);
+    return response;
+  } catch (err) {
+    logger.log("error", "error authorizing", err);
+    return CreateInternalErrorResponse(err);
+  }
+};
+
+export const getUserData = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("Received event", event);
+  try {
+    const response = await getUserDataHandler(configuration, event, context);
     logger.debug("Responding with", response);
     return response;
   } catch (err) {

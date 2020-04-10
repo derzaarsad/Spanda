@@ -1,13 +1,13 @@
 import winston from "winston";
-import { Context, APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { CreateSimpleResponse, HasAuthorization, CreateInternalErrorResponse } from "./lambda-util";
+import { Context, APIGatewayProxyEvent } from "aws-lambda";
+import { CreateSimpleResponse, CreateResponse, HasAuthorization, CreateInternalErrorResponse } from "./lambda-util";
 
 import { getUserInfo } from "./userinfo";
 import { FinAPI, FinAPIModel } from "dinodime-lib";
 import { User, Users } from "dinodime-lib";
 import { Transactions } from "dinodime-lib";
 import { RecurrentTransactions } from "dinodime-lib";
-import { BankConnection, BankConnections } from "dinodime-lib";
+import { BankConnection, BankConnections, Transaction } from "dinodime-lib";
 
 const badRequest = CreateSimpleResponse(400, "bad request");
 const unauthorized = CreateSimpleResponse(401, "unauthorized");
@@ -18,7 +18,7 @@ interface AuthenticationConfiguration {
   logger: winston.Logger;
 }
 
-export interface DeleteUserDataHandlerConfiguration extends AuthenticationConfiguration {
+export interface UserDataHandlerConfiguration extends AuthenticationConfiguration {
   bankConnections: BankConnections.BankConnectionsRepository;
   transactions: Transactions.TransactionsRepository;
   recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
@@ -81,8 +81,50 @@ export const deleteUserHandler = async (
   return CreateSimpleResponse(200, "ok");
 };
 
+export const getUserDataHandler = async (
+  configuration: UserDataHandlerConfiguration,
+  event: APIGatewayProxyEvent,
+  context: Context
+) => {
+  const { logger, bankConnections, transactions, recurrentTransactions } = configuration;
+
+  const user = await getAuthenticatedUser(configuration, event.headers);
+
+  if (!user) {
+    return unauthorized;
+  }
+
+  let userConnections: BankConnection[] | undefined;
+
+  try {
+    userConnections = await bankConnections.findByIds(user.bankConnectionIds);
+  } catch (err) {
+    logger.error("error fetching bank connections", err);
+    return CreateSimpleResponse(401, "unauthorized");
+  }
+
+  const result: Transaction[] = [];
+
+  try {
+    for (let i = 0; userConnections.length; i++) {
+      const connection = userConnections[i];
+      const tx = await transactions.findByAccountIds(connection.bankAccountIds);
+
+      for (let j = 0; tx.length; j++) {
+        result.push(tx[j]);
+      }
+    }
+  } catch (err) {
+    logger.error("error accessing bank data", err);
+    return CreateInternalErrorResponse("error accessing bank data");
+  }
+
+  logger.info(`Banking data for username ${user.username} retrieved susccesfully`);
+  return CreateResponse(200, result);
+};
+
 export const deleteUserDataHandler = async (
-  configuration: DeleteUserDataHandlerConfiguration,
+  configuration: UserDataHandlerConfiguration,
   event: APIGatewayProxyEvent,
   context: Context
 ) => {
