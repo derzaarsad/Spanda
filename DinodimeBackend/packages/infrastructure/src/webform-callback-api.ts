@@ -24,7 +24,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
     this.completionsDLQ = new sqs.Queue(this, "WebFormCompletionsDLQ");
 
     const completionsQueue = new sqs.Queue(this, "WebFormCompletionsQueue", {
-      visibilityTimeout: cdk.Duration.seconds(300),
+      visibilityTimeout: cdk.Duration.seconds(120),
       deadLetterQueue: {
         queue: this.completionsDLQ,
         maxReceiveCount: 3,
@@ -95,6 +95,10 @@ export class WebFormCallbackAPI extends cdk.Construct {
     const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-fetch-webform"));
     const processor = lambdaFactory.createLambda("FetchWebForm", handler, "main.handler");
 
-    processor.addEventSource(new SqsEventSource(completionsQueue));
+    processor.addEventSource(
+      new SqsEventSource(completionsQueue, {
+        batchSize: 1,
+      })
+    );
   }
 }
