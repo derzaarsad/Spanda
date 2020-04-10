@@ -62,9 +62,13 @@ jobs:
           echo '---'
           $ANDROID_HOME/platform-tools/adb devices
         displayName: "start Android emulator"
+      - task: DownloadSecureFile@1
+        inputs:
+          secureFile: 'google-services.json'
       - script: |
           cd SpandaApp
           tns platform add android
+          cp --verbose $(System.DefaultWorkingDirectory)/google-services.json $(System.DefaultWorkingDirectory)/SpandaApp/app/App_Resources/Android/google-services.json
           tns test android --justlaunch
         displayName: "Run unit test"
         continueOnError: true
