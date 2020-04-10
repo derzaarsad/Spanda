@@ -22,7 +22,7 @@ Finally, run the app using:
 tns run android --env.environmentJson="{\"stage\":\"prototype\",\"backendUrl\":\"<backendUrl>\"}"
 ```
 
-## Firebase
+## Firebase Installation (if not available)
 
 Install NativeScript plugin for Firebase:
 
