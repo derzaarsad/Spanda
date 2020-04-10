@@ -8,13 +8,17 @@ const env = process.env;
 const services = new ServiceProvider(env);
 const queueUrl = env["QUEUE_URL"] as string;
 const sqs = new AWSSQSPublisher(new SQS(), queueUrl);
+const logger = services.logger;
+
+const configuration: HandlerConfiguration = {
+  log: services.logger,
+  users: services.users,
+  sqs: sqs,
+};
 
 export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
-  const configuration: HandlerConfiguration = {
-    log: services.logger,
-    users: services.users,
-    sqs: sqs
-  };
-
-  return webformCallback(event, context, configuration);
+  logger.debug("Received event", event);
+  const response = await webformCallback(event, context, configuration);
+  logger.debug("Responding with", response);
+  return response;
 };
