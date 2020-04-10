@@ -33,34 +33,8 @@ export class SearchBankComponent implements OnInit {
         this.page.actionBarHidden = true;
     }
 
-    alert(message: string) {
-        return alert({
-            title: "DERZA APP",
-            okButtonText: "OK",
-            message: message
-        });
+    private onBack() {
+        this.routerExtensions.navigate(['../home'], { clearHistory: true, relativeTo: this.activeRoute });
     }
 
-    private onSearch() {
-        if(this.SearchedBlz.length !== 8) {
-            this.alert("Invalid BLZ");
-            return;
-        }
-
-        this.bankService.getBankByBLZ(this.SearchedBlz).then((bank) => {
-            this.bank = bank;
-            this.EnableBank = true;
-        }).catch(()=>{
-            this.alert("Bank not found!");
-        });
-    }
-
-    private onAddAccount() {
-        this.bankService.getWebformIdAndToken(this.bank).then((res) => {
-            if(!res) {
-                return;
-            }
-            utils.openUrl(res + "&redirectUrl=" + this.invalidUrl);
-        });
-    }
 }

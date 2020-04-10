@@ -67,7 +67,7 @@ export class AllowanceComponent implements OnInit {
     }
 
     onTap() {
-        this.routerExtensions.navigate(["../searchBank"], { clearHistory: true, relativeTo: this.activeRoute });
+        this.routerExtensions.navigate(["searchBank"], { clearHistory: true });
     }
 
     onLogOut() {
