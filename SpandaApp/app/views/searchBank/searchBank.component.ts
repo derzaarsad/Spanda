@@ -9,6 +9,7 @@ import { BankService } from "~/services/bank.service";
 import { AuthenticationService } from "~/services/authentication.service";
 import { Bank } from "~/models/bank.model";
 import * as utils from "tns-core-modules/utils/utils";
+import { WebView, LoadEventData } from "tns-core-modules/ui/web-view";
 
 @Component({
     selector: "searchBank",
@@ -19,8 +20,8 @@ import * as utils from "tns-core-modules/utils/utils";
 export class SearchBankComponent implements OnInit {
     private SearchedBlz: string = "";
     private bank: Bank;
-    private EnableBank: boolean = false;
-    private invalidUrl = "https://invalidurl";
+    private enableBank: boolean = false;
+    private webViewSrc = "";
 
     constructor(
         private routerExtensions: RouterExtensions,
@@ -35,6 +36,67 @@ export class SearchBankComponent implements OnInit {
 
     private onBack() {
         this.routerExtensions.navigate(['../home'], { clearHistory: true, relativeTo: this.activeRoute });
+    }
+
+    alert(message: string) {
+        return alert({
+            title: "DERZA APP",
+            okButtonText: "OK",
+            message: message
+        });
+    }
+
+
+    private onSearch() {
+        if(this.SearchedBlz.length !== 8) {
+            this.alert("Invalid BLZ");
+            return;
+        }
+
+        this.bankService.getBankByBLZ(this.SearchedBlz).then((bank) => {
+            this.bank = bank;
+            this.webViewSrc = "https://docs.nativescript.org/";
+            this.enableBank = true;
+        }).catch(()=>{
+            this.alert("Bank not found!");
+        });
+    }
+
+    private onAddAccount() {
+        this.bankService.getWebformIdAndToken(this.bank).then((res) => {
+            if(!res) {
+                return;
+            }
+            utils.openUrl(res + "&redirectUrl=" + "invalid");
+        });
+    }
+
+    onLoadStarted(args: LoadEventData) {
+        const webView = args.object as WebView;
+
+        if (!args.error) {
+            console.log("Load Start");
+            console.log(`EventName: ${args.eventName}`);
+            console.log(`NavigationType: ${args.navigationType}`);
+            console.log(`Url: ${args.url}`);
+        } else {
+            console.log(`EventName: ${args.eventName}`);
+            console.log(`Error: ${args.error}`);
+        }
+    }
+
+    onLoadFinished(args: LoadEventData) {
+        const webView = args.object as WebView;
+
+        if (!args.error) {
+            console.log("Load Finished");
+            console.log(`EventName: ${args.eventName}`);
+            console.log(`NavigationType: ${args.navigationType}`);
+            console.log(`Url: ${args.url}`);
+        } else {
+            console.log(`EventName: ${args.eventName}`);
+            console.log(`Error: ${args.error}`);
+        }
     }
 
 }

@@ -59,15 +59,13 @@ export class AppComponent {
 
           console.log('[Firebase] onMessageReceivedCallback:', { message });
 
-          console.log(this.activeRoute.children[0]);
-          console.log(this.activeRoute.children[0].children);
-          this.routerExtensions.navigate([{ outlets: { homeRouterOutlet: ['allowance'] } }], {
-            transition: {
-              name: "fade"
-            },
-            clearHistory: true,
-            relativeTo: this.activeRoute.children[0]
-          });
+          console.log(this.routerExtensions.router.url.toString());
+          if(this.routerExtensions.router.url.toString() === '/searchBank') {
+            this.routerExtensions.navigate(['../home'], { clearHistory: true, relativeTo: this.activeRoute });
+          }
+          else {
+            console.log("no event is triggered");
+          }
         }
       })
         .then(() => {
