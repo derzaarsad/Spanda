@@ -18,7 +18,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
     super(scope, id);
 
     const restAPI = new apigw.RestApi(this, "WebFormCallbackAPI", {
-      endpointExportName: "WebFormCallbackAPIEndpoint"
+      endpointExportName: "WebFormCallbackAPIEndpoint",
     });
 
     this.completionsDLQ = new sqs.Queue(this, "WebFormCompletionsDLQ");
@@ -27,8 +27,8 @@ export class WebFormCallbackAPI extends cdk.Construct {
       visibilityTimeout: cdk.Duration.seconds(300),
       deadLetterQueue: {
         queue: this.completionsDLQ,
-        maxReceiveCount: 3
-      }
+        maxReceiveCount: 3,
+      },
     });
 
     this.createProcessingBackend(completionsQueue, props);
@@ -38,7 +38,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
     const webFormCallbackResource = callback.addResource("{webFormAuth}");
     const webFrontEnd = this.createWebFrontend(completionsQueue, props);
     webFormCallbackResource.addMethod("GET", webFrontEnd, {
-      operationName: "web form callback"
+      operationName: "web form callback",
     });
 
     this.restAPI = restAPI;
@@ -50,7 +50,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
     env["QUEUE_URL"] = completionsQueue.queueUrl;
 
     const callbackRole = new iam.Role(this, "WebFormCallbackLambdaRole", {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com")
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
     });
 
     const lambdaFactory = new LambdaFactory({
@@ -60,7 +60,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
       deploymentProps: props.lambdaDeploymentProps,
       permissionProps: props.lambdaPermissionProps,
       executionRole: callbackRole,
-      env: env
+      env: env,
     });
 
     const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-webform-callback"));
@@ -73,7 +73,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
     env["QUEUE_URL"] = completionsQueue.queueUrl;
 
     const processingRole = new iam.Role(this, "WebFormCallbackProcessingLambdaRole", {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com")
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
     });
 
     completionsQueue.grantConsumeMessages(processingRole);
@@ -85,7 +85,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
       deploymentProps: props.lambdaDeploymentProps,
       permissionProps: props.lambdaPermissionProps,
       executionRole: processingRole,
-      env: env
+      env: env,
     });
 
     const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-fetch-webform"));
