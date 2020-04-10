@@ -15,23 +15,27 @@ const services = new ServiceProvider(env);
  * -------------------------
  */
 export const isUserAuthenticated = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
   try {
-    return authenticationController.isUserAuthenticated(
+    const response = authenticationController.isUserAuthenticated(
       event,
       context,
       logger,
       services.bankInterface,
       services.users
     );
+    logger.debug("returning regular response", response);
+    return response;
   } catch (err) {
-    logger.log("error", "error authorizing", err);
+    logger.error("error authorizing", err);
     return CreateInternalErrorResponse(err);
   }
 };
 
 export const registerUser = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
   try {
-    return authenticationController.registerUser(
+    const response = authenticationController.registerUser(
       event,
       context,
       logger,
@@ -40,30 +44,40 @@ export const registerUser = async (event: APIGatewayProxyEvent, context: Context
       services.bankInterface,
       services.users
     );
+    logger.debug("returning regular response", response);
+    return response;
   } catch (err) {
-    logger.log("error", "error registering user", err);
-    return CreateInternalErrorResponse(err);
+    logger.error("error registering user", err);
+    const response = CreateInternalErrorResponse(err);
+    logger.debug("returning error response", response);
+    return response;
   }
 };
 
 export const authenticateAndSaveUser = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
   try {
-    return authenticationController.authenticateAndSave(
+    const response = authenticationController.authenticateAndSave(
       event,
       context,
       logger,
       services.clientSecrets,
       services.authentication
     );
+    logger.debug("returning regular response", response);
+    return response;
   } catch (err) {
-    logger.log("error", "error logging in user", err);
-    return CreateInternalErrorResponse(err);
+    logger.error("error logging in user", err);
+    const response = CreateInternalErrorResponse(err);
+    logger.debug("returning error response", response);
+    return response;
   }
 };
 
 export const updateRefreshToken = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
   try {
-    return authenticationController.updateRefreshToken(
+    const response = authenticationController.updateRefreshToken(
       event,
       context,
       logger,
@@ -72,9 +86,13 @@ export const updateRefreshToken = async (event: APIGatewayProxyEvent, context: C
       services.bankInterface,
       services.users
     );
+    logger.debug("returning regular response", response);
+    return response;
   } catch (err) {
-    logger.log("error", "error refreshing token", err);
-    return CreateInternalErrorResponse(err);
+    logger.error("error refreshing token", err);
+    const response = CreateInternalErrorResponse(err);
+    logger.debug("returning error response", response);
+    return response;
   }
 };
 
@@ -83,8 +101,9 @@ export const updateRefreshToken = async (event: APIGatewayProxyEvent, context: C
  * ---------------
  */
 export const getBankByBLZ = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
   try {
-    return bankController.getBankByBLZ(
+    const response = bankController.getBankByBLZ(
       event,
       context,
       logger,
@@ -92,15 +111,20 @@ export const getBankByBLZ = async (event: APIGatewayProxyEvent, context: Context
       services.authentication,
       services.bankInterface
     );
+    logger.debug("returning regular response", response);
+    return response;
   } catch (err) {
-    logger.log("error", "error listing banks", err);
-    return CreateInternalErrorResponse(err);
+    logger.error("error listing banks", err);
+    const response = CreateInternalErrorResponse(err);
+    logger.debug("returning error response", response);
+    return response;
   }
 };
 
 export const getWebFormId = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
   try {
-    return bankController.getWebformId(
+    const response = bankController.getWebformId(
       event,
       context,
       logger,
@@ -108,26 +132,36 @@ export const getWebFormId = async (event: APIGatewayProxyEvent, context: Context
       services.users,
       services.encryptions
     );
+    logger.debug("returning regular response", response);
+    return response;
   } catch (err) {
-    logger.log("error", "error importing bank connection", err);
-    return CreateInternalErrorResponse(err);
+    logger.error("error importing bank connection", err);
+    const response = CreateInternalErrorResponse(err);
+    logger.debug("returning error response", response);
+    return response;
   }
 };
 
 export const webFormCallback = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
   try {
     // TODO: not finished!
     console.log(event.pathParameters);
-    return CreateSimpleResponse(200, "the function is called!");
+    const response = CreateSimpleResponse(200, "the function is called!");
+    logger.debug("returning regular response", response);
+    return response;
   } catch (err) {
-    logger.log("error", "error importing bank connection", err);
-    return CreateInternalErrorResponse(err);
+    logger.error("error importing bank connection", err);
+    const response = CreateInternalErrorResponse(err);
+    logger.debug("returning error response", response);
+    return response;
   }
 };
 
 export const getRecurrentTransactions = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
   try {
-    return bankController.getRecurrentTransactions(
+    const response = bankController.getRecurrentTransactions(
       event,
       context,
       logger,
@@ -136,15 +170,20 @@ export const getRecurrentTransactions = async (event: APIGatewayProxyEvent, cont
       services.connections,
       services.recurrentTransactions
     );
+    logger.debug("returning regular response", response);
+    return response;
   } catch (err) {
-    logger.log("error", "error get recurrent transactions", err);
-    return CreateInternalErrorResponse(err);
+    logger.error("error get recurrent transactions", err);
+    const response = CreateInternalErrorResponse(err);
+    logger.debug("returning error response", response);
+    return response;
   }
 };
 
 export const updateRecurrentTransactions = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
   try {
-    return bankController.updateRecurrentTransactions(
+    const response = bankController.updateRecurrentTransactions(
       event,
       context,
       logger,
@@ -152,15 +191,20 @@ export const updateRecurrentTransactions = async (event: APIGatewayProxyEvent, c
       services.users,
       services.recurrentTransactions
     );
+    logger.debug("returning regular response", response);
+    return response;
   } catch (err) {
-    logger.log("error", "error get recurrent transactions", err);
-    return CreateInternalErrorResponse(err);
+    logger.error("error get recurrent transactions", err);
+    const response = CreateInternalErrorResponse(err);
+    logger.debug("returning error response", response);
+    return response;
   }
 };
 
 export const fetchWebFormInfo = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
   try {
-    return bankController.fetchWebFormInfo(
+    const response = bankController.fetchWebFormInfo(
       event,
       context,
       logger,
@@ -170,23 +214,26 @@ export const fetchWebFormInfo = async (event: APIGatewayProxyEvent, context: Con
       services.transactions,
       services.encryptions
     );
+    logger.debug("returning regular response", response);
+    return response;
   } catch (err) {
-    logger.log("error", "error fetching webform id", err);
-    return CreateInternalErrorResponse(err);
+    logger.error("error fetching webform id", err);
+    const response = CreateInternalErrorResponse(err);
+    logger.debug("returning error response", response);
+    return response;
   }
 };
 
 export const getAllowance = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
   try {
-    return bankController.getAllowance(
-      event,
-      context,
-      logger,
-      services.bankInterface,
-      services.users
-    );
+    const response = bankController.getAllowance(event, context, logger, services.bankInterface, services.users);
+    logger.debug("returning regular response", response);
+    return response;
   } catch (err) {
-    logger.log("error", "error fetching fetching allowance", err);
-    return CreateInternalErrorResponse(err);
+    logger.error("error fetching fetching allowance", err);
+    const response = CreateInternalErrorResponse(err);
+    logger.debug("returning error response", response);
+    return response;
   }
 };
