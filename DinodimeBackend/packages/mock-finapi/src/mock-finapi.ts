@@ -46,28 +46,28 @@ const getTokenHandlerConfiguration = {
 
 export const getToken = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
   logger.debug("Received event", event);
-  const response = getTokenHandler(getTokenHandlerConfiguration, event, context);
+  const response = await getTokenHandler(getTokenHandlerConfiguration, event, context);
   logger.debug("Responding with", response);
   return response;
 };
 
 export const createUser = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
   logger.debug("Received event", event);
-  const response = createUserHandler(createUserHandlerConfiguration, event, context);
+  const response = await createUserHandler(createUserHandlerConfiguration, event, context);
   logger.debug("Responding with", response);
   return response;
 };
 
 export const userinfo = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
   logger.debug("Received event", event);
-  const response = userInfoHandler(userInfoHandlerConfiguration, event, context);
+  const response = await userInfoHandler(userInfoHandlerConfiguration, event, context);
   logger.debug("Responding with", response);
   return response;
 };
 
 export const webform = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
   logger.debug("Received event", event);
-  const response = webFormHandler(webFormHandlerConfiguration, event, context);
+  const response = await webFormHandler(webFormHandlerConfiguration, event, context);
   logger.debug("Responding with", response);
   return response;
 };
@@ -77,14 +77,14 @@ export const importBankConnections = async (
   context: Context
 ): Promise<APIGatewayProxyResult> => {
   logger.debug("Received event", event);
-  const response = importBankConnectionsHandler(importBankConnectionsHandlerConfiguration, event, context);
+  const response = await importBankConnectionsHandler(importBankConnectionsHandlerConfiguration, event, context);
   logger.debug("Responding with", response);
   return response;
 };
 
 export const transactions = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
   logger.debug("Received event", event);
-  const response = transactionsHandler(transactionsHandlerConfiguration, event, context);
+  const response = await transactionsHandler(transactionsHandlerConfiguration, event, context);
   logger.debug("Responding with", response);
   return response;
 };
