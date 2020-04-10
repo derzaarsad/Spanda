@@ -7,9 +7,9 @@ import { getWebformId } from "../../src/controllers/bank-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import { VoidTransport, Users, User } from "dinodime-lib";
 import { CreateUnittestInterfaces } from "../test-utility";
-import { Encryptions, CallbackCrypto } from "dinodime-lib";
+import { Crypto, AesCrypto } from "dinodime-lib";
 
-describe("unit: get webform id", function() {
+describe("unit: get webform id", function () {
   let logger: winston.Logger;
   let users: Users.UsersRepository;
   let context: Context;
@@ -18,9 +18,9 @@ describe("unit: get webform id", function() {
   let testValidPhone: string;
 
   let dummyInterfaces = CreateUnittestInterfaces();
-  let encryptions: Encryptions;
+  let encryptions: Crypto;
 
-  beforeEach(function() {
+  beforeEach(function () {
     testUsername = "chapu";
     testValidEmail = "chapu@chapu.com";
     testValidPhone = "+66 6666";
@@ -30,7 +30,7 @@ describe("unit: get webform id", function() {
     users = new Users.InMemoryRepository();
 
     context = {} as Context;
-    encryptions = new CallbackCrypto();
+    encryptions = new AesCrypto("006f1eb8e2z4a46xyz7fda7843628fa4");
   });
 
   it("rejects requests with failing authentication", async () => {
@@ -38,20 +38,13 @@ describe("unit: get webform id", function() {
 
     const event = ({
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
 
-      body: JSON.stringify({ bankId: 123545 })
+      body: JSON.stringify({ bankId: 123545 }),
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await getWebformId(
-      event,
-      context,
-      logger,
-      dummyInterfaces.bankInterface,
-      users,
-      encryptions
-    );
+    const result = await getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(401);
@@ -61,20 +54,13 @@ describe("unit: get webform id", function() {
     const event = ({
       headers: {
         Authorization: "bearer 12345678",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
 
-      body: JSON.stringify({ bankId: 123545 })
+      body: JSON.stringify({ bankId: 123545 }),
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await getWebformId(
-      event,
-      context,
-      logger,
-      dummyInterfaces.bankInterface,
-      users,
-      encryptions
-    );
+    const result = await getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(401);
@@ -84,56 +70,42 @@ describe("unit: get webform id", function() {
     const failingUsers = ({
       findById: async () => {
         return {
-          username: testUsername
+          username: testUsername,
         };
       },
 
       save: async () => {
         throw "nada";
-      }
+      },
     } as unknown) as Users.UsersRepository;
 
     const event = ({
       headers: {
         Authorization: "bearer 12345678",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
 
-      body: JSON.stringify({ bankId: 123545 })
+      body: JSON.stringify({ bankId: 123545 }),
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await getWebformId(
-      event,
-      context,
-      logger,
-      dummyInterfaces.bankInterface,
-      failingUsers,
-      encryptions
-    );
+    const result = await getWebformId(event, context, logger, dummyInterfaces.bankInterface, failingUsers, encryptions);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(500);
   });
 
-  it("returns webform's location", async function() {
+  it("returns webform's location", async function () {
     await users.save(new User(testUsername, testValidEmail, testValidPhone, false));
 
     const event = ({
       headers: {
         Authorization: "bearer 12345678",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ bankId: 123545 })
+      body: JSON.stringify({ bankId: 123545 }),
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await getWebformId(
-      event,
-      context,
-      logger,
-      dummyInterfaces.bankInterface,
-      users,
-      encryptions
-    );
+    const result = await getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(200);
@@ -154,8 +126,6 @@ describe("unit: get webform id", function() {
     let user = await users.findByWebFormId(2934);
     expect(user).to.be.ok;
     expect(formId).to.equal(user!.activeWebFormId!);
-    expect(
-      encryptions.DecryptText({ iv: user!.activeWebFormAuth!, cipherText: encryptedAuth })
-    ).to.equal(event.headers.Authorization);
+    expect(encryptions.decrypt(encryptedAuth)).to.equal(event.headers.Authorization);
   });
 });

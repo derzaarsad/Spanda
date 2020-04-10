@@ -14,13 +14,7 @@ const logger = services.logger;
  */
 export const isUserAuthenticated = async (event: APIGatewayProxyEvent, context: Context) => {
   try {
-    return authenticationController.isUserAuthenticated(
-      event,
-      context,
-      logger,
-      services.bankInterface,
-      services.users
-    );
+    return authenticationController.isUserAuthenticated(event, context, logger, services.bankInterface, services.users);
   } catch (err) {
     logger.log("error", "error authorizing", err);
     return CreateInternalErrorResponse(err);
@@ -112,17 +106,6 @@ export const getWebFormId = async (event: APIGatewayProxyEvent, context: Context
   }
 };
 
-export const webFormCallback = async (event: APIGatewayProxyEvent, context: Context) => {
-  try {
-    // TODO: not finished!
-    console.log(event.pathParameters);
-    return CreateSimpleResponse(200, "the function is called!");
-  } catch (err) {
-    logger.log("error", "error importing bank connection", err);
-    return CreateInternalErrorResponse(err);
-  }
-};
-
 export const getRecurrentTransactions = async (event: APIGatewayProxyEvent, context: Context) => {
   try {
     return bankController.getRecurrentTransactions(
@@ -156,33 +139,9 @@ export const updateRecurrentTransactions = async (event: APIGatewayProxyEvent, c
   }
 };
 
-export const fetchWebFormInfo = async (event: APIGatewayProxyEvent, context: Context) => {
-  try {
-    return bankController.fetchWebFormInfo(
-      event,
-      context,
-      logger,
-      services.bankInterface,
-      services.users,
-      services.connections,
-      services.transactions,
-      services.encryptions
-    );
-  } catch (err) {
-    logger.log("error", "error fetching webform id", err);
-    return CreateInternalErrorResponse(err);
-  }
-};
-
 export const getAllowance = async (event: APIGatewayProxyEvent, context: Context) => {
   try {
-    return bankController.getAllowance(
-      event,
-      context,
-      logger,
-      services.bankInterface,
-      services.users
-    );
+    return bankController.getAllowance(event, context, logger, services.bankInterface, services.users);
   } catch (err) {
     logger.log("error", "error fetching fetching allowance", err);
     return CreateInternalErrorResponse(err);

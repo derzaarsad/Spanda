@@ -17,7 +17,7 @@ export const handler = async (event: SQSEvent, context: Context) => {
     connections: services.connections,
     transactions: services.transactions,
     bankInterface: services.bankInterface,
-    encryptions: services.encryptions
+    encryptions: services.encryptions,
   };
 
   return fetchWebForm(event, context, configuration);

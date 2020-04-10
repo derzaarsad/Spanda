@@ -2,7 +2,7 @@ import * as winston from "winston";
 import { Status, Success, Failure } from "dinodime-lib";
 import { SQSEvent, SQSRecord, Context } from "aws-lambda";
 import {
-  Encryptions,
+  Crypto,
   Transactions,
   BankConnections,
   Users,
@@ -19,7 +19,7 @@ export interface HandlerConfiguration {
   users: Users.UsersRepository;
   connections: BankConnections.BankConnectionsRepository;
   transactions: Transactions.TransactionsRepository;
-  encryptions: Encryptions;
+  encryptions: Crypto;
 }
 
 /*
@@ -72,10 +72,11 @@ export const handleRecord = async (
     return { kind: "failure", error: new Error("no user found") };
   }
 
-  const authorization = encryptions.DecryptText({
-    iv: user.activeWebFormAuth,
-    cipherText: completion.userSecret,
-  });
+  if (user.activeWebFormAuth !== completion.userSecret) {
+    return { kind: "failure", error: new Error("user secret doesn't match") };
+  }
+
+  const authorization = encryptions.decrypt(completion.userSecret);
 
   let webForm: { serviceResponseBody: string };
   try {

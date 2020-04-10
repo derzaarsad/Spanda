@@ -16,7 +16,7 @@ export class DinodimeAPI extends cdk.Construct {
     super(scope, id);
 
     const restAPI = new apigw.RestApi(this, "DinodimeAPI", {
-      endpointExportName: "APIEndpointURL"
+      endpointExportName: "APIEndpointURL",
     });
 
     this.initializeAppApi(restAPI, props);
@@ -28,7 +28,7 @@ export class DinodimeAPI extends cdk.Construct {
     const environment = lambdaEnvironment(props);
 
     const role = new iam.Role(this, "APIMethodLambdaRole", {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com")
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
     });
 
     const lambdaFactory = new LambdaFactory({
@@ -38,7 +38,7 @@ export class DinodimeAPI extends cdk.Construct {
       deploymentProps: props.lambdaDeploymentProps,
       permissionProps: props.lambdaPermissionProps,
       executionRole: role,
-      env: environment
+      env: environment,
     });
 
     const asset = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-api"));
@@ -49,13 +49,13 @@ export class DinodimeAPI extends cdk.Construct {
     const isUserAuthenticated = lambdaFactory.createLambda("IsUserAuthenticated", asset, "main.isUserAuthenticated");
 
     users.addMethod("GET", new LambdaIntegration(isUserAuthenticated), {
-      operationName: "is user authenticated"
+      operationName: "is user authenticated",
     });
 
     const registerUser = lambdaFactory.createLambda("RegisterUser", asset, "main.registerUser");
 
     users.addMethod("POST", new LambdaIntegration(registerUser), {
-      operationName: "register user"
+      operationName: "register user",
     });
 
     const oauth = restAPI.root.addResource("oauth");
@@ -68,7 +68,7 @@ export class DinodimeAPI extends cdk.Construct {
     );
 
     login.addMethod("POST", new LambdaIntegration(authenticateAndSaveUser), {
-      operationName: "authenticate and save user"
+      operationName: "authenticate and save user",
     });
 
     const token = oauth.addResource("token");
@@ -76,7 +76,7 @@ export class DinodimeAPI extends cdk.Construct {
     const updateRefreshToken = lambdaFactory.createLambda("UpdateRefreshToken", asset, "main.updateRefreshToken");
 
     token.addMethod("POST", new LambdaIntegration(updateRefreshToken), {
-      operationName: "update fefresh token"
+      operationName: "update fefresh token",
     });
 
     // Authenticaction controller
@@ -93,33 +93,13 @@ export class DinodimeAPI extends cdk.Construct {
     const getWebFormId = lambdaFactory.createLambda("GetWebFormId", asset, "main.getWebFormId");
 
     importBankConnections.addMethod("POST", new LambdaIntegration(getWebFormId), {
-      operationName: "get webform id"
-    });
-
-    const webForms = restAPI.root.addResource("webForms");
-    const callback = webForms.addResource("callback");
-    const webFormCallbackResource = callback.addResource("{webFormAuth}");
-
-    const webFormCallback = lambdaFactory.createLambda("WebFormCallback", asset, "main.webFormCallback");
-
-    webFormCallbackResource.addMethod("POST", new LambdaIntegration(webFormCallback), {
-      operationName: "web form callback"
-    });
-
-    const webForm = webForms.addResource("{webFormId}");
-
-    const getWebFormInfo = lambdaFactory.createLambda("GetWebFormInfo", asset, "main.getWebFormInfo");
-
-    webForm.addMethod("GET", new LambdaIntegration(getWebFormInfo), {
-      operationName: "get webform info"
+      operationName: "get webform id",
     });
 
     const allowance = restAPI.root.addResource("allowance");
-
     const getAllowance = lambdaFactory.createLambda("GetAllowance", asset, "main.getAllowance");
-
     allowance.addMethod("GET", new LambdaIntegration(getAllowance), {
-      operationName: "get allowance"
+      operationName: "get allowance",
     });
 
     const recurrentTransactions = restAPI.root.addResource("recurrentTransactions");
@@ -137,11 +117,11 @@ export class DinodimeAPI extends cdk.Construct {
     );
 
     recurrentTransactions.addMethod("GET", new LambdaIntegration(getRecurrentTransactions), {
-      operationName: "get recurrent transactions"
+      operationName: "get recurrent transactions",
     });
 
     updateRT.addMethod("POST", new LambdaIntegration(updateRecurrentTransactions), {
-      operationName: "update recurrent transactions"
+      operationName: "update recurrent transactions",
     });
   }
 }

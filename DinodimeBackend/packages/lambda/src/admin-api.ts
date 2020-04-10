@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 
-import { CreateInternalErrorResponse, CreateSimpleResponse } from "./lambda-util";
+import { CreateInternalErrorResponse } from "./lambda-util";
 import { ServiceProvider } from "./service-provider";
 import { addUserHandler, deleteUserHandler, deleteUserDataHandler, getUserDataHandler } from "./admin-api-handler";
 

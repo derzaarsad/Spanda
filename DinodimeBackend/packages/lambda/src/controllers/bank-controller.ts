@@ -5,10 +5,10 @@ import {
   CreateResponse,
   HasAuthorization,
   CreateAuthHeader,
-  CreateInternalErrorResponse
+  CreateInternalErrorResponse,
 } from "../lambda-util";
 
-import { Authentication, Encryptions, ClientSecretsProvider } from "dinodime-lib";
+import { Authentication, Crypto, ClientSecretsProvider } from "dinodime-lib";
 import { FinAPI, FinAPIModel } from "dinodime-lib";
 import { User, Users } from "dinodime-lib";
 import { Algorithm } from "dinodime-lib";
@@ -57,7 +57,7 @@ export const getBankByBLZ = async (
   try {
     authorization = await authentication
       .getClientCredentialsToken(clientSecrets)
-      .then(token => CreateAuthHeader(token));
+      .then((token) => CreateAuthHeader(token));
   } catch (err) {
     logger.log("error", "error while authorizing against bank interface", { cause: err });
     return CreateSimpleResponse(401, "could not obtain an authentication token");
@@ -65,8 +65,8 @@ export const getBankByBLZ = async (
 
   return bankInterface
     .listBanksByBLZ(authorization, pathParams["blz"])
-    .then(response => CreateResponse(200, response))
-    .catch(err => {
+    .then((response) => CreateResponse(200, response))
+    .catch((err) => {
       // TODO distinguish unauthorized from other errors
       logger.log("error", "error listing banks by BLZ", { cause: err });
       return CreateSimpleResponse(500, "could not list banks");
@@ -82,7 +82,7 @@ export const getWebformId = async (
   logger: winston.Logger,
   bankInterface: FinAPI,
   users: Users.UsersRepository,
-  encryptions: Encryptions
+  encryptions: Crypto
 ): Promise<APIGatewayProxyResult> => {
   const authorization = HasAuthorization(event.headers);
 
@@ -116,10 +116,10 @@ export const getWebformId = async (
   }
 
   const response = await bankInterface.importConnection(authorization, params.bankId);
-  const secret = encryptions.EncryptText(authorization);
+  const secret = encryptions.encrypt(authorization);
 
   user.activeWebFormId = response.webFormId;
-  user.activeWebFormAuth = secret.iv;
+  user.activeWebFormAuth = secret;
 
   return users
     .save(user)
@@ -129,10 +129,10 @@ export const getWebformId = async (
        */
       return CreateResponse(200, {
         location: response.location,
-        webFormAuth: response.webFormId + "-" + secret.cipherText
+        webFormAuth: response.webFormId + "-" + secret,
       });
     })
-    .catch(err => {
+    .catch((err) => {
       logger.log("error", "error importing connection", { cause: err });
       return CreateSimpleResponse(500, "could not import connection");
     });
@@ -194,14 +194,14 @@ export const getRecurrentTransactions = async (
     return CreateSimpleResponse(204, "getting recurrent transactions failed");
   }
 
-  let recurrenttransactions = recurrentTransactions_.map(el => {
+  let recurrenttransactions = recurrentTransactions_.map((el) => {
     return {
       id: el.id,
       accountId: el.accountId,
       isExpense: el.isExpense,
       isConfirmed: el.isConfirmed,
       frequency: el.frequency,
-      counterPartName: el.counterPartName
+      counterPartName: el.counterPartName,
     };
   });
 
@@ -210,7 +210,7 @@ export const getRecurrentTransactions = async (
 
 // @Post('/recurrentTransactions/update')
 // @Header('Authorization') authorization: string,
-// @BodyProp() recurrenttransactions: []) 
+// @BodyProp() recurrenttransactions: [])
 export const updateRecurrentTransactions = async (
   event: APIGatewayProxyEvent,
   context: Context,
@@ -252,7 +252,7 @@ export const updateRecurrentTransactions = async (
 
   const recurrentArray: Array<any> = params.recurrenttransactions;
 
-  const recurrenttransactions = recurrentArray.map(el => {
+  const recurrenttransactions = recurrentArray.map((el) => {
     let ret = new RecurrentTransaction(el.AccountId, [], el.IsExpense, el.CounterPartName, el.Id);
     ret.isConfirmed = el.IsConfirmed;
     ret.frequency = el.Frequency;
@@ -269,12 +269,12 @@ export const updateRecurrentTransactions = async (
   user.isRecurrentTransactionConfirmed = true;
 
   return users
-  .save(user)
-  .then(() => CreateResponse(200, { message: "success" }))
-  .catch(err => {
-    logger.log("error", "error importing connection", { cause: err });
-    return CreateSimpleResponse(500, "error updating the user");
-  });
+    .save(user)
+    .then(() => CreateResponse(200, { message: "success" }))
+    .catch((err) => {
+      logger.log("error", "error importing connection", { cause: err });
+      return CreateSimpleResponse(500, "error updating the user");
+    });
 };
 
 export const deduceRecurrentTransactions = async (
@@ -284,91 +284,21 @@ export const deduceRecurrentTransactions = async (
 ): Promise<any> => {
   let ibanGroupedTransactions: Transaction[][] = await transactions.groupByIban(accountId);
   let deducedRecurrent: RecurrentTransaction[][] = ibanGroupedTransactions
-    .map(ibanGroupedTransaction =>
+    .map((ibanGroupedTransaction) =>
       Algorithm.GetRecurrentTransaction(ibanGroupedTransaction).map(
-        res =>
+        (res) =>
           new RecurrentTransaction(
             accountId,
-            res.map(el => el.id),
+            res.map((el) => el.id),
             res[0].isExpense,
             res[0].counterPartName == undefined ? null : res[0].counterPartName
           )
       )
     )
-    .filter(deduced => deduced.length > 0);
+    .filter((deduced) => deduced.length > 0);
   for (let i = 0; i < deducedRecurrent.length; ++i) {
     await recurrentTransactions.saveArrayWithoutId(deducedRecurrent[i]);
   }
-};
-
-// @Get('/webForms/{webFormId}')
-// @Param('webId') webId
-// @Header('Authorization') authorization: string
-export const fetchWebFormInfo = async (
-  event: APIGatewayProxyEvent,
-  context: Context,
-  logger: winston.Logger,
-  bankInterface: FinAPI,
-  users: Users.UsersRepository,
-  connections: BankConnections.BankConnectionsRepository,
-  transactions: Transactions.TransactionsRepository,
-  encryptions: Encryptions
-): Promise<APIGatewayProxyResult> => {
-  const pathParameters = event.pathParameters;
-  if (pathParameters === null || !pathParameters.webFormAuth) {
-    return CreateInternalErrorResponse("no webFormAuth");
-  }
-
-  let tokens = pathParameters.webFormAuth.split("-");
-  let webFormId = parseInt(tokens[0]);
-  let userSecret = tokens[1];
-
-  const user = await users.findByWebFormId(webFormId);
-  if (user === null || user.activeWebFormId === null || user.activeWebFormAuth === null) {
-    logger.log("error", "no user found for webId " + webFormId);
-    return CreateInternalErrorResponse("no user found");
-  }
-
-  const authorization = encryptions.DecryptText({
-    iv: user.activeWebFormAuth,
-    cipherText: userSecret
-  });
-
-  let webForm: { serviceResponseBody: string };
-  try {
-    webForm = await bankInterface.fetchWebForm(authorization, webFormId);
-  } catch (err) {
-    logger.log("error", "could not fetch web form with web form id " + webFormId);
-    return CreateInternalErrorResponse("could not fetch web form");
-  }
-
-  if (!webForm.serviceResponseBody) {
-    logger.log("error", "empty body");
-    return CreateInternalErrorResponse("empty body");
-  }
-
-  const body = JSON.parse(webForm.serviceResponseBody);
-  if (!body.accountIds || body.accountIds.length == 0) {
-    logger.log("error", "no accountIds available");
-    return CreateInternalErrorResponse("no accountIds available");
-  }
-
-  const transactionsDataBankSpecific = await bankInterface.getAllTransactions(authorization, body.accountIds);
-
-  const transactionsData = transactionsDataBankSpecific.map(transaction => Transactions.fromFinAPI(transaction));
-
-  const bankConnection = new BankConnection(body.id, body.bankId);
-  bankConnection.bankAccountIds = body.accountIds;
-
-  user.bankConnectionIds.push(body.id);
-
-  // TODO: rollback on failure
-  return Promise.all([users.save(user), connections.save(bankConnection), transactions.saveArray(transactionsData)])
-    .then(() => CreateResponse(200, body))
-    .catch(err => {
-      logger.log("error", "error persisting bank connection data", { cause: err });
-      return CreateInternalErrorResponse("could not persist bank connection data");
-    });
 };
 
 // @Get('/allowance')

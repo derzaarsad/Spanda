@@ -4,7 +4,7 @@ import winston from "winston";
 import axios, { AxiosInstance } from "axios";
 
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { User, Users, VoidTransport, CallbackCrypto, Encryptions } from "dinodime-lib";
+import { User, Users, VoidTransport, Crypto, AesCrypto } from "dinodime-lib";
 
 import { getWebformId } from "../../src/controllers/bank-controller";
 import { CreateFinApiTestInterfaces } from "../test-utility";
@@ -13,7 +13,7 @@ import { Pool } from "pg";
 import format from "pg-format";
 import { UsersSchema } from "dinodime-lib";
 
-describe("integration: get webform id", function() {
+describe("integration: get webform id", function () {
   this.timeout(10000); // Selenium browser takes so much time.
 
   let logger: winston.Logger;
@@ -29,21 +29,18 @@ describe("integration: get webform id", function() {
   expect(process.env.FinAPIClientId).to.exist;
   expect(process.env.FinAPIClientSecret).to.exist;
 
-  let dummyInterfaces = CreateFinApiTestInterfaces(
-    process.env.FinAPIClientId!,
-    process.env.FinAPIClientSecret!
-  );
-  let encryptions: Encryptions;
+  let dummyInterfaces = CreateFinApiTestInterfaces(process.env.FinAPIClientId!, process.env.FinAPIClientSecret!);
+  let encryptions: Crypto;
 
-  this.beforeAll(async function() {
+  this.beforeAll(async function () {
     http = axios.create({
       baseURL: "https://sandbox.finapi.io",
       timeout: 3000,
-      headers: { Accept: "application/json" }
+      headers: { Accept: "application/json" },
     });
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     testUsername = process.env.AZURE_TEST_USER_LOGIN!;
     testPassword = process.env.AZURE_TEST_USER_LOGIN!;
     testValidEmail = "chapu@chapu.com";
@@ -52,12 +49,12 @@ describe("integration: get webform id", function() {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
     users = new Users.PostgreSQLRepository(new Pool(), format, new UsersSchema());
-    encryptions = new CallbackCrypto();
+    encryptions = new AesCrypto("006f1eb8e2z4a46xyz7fda7843628fa4");
 
     context = {} as Context;
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await users.deleteAll();
   });
 
@@ -66,20 +63,13 @@ describe("integration: get webform id", function() {
 
     const event = ({
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
 
-      body: JSON.stringify({ bankId: 277672 })
+      body: JSON.stringify({ bankId: 277672 }),
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await getWebformId(
-      event,
-      context,
-      logger,
-      dummyInterfaces.bankInterface,
-      users,
-      encryptions
-    );
+    const result = await getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(401);
@@ -95,20 +85,13 @@ describe("integration: get webform id", function() {
     const event = ({
       headers: {
         Authorization: authorization.token_type + " " + authorization.access_token,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
 
-      body: JSON.stringify({ bankId: 277672 })
+      body: JSON.stringify({ bankId: 277672 }),
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await getWebformId(
-      event,
-      context,
-      logger,
-      dummyInterfaces.bankInterface,
-      users,
-      encryptions
-    );
+    const result = await getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(401);
@@ -124,38 +107,31 @@ describe("integration: get webform id", function() {
     const failingUsers = ({
       findById: async (id: string) => {
         return {
-          username: testUsername
+          username: testUsername,
         };
       },
 
       save: async (user: User) => {
         throw "nada";
-      }
+      },
     } as unknown) as Users.UsersRepository;
 
     const event = ({
       headers: {
         Authorization: authorization.token_type + " " + authorization.access_token,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
 
-      body: JSON.stringify({ bankId: 277672 })
+      body: JSON.stringify({ bankId: 277672 }),
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await getWebformId(
-      event,
-      context,
-      logger,
-      dummyInterfaces.bankInterface,
-      failingUsers,
-      encryptions
-    );
+    const result = await getWebformId(event, context, logger, dummyInterfaces.bankInterface, failingUsers, encryptions);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(500);
   });
 
-  it("return webform location", async function() {
+  it("return webform location", async function () {
     users.save(new User(testUsername, testValidEmail, testValidPhone, false));
     const authorization = await dummyInterfaces.authentication.getPasswordToken(
       dummyInterfaces.clientSecrets,
@@ -166,20 +142,13 @@ describe("integration: get webform id", function() {
     const event = ({
       headers: {
         Authorization: authorization.token_type + " " + authorization.access_token,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
 
-      body: JSON.stringify({ bankId: 277672 })
+      body: JSON.stringify({ bankId: 277672 }),
     } as unknown) as APIGatewayProxyEvent;
 
-    const result = await getWebformId(
-      event,
-      context,
-      logger,
-      dummyInterfaces.bankInterface,
-      users,
-      encryptions
-    );
+    const result = await getWebformId(event, context, logger, dummyInterfaces.bankInterface, users, encryptions);
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(200);
@@ -204,7 +173,7 @@ describe("integration: get webform id", function() {
       decoupledCallback: false,
       msaHash: null,
       msaChallengeResponse: null,
-      sepaRequestChallengeResponse: null
+      sepaRequestChallengeResponse: null,
     });
 
     //expect(JSON.parse(result.body).location).to.equal('testlocation');
@@ -219,8 +188,6 @@ describe("integration: get webform id", function() {
     // this test proves whether the right data is written to database
     let user = await users.findByWebFormId(formId);
     //expect(formId).to.equal(user.activeWebFormId);
-    expect(
-      encryptions.DecryptText({ iv: user!.activeWebFormAuth!, cipherText: encryptedAuth })
-    ).to.equal(event.headers.Authorization);
+    expect(encryptions.decrypt(encryptedAuth)).to.equal(event.headers.Authorization);
   });
 });

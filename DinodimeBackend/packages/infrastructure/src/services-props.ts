@@ -22,7 +22,8 @@ export const lambdaEnvironment = (props: ServicesProps): { [key: string]: string
     FINAPI_URL: props.finApiProps.finApiUrl,
     FINAPI_CLIENT_ID: props.finApiProps.finApiClientId,
     FINAPI_CLIENT_SECRET: props.finApiProps.finApiClientSecret,
-    FINAPI_TIMEOUT: props.finApiProps.finApiTimeout?.toString() || "3000"
+    FINAPI_DECRYPTION_KEY: props.finApiProps.finApiDecryptionKey,
+    FINAPI_TIMEOUT: props.finApiProps.finApiTimeout?.toString() || "3000",
   };
 
   if (props.backendConfiguration.storageBackend === "POSTGRESQL") {

@@ -3,35 +3,26 @@ export { VoidTransport };
 
 export { Status, Success, Failure } from "./status";
 
-export { Crypto, Encryptions, AesCrypto, CallbackCrypto } from "./crypto";
+export { Crypto, Encryptions, AesCrypto, CallbackCrypto, EncryptedData } from "./crypto";
 
 export { SNSNotification } from "./sns-notification";
 
 export { WebFormCompletion } from "./web-form-completion";
 
-export {
-  NotificationDecoder,
-  NewTransactionsDecryptor,
-  NewTransactionsEncryptor
-} from "./notification-decoder";
+export { NotificationDecoder, NewTransactionsDecryptor, NewTransactionsEncryptor } from "./notification-decoder";
 
 export { ClientSecretsProvider, Resolved, FromSSM } from "./client-secrets";
 
 export { Authentication, Basic, Token } from "./authentication";
 
-export {
-  RuleHandle,
-  RuleHandleFactory,
-  BasicRuleHandleFactory,
-  UUIDRuleHandleFactory
-} from "./rule-handle";
+export { RuleHandle, RuleHandleFactory, BasicRuleHandleFactory, UUIDRuleHandleFactory } from "./rule-handle";
 
 export { RuleHandleRepository, DynamoDBRuleHandleRepository } from "./rule-handle-repository";
 
 export {
   Notification,
   EncryptedNewTransactionsNotification,
-  DecryptedNewTransactionsNotification
+  DecryptedNewTransactionsNotification,
 } from "./finapi-notifications";
 
 export { SNSPublisher, AWSSNSPublisher, MockSNSPublisher } from "./sns-publisher";
@@ -43,11 +34,7 @@ export { NotificationCallback, NewTransactionsSNSPublisher } from "./notificatio
 export { User, Users } from "./users";
 export { BankConnection, BankConnections } from "./bank-connections";
 export { Transaction, Transactions } from "./transactions";
-export {
-  RecurrentTransaction,
-  RecurrentTransactions,
-  TransactionFrequency
-} from "./recurrent-transactions";
+export { RecurrentTransaction, RecurrentTransactions, TransactionFrequency } from "./recurrent-transactions";
 
 export { Algorithm } from "./algorithm";
 
