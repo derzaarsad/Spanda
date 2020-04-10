@@ -2,6 +2,7 @@ import * as cdk from "@aws-cdk/core";
 import * as iam from "@aws-cdk/aws-iam";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as lambda from "@aws-cdk/aws-lambda";
+import { Tracing } from "@aws-cdk/aws-lambda";
 
 /**
  * Configuration interface for services stacks deploying lambda functions.
@@ -32,11 +33,11 @@ export class LambdaPermissionProps {
   }
 
   applyToRole(role: iam.Role) {
-    this.managedPolicies.forEach(managedPolicy => {
+    this.managedPolicies.forEach((managedPolicy) => {
       role.addManagedPolicy(managedPolicy);
     });
 
-    this.policyStatements.forEach(policyStatement => {
+    this.policyStatements.forEach((policyStatement) => {
       role.addToPolicy(policyStatement);
     });
   }
@@ -58,6 +59,7 @@ interface LambdaFactoryProps {
   runtime: lambda.Runtime;
   duration: cdk.Duration;
   executionRole: iam.Role;
+  withTracing?: boolean;
   env?: { [key: string]: string };
 }
 
@@ -72,6 +74,7 @@ export class LambdaFactory {
   duration: cdk.Duration;
   env: { [key: string]: string };
   executionRole: iam.Role;
+  withTracing: boolean;
 
   constructor(props: LambdaFactoryProps) {
     this.scope = props.scope;
@@ -81,6 +84,7 @@ export class LambdaFactory {
     this.duration = props.duration;
     this.env = props.env ? props.env : {};
     this.executionRole = props.executionRole;
+    this.withTracing = props.withTracing ? props.withTracing : false;
 
     if (this.permissionProps) {
       this.permissionProps.applyToRole(this.executionRole);
@@ -97,7 +101,8 @@ export class LambdaFactory {
       securityGroups: this.deploymentProps ? this.deploymentProps.securityGroups : undefined,
       vpc: this.deploymentProps ? this.deploymentProps.vpc : undefined,
       vpcSubnets: this.deploymentProps ? this.deploymentProps.subnets : undefined,
-      role: this.executionRole
+      role: this.executionRole,
+      tracing: this.withTracing ? Tracing.ACTIVE : Tracing.DISABLED,
     });
 
     return fn;
