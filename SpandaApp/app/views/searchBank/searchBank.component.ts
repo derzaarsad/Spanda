@@ -21,6 +21,7 @@ export class SearchBankComponent implements OnInit {
     private SearchedBlz: string = "";
     private bank: Bank;
     private enableBank: boolean = false;
+    private enableWebView: boolean = false;
     private webViewSrc = "";
 
     constructor(
@@ -55,7 +56,6 @@ export class SearchBankComponent implements OnInit {
 
         this.bankService.getBankByBLZ(this.SearchedBlz).then((bank) => {
             this.bank = bank;
-            this.webViewSrc = "https://docs.nativescript.org/";
             this.enableBank = true;
         }).catch(()=>{
             this.alert("Bank not found!");
@@ -67,7 +67,8 @@ export class SearchBankComponent implements OnInit {
             if(!res) {
                 return;
             }
-            utils.openUrl(res + "&redirectUrl=" + "invalid");
+            this.webViewSrc = res.toString();
+            this.enableWebView = true;
         });
     }
 
