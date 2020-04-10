@@ -53,6 +53,8 @@ export class WebFormCallbackAPI extends cdk.Construct {
       assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
     });
 
+    completionsQueue.grantSendMessages(callbackRole);
+
     const lambdaFactory = new LambdaFactory({
       scope: this,
       runtime: lambda.Runtime.NODEJS_12_X,
@@ -61,6 +63,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
       permissionProps: props.lambdaPermissionProps,
       executionRole: callbackRole,
       env: env,
+      withTracing: true,
     });
 
     const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-webform-callback"));
@@ -86,6 +89,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
       permissionProps: props.lambdaPermissionProps,
       executionRole: processingRole,
       env: env,
+      withTracing: true,
     });
 
     const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-fetch-webform"));

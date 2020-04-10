@@ -68,7 +68,7 @@ export const webformCallback = async (
       if (status.kind === "success") {
         log.info(`Successfully sent message ${status.result} to queue`, status);
       } else {
-        log.error("Could not send message message to queue", status.error);
+        log.error("Could not send message message to queue: ", status.error);
       }
       return response;
     })
