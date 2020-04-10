@@ -1,5 +1,5 @@
 import { AllowanceComponent } from "./views/allowance/allowance.component";
-import { SearchBankComponent } from "./views/searchBank/searchBank.component";
+import { RecurrentTransactionComponent } from "./views/recurrentTransaction/recurrentTransaction.component";
 import { AuthGuard } from "./services/auth-guard.service";
 import { NgModule } from "@angular/core";
 import { Routes } from "@angular/router";
@@ -15,7 +15,7 @@ const routes: Routes = [
 
 export const navigatableComponents: any = [
     AllowanceComponent,
-    SearchBankComponent
+    RecurrentTransactionComponent
 ];
 
 @NgModule({
