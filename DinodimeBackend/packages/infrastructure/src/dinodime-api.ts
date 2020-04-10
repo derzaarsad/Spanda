@@ -16,7 +16,8 @@ const configureEnvironment = (servicesProps: ServicesProps): { [key: string]: st
     FINAPI_URL: servicesProps.finApiProps.finApiUrl,
     FINAPI_CLIENT_ID: servicesProps.finApiProps.finApiClientId,
     FINAPI_CLIENT_SECRET: servicesProps.finApiProps.finApiClientSecret,
-    FINAPI_TIMEOUT: servicesProps.finApiProps.finApiTimeout?.toString() || "3000"
+    FINAPI_TIMEOUT: servicesProps.finApiProps.finApiTimeout?.toString() || "3000",
+    FIREBASE_SERVER_KEY: servicesProps.firebaseProps.firebaseServerKey
   };
 
   if (servicesProps.backendConfiguration.storageBackend === "POSTGRESQL") {
