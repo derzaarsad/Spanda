@@ -1,10 +1,10 @@
 <FlexboxLayout class="page">
 <StackLayout class="form">
     <Button text="Back to Allowance" (tap)="onBack()" ></Button>
-    <Label text="Search a Bank" class="label"></Label>
-    <TextField class="input" [(ngModel)]="SearchedBlz" hint="Enter a BLZ..."></TextField>
-    <Button text="Search" (tap)="onSearch()" ></Button>
-    <Button [text]="'Add ' + bank.Name" (tap)="onAddAccount()" *ngIf="enableBank" ></Button>
+    <Label *ngIf="!enableWebView" text="Search a Bank" class="label"></Label>
+    <TextField *ngIf="!enableWebView" class="input" [(ngModel)]="SearchedBlz" hint="Enter a BLZ..."></TextField>
+    <Button *ngIf="!enableWebView" text="Search" (tap)="onSearch()" ></Button>
+    <Button [text]="'Add ' + bank.Name" (tap)="onAddAccount()" *ngIf="(enableBank && (!enableWebView))" ></Button>
     <WebView *ngIf="enableWebView" [src]="webViewSrc"
          (loadStarted)="onLoadStarted($event)"
          (loadFinished)="onLoadFinished($event)">
