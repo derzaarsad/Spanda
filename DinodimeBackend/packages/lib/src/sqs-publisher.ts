@@ -9,7 +9,7 @@ export interface PublishInput {
  * An SQS publisher.
  */
 export interface SQSPublisher {
-  publish(input: PublishInput): Promise<Status>;
+  publish(input: PublishInput): Promise<Status<String>>;
 }
 
 /**
@@ -24,25 +24,26 @@ export class AWSSQSPublisher implements SQSPublisher {
     this.queueUrl = queueUrl;
   }
 
-  async publish(input: PublishInput): Promise<Status> {
+  async publish(input: PublishInput): Promise<Status<String>> {
     const sendMessageRequest: SQS.Types.SendMessageRequest = {
       QueueUrl: this.queueUrl,
-      MessageBody: JSON.stringify(input.messageBody)
+      MessageBody: JSON.stringify(input.messageBody),
     };
 
     return this.sqs
       .sendMessage(sendMessageRequest)
       .promise()
-      .then(() => {
-        const status: Success = {
-          kind: "success"
+      .then((result) => {
+        const status: Success<String> = {
+          kind: "success",
+          result: result.MessageId ? result.MessageId : "",
         };
         return status;
       })
-      .catch(err => {
+      .catch((err) => {
         const status: Failure = {
           kind: "failure",
-          error: err
+          error: err,
         };
         return status;
       });
@@ -56,8 +57,8 @@ export class MockSQSPublisher implements SQSPublisher {
     this.publishedData = [];
   }
 
-  async publish(input: PublishInput): Promise<Status> {
+  async publish(input: PublishInput): Promise<Status<String>> {
     this.publishedData.push(input);
-    return { kind: "success" };
+    return { kind: "success", result: this.publishedData.length.toString() };
   }
 }

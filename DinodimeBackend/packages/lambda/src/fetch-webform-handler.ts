@@ -9,7 +9,7 @@ import {
   FinAPI,
   WebFormCompletion,
   BankConnection,
-  SQSClient
+  SQSClient,
 } from "dinodime-lib";
 
 export interface HandlerConfiguration {
@@ -34,10 +34,10 @@ export const fetchWebForm = async (event: SQSEvent, context: Context, configurat
     const record = records[i];
 
     await handleRecord(record, context, configuration)
-      .then(status => {
+      .then((status) => {
         handleStatus(record, status, configuration);
       })
-      .catch(err => {
+      .catch((err) => {
         log.error("Could not extract transactions data", err);
       });
   }
@@ -47,7 +47,7 @@ export const handleRecord = async (
   record: SQSRecord,
   context: Context,
   configuration: HandlerConfiguration
-): Promise<Status> => {
+): Promise<Status<String>> => {
   const users = configuration.users;
   const bankInterface = configuration.bankInterface;
   const transactions = configuration.transactions;
@@ -68,7 +68,7 @@ export const handleRecord = async (
 
   const authorization = encryptions.DecryptText({
     iv: user.activeWebFormAuth,
-    cipherText: completion.userSecret
+    cipherText: completion.userSecret,
   });
 
   let webForm: { serviceResponseBody: string };
@@ -89,7 +89,7 @@ export const handleRecord = async (
 
   const transactionsDataBankSpecific = await bankInterface.getAllTransactions(authorization, body.accountIds);
 
-  const transactionsData = transactionsDataBankSpecific.map(transaction => Transactions.fromFinAPI(transaction));
+  const transactionsData = transactionsDataBankSpecific.map((transaction) => Transactions.fromFinAPI(transaction));
 
   const bankConnection = new BankConnection(body.id, body.bankId);
   bankConnection.bankAccountIds = body.accountIds;
@@ -99,16 +99,16 @@ export const handleRecord = async (
   // TODO: rollback on failure
   return Promise.all([users.save(user), connections.save(bankConnection), transactions.saveArray(transactionsData)])
     .then(() => {
-      const status: Success = { kind: "success" };
+      const status: Success<String> = { kind: "success", result: record.messageId };
       return status;
     })
-    .catch(err => {
+    .catch((err) => {
       const status: Failure = { kind: "failure", error: err };
       return status;
     });
 };
 
-const handleStatus = async (record: SQSRecord, status: Status, configuration: HandlerConfiguration) => {
+const handleStatus = async (record: SQSRecord, status: Status<String>, configuration: HandlerConfiguration) => {
   const log = configuration.log;
   if (status.kind === "failure") {
     log.error("Could not extract transactions data", status.error);
@@ -121,7 +121,7 @@ const handleStatus = async (record: SQSRecord, status: Status, configuration: Ha
     .then(() => {
       log.debug(`Deleted message with receipt handle ${receiptHandle} successfully`);
     })
-    .catch(err => {
+    .catch((err) => {
       log.error(`Error deleting SQS record with receipt handle ${receiptHandle}`, err);
     });
 };

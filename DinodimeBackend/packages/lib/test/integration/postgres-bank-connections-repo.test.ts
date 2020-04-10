@@ -8,24 +8,24 @@ import { BankConnection } from "../../src/bank-connections";
 import { BankConnections } from "../../src/bank-connections";
 import { BankConnectionsSchema } from "../../src/schema/bank-connections";
 
-describe("integration: postgres bank connections repository", function() {
+describe("integration: postgres bank connections repository", function () {
   let connections: BankConnections.PostgreSQLRepository;
 
-  before(function() {
+  before(function () {
     const schema = new BankConnectionsSchema();
     connections = new BankConnections.PostgreSQLRepository(new Pool(), format, schema);
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await connections.deleteAll();
   });
 
-  it("returns null when connection not found", async function() {
+  it("returns null when connection not found", async function () {
     const result = await connections.findById(1);
     expect(result).to.be.null;
   });
 
-  it("saves and retrieves a bank connection", async function() {
+  it("saves and retrieves a bank connection", async function () {
     const connection = new BankConnection(1, 666);
     await connections.save(connection);
 
@@ -33,7 +33,7 @@ describe("integration: postgres bank connections repository", function() {
     expect(result).to.eql(connection);
   });
 
-  it("saves and retrieves a connection with bank account ids", async function() {
+  it("saves and retrieves a connection with bank account ids", async function () {
     const connection = new BankConnection(2, 69);
     connection.bankAccountIds.push(1);
     connection.bankAccountIds.push(2);
@@ -43,7 +43,7 @@ describe("integration: postgres bank connections repository", function() {
     expect(result).to.eql(connection);
   });
 
-  it("deletes a single connection", async function() {
+  it("deletes a single connection", async function () {
     const connection = new BankConnection(2, 69);
     await connections.save(connection);
 
@@ -56,7 +56,7 @@ describe("integration: postgres bank connections repository", function() {
     expect(afterDelete).to.be.null;
   });
 
-  it("find by ids", async function() {
+  it("find by ids", async function () {
     await connections.save(new BankConnection(22, 69));
     await connections.save(new BankConnection(23, 70));
     await connections.save(new BankConnection(24, 71));
@@ -72,7 +72,16 @@ describe("integration: postgres bank connections repository", function() {
     expect(result[2].bankId).to.equal(71);
   });
 
-  it("overwrites an existing bank connection on save", async function() {
+  it("find by ids with no ids", async function () {
+    await connections.save(new BankConnection(22, 69));
+    await connections.save(new BankConnection(23, 70));
+    await connections.save(new BankConnection(24, 71));
+
+    const result = await connections.findByIds([]);
+    expect(result.length).to.equal(0);
+  });
+
+  it("overwrites an existing bank connection on save", async function () {
     const connection = new BankConnection(2, 69);
     connection.bankAccountIds.push(1);
 

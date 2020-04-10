@@ -1,6 +1,6 @@
 import winston from "winston";
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from "aws-lambda";
-import { Users, WebFormCompletion, SQSPublisher } from "dinodime-lib";
+import { Users, WebFormCompletion, SQSPublisher, Status } from "dinodime-lib";
 import { CreateSimpleResponse } from "./lambda-util";
 
 // Since this can be called by anyone, we don't reveal anything in the response
@@ -55,20 +55,24 @@ export const webformCallback = async (
 
   const messageBody: WebFormCompletion = {
     webFormId: webFormId,
-    userSecret: userSecret
+    userSecret: userSecret,
   };
 
   const sendMessageRequest = {
-    messageBody: messageBody
+    messageBody: messageBody,
   };
 
   return sqs
     .publish(sendMessageRequest)
-    .then(() => {
-      log.info("Successfully sent message to topic");
+    .then((status: Status<String>) => {
+      if (status.kind === "success") {
+        log.info(`Successfully sent message ${status.result} to queue`, status);
+      } else {
+        log.error("Could not send message message to queue", status.error);
+      }
       return response;
     })
-    .catch(err => {
+    .catch((err) => {
       log.error("Error sending message to topic", err);
       return response;
     });

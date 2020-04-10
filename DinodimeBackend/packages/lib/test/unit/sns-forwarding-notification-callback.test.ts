@@ -61,20 +61,20 @@ describe("unit: SNS forwarding notification callback", () => {
                   amount: 200,
                   counterpartName: "your uncle",
                   purpose: "cash",
-                  isAdjustingEntry: false
-                }
-              ]
+                  isAdjustingEntry: false,
+                },
+              ],
             })
-          )
-        }
-      ]
+          ),
+        },
+      ],
     };
 
     const callback = new NewTransactionsSNSPublisher(decoder, handles, sns, "topic", logger);
     const status = await callback.accept(notification);
     const publishMessageInput = sns.publishedData.pop()!;
 
-    expect(status).to.eql({ kind: "success" });
+    expect(status.kind).to.eql("success");
 
     const body = publishMessageInput.message;
     expect(body).to.haveOwnProperty("newTransactions");
@@ -90,7 +90,7 @@ describe("unit: SNS forwarding notification callback", () => {
       notificationRuleId: 1,
       triggerEvent: "NEW_TRANSACTIONS",
       callbackHandle: handle.id,
-      newTransactions: []
+      newTransactions: [],
     };
 
     const callback = new NewTransactionsSNSPublisher(decoder, handles, sns, "topic", logger);

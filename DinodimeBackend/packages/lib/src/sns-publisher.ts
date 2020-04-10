@@ -19,7 +19,7 @@ export class PublishInput {
   messageEnvelope(): string {
     const messageBody = JSON.stringify(this.message);
     const messageEnvelope = JSON.stringify({
-      default: messageBody
+      default: messageBody,
     });
     return messageEnvelope;
   }
@@ -29,7 +29,7 @@ export class PublishInput {
  * Publishes json-formatted messages on an SNS topic.
  */
 export interface SNSPublisher {
-  publish(input: PublishInput): Promise<Status>;
+  publish(input: PublishInput): Promise<Status<String>>;
 }
 
 /**
@@ -42,27 +42,28 @@ export class AWSSNSPublisher implements SNSPublisher {
     this.sns = sns;
   }
 
-  async publish(input: PublishInput): Promise<Status> {
+  async publish(input: PublishInput): Promise<Status<String>> {
     const params: SNS.PublishInput = {
       TopicArn: input.topicArn,
       MessageStructure: "json",
       Message: input.messageEnvelope(),
-      MessageAttributes: input.messageAttributes
+      MessageAttributes: input.messageAttributes,
     };
 
     return this.sns
       .publish(params)
       .promise()
-      .then(() => {
-        const status: Success = {
-          kind: "success"
+      .then((result) => {
+        const status: Success<String> = {
+          kind: "success",
+          result: result.MessageId ? result.MessageId : "",
         };
         return status;
       })
       .catch((err: any) => {
         const status: Failure = {
           kind: "failure",
-          error: err
+          error: err,
         };
         return status;
       });
@@ -76,8 +77,8 @@ export class MockSNSPublisher implements SNSPublisher {
     this.publishedData = [];
   }
 
-  async publish(input: PublishInput): Promise<Status> {
+  async publish(input: PublishInput): Promise<Status<String>> {
     this.publishedData.push(input);
-    return { kind: "success" };
+    return { kind: "success", result: this.publishedData.length.toString() };
   }
 }

@@ -2,7 +2,7 @@ import SQS, { DeleteMessageRequest } from "aws-sdk/clients/sqs";
 import { Status, Failure, Success } from "./status";
 
 export interface SQSClient {
-  deleteMessage(receiptHandle: string): Promise<Status>;
+  deleteMessage(receiptHandle: string): Promise<Status<String>>;
 }
 
 export class MockSQSClient implements SQSClient {
@@ -12,9 +12,9 @@ export class MockSQSClient implements SQSClient {
     this.deletions = [];
   }
 
-  async deleteMessage(receiptHandle: string): Promise<Status> {
+  async deleteMessage(receiptHandle: string): Promise<Status<String>> {
     this.deletions.push(receiptHandle);
-    return { kind: "success" };
+    return { kind: "success", result: receiptHandle };
   }
 }
 
@@ -27,20 +27,20 @@ export class AWSSQSClient implements SQSClient {
     this.queueUrl = queueUrl;
   }
 
-  async deleteMessage(receiptHandle: string): Promise<Status> {
+  async deleteMessage(receiptHandle: string): Promise<Status<String>> {
     const deletionRequest: DeleteMessageRequest = {
       QueueUrl: this.queueUrl,
-      ReceiptHandle: receiptHandle
+      ReceiptHandle: receiptHandle,
     };
 
     return this.sqs
       .deleteMessage(deletionRequest)
       .promise()
-      .then(() => {
-        const status: Success = { kind: "success" };
+      .then((result) => {
+        const status: Success<String> = { kind: "success", result: receiptHandle };
         return status;
       })
-      .catch(err => {
+      .catch((err) => {
         const status: Failure = { kind: "failure", error: err };
         return status;
       });

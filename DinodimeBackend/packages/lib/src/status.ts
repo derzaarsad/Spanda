@@ -1,5 +1,6 @@
-export type Success = {
+export type Success<T> = {
   kind: "success";
+  result: T;
 };
 
 export type Failure = {
@@ -7,4 +8,4 @@ export type Failure = {
   error: Error;
 };
 
-export type Status = Success | Failure;
+export type Status<T> = Success<T> | Failure;
