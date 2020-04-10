@@ -49,12 +49,11 @@ export namespace Users {
     }
 
     async findByIds(usernames: Array<string>): Promise<Array<User>> {
-
       let candidate: Array<User> = [];
 
       for (let i in usernames) {
         const username = this.repository[usernames[i]];
-        if(!username) {
+        if (!username) {
           continue;
         }
 
@@ -104,16 +103,16 @@ export namespace Users {
       const params = {
         Key: {
           username: {
-            S: username
-          }
+            S: username,
+          },
         },
-        TableName: this.tableName
+        TableName: this.tableName,
       };
 
       return this.client
         .getItem(params)
         .promise()
-        .then(data => {
+        .then((data) => {
           if (data.Item) {
             return this.decodeUser(data.Item);
           } else {
@@ -163,7 +162,7 @@ export namespace Users {
         isAutoUpdateEnabled: data["isAutoUpdateEnabled"]!["BOOL"]!,
         activeWebFormAuth: activeWebFormId !== undefined ? activeWebFormAuth["S"]! : null,
         activeWebFormId: activeWebFormAuth !== undefined ? parseInt(activeWebFormId["N"]!) : null,
-        bankConnectionIds: bankConnectionIds !== undefined ? bankConnectionIds["NS"]!.map(id => parseInt(id)) : []
+        bankConnectionIds: bankConnectionIds !== undefined ? bankConnectionIds["NS"]!.map((id) => parseInt(id)) : [],
       };
 
       return user;
@@ -177,11 +176,11 @@ export namespace Users {
         email: { S: user.email },
         phone: { S: user.phone },
         isAutoUpdateEnabled: { BOOL: user.isAutoUpdateEnabled },
-        creationDate: { N: user.creationDate.valueOf().toString() }
+        creationDate: { N: user.creationDate.valueOf().toString() },
       };
 
       if (user.bankConnectionIds.length > 0) {
-        values["bankConnectionIds"] = { NS: user.bankConnectionIds.map(id => id.toString()) };
+        values["bankConnectionIds"] = { NS: user.bankConnectionIds.map((id) => id.toString()) };
       }
 
       if (user.activeWebFormAuth) {
@@ -195,7 +194,7 @@ export namespace Users {
       return {
         Item: values,
         ReturnConsumedCapacity: returnConsumedCapacity,
-        TableName: this.tableName
+        TableName: this.tableName,
       };
     }
   }
@@ -210,11 +209,10 @@ export namespace Users {
     }
 
     findByIdsQuery(userNames: Array<string>) {
-      return this.format(
-        "SELECT * FROM %I WHERE username in (%L)",
-        this.schema.tableName,
-        userNames
-      );
+      if (userNames.length === 0) {
+        throw new Error("illegal argument: cannot pass an empty ids array");
+      }
+      return this.format("SELECT * FROM %I WHERE username in (%L)", this.schema.tableName, userNames);
     }
 
     findByWebFormIdQuery(activeWebFormId: number) {
@@ -254,39 +252,44 @@ export namespace Users {
     async findById(username: string) {
       const params = {
         text: this.findByIdQuery(username),
-        rowMode: "array"
+        rowMode: "array",
       };
 
-      return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
+      return this.doQuery(params).then((res) => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async findByIds(usernames: Array<string>): Promise<Array<User>> {
+      if (usernames.length === 0) {
+        return [];
+      }
+
       const params = {
         text: this.findByIdsQuery(usernames),
         rowMode: "array",
-        types: this.types
+        types: this.types,
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? res.rows
-        .map(row => {
-          return this.schema.asObject(row)
-        }) : []
+      return this.doQuery(params).then((res) =>
+        res.rowCount > 0
+          ? res.rows.map((row) => {
+              return this.schema.asObject(row);
+            })
+          : []
       );
     }
 
     async findByWebFormId(activeWebFormId: number) {
       const params = {
         text: this.findByWebFormIdQuery(activeWebFormId),
-        rowMode: "array"
+        rowMode: "array",
       };
 
-      return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
+      return this.doQuery(params).then((res) => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async save(user: User) {
       const params = {
-        text: this.saveQuery(user)
+        text: this.saveQuery(user),
       };
 
       return this.doQuery(params).then(() => user);
@@ -294,7 +297,7 @@ export namespace Users {
 
     async delete(user: User) {
       const params = {
-        text: this.deleteQuery(user.username)
+        text: this.deleteQuery(user.username),
       };
 
       return this.doQuery(params).then(() => undefined);
@@ -302,7 +305,7 @@ export namespace Users {
 
     async deleteAll() {
       const params = {
-        text: this.deleteAllQuery()
+        text: this.deleteAllQuery(),
       };
 
       await this.doQuery(params);

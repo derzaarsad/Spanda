@@ -6,7 +6,7 @@ export enum TransactionFrequency {
   Unknown = "Unknown",
   Monthly = "Monthly",
   Quarterly = "Quarterly",
-  Yearly = "Yearly"
+  Yearly = "Yearly",
 }
 
 export class RecurrentTransaction {
@@ -66,17 +66,17 @@ export namespace RecurrentTransactions {
     }
 
     async saveArray(recurrentTransactions: Array<RecurrentTransaction>) {
-      recurrentTransactions.forEach(recurrentTransaction => this.save(recurrentTransaction));
+      recurrentTransactions.forEach((recurrentTransaction) => this.save(recurrentTransaction));
       return recurrentTransactions;
     }
 
     async saveArrayWithoutId(recurrentTransactions: Array<RecurrentTransaction>) {
-      recurrentTransactions.forEach(recurrentTransaction => this.saveWithoutId(recurrentTransaction));
+      recurrentTransactions.forEach((recurrentTransaction) => this.saveWithoutId(recurrentTransaction));
       return recurrentTransactions;
     }
 
     async updateArray(recurrentTransactions: Array<RecurrentTransaction>) {
-      recurrentTransactions.forEach(recurrentTransaction => {
+      recurrentTransactions.forEach((recurrentTransaction) => {
         this.repository[recurrentTransaction.id].isConfirmed = recurrentTransaction.isConfirmed;
         this.repository[recurrentTransaction.id].frequency = recurrentTransaction.frequency;
       });
@@ -85,11 +85,11 @@ export namespace RecurrentTransactions {
 
     async findByAccountIds(accountIds: Array<number>) {
       return Object.keys(this.repository)
-        .filter(index => {
+        .filter((index) => {
           const key = parseInt(index);
           return accountIds.includes(this.repository[key].accountId);
         })
-        .map(index => {
+        .map((index) => {
           const key = parseInt(index);
           return this.repository[key];
         });
@@ -147,16 +147,16 @@ export namespace RecurrentTransactions {
 
     async save(recurrentTransaction: RecurrentTransaction): Promise<RecurrentTransaction> {
       const params = {
-        text: this.saveQuery(recurrentTransaction)
+        text: this.saveQuery(recurrentTransaction),
       };
       return this.doQuery(params).then(() => recurrentTransaction);
     }
 
     async saveWithoutId(tx: RecurrentTransaction): Promise<RecurrentTransaction> {
       const params = {
-        text: this.saveWithoutIdQuery(tx)
+        text: this.saveWithoutIdQuery(tx),
       };
-      return this.doQuery(params).then(res => {
+      return this.doQuery(params).then((res) => {
         return this.cloneRecurrentTransaction(tx, res.rows[0].id as number);
       });
     }
@@ -165,22 +165,26 @@ export namespace RecurrentTransactions {
       const params = {
         text: this.findByIdQuery(id),
         rowMode: "array",
-        types: this.types
+        types: this.types,
       };
 
-      return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
+      return this.doQuery(params).then((res) => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async findByIds(ids: Array<number>): Promise<Array<RecurrentTransaction>> {
+      if (ids.length === 0) {
+        return [];
+      }
+
       const params = {
         text: this.findByIdsQuery(ids),
         rowMode: "array",
-        types: this.types
+        types: this.types,
       };
 
-      return this.doQuery(params).then(res =>
+      return this.doQuery(params).then((res) =>
         res.rowCount > 0
-          ? res.rows.map(row => {
+          ? res.rows.map((row) => {
               return this.schema.asObject(row);
             })
           : []
@@ -195,14 +199,14 @@ export namespace RecurrentTransactions {
 
     async delete(tx: RecurrentTransaction): Promise<void> {
       const params = {
-        text: this.deleteQuery(tx.id)
+        text: this.deleteQuery(tx.id),
       };
       await this.doQuery(params);
     }
 
     async deleteAll(): Promise<void> {
       const params = {
-        text: this.deleteAllQuery()
+        text: this.deleteAllQuery(),
       };
       await this.doQuery(params);
     }
@@ -211,38 +215,38 @@ export namespace RecurrentTransactions {
       const params = {
         text: this.findByAccountIdsQuery(accountIds),
         rowMode: "array",
-        types: this.types
+        types: this.types,
       };
 
-      return this.doQuery(params).then(res => res.rows.map(row => this.schema.asObject(row)));
+      return this.doQuery(params).then((res) => res.rows.map((row) => this.schema.asObject(row)));
     }
 
     async groupByIsExpense(accountId: number): Promise<RecurrentTransaction[][]> {
       const params = {
         text: this.groupByColumnQuery(accountId, 3),
         rowMode: "array",
-        types: this.types
+        types: this.types,
       };
 
-      return this.doQuery(params).then(res =>
-        res.rows.map(row => row[0].map((element: any) => this.schema.mapColumns(element)))
+      return this.doQuery(params).then((res) =>
+        res.rows.map((row) => row[0].map((element: any) => this.schema.mapColumns(element)))
       );
     }
 
     async saveArray(recurrentTransactions: RecurrentTransaction[]): Promise<RecurrentTransaction[]> {
       const params = {
-        text: this.saveArrayQuery(recurrentTransactions)
+        text: this.saveArrayQuery(recurrentTransactions),
       };
 
-      return this.doQuery(params).then(res => recurrentTransactions);
+      return this.doQuery(params).then((res) => recurrentTransactions);
     }
 
     async saveArrayWithoutId(recurrentTransactions: RecurrentTransaction[]): Promise<RecurrentTransaction[]> {
       const params = {
-        text: this.saveArrayWithoutIdQuery(recurrentTransactions)
+        text: this.saveArrayWithoutIdQuery(recurrentTransactions),
       };
 
-      return this.doQuery(params).then(res => {
+      return this.doQuery(params).then((res) => {
         const result = [];
         for (let i = 0; i < res.rowCount; i++) {
           const newIndex = res.rows[i].id as number;
@@ -257,22 +261,22 @@ export namespace RecurrentTransactions {
         return recurrentTransactions;
       }
 
-      const existingTransactions = await this.findByIds(recurrentTransactions.map(tx => tx.id));
+      const existingTransactions = await this.findByIds(recurrentTransactions.map((tx) => tx.id));
 
       if (existingTransactions.length !== recurrentTransactions.length) {
         throw new Error("Cannot perform update. Some transactions don't exist.");
       }
 
       const params = {
-        text: this.updateArrayQuery(recurrentTransactions)
+        text: this.updateArrayQuery(recurrentTransactions),
       };
 
-      return this.doQuery(params).then(res => recurrentTransactions);
+      return this.doQuery(params).then((res) => recurrentTransactions);
     }
 
     async deleteByAccountId(accountId: number) {
       const params = {
-        text: this.deleteByAccountIdQuery(accountId)
+        text: this.deleteByAccountIdQuery(accountId),
       };
       await this.doQuery(params);
     }
@@ -282,6 +286,9 @@ export namespace RecurrentTransactions {
     }
 
     findByIdsQuery(ids: Array<number>) {
+      if (ids.length === 0) {
+        throw new Error("illegal argument: cannot pass an empty ids array");
+      }
       const idAttribute = this.schema.columns["id"];
       return this.format("SELECT * FROM %I WHERE id in (%L) ORDER BY %s ASC", this.schema.tableName, ids, idAttribute);
     }
@@ -334,12 +341,12 @@ export namespace RecurrentTransactions {
       const tableName = this.schema.tableName;
       const attributes = this.schema.attributes;
       const values = recurrentTransactions
-        .map(recurrentTransaction => {
+        .map((recurrentTransaction) => {
           return (
             "(" +
             this.schema
               .asRow(recurrentTransaction)
-              .map(item => this.format("%L", item != null ? item.toString() : item)) +
+              .map((item) => this.format("%L", item != null ? item.toString() : item)) +
             ")"
           );
         })
@@ -353,13 +360,13 @@ export namespace RecurrentTransactions {
       const idAttribute = this.schema.attributes[0];
       const attributes = this.schema.attributes.slice(1);
       const values = recurrentTransactions
-        .map(recurrentTransaction => {
+        .map((recurrentTransaction) => {
           return (
             "(" +
             this.schema
               .asRow(recurrentTransaction)
               .slice(1)
-              .map(item => this.format("%L", item != null ? item.toString() : item)) +
+              .map((item) => this.format("%L", item != null ? item.toString() : item)) +
             ")"
           );
         })
@@ -372,12 +379,12 @@ export namespace RecurrentTransactions {
       const tableName = this.schema.tableName;
       const attributes = this.schema.attributes;
       const values = recurrentTransactions
-        .map(recurrentTransaction => {
+        .map((recurrentTransaction) => {
           return (
             "(" +
             this.schema
               .asRow(recurrentTransaction)
-              .map(item => this.format("%L", item != null ? item.toString() : item)) +
+              .map((item) => this.format("%L", item != null ? item.toString() : item)) +
             ")"
           );
         })

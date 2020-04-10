@@ -37,7 +37,7 @@ export namespace Transactions {
       counterPartIban: tx.counterpartIban,
       counterPartBlz: tx.counterpartBlz,
       counterPartBic: tx.counterpartBic,
-      counterPartBankName: tx.counterpartBankName
+      counterPartBankName: tx.counterpartBankName,
     };
   };
 
@@ -61,17 +61,17 @@ export namespace Transactions {
     }
 
     async saveArray(transactions: Array<Transaction>) {
-      transactions.forEach(transaction => this.save(transaction));
+      transactions.forEach((transaction) => this.save(transaction));
       return transactions;
     }
 
     async findByAccountIds(accountIds: Array<number>) {
       return Object.keys(this.repository)
-        .filter(index => {
+        .filter((index) => {
           const key = parseInt(index);
           return accountIds.includes(this.repository[key].accountId);
         })
-        .map(index => {
+        .map((index) => {
           const key = parseInt(index);
           return this.repository[key];
         });
@@ -149,7 +149,7 @@ export namespace Transactions {
 
     async save(transaction: Transaction): Promise<Transaction> {
       const params = {
-        text: this.saveQuery(transaction)
+        text: this.saveQuery(transaction),
       };
       return this.doQuery(params).then(() => transaction);
     }
@@ -158,22 +158,26 @@ export namespace Transactions {
       const params = {
         text: this.findByIdQuery(id),
         rowMode: "array",
-        types: this.types
+        types: this.types,
       };
 
-      return this.doQuery(params).then(res => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
+      return this.doQuery(params).then((res) => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async findByIds(ids: Array<number>): Promise<Array<Transaction>> {
+      if (ids.length === 0) {
+        return [];
+      }
+
       const params = {
         text: this.findByIdsQuery(ids),
         rowMode: "array",
-        types: this.types
+        types: this.types,
       };
 
-      return this.doQuery(params).then(res =>
+      return this.doQuery(params).then((res) =>
         res.rowCount > 0
-          ? res.rows.map(row => {
+          ? res.rows.map((row) => {
               return this.schema.asObject(row);
             })
           : []
@@ -182,14 +186,14 @@ export namespace Transactions {
 
     async deleteAll(): Promise<void> {
       const params = {
-        text: this.deleteAllQuery()
+        text: this.deleteAllQuery(),
       };
       await this.doQuery(params);
     }
 
     async delete(tx: Transaction): Promise<void> {
       const params = {
-        text: this.deleteQuery(tx.id)
+        text: this.deleteQuery(tx.id),
       };
       await this.doQuery(params);
     }
@@ -198,35 +202,35 @@ export namespace Transactions {
       const params = {
         text: this.findByAccountIdsQuery(accountIds),
         rowMode: "array",
-        types: this.types
+        types: this.types,
       };
 
-      return this.doQuery(params).then(res => res.rows.map(row => this.schema.asObject(row)));
+      return this.doQuery(params).then((res) => res.rows.map((row) => this.schema.asObject(row)));
     }
 
     async groupByIban(accountId: number): Promise<Transaction[][]> {
       const params = {
         text: this.groupByColumnQuery(accountId, 8),
         rowMode: "array",
-        types: this.types
+        types: this.types,
       };
 
-      return this.doQuery(params).then(res =>
-        res.rows.map(row => row[0].map((element: any) => this.schema.mapColumns(element)))
+      return this.doQuery(params).then((res) =>
+        res.rows.map((row) => row[0].map((element: any) => this.schema.mapColumns(element)))
       );
     }
 
     async saveArray(transactions: Transaction[]): Promise<Transaction[]> {
       const params = {
-        text: this.saveArrayQuery(transactions)
+        text: this.saveArrayQuery(transactions),
       };
 
-      return this.doQuery(params).then(res => transactions);
+      return this.doQuery(params).then((res) => transactions);
     }
 
     async deleteByAccountId(accountId: number) {
       const params = {
-        text: this.deleteByAccountIdQuery(accountId)
+        text: this.deleteByAccountIdQuery(accountId),
       };
 
       return this.doQuery(params).then(() => undefined);
@@ -243,6 +247,9 @@ export namespace Transactions {
     }
 
     findByIdsQuery(ids: Array<number>) {
+      if (ids.length === 0) {
+        throw new Error("illegal argument: cannot pass an empty ids array");
+      }
       return this.format("SELECT * FROM %I WHERE id in (%L)", this.schema.tableName, ids);
     }
 
@@ -291,7 +298,7 @@ export namespace Transactions {
     saveArrayQuery(transactions: Transaction[]) {
       const tableName = this.schema.tableName;
       const attributes = this.schema.attributes;
-      const values = transactions.map(transaction => this.format("(%L)", this.schema.asRow(transaction))).join(", ");
+      const values = transactions.map((transaction) => this.format("(%L)", this.schema.asRow(transaction))).join(", ");
 
       return this.format("INSERT INTO %I (%s) VALUES %s", tableName, attributes, values);
     }
