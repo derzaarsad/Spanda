@@ -41,7 +41,12 @@ export class AdminApi extends cdk.Stack {
       operationName: "delete user data",
     });
 
-    const userResource = restAPI.root.addResource("user");
+    const userResource = restAPI.root.addResource("users");
+    const addUserMethod = lambdaFactory.createLambda("add-user ", asset, "main.addUser");
+    userResource.addMethod("POST", new LambdaIntegration(addUserMethod), {
+      operationName: "add user",
+    });
+
     const deleteUserMethod = lambdaFactory.createLambda("delete-user ", asset, "main.deleteUser");
     userResource.addMethod("DELETE", new LambdaIntegration(deleteUserMethod), {
       operationName: "delete user",

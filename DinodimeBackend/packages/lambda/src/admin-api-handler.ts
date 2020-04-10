@@ -9,6 +9,7 @@ import { Transactions } from "dinodime-lib";
 import { RecurrentTransactions } from "dinodime-lib";
 import { BankConnection, BankConnections } from "dinodime-lib";
 
+const badRequest = CreateSimpleResponse(400, "bad request");
 const unauthorized = CreateSimpleResponse(401, "unauthorized");
 
 interface AuthenticationConfiguration {
@@ -25,6 +26,36 @@ export interface DeleteUserDataHandlerConfiguration extends AuthenticationConfig
 }
 
 export interface DeleteUserHandlerConfiguration extends AuthenticationConfiguration {}
+
+export const addUserHandler = async (
+  configuration: AuthenticationConfiguration,
+  event: APIGatewayProxyEvent,
+  context: Context
+) => {
+  const { logger, users } = configuration;
+
+  const body = event.body;
+
+  if (!body) {
+    return badRequest;
+  }
+
+  const user = JSON.parse(body) as User;
+
+  if (!user) {
+    return badRequest;
+  }
+
+  try {
+    await users.save(user);
+  } catch (err) {
+    logger.error(`Could not save user ${user.username}`, err);
+    return unauthorized;
+  }
+
+  logger.info(`User ${user.username} added susccesfully`);
+  return CreateSimpleResponse(200, "ok");
+};
 
 export const deleteUserHandler = async (
   configuration: DeleteUserHandlerConfiguration,
