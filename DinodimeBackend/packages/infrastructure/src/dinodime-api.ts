@@ -174,6 +174,18 @@ export class DinodimeAPI extends cdk.Construct {
       operationName: "update recurrent transactions"
     });
 
+    /*
+     * Test Interfaces
+     */
+    const test = restAPI.root.addResource("test");
+
+    const push = test.addResource("push");
+    const testPush = lambdaFactory.createLambda("TestPush", asset, "main.testPush");
+
+    push.addMethod("POST", new LambdaIntegration(testPush), {
+      operationName: "test push notification"
+    });
+
     this.restAPI = restAPI;
   }
 }

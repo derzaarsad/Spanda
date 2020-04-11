@@ -3,6 +3,9 @@ import * as admin from 'firebase-admin';
 export class FirebaseMessaging {
   
     constructor(databaseurl: string) {
+
+        console.log(databaseurl);
+        
         admin.initializeApp({
             credential: admin.credential.applicationDefault(),
             databaseURL: databaseurl

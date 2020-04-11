@@ -5,6 +5,7 @@ import CreateLogger from "./create-logger";
 import { ServiceProvider } from "./service-provider";
 import * as authenticationController from "./controllers/authentication-controller";
 import * as bankController from "./controllers/bank-controller";
+import * as testController from "./controllers/test-controller";
 
 const env = process.env;
 const logger = CreateLogger(env);
@@ -232,6 +233,29 @@ export const getAllowance = async (event: APIGatewayProxyEvent, context: Context
     return response;
   } catch (err) {
     logger.error("error fetching fetching allowance", err);
+    const response = CreateInternalErrorResponse(err);
+    logger.debug("returning error response", response);
+    return response;
+  }
+};
+
+/*
+ * Test Controller
+ * ---------------
+ */
+export const testPush = async (event: APIGatewayProxyEvent, context: Context) => {
+  logger.debug("received event", event);
+  try {
+    const response = testController.testPush(
+      event,
+      context,
+      logger,
+      services.firebaseMessaging
+    );
+    logger.debug("returning regular response", response);
+    return response;
+  } catch (err) {
+    logger.error("error listing banks", err);
     const response = CreateInternalErrorResponse(err);
     logger.debug("returning error response", response);
     return response;
