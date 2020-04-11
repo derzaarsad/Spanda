@@ -1,4 +1,5 @@
 export interface FirebaseProps {
-    firebaseServerKey: string;
+    googleAppCredentials: string;
+    googleAppDatabaseUrl: string;
 }
   

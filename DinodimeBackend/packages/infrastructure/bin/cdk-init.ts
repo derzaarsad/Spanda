@@ -86,7 +86,8 @@ const servicesProps: ServicesProps = {
     storageBackend: "POSTGRESQL"
   },
   firebaseProps: {
-    firebaseServerKey: app.node.tryGetContext("firebaseServerKey")! as string
+    googleAppCredentials: app.node.tryGetContext("googleAppCredentials")! as string,
+    googleAppDatabaseUrl: app.node.tryGetContext("googleAppDatabaseUrl")! as string
   }
 };
 

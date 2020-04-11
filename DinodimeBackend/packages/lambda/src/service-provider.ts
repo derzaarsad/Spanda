@@ -3,6 +3,7 @@ import { BankConnections, Users, Transactions, RecurrentTransactions } from "din
 import { ClientSecretsProvider, Resolved } from "dinodime-lib";
 import { Encryptions, CallbackCrypto } from "dinodime-lib";
 import { FinAPI } from "dinodime-lib";
+import { FirebaseMessaging } from "dinodime-lib";
 
 import axios from "axios";
 import { BackendProvider } from "./backend-provider";
@@ -19,6 +20,7 @@ export class ServiceProvider {
   readonly connections: BankConnections.BankConnectionsRepository;
   readonly recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
   readonly encryptions: Encryptions;
+  readonly firebaseMessaging: FirebaseMessaging;
   transactions: Transactions.TransactionsRepository;
 
   constructor(env: NodeJS.ProcessEnv) {
@@ -62,5 +64,6 @@ export class ServiceProvider {
     this.recurrentTransactions = storageBackend.recurrentTransactions;
     this.transactions = storageBackend.transactions;
     this.encryptions = new CallbackCrypto();
+    this.firebaseMessaging = new FirebaseMessaging(env["GOOGLE_APPLICATION_URL"] as string);
   }
 }
