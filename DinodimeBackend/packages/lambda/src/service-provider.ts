@@ -3,6 +3,7 @@ import { BankConnections, Users, Transactions, RecurrentTransactions } from "din
 import { ClientSecretsProvider, Resolved } from "dinodime-lib";
 import { Crypto, AesCrypto } from "dinodime-lib";
 import { FinAPI } from "dinodime-lib";
+import { FirebaseMessaging } from "dinodime-lib";
 import winston from "winston";
 import axios from "axios";
 import { BackendProvider } from "./backend-provider";
@@ -15,6 +16,7 @@ export class ServiceProvider {
   readonly clientSecrets: ClientSecretsProvider;
   readonly authentication: Authentication;
   readonly bankInterface: FinAPI;
+  readonly firebaseMessaging: FirebaseMessaging;
   readonly users: Users.UsersRepository;
   readonly connections: BankConnections.BankConnectionsRepository;
   readonly recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
@@ -56,10 +58,23 @@ export class ServiceProvider {
       throw new Error("insufficient finAPI credentials given");
     }
 
+    const firebaseUrl = "https://fcm.googleapis.com/fcm/send";
+    const firebaseServerKey = env["FIREBASE_SERVER_KEY"];
+    const pushClient = axios.create({
+      baseURL: firebaseUrl,
+      timeout: timeout !== undefined ? parseInt(timeout) : 3000,
+      headers: { Accept: "application/json" },
+    });
+
+    if (firebaseServerKey === undefined) {
+      throw new Error("insufficient firebase credentials given");
+    }
+
     this.encryptions = new AesCrypto(finAPIDecryptionKey);
     const crypto = (this.clientSecrets = new Resolved(finAPIClientId, finAPIClientSecret));
     this.authentication = new Basic(httpClient);
     this.bankInterface = new FinAPI(httpClient);
+    this.firebaseMessaging = new FirebaseMessaging(pushClient,firebaseServerKey);
     this.users = storageBackend.users;
     this.connections = storageBackend.connections;
     this.recurrentTransactions = storageBackend.recurrentTransactions;
