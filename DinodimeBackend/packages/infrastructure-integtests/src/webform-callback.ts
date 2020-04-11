@@ -17,7 +17,7 @@ const callbackUrl = env["CALLBACK_ENDPOINT_URL"] as string;
 const adminEndpointUrl = env["ADMIN_ENDPOINT_URL"] as string;
 const decryptionKey = env["FINAPI_DECRYPTION_KEY"] as string;
 
-AWS.config.update({ region: process.env.CDK_DEPLOY_REGION });
+AWS.config.update({ region: process.env.AWS_REGION });
 
 describe("integration: web form callback", function () {
   this.timeout(60000);

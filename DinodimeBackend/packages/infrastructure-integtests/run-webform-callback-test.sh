@@ -18,11 +18,6 @@ if [[ -z "$adminUrl" ]]; then
   exit 1
 fi
 
-if [[ -z "FINAPI_DECRYPTION_KEY" ]]; then
-  echo "Please indicate the finapi decryption key in the FINAPI_DECRYPTION_KEY environment variable"
-  exit 1
-fi
-
 env CALLBACK_ENDPOINT_URL=$callbackEndpointUrl \
   ADMIN_ENDPOINT_URL=$adminUrl \
   FINAPI_DECRYPTION_KEY=$FINAPI_DECRYPTION_KEY \

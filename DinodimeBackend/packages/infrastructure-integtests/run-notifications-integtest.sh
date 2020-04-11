@@ -12,7 +12,7 @@ endpointUrl=$(getStackOutput $STACK_NAME NotificationsApiEndpointURL)
 queueUrl=$(getStackOutput $STACK_NAME NotificationsQueueURL)
 
 env ENDPOINT_URL=$endpointUrl \
-  DECRYPTION_KEY=covfefe \
+  DECRYPTION_KEY=$FINAPI_DECRYPTION_KEY \
   TABLE_NAME=$tableName \
   QUEUE_URL=$queueUrl \
   yarn workspace dinodime-infrastructure-integtests run test-new-transactions-notification $@
