@@ -31,6 +31,10 @@ export class Services extends cdk.Stack {
       value: notifications.notificationsQueue.queueUrl,
     });
 
+    new cdk.CfnOutput(this, "NotificationsApiEndpointURL", {
+      value: notifications.restAPI.url,
+    });
+
     new cdk.CfnOutput(this, "NotificationsTopicARN", {
       value: notifications.notificationsTopic.topicArn,
     });

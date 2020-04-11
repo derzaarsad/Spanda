@@ -8,7 +8,7 @@ source "$DIRNAME/common_functions.sh"
 
 tableName=$(getStackOutput $STACK_NAME NotificationsTableName)
 topicArn=$(getStackOutput $STACK_NAME NotificationsTopicARN)
-endpointUrl=$(getStackOutput $STACK_NAME NotificationsEndpointURL)
+endpointUrl=$(getStackOutput $STACK_NAME NotificationsApiEndpointURL)
 queueUrl=$(getStackOutput $STACK_NAME NotificationsQueueURL)
 
 env ENDPOINT_URL=$endpointUrl \
