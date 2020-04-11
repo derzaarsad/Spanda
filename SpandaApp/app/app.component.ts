@@ -4,6 +4,10 @@ import { AUTH_SERVICE_IMPL, IAuthentication } from "./services/authentication.se
 import { RouterExtensions } from "nativescript-angular/router";
 import * as app from "application";
 
+import * as firebase from 'nativescript-plugin-firebase';
+
+import { ActivatedRoute } from "@angular/router";
+
 import { TranslateService, LangChangeEvent } from './@ngx-translate/core@10.0.2';
 
 import enLang from './locale/en'
@@ -22,6 +26,7 @@ export class AppComponent {
     constructor(
         private translate: TranslateService,
         private routerExtensions: RouterExtensions,
+        private activeRoute: ActivatedRoute,
         @Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) {
         // Add translations
         translate.setTranslation('en', enLang);
@@ -40,6 +45,38 @@ export class AppComponent {
     }
 
     ngOnInit(): void {
+      firebase.init({
+        showNotifications: true,
+        showNotificationsWhenInForeground: true,
+
+        onPushTokenReceivedCallback: (token) => {
+          console.log('[Firebase] onPushTokenReceivedCallback:', { token });
+        },
+
+        onMessageReceivedCallback: async (message: firebase.Message) => {
+          const sideDrawer = <RadSideDrawer>app.getRootView();
+          sideDrawer.closeDrawer();
+
+          console.log('[Firebase] onMessageReceivedCallback:', { message });
+
+          console.log(this.activeRoute.children[0]);
+          console.log(this.activeRoute.children[0].children);
+          this.routerExtensions.navigate([{ outlets: { homeRouterOutlet: ['allowance'] } }], {
+            transition: {
+              name: "fade"
+            },
+            clearHistory: true,
+            relativeTo: this.activeRoute.children[0]
+          });
+        }
+      })
+        .then(() => {
+          console.log('[Firebase] Initialized');
+        })
+        .catch(error => {
+          console.log('[Firebase] Initialize', { error });
+        });
+
       this._sideDrawerTransition = new SlideInOnTopTransition();
     }
 

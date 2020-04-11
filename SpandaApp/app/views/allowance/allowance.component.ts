@@ -74,10 +74,4 @@ export class AllowanceComponent implements OnInit {
         this.authenticationService.removeAllUserAuthentication();
         this.routerExtensions.navigate(["login"], { clearHistory: true });
     }
-
-    onRefreshAllowance() {
-        this.bankService.getAllowance().then((res) => {
-            this.allowanceValue = res.toString() + "€";
-        });
-    }
 }
