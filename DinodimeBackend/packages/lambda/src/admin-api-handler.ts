@@ -110,7 +110,7 @@ export const getUserDataHandler = async (
       const connection = userConnections[i];
       const tx = await transactions.findByAccountIds(connection.bankAccountIds);
 
-      for (let j = 0; tx.length; j++) {
+      for (let j = 0; j < tx.length; j++) {
         result.push(tx[j]);
       }
     }
