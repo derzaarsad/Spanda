@@ -86,7 +86,7 @@ export const getUserDataHandler = async (
   event: APIGatewayProxyEvent,
   context: Context
 ) => {
-  const { logger, bankConnections, transactions, recurrentTransactions } = configuration;
+  const { logger, bankConnections, transactions } = configuration;
 
   const user = await getAuthenticatedUser(configuration, event.headers);
 
@@ -106,7 +106,7 @@ export const getUserDataHandler = async (
   const result: Transaction[] = [];
 
   try {
-    for (let i = 0; userConnections.length; i++) {
+    for (let i = 0; i < userConnections.length; i++) {
       const connection = userConnections[i];
       const tx = await transactions.findByAccountIds(connection.bankAccountIds);
 
@@ -146,11 +146,11 @@ export const deleteUserDataHandler = async (
   }
 
   try {
-    for (let i = 0; userConnections.length; i++) {
+    for (let i = 0; i < userConnections.length; i++) {
       const connection = userConnections[i];
       const bankAccounts = connection.bankAccountIds;
 
-      for (let j = 0; bankAccounts.length; j++) {
+      for (let j = 0; j < bankAccounts.length; j++) {
         const bankAccountId = bankAccounts[j];
         logger.debug(`Removing transactions from bank account ${bankAccountId}`);
         await transactions.deleteByAccountId(bankAccountId);
