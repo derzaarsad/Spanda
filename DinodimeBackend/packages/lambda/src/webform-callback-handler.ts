@@ -1,4 +1,5 @@
 import * as winston from "winston";
+import qs from "querystring";
 import { CreateSimpleResponse } from "./lambda-util";
 import { Status, Success, Failure } from "dinodime-lib";
 import { SQSEvent, SQSRecord } from "aws-lambda";
@@ -43,7 +44,7 @@ export const webFormCallbackHandler = async (
     return response;
   }
 
-  const webFormAuth = pathParameters.webFormAuth;
+  const webFormAuth = qs.unescape(pathParameters.webFormAuth);
   const tokens = webFormAuth.split("-", 2);
   if (tokens.length !== 2) {
     log.error(`Invalid webform authorization received: ${webFormAuth}`);
@@ -121,6 +122,7 @@ export const fetchWebFormHandler = async (
     });
 
     if (status.kind === "failure") {
+      log.error("Message handling returned a failure: ", status.error);
       success = false;
     }
   }
@@ -150,7 +152,7 @@ export const handleRecord = async (
 
   const user = await users.findByWebFormId(completion.webFormId);
   if (user === null || user.activeWebFormId === null || user.activeWebFormAuth === null) {
-    return { kind: "failure", error: new Error("no user found") };
+    return { kind: "failure", error: new Error(`No user for webform ${completion.webFormId} found`) };
   }
 
   if (user.activeWebFormAuth !== completion.userSecret) {
