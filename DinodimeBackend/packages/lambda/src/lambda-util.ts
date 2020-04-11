@@ -9,7 +9,7 @@ const EncodeResponse = (status: number, body: any): APIGatewayProxyResult => {
   return {
     statusCode: status,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   };
 };
 
@@ -19,7 +19,7 @@ export const CreateResponse = (status: number, body: any) => {
 
 export const CreateSimpleResponse = (status: number, message: string) => {
   return EncodeResponse(status, {
-    message: message
+    message: message,
   });
 };
 

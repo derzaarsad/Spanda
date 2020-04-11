@@ -1,7 +1,6 @@
 import * as cdk from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as iam from "@aws-cdk/aws-iam";
-import * as kms from "@aws-cdk/aws-kms";
 import * as sm from "@aws-cdk/aws-secretsmanager";
 
 import { InfrastructureProps } from "./infrastructure-props";
@@ -41,29 +40,29 @@ export class Infrastructure extends cdk.Stack {
         {
           cidrMask: 20,
           name: "public",
-          subnetType: ec2.SubnetType.PUBLIC
+          subnetType: ec2.SubnetType.PUBLIC,
         },
         {
           cidrMask: 20,
           name: "private",
-          subnetType: ec2.SubnetType.PRIVATE
+          subnetType: ec2.SubnetType.PRIVATE,
         },
         {
           cidrMask: 24,
           name: "rds",
-          subnetType: ec2.SubnetType.ISOLATED
-        }
-      ]
+          subnetType: ec2.SubnetType.ISOLATED,
+        },
+      ],
     });
 
     this.databaseApplicationsSecurityGroup = new ec2.SecurityGroup(this, "DatabaseApplicationsSG", {
       vpc: this.vpc,
-      description: "A security group of instances that are able to connect to the database"
+      description: "A security group of instances that are able to connect to the database",
     });
 
     const bastionSecurityGroup = new ec2.SecurityGroup(this, "BastionsSG", {
       vpc: this.vpc,
-      description: "A security group for bastion hosts"
+      description: "A security group for bastion hosts",
     });
 
     bastionSecurityGroup.addIngressRule(
@@ -74,7 +73,7 @@ export class Infrastructure extends cdk.Stack {
 
     this.databasesSecurityGroup = new ec2.SecurityGroup(this, "DatabasesSG", {
       vpc: this.vpc,
-      description: "A security group for RDS instances"
+      description: "A security group for RDS instances",
     });
 
     this.databasesSecurityGroup.addIngressRule(
@@ -93,13 +92,14 @@ export class Infrastructure extends cdk.Stack {
 
     this.lambdaManagedPolicies = [
       iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
-      iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole")
+      iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole"),
+      iam.ManagedPolicy.fromAwsManagedPolicyName("AWSXRayDaemonWriteAccess"),
     ];
 
     this.databasePassword = new sm.Secret(this, "DatabaseSecret", {
       description: "The database master user secret",
       secretName: "database-password",
-      generateSecretString: { excludeCharacters: '",|@/\\;' }
+      generateSecretString: { excludeCharacters: '",|@/\\;' },
     });
   }
 
@@ -127,13 +127,10 @@ export class Infrastructure extends cdk.Stack {
     return { subnets: this.vpc.publicSubnets };
   }
 
-  private initializeBastionHostsConfig(
-    subnets: ec2.ISubnet[],
-    bastionSecurityGroup: ec2.SecurityGroup
-  ) {
+  private initializeBastionHostsConfig(subnets: ec2.ISubnet[], bastionSecurityGroup: ec2.SecurityGroup) {
     const amiLookup = new ec2.LookupMachineImage({
       name: "amzn2-ami-hvm-*-x86_64-gp2",
-      owners: ["amazon"]
+      owners: ["amazon"],
     });
 
     const ami = amiLookup.getImage(this);
@@ -148,13 +145,13 @@ export class Infrastructure extends cdk.Stack {
 
     const ssmManagementRole = new iam.Role(this, "BastionSSMManagedInstanceRole", {
       assumedBy: new iam.ServicePrincipal("ec2.amazonaws.com"),
-      managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")]
+      managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")],
     });
 
     const bastionInstanceProfileName = "BastionInstanceProfile";
     const bastionInstanceProfile = new iam.CfnInstanceProfile(this, "BastionSSMRole", {
       instanceProfileName: bastionInstanceProfileName,
-      roles: [ssmManagementRole.roleName]
+      roles: [ssmManagementRole.roleName],
     });
 
     subnets.map((subnet: ec2.ISubnet, index: number) => {
@@ -165,7 +162,7 @@ export class Infrastructure extends cdk.Stack {
         launchTemplateData: {
           imageId: ami.imageId,
           iamInstanceProfile: {
-            arn: bastionInstanceProfile.attrArn
+            arn: bastionInstanceProfile.attrArn,
           },
           instanceType: "t2.nano",
           instanceInitiatedShutdownBehavior: "terminate",
@@ -177,8 +174,8 @@ export class Infrastructure extends cdk.Stack {
               description: `A network interface on subnet ${subnet.subnetId}`,
               deleteOnTermination: true,
               associatePublicIpAddress: false,
-              deviceIndex: 0
-            }
+              deviceIndex: 0,
+            },
           ],
           blockDeviceMappings: [
             {
@@ -187,12 +184,12 @@ export class Infrastructure extends cdk.Stack {
                 deleteOnTermination: true,
                 volumeSize: 8,
                 volumeType: "gp2",
-                encrypted: false
-              }
-            }
+                encrypted: false,
+              },
+            },
           ],
-          userData: cdk.Fn.base64(userData.render())
-        }
+          userData: cdk.Fn.base64(userData.render()),
+        },
       });
     });
   }

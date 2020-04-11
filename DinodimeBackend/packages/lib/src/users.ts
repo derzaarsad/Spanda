@@ -16,12 +16,7 @@ export class User {
   activeWebFormAuth: string | null;
   creationDate: Date;
 
-  constructor(
-    username: string,
-    email: string,
-    phone: string,
-    isAutoUpdateEnabled: boolean = false
-  ) {
+  constructor(username: string, email: string, phone: string, isAutoUpdateEnabled: boolean = false) {
     this.username = username;
     this.email = email;
     this.phone = phone;
@@ -54,12 +49,11 @@ export namespace Users {
     }
 
     async findByIds(usernames: Array<string>): Promise<Array<User>> {
-
       let candidate: Array<User> = [];
 
       for (let i in usernames) {
         const username = this.repository[usernames[i]];
-        if(!username) {
+        if (!username) {
           continue;
         }
 
@@ -78,6 +72,10 @@ export namespace Users {
       }
 
       return null;
+    }
+
+    async delete(user: User) {
+      delete this.repository[user.username];
     }
 
     async save(user: User) {
@@ -105,16 +103,16 @@ export namespace Users {
       const params = {
         Key: {
           username: {
-            S: username
-          }
+            S: username,
+          },
         },
-        TableName: this.tableName
+        TableName: this.tableName,
       };
 
       return this.client
         .getItem(params)
         .promise()
-        .then(data => {
+        .then((data) => {
           if (data.Item) {
             return this.decodeUser(data.Item);
           } else {
@@ -140,6 +138,10 @@ export namespace Users {
       throw new Error("Method not implemented.");
     }
 
+    async delete(user: User) {
+      throw new Error("Method not implemented.");
+    }
+
     async deleteAll(): Promise<void> {
       throw new Error("Method not implemented.");
     }
@@ -160,8 +162,7 @@ export namespace Users {
         isAutoUpdateEnabled: data["isAutoUpdateEnabled"]!["BOOL"]!,
         activeWebFormAuth: activeWebFormId !== undefined ? activeWebFormAuth["S"]! : null,
         activeWebFormId: activeWebFormAuth !== undefined ? parseInt(activeWebFormId["N"]!) : null,
-        bankConnectionIds:
-          bankConnectionIds !== undefined ? bankConnectionIds["NS"]!.map(id => parseInt(id)) : []
+        bankConnectionIds: bankConnectionIds !== undefined ? bankConnectionIds["NS"]!.map((id) => parseInt(id)) : [],
       };
 
       return user;
@@ -175,11 +176,11 @@ export namespace Users {
         email: { S: user.email },
         phone: { S: user.phone },
         isAutoUpdateEnabled: { BOOL: user.isAutoUpdateEnabled },
-        creationDate: { N: user.creationDate.valueOf().toString() }
+        creationDate: { N: user.creationDate.valueOf().toString() },
       };
 
       if (user.bankConnectionIds.length > 0) {
-        values["bankConnectionIds"] = { NS: user.bankConnectionIds.map(id => id.toString()) };
+        values["bankConnectionIds"] = { NS: user.bankConnectionIds.map((id) => id.toString()) };
       }
 
       if (user.activeWebFormAuth) {
@@ -193,47 +194,39 @@ export namespace Users {
       return {
         Item: values,
         ReturnConsumedCapacity: returnConsumedCapacity,
-        TableName: this.tableName
+        TableName: this.tableName,
       };
     }
   }
 
-  export class PostgreSQLRepository extends PostgresRepository<string, User>
-    implements UsersRepository {
-    constructor(
-      pool: Pool | undefined,
-      format: (fmt: string, ...args: any[]) => string,
-      schema: Schema<User>
-    ) {
+  export class PostgreSQLRepository extends PostgresRepository<string, User> implements UsersRepository {
+    constructor(pool: Pool | undefined, format: (fmt: string, ...args: any[]) => string, schema: Schema<User>) {
       super(pool, format, schema);
     }
 
     findByIdQuery(userName: string) {
-      return this.format(
-        "SELECT * FROM %I WHERE username = %L LIMIT 1",
-        this.schema.tableName,
-        userName
-      );
+      return this.format("SELECT * FROM %I WHERE username = %L LIMIT 1", this.schema.tableName, userName);
     }
 
     findByIdsQuery(userNames: Array<string>) {
-      return this.format(
-        "SELECT * FROM %I WHERE username in (%L)",
-        this.schema.tableName,
-        userNames
-      );
+      if (userNames.length === 0) {
+        throw new Error("illegal argument: cannot pass an empty ids array");
+      }
+      return this.format("SELECT * FROM %I WHERE username in (%L)", this.schema.tableName, userNames);
     }
 
     findByWebFormIdQuery(activeWebFormId: number) {
-      return this.format(
-        "SELECT * FROM %I WHERE activewebformid = %L LIMIT 1",
-        this.schema.tableName,
-        activeWebFormId
-      );
+      return this.format("SELECT * FROM %I WHERE activewebformid = %L LIMIT 1", this.schema.tableName, activeWebFormId);
     }
 
     deleteAllQuery() {
       return this.format("DELETE FROM %I", this.schema.tableName);
+    }
+
+    deleteQuery(userName: string) {
+      const tableName = this.schema.tableName;
+      const idAttribute = this.schema.columns.username;
+      return this.format("DELETE FROM %I WHERE %I.%I = %L", this.schema.tableName, tableName, idAttribute, userName);
     }
 
     saveQuery(user: User) {
@@ -259,51 +252,60 @@ export namespace Users {
     async findById(username: string) {
       const params = {
         text: this.findByIdQuery(username),
-        rowMode: "array"
+        rowMode: "array",
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null
-      );
+      return this.doQuery(params).then((res) => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async findByIds(usernames: Array<string>): Promise<Array<User>> {
+      if (usernames.length === 0) {
+        return [];
+      }
+
       const params = {
         text: this.findByIdsQuery(usernames),
         rowMode: "array",
-        types: this.types
+        types: this.types,
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? res.rows
-        .map(row => {
-          return this.schema.asObject(row)
-        }) : []
+      return this.doQuery(params).then((res) =>
+        res.rowCount > 0
+          ? res.rows.map((row) => {
+              return this.schema.asObject(row);
+            })
+          : []
       );
     }
 
     async findByWebFormId(activeWebFormId: number) {
       const params = {
         text: this.findByWebFormIdQuery(activeWebFormId),
-        rowMode: "array"
+        rowMode: "array",
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null
-      );
+      return this.doQuery(params).then((res) => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async save(user: User) {
       const params = {
-        text: this.saveQuery(user)
+        text: this.saveQuery(user),
       };
 
       return this.doQuery(params).then(() => user);
     }
 
+    async delete(user: User) {
+      const params = {
+        text: this.deleteQuery(user.username),
+      };
+
+      return this.doQuery(params).then(() => undefined);
+    }
+
     async deleteAll() {
       const params = {
-        text: this.deleteAllQuery()
+        text: this.deleteAllQuery(),
       };
 
       await this.doQuery(params);

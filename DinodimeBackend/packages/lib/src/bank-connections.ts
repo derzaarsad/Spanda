@@ -27,12 +27,11 @@ export namespace BankConnections {
     }
 
     async findByIds(ids: Array<number>): Promise<Array<BankConnection>> {
-
       let candidate: Array<BankConnection> = [];
 
       for (let i in ids) {
         const bankConnection = this.repository[ids[i]];
-        if(!bankConnection) {
+        if (!bankConnection) {
           continue;
         }
 
@@ -45,6 +44,10 @@ export namespace BankConnections {
     async save(bankConnection: BankConnection) {
       this.repository[bankConnection.id] = bankConnection;
       return bankConnection;
+    }
+
+    async delete(bankConnection: BankConnection) {
+      delete this.repository[bankConnection.id];
     }
 
     async deleteAll() {
@@ -69,39 +72,36 @@ export namespace BankConnections {
       return {
         id: parseInt(data["id"]!["N"]!),
         bankId: parseInt(data["bankId"]!["N"]!),
-        bankAccountIds: inputIds ? data["bankAccountIds"]!["NS"]!.map(id => parseInt(id)) : []
+        bankAccountIds: inputIds ? data["bankAccountIds"]!["NS"]!.map((id) => parseInt(id)) : [],
       };
     }
 
-    private encodeBankConnection(
-      bankConnection: BankConnection,
-      returnValues: string
-    ): DynamoDB.UpdateItemInput {
+    private encodeBankConnection(bankConnection: BankConnection, returnValues: string): DynamoDB.UpdateItemInput {
       let expression = "SET #B = :b";
 
       const attributes: DynamoDB.ExpressionAttributeNameMap = {
-        "#B": "bankId"
+        "#B": "bankId",
       };
 
       const values: DynamoDB.ExpressionAttributeValueMap = {
-        ":b": { N: bankConnection.bankId.toString() }
+        ":b": { N: bankConnection.bankId.toString() },
       };
 
       if (bankConnection.bankAccountIds.length > 0) {
         expression = expression + ", #BA = :ba";
         attributes["#BA"] = "bankAccountIds";
-        values[":ba"] = { NS: bankConnection.bankAccountIds.map(id => id.toString()) };
+        values[":ba"] = { NS: bankConnection.bankAccountIds.map((id) => id.toString()) };
       }
 
       return {
         Key: {
-          id: { N: bankConnection.id.toString() }
+          id: { N: bankConnection.id.toString() },
         },
         ExpressionAttributeNames: attributes,
         ExpressionAttributeValues: values,
         UpdateExpression: expression,
         ReturnValues: returnValues,
-        TableName: this.tableName
+        TableName: this.tableName,
       };
     }
 
@@ -109,16 +109,16 @@ export namespace BankConnections {
       const params: DynamoDB.GetItemInput = {
         Key: {
           id: {
-            N: id.toString()
-          }
+            N: id.toString(),
+          },
         },
-        TableName: this.tableName
+        TableName: this.tableName,
       };
 
       return this.client
         .getItem(params)
         .promise()
-        .then(data => {
+        .then((data) => {
           if (data.Item) {
             return this.decodeBankConnection(data.Item);
           } else {
@@ -142,6 +142,10 @@ export namespace BankConnections {
     deleteAll(): Promise<void> {
       throw new Error("Method not implemented.");
     }
+
+    delete(bankConnection: BankConnection): Promise<void> {
+      throw new Error("Method not implemented.");
+    }
   }
 
   export class PostgreSQLRepository extends PostgresRepository<number, BankConnection>
@@ -155,19 +159,26 @@ export namespace BankConnections {
     }
 
     findByIdQuery(id: number) {
+      return this.format("SELECT * FROM %I WHERE id = %L LIMIT 1", this.schema.tableName, id.toString());
+    }
+
+    deleteQuery(bankConnectionId: number) {
+      const tableName = this.schema.tableName;
+      const idAttribute = this.schema.columns.id;
       return this.format(
-        "SELECT * FROM %I WHERE id = %L LIMIT 1",
+        "DELETE FROM %I WHERE %I.%I = %L",
         this.schema.tableName,
-        id.toString()
+        tableName,
+        idAttribute,
+        bankConnectionId
       );
     }
 
     findByIdsQuery(ids: Array<number>) {
-      return this.format(
-        "SELECT * FROM %I WHERE id in (%L)",
-        this.schema.tableName,
-        ids
-      );
+      if (ids.length === 0) {
+        throw new Error("illegal argument: cannot pass an empty ids array");
+      }
+      return this.format("SELECT * FROM %I WHERE id in (%L)", this.schema.tableName, ids);
     }
 
     deleteAllQuery() {
@@ -198,26 +209,29 @@ export namespace BankConnections {
       const params = {
         text: this.findByIdQuery(id),
         rowMode: "array",
-        types: types
+        types: types,
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null
-      );
+      return this.doQuery(params).then((res) => (res.rowCount > 0 ? this.schema.asObject(res.rows[0]) : null));
     }
 
     async findByIds(ids: Array<number>): Promise<Array<BankConnection>> {
+      if (ids.length === 0) {
+        return [];
+      }
+
       const params = {
         text: this.findByIdsQuery(ids),
         rowMode: "array",
-        types: this.types
+        types: this.types,
       };
 
-      return this.doQuery(params).then(res =>
-        res.rowCount > 0 ? res.rows
-        .map(row => {
-          return this.schema.asObject(row)
-        }) : []
+      return this.doQuery(params).then((res) =>
+        res.rowCount > 0
+          ? res.rows.map((row) => {
+              return this.schema.asObject(row);
+            })
+          : []
       );
     }
 
@@ -236,9 +250,17 @@ export namespace BankConnections {
         });
     }
 
+    async delete(bankConnection: BankConnection) {
+      const params = {
+        text: this.deleteQuery(bankConnection.id),
+      };
+
+      await this.doQuery(params);
+    }
+
     async deleteAll() {
       const params = {
-        text: this.deleteAllQuery()
+        text: this.deleteAllQuery(),
       };
 
       await this.doQuery(params);

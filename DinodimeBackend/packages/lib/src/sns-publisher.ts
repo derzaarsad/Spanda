@@ -1,5 +1,6 @@
 import SNS from "aws-sdk/clients/sns";
 import { MessageAttributeMap } from "aws-sdk/clients/sns";
+import { Status, Failure, Success } from "./status";
 
 /**
  * A type summarizing the required input parameters for publishing to SQS.
@@ -18,28 +19,17 @@ export class PublishInput {
   messageEnvelope(): string {
     const messageBody = JSON.stringify(this.message);
     const messageEnvelope = JSON.stringify({
-      default: messageBody
+      default: messageBody,
     });
     return messageEnvelope;
   }
 }
 
-export type PublishSuccess = {
-  kind: "success";
-};
-
-export type PublishFailure = {
-  kind: "failure";
-  error: any;
-};
-
-export type PublishStatus = PublishSuccess | PublishFailure;
-
 /**
  * Publishes json-formatted messages on an SNS topic.
  */
 export interface SNSPublisher {
-  publish(input: PublishInput): Promise<PublishStatus>;
+  publish(input: PublishInput): Promise<Status<String>>;
 }
 
 /**
@@ -52,27 +42,28 @@ export class AWSSNSPublisher implements SNSPublisher {
     this.sns = sns;
   }
 
-  async publish(input: PublishInput): Promise<PublishStatus> {
+  async publish(input: PublishInput): Promise<Status<String>> {
     const params: SNS.PublishInput = {
       TopicArn: input.topicArn,
       MessageStructure: "json",
       Message: input.messageEnvelope(),
-      MessageAttributes: input.messageAttributes
+      MessageAttributes: input.messageAttributes,
     };
 
     return this.sns
       .publish(params)
       .promise()
-      .then(() => {
-        const status: PublishSuccess = {
-          kind: "success"
+      .then((result) => {
+        const status: Success<String> = {
+          kind: "success",
+          result: result.MessageId ? result.MessageId : "",
         };
         return status;
       })
       .catch((err: any) => {
-        const status: PublishFailure = {
+        const status: Failure = {
           kind: "failure",
-          error: err
+          error: err,
         };
         return status;
       });
@@ -86,8 +77,8 @@ export class MockSNSPublisher implements SNSPublisher {
     this.publishedData = [];
   }
 
-  async publish(input: PublishInput): Promise<PublishStatus> {
+  async publish(input: PublishInput): Promise<Status<String>> {
     this.publishedData.push(input);
-    return { kind: "success" };
+    return { kind: "success", result: this.publishedData.length.toString() };
   }
 }

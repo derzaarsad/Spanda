@@ -1,12 +1,13 @@
 /* eslint-env node, mocha */
 import chai from "chai";
-const expect = chai.expect;
+import winston from "winston";
 import { updateRefreshToken } from "../../src/controllers/authentication-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import winston from "winston";
 import { VoidTransport, Authentication, Resolved, ClientSecretsProvider, FinAPI } from "dinodime-lib";
 import { Users, User } from "dinodime-lib";
 import { CreateUnittestInterfaces } from "../test-utility";
+
+const expect = chai.expect;
 
 describe("unit: get refresh token handler", function() {
   let logger: winston.Logger;
@@ -126,7 +127,6 @@ describe("unit: get refresh token handler", function() {
   });
 
   it("rejects with an internal error if user is not found in the database", async function() {
-
     const event = {
       body: JSON.stringify({ refresh_token: "secret" })
     };

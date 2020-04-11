@@ -3,7 +3,9 @@
   "references": [
     { "path": "packages/lib" },
     { "path": "packages/lambda" },
-    { "path": "packages/infrastructure" }
+    { "path": "packages/infrastructure" },
+    { "path": "packages/infrastructure-integtests" },
+    { "path": "packages/mock-finapi" }
   ],
   "files": []
 }

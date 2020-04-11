@@ -2,6 +2,7 @@ import * as cdk from "@aws-cdk/core";
 import * as iam from "@aws-cdk/aws-iam";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as lambda from "@aws-cdk/aws-lambda";
+import { Tracing } from "@aws-cdk/aws-lambda";
 
 /**
  * Configuration interface for services stacks deploying lambda functions.
@@ -32,11 +33,11 @@ export class LambdaPermissionProps {
   }
 
   applyToRole(role: iam.Role) {
-    this.managedPolicies.forEach(managedPolicy => {
+    this.managedPolicies.forEach((managedPolicy) => {
       role.addManagedPolicy(managedPolicy);
     });
 
-    this.policyStatements.forEach(policyStatement => {
+    this.policyStatements.forEach((policyStatement) => {
       role.addToPolicy(policyStatement);
     });
   }
@@ -53,11 +54,12 @@ export interface LambdaDeploymentProps {
 
 interface LambdaFactoryProps {
   scope: cdk.Construct;
-  deploymentProps: LambdaDeploymentProps;
-  permissionProps: LambdaPermissionProps;
+  deploymentProps?: LambdaDeploymentProps;
+  permissionProps?: LambdaPermissionProps;
   runtime: lambda.Runtime;
   duration: cdk.Duration;
   executionRole: iam.Role;
+  withTracing?: boolean;
   env?: { [key: string]: string };
 }
 
@@ -66,12 +68,13 @@ interface LambdaFactoryProps {
  */
 export class LambdaFactory {
   scope: cdk.Construct;
-  deploymentProps: LambdaDeploymentProps;
-  permissionProps: LambdaPermissionProps;
+  deploymentProps?: LambdaDeploymentProps;
+  permissionProps?: LambdaPermissionProps;
   runtime: lambda.Runtime;
   duration: cdk.Duration;
   env: { [key: string]: string };
   executionRole: iam.Role;
+  withTracing: boolean;
 
   constructor(props: LambdaFactoryProps) {
     this.scope = props.scope;
@@ -81,8 +84,11 @@ export class LambdaFactory {
     this.duration = props.duration;
     this.env = props.env ? props.env : {};
     this.executionRole = props.executionRole;
+    this.withTracing = props.withTracing ? props.withTracing : false;
 
-    this.permissionProps.applyToRole(this.executionRole);
+    if (this.permissionProps) {
+      this.permissionProps.applyToRole(this.executionRole);
+    }
   }
 
   public createLambda(id: string, asset: lambda.AssetCode, handler: string): lambda.Function {
@@ -92,10 +98,11 @@ export class LambdaFactory {
       runtime: this.runtime,
       timeout: this.duration,
       environment: this.env,
-      securityGroups: this.deploymentProps.securityGroups,
-      vpc: this.deploymentProps.vpc,
-      vpcSubnets: this.deploymentProps.subnets,
-      role: this.executionRole
+      securityGroups: this.deploymentProps ? this.deploymentProps.securityGroups : undefined,
+      vpc: this.deploymentProps ? this.deploymentProps.vpc : undefined,
+      vpcSubnets: this.deploymentProps ? this.deploymentProps.subnets : undefined,
+      role: this.executionRole,
+      tracing: this.withTracing ? Tracing.ACTIVE : Tracing.DISABLED,
     });
 
     return fn;

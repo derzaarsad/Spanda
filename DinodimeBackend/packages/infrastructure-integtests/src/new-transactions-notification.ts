@@ -2,15 +2,12 @@ import chai from "chai";
 const assert = chai.assert;
 const expect = chai.expect;
 
+import { deleteMessages } from "./util";
 import axios, { AxiosInstance } from "axios";
 
 import AWS from "aws-sdk";
 import DynamoDB from "aws-sdk/clients/dynamodb";
-import SQS, {
-  MessageList,
-  DeleteMessageBatchRequest,
-  DeleteMessageBatchResult
-} from "aws-sdk/clients/sqs";
+import SQS, { MessageList } from "aws-sdk/clients/sqs";
 import { AesCrypto, DecryptedNewTransactionsNotification } from "dinodime-lib";
 
 import { v4 as uuid } from "uuid";
@@ -20,7 +17,7 @@ import { NewTransactionsEncryptor } from "dinodime-lib";
 import { UUIDRuleHandleFactory } from "dinodime-lib";
 import { RuleHandle } from "dinodime-lib";
 
-AWS.config.update({ region: process.env.CDK_DEPLOY_REGION });
+AWS.config.update({ region: process.env.AWS_REGION });
 
 const env = process.env;
 const endpointURL = env["ENDPOINT_URL"] as string;
@@ -60,12 +57,12 @@ const cleartextNotification: DecryptedNewTransactionsNotification = {
             amount: 200,
             counterpartName: "your uncle",
             purpose: "cash",
-            isAdjustingEntry: false
-          }
-        ]
-      }
-    }
-  ]
+            isAdjustingEntry: false,
+          },
+        ],
+      },
+    },
+  ],
 };
 
 const http: AxiosInstance = axios.create({ baseURL: endpointURL });
@@ -84,31 +81,8 @@ const unpackTransactions = (message: SQS.Message): DecryptedNewTransactionsNotif
   }
 };
 
-const deleteMessages = async (messages?: MessageList): Promise<void> => {
-  if (messages === undefined) {
-    return;
-  }
-
-  const metadata = messages.map(message => {
-    return {
-      Id: message.MessageId!,
-      ReceiptHandle: message.ReceiptHandle!
-    };
-  });
-
-  const request: DeleteMessageBatchRequest = {
-    Entries: metadata,
-    QueueUrl: queueURL
-  };
-
-  const result: DeleteMessageBatchResult = await sqs.deleteMessageBatch(request).promise();
-  if (result.Failed.length > 0) {
-    throw "some messages couldn't be deleted.";
-  }
-};
-
-describe("New transactions notifications stack", async function() {
-  it("sends and receives a new transactions notification", async function() {
+describe("New transactions notifications stack", async function () {
+  it("sends and receives a new transactions notification", async function () {
     this.timeout(20000);
 
     let persistedHandle: RuleHandle | undefined;
@@ -117,7 +91,7 @@ describe("New transactions notifications stack", async function() {
     console.log("saving rule handle");
     await ruleHandlesRepository
       .save(ruleHandle)
-      .then(result => {
+      .then((result) => {
         persistedHandle = result;
         console.log("posting notification");
         return http.post("/", encryptedNotification);
@@ -126,12 +100,12 @@ describe("New transactions notifications stack", async function() {
         const params = { QueueUrl: queueURL, AttributeNames: ["All"], WaitTimeSeconds: 3 };
         return sqs.receiveMessage(params).promise();
       })
-      .then(result => {
+      .then((result) => {
         messages = result.Messages;
       })
       .finally(() => {
         console.log("deleting received messages");
-        deleteMessages(messages);
+        deleteMessages(sqs, queueURL, messages);
 
         if (persistedHandle) {
           console.log("deleting rule handle");
@@ -140,7 +114,7 @@ describe("New transactions notifications stack", async function() {
       });
 
     if (messages !== undefined) {
-      const message = messages.find(message => {
+      const message = messages.find((message) => {
         const transactions = unpackTransactions(message);
         if (transactions) {
           return transactions.callbackHandle === ruleHandle.id;

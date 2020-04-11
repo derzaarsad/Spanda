@@ -1,9 +1,9 @@
 import { Authentication, Basic } from "dinodime-lib";
 import { BankConnections, Users, Transactions, RecurrentTransactions } from "dinodime-lib";
 import { ClientSecretsProvider, Resolved } from "dinodime-lib";
-import { Encryptions, CallbackCrypto } from "dinodime-lib";
+import { Crypto, AesCrypto } from "dinodime-lib";
 import { FinAPI } from "dinodime-lib";
-
+import winston from "winston";
 import axios from "axios";
 import { BackendProvider } from "./backend-provider";
 
@@ -18,8 +18,9 @@ export class ServiceProvider {
   readonly users: Users.UsersRepository;
   readonly connections: BankConnections.BankConnectionsRepository;
   readonly recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
-  readonly encryptions: Encryptions;
-  transactions: Transactions.TransactionsRepository;
+  readonly encryptions: Crypto;
+  readonly transactions: Transactions.TransactionsRepository;
+  readonly logger: winston.Logger;
 
   constructor(env: NodeJS.ProcessEnv) {
     console.log("Configuring controllers from environment:");
@@ -44,23 +45,39 @@ export class ServiceProvider {
     const httpClient = axios.create({
       baseURL: baseURL,
       timeout: timeout !== undefined ? parseInt(timeout) : 3000,
-      headers: { Accept: "application/json" }
+      headers: { Accept: "application/json" },
     });
 
     const finAPIClientId = env["FINAPI_CLIENT_ID"];
     const finAPIClientSecret = env["FINAPI_CLIENT_SECRET"];
+    const finAPIDecryptionKey = env["FINAPI_DECRYPTION_KEY"];
 
-    if (finAPIClientId === undefined || finAPIClientSecret === undefined) {
-      throw new Error("no finAPI credentials given");
+    if (finAPIClientId === undefined || finAPIClientSecret === undefined || finAPIDecryptionKey === undefined) {
+      throw new Error("insufficient finAPI credentials given");
     }
 
-    this.clientSecrets = new Resolved(finAPIClientId, finAPIClientSecret);
+    this.encryptions = new AesCrypto(finAPIDecryptionKey);
+    const crypto = (this.clientSecrets = new Resolved(finAPIClientId, finAPIClientSecret));
     this.authentication = new Basic(httpClient);
     this.bankInterface = new FinAPI(httpClient);
     this.users = storageBackend.users;
     this.connections = storageBackend.connections;
     this.recurrentTransactions = storageBackend.recurrentTransactions;
     this.transactions = storageBackend.transactions;
-    this.encryptions = new CallbackCrypto();
+    this.logger = this.createLogger(env);
+  }
+
+  private createLogger(env: NodeJS.ProcessEnv) {
+    console.log("Configuring logger from environment:");
+
+    return winston.createLogger({
+      level: env["LOGGER_LEVEL"] || "debug",
+      format: winston.format.json(),
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.json(),
+        }),
+      ],
+    });
   }
 }

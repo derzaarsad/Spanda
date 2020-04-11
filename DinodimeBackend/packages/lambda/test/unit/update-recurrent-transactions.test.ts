@@ -5,18 +5,17 @@ const expect = chai.expect;
 
 import { updateRecurrentTransactions } from "../../src/controllers/bank-controller";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { VoidTransport, FinAPI, User } from "dinodime-lib";
-import { RecurrentTransactions, Users } from "dinodime-lib";
-import { RecurrentTransaction } from "dinodime-lib";
-import { TransactionFrequency } from "dinodime-lib";
+import { VoidTransport, FinAPI } from "dinodime-lib";
+import { Users, User } from "dinodime-lib";
+import { RecurrentTransactions, RecurrentTransaction, TransactionFrequency } from "dinodime-lib";
 
-describe("unit: update recurrent transactions", function() {
+describe("unit: update recurrent transactions", function () {
   let logger: winston.Logger;
   let recurrentTransactions: RecurrentTransactions.RecurrentTransactionsRepository;
   let users: Users.UsersRepository;
   let context: Context;
 
-  beforeEach(function() {
+  beforeEach(function () {
     logger = winston.createLogger({ transports: [new VoidTransport()] });
 
     recurrentTransactions = new RecurrentTransactions.InMemoryRepository();
@@ -25,204 +24,169 @@ describe("unit: update recurrent transactions", function() {
     context = {} as Context;
   });
 
-  it("no auth must fail", async function() {
+  it("no auth must fail", async function () {
     const finapi = ({
-        userInfo: async () => {
-          return { 'id': 'chapu' }
-        }
-      } as unknown) as FinAPI;
+      userInfo: async () => {
+        return { id: "chapu" };
+      },
+    } as unknown) as FinAPI;
 
-      const event = ({
-        headers: {},
-        body: JSON.stringify({})
-      } as unknown) as APIGatewayProxyEvent;
+    const event = ({
+      headers: {},
+      body: JSON.stringify({}),
+    } as unknown) as APIGatewayProxyEvent;
 
-    const result = await updateRecurrentTransactions(
-        event,
-        context,
-        logger,
-        finapi,
-        users,
-        recurrentTransactions
-      );
-    
+    const result = await updateRecurrentTransactions(event, context, logger, finapi, users, recurrentTransactions);
+
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(401);
     expect(JSON.parse(result.body).message).to.include("unauthorized");
   });
 
-  it("no user must fail", async function() {
+  it("no user must fail", async function () {
     const finapi = ({
-        userInfo: async () => {
-          return { 'id': 'chapu' }
-        }
-      } as unknown) as FinAPI;
+      userInfo: async () => {
+        return { id: "chapu" };
+      },
+    } as unknown) as FinAPI;
 
-      const event = ({
-        headers: {
-          Authorization: "bearer 12345678"
-        },
-        body: JSON.stringify({})
-      } as unknown) as APIGatewayProxyEvent;
+    const event = ({
+      headers: {
+        Authorization: "bearer 12345678",
+      },
+      body: JSON.stringify({}),
+    } as unknown) as APIGatewayProxyEvent;
 
-    const result = await updateRecurrentTransactions(
-        event,
-        context,
-        logger,
-        finapi,
-        users,
-        recurrentTransactions
-      );
-    
+    const result = await updateRecurrentTransactions(event, context, logger, finapi, users, recurrentTransactions);
+
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(401);
     expect(JSON.parse(result.body).message).to.include("unauthorized");
   });
 
-  it("no body must fail", async function() {
+  it("no body must fail", async function () {
     const finapi = ({
-        userInfo: async () => {
-          return { 'id': 'chapu' }
-        }
-      } as unknown) as FinAPI;
+      userInfo: async () => {
+        return { id: "chapu" };
+      },
+    } as unknown) as FinAPI;
 
-      const event = ({
-        headers: {
-          Authorization: "bearer 12345678"
-        }
-      } as unknown) as APIGatewayProxyEvent;
-    
-    await users.save(new User("chapu","",""));
+    const event = ({
+      headers: {
+        Authorization: "bearer 12345678",
+      },
+    } as unknown) as APIGatewayProxyEvent;
 
-    const result = await updateRecurrentTransactions(
-        event,
-        context,
-        logger,
-        finapi,
-        users,
-        recurrentTransactions
-      );
-    
+    await users.save(new User("chapu", "", ""));
+
+    const result = await updateRecurrentTransactions(event, context, logger, finapi, users, recurrentTransactions);
+
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(400);
     expect(JSON.parse(result.body).message).to.include("empty body");
   });
 
-  it("no recurrenttransactions in the body must fail", async function() {
+  it("no recurrenttransactions in the body must fail", async function () {
     const finapi = ({
-        userInfo: async () => {
-          return { 'id': 'chapu' }
-        }
-      } as unknown) as FinAPI;
+      userInfo: async () => {
+        return { id: "chapu" };
+      },
+    } as unknown) as FinAPI;
 
-      const event = ({
-        headers: {
-          Authorization: "bearer 12345678"
-        },
-        body: JSON.stringify({})
-      } as unknown) as APIGatewayProxyEvent;
-    
-    await users.save(new User("chapu","",""));
+    const event = ({
+      headers: {
+        Authorization: "bearer 12345678",
+      },
+      body: JSON.stringify({}),
+    } as unknown) as APIGatewayProxyEvent;
 
-    const result = await updateRecurrentTransactions(
-        event,
-        context,
-        logger,
-        finapi,
-        users,
-        recurrentTransactions
-      );
-    
+    await users.save(new User("chapu", "", ""));
+
+    const result = await updateRecurrentTransactions(event, context, logger, finapi, users, recurrentTransactions);
+
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(400);
     expect(JSON.parse(result.body).message).to.include("invalid request");
   });
 
-  it("if updateArray failed must fail", async function() {
+  it("if updateArray failed must fail", async function () {
     const finapi = ({
-        userInfo: async () => {
-          return { 'id': 'chapu' }
-        }
-      } as unknown) as FinAPI;
+      userInfo: async () => {
+        return { id: "chapu" };
+      },
+    } as unknown) as FinAPI;
 
-      const event = ({
-        headers: {
-          Authorization: "bearer 12345678"
-        },
-        body: JSON.stringify({
-            recurrenttransactions: [
-                {
-                    Id: 1,
-                    AccountId: 1,
-                    AbsAmount: 1023,
-                    IsExpense: true,
-                    IsConfirmed: true,
-                    Frequency: TransactionFrequency.Unknown,
-                    CounterPartName: "Dinodime GmbH"
-                }
-            ]
-        })
-      } as unknown) as APIGatewayProxyEvent;
-    
-    await users.save(new User("chapu","",""));
+    const event = ({
+      headers: {
+        Authorization: "bearer 12345678",
+      },
+      body: JSON.stringify({
+        recurrenttransactions: [
+          {
+            Id: 1,
+            AccountId: 1,
+            AbsAmount: 1023,
+            IsExpense: true,
+            IsConfirmed: true,
+            Frequency: TransactionFrequency.Unknown,
+            CounterPartName: "Dinodime GmbH",
+          },
+        ],
+      }),
+    } as unknown) as APIGatewayProxyEvent;
 
-    const result = await updateRecurrentTransactions(
-        event,
-        context,
-        logger,
-        finapi,
-        users,
-        recurrentTransactions
-      );
-    
+    await users.save(new User("chapu", "", ""));
+
+    const result = await updateRecurrentTransactions(event, context, logger, finapi, users, recurrentTransactions);
+
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(204);
     expect(JSON.parse(result.body).message).to.include("updating recurrent transactions failed");
   });
 
-  it("id recurrent transaction exist must success", async function() {
+  it("id recurrent transaction exist must success", async function () {
     const finapi = ({
-        userInfo: async () => {
-          return { 'id': 'chapu' }
-        }
-      } as unknown) as FinAPI;
+      userInfo: async () => {
+        return { id: "chapu" };
+      },
+    } as unknown) as FinAPI;
 
-      const event = ({
-        headers: {
-          Authorization: "bearer 12345678"
-        },
-        body: JSON.stringify({
-            recurrenttransactions: [
-                {
-                    Id: 1,
-                    AccountId: 1,
-                    AbsAmount: 1023,
-                    IsExpense: true,
-                    IsConfirmed: true,
-                    Frequency: TransactionFrequency.Monthly,
-                    CounterPartName: "Dinodime GmbH"
-                },
-                {
-                    Id: 2,
-                    AccountId: 1,
-                    AbsAmount: 1024,
-                    IsExpense: true,
-                    IsConfirmed: true,
-                    Frequency: TransactionFrequency.Yearly,
-                    CounterPartName: "Dinodime GmbH 2"
-                }
-            ]
-        })
-      } as unknown) as APIGatewayProxyEvent;
-    
+    const event = ({
+      headers: {
+        Authorization: "bearer 12345678",
+      },
+      body: JSON.stringify({
+        recurrenttransactions: [
+          {
+            Id: 1,
+            AccountId: 1,
+            AbsAmount: 1023,
+            IsExpense: true,
+            IsConfirmed: true,
+            Frequency: TransactionFrequency.Monthly,
+            CounterPartName: "Dinodime GmbH",
+          },
+          {
+            Id: 2,
+            AccountId: 1,
+            AbsAmount: 1024,
+            IsExpense: true,
+            IsConfirmed: true,
+            Frequency: TransactionFrequency.Yearly,
+            CounterPartName: "Dinodime GmbH 2",
+          },
+        ],
+      }),
+    } as unknown) as APIGatewayProxyEvent;
+
     {
-      let user = new User("chapu","","");
+      let user = new User("chapu", "", "");
       user.isRecurrentTransactionConfirmed = false;
       await users.save(user);
     }
     await recurrentTransactions.saveArray([
-        new RecurrentTransaction(1, [1,2,3], 1023, true, "Dinodime GmbH", 1),
-        new RecurrentTransaction(1, [3,4,5], 1024, true, "Dinodime GmbH 2", 2)
+      new RecurrentTransaction(1, [1, 2, 3], 1023, true, "Dinodime GmbH", 1),
+      new RecurrentTransaction(1, [3, 4, 5], 1024, true, "Dinodime GmbH 2", 2),
     ]);
 
     const initialResult = await recurrentTransactions.findById(1);
@@ -232,15 +196,8 @@ describe("unit: update recurrent transactions", function() {
     expect(initialResult!.frequency).to.equal(TransactionFrequency.Unknown);
     expect(initialResult2!.frequency).to.equal(TransactionFrequency.Unknown);
 
-    const result = await updateRecurrentTransactions(
-        event,
-        context,
-        logger,
-        finapi,
-        users,
-        recurrentTransactions
-      );
-    
+    const result = await updateRecurrentTransactions(event, context, logger, finapi, users, recurrentTransactions);
+
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(200);
     expect(JSON.parse(result.body).message).to.include("success");

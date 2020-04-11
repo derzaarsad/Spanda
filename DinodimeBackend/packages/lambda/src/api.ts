@@ -1,14 +1,12 @@
 import { APIGatewayProxyEvent, Context } from "aws-lambda";
 
 import { CreateInternalErrorResponse, CreateSimpleResponse } from "./lambda-util";
-import CreateLogger from "./create-logger";
 import { ServiceProvider } from "./service-provider";
 import * as authenticationController from "./controllers/authentication-controller";
 import * as bankController from "./controllers/bank-controller";
 
-const env = process.env;
-const logger = CreateLogger(env);
-const services = new ServiceProvider(env);
+const services = new ServiceProvider(process.env);
+const logger = services.logger;
 
 /*
  * Authentication Controller
@@ -17,7 +15,7 @@ const services = new ServiceProvider(env);
 export const isUserAuthenticated = async (event: APIGatewayProxyEvent, context: Context) => {
   logger.debug("received event", event);
   try {
-    const response = authenticationController.isUserAuthenticated(
+    const response = await authenticationController.isUserAuthenticated(
       event,
       context,
       logger,
@@ -35,7 +33,7 @@ export const isUserAuthenticated = async (event: APIGatewayProxyEvent, context: 
 export const registerUser = async (event: APIGatewayProxyEvent, context: Context) => {
   logger.debug("received event", event);
   try {
-    const response = authenticationController.registerUser(
+    const response = await authenticationController.registerUser(
       event,
       context,
       logger,
@@ -57,7 +55,7 @@ export const registerUser = async (event: APIGatewayProxyEvent, context: Context
 export const authenticateAndSaveUser = async (event: APIGatewayProxyEvent, context: Context) => {
   logger.debug("received event", event);
   try {
-    const response = authenticationController.authenticateAndSave(
+    const response = await authenticationController.authenticateAndSave(
       event,
       context,
       logger,
@@ -77,7 +75,7 @@ export const authenticateAndSaveUser = async (event: APIGatewayProxyEvent, conte
 export const updateRefreshToken = async (event: APIGatewayProxyEvent, context: Context) => {
   logger.debug("received event", event);
   try {
-    const response = authenticationController.updateRefreshToken(
+    const response = await authenticationController.updateRefreshToken(
       event,
       context,
       logger,
@@ -103,7 +101,7 @@ export const updateRefreshToken = async (event: APIGatewayProxyEvent, context: C
 export const getBankByBLZ = async (event: APIGatewayProxyEvent, context: Context) => {
   logger.debug("received event", event);
   try {
-    const response = bankController.getBankByBLZ(
+    const response = await bankController.getBankByBLZ(
       event,
       context,
       logger,
@@ -124,7 +122,7 @@ export const getBankByBLZ = async (event: APIGatewayProxyEvent, context: Context
 export const getWebFormId = async (event: APIGatewayProxyEvent, context: Context) => {
   logger.debug("received event", event);
   try {
-    const response = bankController.getWebformId(
+    const response = await bankController.getWebformId(
       event,
       context,
       logger,
@@ -142,26 +140,10 @@ export const getWebFormId = async (event: APIGatewayProxyEvent, context: Context
   }
 };
 
-export const webFormCallback = async (event: APIGatewayProxyEvent, context: Context) => {
-  logger.debug("received event", event);
-  try {
-    // TODO: not finished!
-    console.log(event.pathParameters);
-    const response = CreateSimpleResponse(200, "the function is called!");
-    logger.debug("returning regular response", response);
-    return response;
-  } catch (err) {
-    logger.error("error importing bank connection", err);
-    const response = CreateInternalErrorResponse(err);
-    logger.debug("returning error response", response);
-    return response;
-  }
-};
-
 export const getRecurrentTransactions = async (event: APIGatewayProxyEvent, context: Context) => {
   logger.debug("received event", event);
   try {
-    const response = bankController.getRecurrentTransactions(
+    const response = await bankController.getRecurrentTransactions(
       event,
       context,
       logger,
@@ -183,7 +165,7 @@ export const getRecurrentTransactions = async (event: APIGatewayProxyEvent, cont
 export const updateRecurrentTransactions = async (event: APIGatewayProxyEvent, context: Context) => {
   logger.debug("received event", event);
   try {
-    const response = bankController.updateRecurrentTransactions(
+    const response = await bankController.updateRecurrentTransactions(
       event,
       context,
       logger,
@@ -201,33 +183,10 @@ export const updateRecurrentTransactions = async (event: APIGatewayProxyEvent, c
   }
 };
 
-export const fetchWebFormInfo = async (event: APIGatewayProxyEvent, context: Context) => {
-  logger.debug("received event", event);
-  try {
-    const response = bankController.fetchWebFormInfo(
-      event,
-      context,
-      logger,
-      services.bankInterface,
-      services.users,
-      services.connections,
-      services.transactions,
-      services.encryptions
-    );
-    logger.debug("returning regular response", response);
-    return response;
-  } catch (err) {
-    logger.error("error fetching webform id", err);
-    const response = CreateInternalErrorResponse(err);
-    logger.debug("returning error response", response);
-    return response;
-  }
-};
-
 export const getAllowance = async (event: APIGatewayProxyEvent, context: Context) => {
   logger.debug("received event", event);
   try {
-    const response = bankController.getAllowance(event, context, logger, services.bankInterface, services.users);
+    const response = await bankController.getAllowance(event, context, logger, services.bankInterface, services.users);
     logger.debug("returning regular response", response);
     return response;
   } catch (err) {

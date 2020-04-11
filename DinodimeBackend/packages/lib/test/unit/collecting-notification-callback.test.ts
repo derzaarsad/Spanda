@@ -12,7 +12,7 @@ describe("unit: Collecting notification callback", () => {
       notificationRuleId: 1,
       triggerEvent: "NEW_TRANSACTIONS",
       newTransactions: [],
-      callbackHandle: "new-transactions"
+      callbackHandle: "new-transactions",
     };
 
     const expected = [
@@ -20,15 +20,15 @@ describe("unit: Collecting notification callback", () => {
         notificationRuleId: 1,
         triggerEvent: "NEW_TRANSACTIONS",
         newTransactions: [],
-        callbackHandle: "new-transactions"
-      }
+        callbackHandle: "new-transactions",
+      },
     ];
 
     const decoder = new Pass();
     const callback = new Accumulator(decoder);
     const status = await callback.accept(payload);
 
-    expect(status).to.eql({ kind: "success" });
+    expect(status.kind).to.eql("success");
     expect(callback.notifications).to.eql(expected);
   });
 
@@ -59,13 +59,13 @@ describe("unit: Collecting notification callback", () => {
                   amount: 200,
                   counterpartName: "your uncle",
                   purpose: "cash",
-                  isAdjustingEntry: false
-                }
-              ]
+                  isAdjustingEntry: false,
+                },
+              ],
             })
-          )
-        }
-      ]
+          ),
+        },
+      ],
     };
 
     const expected = [
@@ -91,13 +91,13 @@ describe("unit: Collecting notification callback", () => {
                   amount: 200,
                   counterpartName: "your uncle",
                   purpose: "cash",
-                  isAdjustingEntry: false
-                }
-              ]
-            }
-          }
-        ]
-      }
+                  isAdjustingEntry: false,
+                },
+              ],
+            },
+          },
+        ],
+      },
     ];
 
     const decoder = new NewTransactionsDecryptor(crypto);
@@ -105,7 +105,7 @@ describe("unit: Collecting notification callback", () => {
     const callback = new Accumulator(decoder);
     const status = await callback.accept(payload);
 
-    expect(status).to.eql({ kind: "success" });
+    expect(status.kind).to.eql("success");
     expect(callback.notifications).to.eql(expected);
   });
 });

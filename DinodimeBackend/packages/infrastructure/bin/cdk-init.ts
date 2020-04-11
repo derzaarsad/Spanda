@@ -9,6 +9,8 @@ import { PostgresDeploymentProps } from "../src/postgres-deployment-props";
 import { ServicesProps } from "../src/services-props";
 import { DatabaseMigrationsRepository } from "../src/db-migrations-repo";
 import { LambdaPermissionProps } from "../src/lambda-factory";
+import { MockFinApi } from "../src/mock-finapi";
+import { AdminApi } from "../src/admin-api";
 
 const app = new cdk.App();
 
@@ -16,13 +18,9 @@ const account = app.node.tryGetContext("awsAccount")! as string;
 const region = app.node.tryGetContext("awsRegion")! as string;
 const deploymentEnv = { region: region, account: account };
 
-const migrationsRepository = new DatabaseMigrationsRepository(
-  app,
-  "DinodimeDbMigrationsRepository",
-  {
-    env: deploymentEnv
-  }
-);
+const migrationsRepository = new DatabaseMigrationsRepository(app, "DinodimeDbMigrationsRepository", {
+  env: deploymentEnv
+});
 
 const infrastructure = new Infrastructure(app, "DinodimeInfrastructure", { env: deploymentEnv });
 
@@ -91,3 +89,7 @@ const servicesProps: ServicesProps = {
 };
 
 new Services(app, "DinodimeServices", servicesProps);
+
+new MockFinApi(app, "MockFinAPI");
+
+new AdminApi(app, "DinodimeAdminAPI", servicesProps);

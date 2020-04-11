@@ -9,10 +9,17 @@ import * as iam from "@aws-cdk/aws-iam";
 import * as path from "path";
 
 import { Duration, RemovalPolicy } from "@aws-cdk/core";
-import { NewTransactionsNotificationsProps } from "./new-transactions-notifications-config";
 import { LambdaFactory } from "./lambda-factory";
 
 const tableName = "RuleHandleTable";
+
+import { LambdaDeploymentProps, LambdaPermissionProps } from "./lambda-factory";
+
+export interface NewTransactionsNotificationsProps {
+  decryptionKey: string;
+  lambdaDeploymentProps: LambdaDeploymentProps;
+  lambdaPermissionProps: LambdaPermissionProps;
+}
 
 export class NewTransactionsNotifications extends cdk.Construct {
   readonly restAPI: apigw.LambdaRestApi;
