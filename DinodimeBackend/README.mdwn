@@ -37,7 +37,7 @@ You need to explicitly install the Yarn and the Amazon CDK binaries.
 
 ### WebForm Callback
 
-The webform callback API is called by finAPI upon successfull webform completions. The callback places a completion token on a topic, which is processed by a backend function that fetches the bank data associated with the form and saves it in the backend.
+The webform callback API is called by finAPI upon successfull webform completions. The callback places a completion token on a topic, which is processed by a backend function that fetches the bank data associated with the form and saves it in the backend. Completions that could not be processed are placed on a dead-letter queue.
 
 ![WebForm callback diagram](documentation/webform-callback.png)
 
@@ -83,6 +83,38 @@ yarn workspace dinodime-infrastructure run cdk deploy
 The lines above correspond to a typical sequence of commands you would use when working with the CDK.
 
 ## HOWTO
+
+### Run the Infrastructure Integration Tests
+
+The package `infrastructure-integtests` features tests that work against the deployed infrastructure on a live AWS environment. Each test case is started by a separate bash script, which queries the outputs of the deployed stacks to configure the test environment correctly. To make execute the tests, you can leverage the mock finAPI implementation:
+
+```
+yarn workspace dinodime-infrastructure run cdk \
+-c awsRegion=us-east-1 \
+-c awsAccount=807610544828
+deploy MockFinAPI
+```
+
+Note the base URL that is displayed at the end of the deployment. Then, deploy the services and admin APIs:
+
+```
+yarn workspace dinodime-infrastructure run cdk \
+-c awsRegion=us-east-1 \
+-c awsAccount=807610544828 \
+-c finApiUrl=$MOCK_FINAPI_URL \
+-c finApiClientId=$FINAPI_CLIENT_ID \
+-c finApiClientSecret=$FINAPI_CLIENT_SECRET \
+-c finApiDecryptionKey=$FINAPI_DECRYPTION_KEY \
+-c pgDatabaseName=postgres \
+-c pgMasterUserName=postgres \
+deploy DinodimeAdminAPI DinodimeServices
+```
+
+You can execute the tests by running the respective shell script, i.e.:
+
+```
+./packages/infrastructure-integtests/run-webform-callback-test.sh
+```
 
 ### Connect to a bastion host with the AWS Systems Manager
 
