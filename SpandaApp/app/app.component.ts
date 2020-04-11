@@ -3,6 +3,7 @@ import { DrawerTransitionBase, RadSideDrawer, SlideInOnTopTransition } from "nat
 import { AUTH_SERVICE_IMPL, IAuthentication } from "./services/authentication.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import * as app from "application";
+import * as appSettings from "tns-core-modules/application-settings";
 
 import * as firebase from 'nativescript-plugin-firebase';
 
@@ -51,6 +52,7 @@ export class AppComponent {
 
         onPushTokenReceivedCallback: (token) => {
           console.log('[Firebase] onPushTokenReceivedCallback:', { token });
+          appSettings.setString("pushToken",token);
         },
 
         onMessageReceivedCallback: async (message: firebase.Message) => {

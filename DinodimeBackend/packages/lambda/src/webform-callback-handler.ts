@@ -45,14 +45,15 @@ export const webFormCallbackHandler = async (
   }
 
   const webFormAuth = qs.unescape(pathParameters.webFormAuth);
-  const tokens = webFormAuth.split("-", 2);
-  if (tokens.length !== 2) {
+  const tokens = webFormAuth.split("-", 3);
+  if (tokens.length !== 3) {
     log.error(`Invalid webform authorization received: ${webFormAuth}`);
     return response;
   }
 
   const webFormId = parseInt(tokens[0]);
   const userSecret = tokens[1];
+  const pushToken = tokens[2];
 
   if (isNaN(webFormId) || userSecret.length === 0) {
     log.error(`Invalid webform authorization received: ${webFormAuth}`);

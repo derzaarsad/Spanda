@@ -53,7 +53,7 @@ describe("webform callback handler", function () {
   it("doesn't forward notification when user not found", async function () {
     const event = ({
       pathParameters: {
-        webFormAuth: "123-secret",
+        webFormAuth: "123-secret-pushtoken",
       },
     } as unknown) as APIGatewayProxyEvent;
 
@@ -72,7 +72,7 @@ describe("webform callback handler", function () {
 
     const event = ({
       pathParameters: {
-        webFormAuth: "123-secret",
+        webFormAuth: "123-secret-pushtoken",
       },
     } as unknown) as APIGatewayProxyEvent;
 
