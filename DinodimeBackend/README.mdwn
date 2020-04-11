@@ -35,6 +35,12 @@ You need to explicitly install the Yarn and the Amazon CDK binaries.
 
 ## Infrastructure Diagrams
 
+### WebForm Callback
+
+The webform callback API is called by finAPI upon successfull webform completions. The callback places a completion token on a topic, which is processed by a backend function that fetches the bank data associated with the form and saves it in the backend.
+
+![WebForm callback diagram](documentation/webform-callback.png)
+
 ### Database Migrations
 
 The migrations infrastructure is responsible for initializing the RDS instance with the schema definitions of the data model. It requires a bootstrapping step that prepares an image with the migrations scripts and pushes it to an internal docker repository. The step can be executed by

@@ -3,9 +3,8 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import winston from "winston";
 
 import AWS from "aws-sdk";
-import SQS, { MessageList } from "aws-sdk/clients/sqs";
+import SQS from "aws-sdk/clients/sqs";
 
-import { deleteMessages } from "./util";
 import { User, Transaction, CallbackCrypto, EncryptedData } from "dinodime-lib";
 
 const assert = chai.assert;
