@@ -67,7 +67,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
     });
 
     const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-webform-callback"));
-    const webFormCallback = lambdaFactory.createLambda("WebFormCallback", handler, "main.handler");
+    const webFormCallback = lambdaFactory.createLambda("WebFormCallback", handler, "main.webFormCallback");
     return new apigw.LambdaIntegration(webFormCallback);
   }
 
@@ -92,8 +92,8 @@ export class WebFormCallbackAPI extends cdk.Construct {
       withTracing: true,
     });
 
-    const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-fetch-webform"));
-    const processor = lambdaFactory.createLambda("FetchWebForm", handler, "main.handler");
+    const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-webform-callback"));
+    const processor = lambdaFactory.createLambda("FetchWebForm", handler, "main.fetchWebForm");
 
     processor.addEventSource(
       new SqsEventSource(completionsQueue, {
