@@ -99,6 +99,7 @@ export class BankService {
                 let r: RecurrentTransaction = new RecurrentTransaction();
                 r.Id = res["content"]["recurrenttransactions"][item]["id"];
                 r.AccountId = res["content"]["recurrenttransactions"][item]["accountId"];
+                r.AbsAmount = res["content"]["recurrenttransactions"][item]["absAmount"];
                 r.IsExpense = res["content"]["recurrenttransactions"][item]["isExpense"];
                 r.IsConfirmed = res["content"]["recurrenttransactions"][item]["isConfirmed"];
                 r.Frequency = res["content"]["recurrenttransactions"][item]["frequency"];

@@ -16,6 +16,9 @@ export class RecurrentTransaction {
     @JsonProperty("AccountId", Number)
     AccountId: number = undefined;
 
+    @JsonProperty("AbsAmount", Number)
+    AbsAmount: number = undefined;
+
     @JsonProperty("IsExpense", Boolean)
     IsExpense: boolean = undefined;
 

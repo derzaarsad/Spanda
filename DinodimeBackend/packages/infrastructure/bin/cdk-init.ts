@@ -82,6 +82,9 @@ const servicesProps: ServicesProps = {
     pgUser: pgMasterUserName,
     pgPassword: infrastructure.databasePassword,
     storageBackend: "POSTGRESQL"
+  },
+  firebaseProps: {
+    firebaseServerKey: app.node.tryGetContext("firebaseServerKey")! as string
   }
 };
 

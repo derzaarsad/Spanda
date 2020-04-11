@@ -25,7 +25,10 @@ describe("The services stack", () => {
         storageBackend: "IN_MEMORY"
       },
       lambdaDeploymentProps: {},
-      lambdaPermissionProps: new LambdaPermissionProps()
+      lambdaPermissionProps: new LambdaPermissionProps(),
+      firebaseProps: {
+        firebaseServerKey: ""
+      }
     };
   });
 

@@ -198,6 +198,7 @@ export const getRecurrentTransactions = async (
     return {
       id: el.id,
       accountId: el.accountId,
+      absAmount: el.absAmount,
       isExpense: el.isExpense,
       isConfirmed: el.isConfirmed,
       frequency: el.frequency,
@@ -253,7 +254,7 @@ export const updateRecurrentTransactions = async (
   const recurrentArray: Array<any> = params.recurrenttransactions;
 
   const recurrenttransactions = recurrentArray.map((el) => {
-    let ret = new RecurrentTransaction(el.AccountId, [], el.IsExpense, el.CounterPartName, el.Id);
+    let ret = new RecurrentTransaction(el.AccountId, [], el.AbsAmount, el.IsExpense, el.CounterPartName, el.Id);
     ret.isConfirmed = el.IsConfirmed;
     ret.frequency = el.Frequency;
     return ret;
@@ -290,6 +291,7 @@ export const deduceRecurrentTransactions = async (
           new RecurrentTransaction(
             accountId,
             res.map((el) => el.id),
+            res[0].absAmount,
             res[0].isExpense,
             res[0].counterPartName == undefined ? null : res[0].counterPartName
           )

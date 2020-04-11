@@ -77,13 +77,17 @@ export class LoginComponent {
             return;
         }
         this.authenticationService.register(this.Username, this.Password)
-            .then(() => {
-                this.alert("Your account was successfully created.");
-                this.isLoggingIn = true;
-                this.authenticationService.authenticateAndSave(this.Username,this.Password)
-                .then(() => {
-                    this.routerExtension.navigate(['../home'], { clearHistory: true, relativeTo: this.activeRoute });
-                });
+            .then(([registrationSuccess,message]) => {
+                if(registrationSuccess) {
+                    this.alert("Your account was successfully created.");
+                    this.isLoggingIn = true;
+                    this.authenticationService.authenticateAndSave(this.Username,this.Password)
+                    .then(() => {
+                        this.routerExtension.navigate(['../home'], { clearHistory: true, relativeTo: this.activeRoute });
+                    });
+                } else {
+                    this.alert(message);
+                }
             })
             .catch((err) => {
                 console.log(err);
