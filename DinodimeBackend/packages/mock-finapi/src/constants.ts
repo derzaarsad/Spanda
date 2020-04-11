@@ -1,10 +1,5 @@
 import { FinAPIModel } from "dinodime-lib";
 
-export interface ClientCredentials {
-  clientId: string;
-  clientSecret: string;
-}
-
 const importConnectionResponse = {
   id: 1,
   bankId: 277672,

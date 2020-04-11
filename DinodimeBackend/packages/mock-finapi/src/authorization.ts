@@ -1,7 +1,7 @@
 import * as querystring from "querystring";
 import * as winston from "winston";
 
-import { ClientCredentials } from "./constants";
+import { ClientCredentials } from "./client-credentials";
 import { FinAPIModel } from "dinodime-lib";
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from "aws-lambda";
 import { CreateResponse } from "./lambda-util";
