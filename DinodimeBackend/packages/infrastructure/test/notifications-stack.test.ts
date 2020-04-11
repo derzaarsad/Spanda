@@ -27,7 +27,8 @@ describe("The services stack", () => {
       lambdaDeploymentProps: {},
       lambdaPermissionProps: new LambdaPermissionProps(),
       firebaseProps: {
-        firebaseServerKey: ""
+        googleAppCredentials: "",
+        googleAppDatabaseUrl: ""
       }
     };
   });
