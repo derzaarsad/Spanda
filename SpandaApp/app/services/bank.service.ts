@@ -133,7 +133,7 @@ export class BankService {
             }
             console.log("WebForm Valid");
             console.log(res);
-            return res["content"]["location"] + "?callbackUrl=" + this.authenticationService.getBackendUrl() + "/webForms/callback/" + res["content"]["webFormAuth"];
+            return res["content"]["location"] + "?callbackUrl=" + encodeURIComponent(this.authenticationService.getBackendUrl() + "/webForms/callback/" + res["content"]["webFormAuth"]);
         }, err => {
             console.log("WebForm Invalid");
             console.log(err);

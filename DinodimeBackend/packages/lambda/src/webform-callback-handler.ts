@@ -48,15 +48,16 @@ export const webFormCallbackHandler = async (
   }
 
   const webFormAuth = qs.unescape(pathParameters.webFormAuth);
-  const tokens = webFormAuth.split("-", 3);
-  if (tokens.length !== 3) {
+  const splitkey = "-";
+  const tokens = webFormAuth.split(splitkey);
+  if (tokens.length < 3) {
     log.error(`Invalid webform authorization received: ${webFormAuth}`);
     return response;
   }
 
   const webFormId = parseInt(tokens[0]);
   const userSecret = tokens[1];
-  const pushToken = tokens[2];
+  const pushToken = tokens.slice(2).join(splitkey);
 
   // Push a signal to the app to close the webform page.
   // This signal should not have an await

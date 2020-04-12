@@ -68,7 +68,7 @@ export class SearchBankComponent implements OnInit {
             if(!res) {
                 return;
             }
-            this.webViewSrc = res + "-" + appSettings.getString("pushToken");
+            this.webViewSrc = res + "-" + encodeURIComponent(appSettings.getString("pushToken"));
             this.enableWebView = true;
         });
     }
