@@ -47,4 +47,4 @@ export { RecurrentTransactionsSchema } from "./schema/recurrent-transactions";
 export { FinAPI } from "./region-specific/de/finapi";
 export { Model as FinAPIModel } from "./region-specific/de/model";
 
-export { FirebaseMessaging } from "./firebase/messaging";
+export { PushMessaging, FirebaseMessaging } from "./firebase/messaging";

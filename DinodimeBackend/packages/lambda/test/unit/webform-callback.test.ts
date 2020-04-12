@@ -2,8 +2,9 @@
 import chai from "chai";
 import winston from "winston";
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
-import { VoidTransport, MockSQSPublisher, User, Users } from "dinodime-lib";
+import { VoidTransport, MockSQSPublisher, User, Users, PushMessaging } from "dinodime-lib";
 import { WebFormCallbackHandlerConfiguration, webFormCallbackHandler } from "../../src/webform-callback-handler";
+import { TestMessaging } from "../test-utility";
 
 const expect = chai.expect;
 
@@ -12,15 +13,18 @@ describe("webform callback handler", function () {
   let sqs: MockSQSPublisher;
   let users: Users.UsersRepository;
   let configuration: WebFormCallbackHandlerConfiguration;
+  let pushMessaging: PushMessaging;
 
   beforeEach(function () {
     context = {} as Context;
     sqs = new MockSQSPublisher();
     users = new Users.InMemoryRepository();
+    pushMessaging = new TestMessaging();
     configuration = {
       log: winston.createLogger({ transports: [new VoidTransport()] }),
       sqs: sqs,
       users: users,
+      pushMessaging: pushMessaging
     };
   });
 

@@ -1,6 +1,10 @@
 import { AxiosInstance, AxiosRequestConfig } from "axios";
 
-export class FirebaseMessaging {
+export interface PushMessaging {
+    sendMessage(registrationToken: string, body: any, title: string): Promise<any>;
+}
+
+export class FirebaseMessaging implements PushMessaging {
     private http: AxiosInstance;
     private serverKey: string;
 
@@ -11,7 +15,7 @@ export class FirebaseMessaging {
         console.log("Firebase push server key: " + this.serverKey);
     }
   
-    async sendMessage(registrationToken: string, body: any, title: string) {
+    async sendMessage(registrationToken: string, body: any, title: string): Promise<any> {
         const config = {
             headers: {
                 Authorization: "key=" + this.serverKey,

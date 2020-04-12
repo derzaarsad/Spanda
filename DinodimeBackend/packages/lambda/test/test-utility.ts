@@ -2,6 +2,13 @@ import axios from "axios";
 import { User, FinAPI } from "dinodime-lib";
 import { Authentication, Basic } from "dinodime-lib";
 import { ClientSecretsProvider, Resolved } from "dinodime-lib";
+import { PushMessaging } from "dinodime-lib/src";
+
+export class TestMessaging implements PushMessaging {
+  async sendMessage(registrationToken: string, body: any, title: string): Promise<any> {
+    return {};
+  }
+}
 
 export const CreateUnittestInterfaces = () => {
   // Create Authentications
