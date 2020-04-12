@@ -19,7 +19,7 @@ Get google-services.json from the server firebase and copy it in `./app/App_Reso
 Finally, run the app using:
 
 ```bash
-tns run android --env.environmentJson="{\"stage\":\"prototype\",\"APIEndpointURL\":\"<APIEndpointURL>\"}"
+tns run android --env.environmentJson="{\"stage\":\"prototype\",\"APIEndpointURL\":\"<APIEndpointURL>\",\"CallbackEndpointURL\":\"<CallbackEndpointURL>\"}"
 ```
 
 ## Firebase Installation (if not available)

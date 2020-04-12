@@ -4,6 +4,8 @@ import { Bank } from "~/models/bank.model";
 import { IAuthentication, AUTH_SERVICE_IMPL } from "~/services/authentication.service";
 import { Token } from "~/models/token.model";
 import { RecurrentTransaction } from "~/models/recurrent-transactions.model";
+import { environment } from "~/environments/environment";
+import * as appSettings from "tns-core-modules/application-settings";
 
 @Injectable()
 export class BankService {
@@ -133,7 +135,7 @@ export class BankService {
             }
             console.log("WebForm Valid");
             console.log(res);
-            return res["content"]["location"] + "?callbackUrl=" + encodeURIComponent(this.authenticationService.getBackendUrl() + "/webForms/callback/" + res["content"]["webFormAuth"]);
+            return res["content"]["location"] + "?callbackUrl=" + encodeURIComponent(environment.CallbackEndpointURL + "/webForms/callback/" + res["content"]["webFormAuth"] + "-" + appSettings.getString("pushToken"));
         }, err => {
             console.log("WebForm Invalid");
             console.log(err);

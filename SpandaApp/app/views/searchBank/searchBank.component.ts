@@ -10,7 +10,6 @@ import { AuthenticationService } from "~/services/authentication.service";
 import { Bank } from "~/models/bank.model";
 import * as utils from "tns-core-modules/utils/utils";
 import { WebView, LoadEventData } from "tns-core-modules/ui/web-view";
-import * as appSettings from "tns-core-modules/application-settings";
 
 @Component({
     selector: "searchBank",
@@ -68,7 +67,7 @@ export class SearchBankComponent implements OnInit {
             if(!res) {
                 return;
             }
-            this.webViewSrc = res + "-" + encodeURIComponent(appSettings.getString("pushToken"));
+            this.webViewSrc = res.toString();
             this.enableWebView = true;
         });
     }
