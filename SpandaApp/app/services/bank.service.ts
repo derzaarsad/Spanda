@@ -135,7 +135,7 @@ export class BankService {
             }
             console.log("WebForm Valid");
             console.log(res);
-            return res["content"]["location"] + "?callbackUrl=" + encodeURIComponent(environment.CallbackEndpointURL + "/webForms/callback/" + res["content"]["webFormAuth"] + "-" + appSettings.getString("pushToken"));
+            return res["content"]["location"] + "?callbackUrl=" + encodeURIComponent(environment.CallbackEndpointURL + "/webForms/callback/" + encodeURIComponent(res["content"]["webFormAuth"] + "-" + appSettings.getString("pushToken")));
         }, err => {
             console.log("WebForm Invalid");
             console.log(err);
