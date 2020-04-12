@@ -37,7 +37,7 @@ export class WebFormCallbackAPI extends cdk.Construct {
     const callback = webForms.addResource("callback");
     const webFormCallbackResource = callback.addResource("{webFormAuth}");
     const webFrontEnd = this.createWebFrontend(completionsQueue, props);
-    webFormCallbackResource.addMethod("GET", webFrontEnd, {
+    webFormCallbackResource.addMethod("POST", webFrontEnd, {
       operationName: "web form callback",
     });
 
