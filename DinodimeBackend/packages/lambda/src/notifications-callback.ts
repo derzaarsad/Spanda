@@ -4,7 +4,7 @@ import { Context, APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda
 
 import winston from "winston";
 
-import { CreateResponse } from "./lambda-util";
+import { CreateSimpleResponse } from "./lambda-util";
 
 import { Notification, EncryptedNewTransactionsNotification } from "dinodime-lib";
 import { AesCrypto } from "dinodime-lib";
@@ -63,7 +63,7 @@ export const handler = async (
   context: Context
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== "POST") {
-    return CreateResponse(405, "method not allowed");
+    return CreateSimpleResponse(405, "method not allowed");
   }
 
   logger.debug("received event", event);
@@ -75,16 +75,16 @@ export const handler = async (
     try {
       const status = await callback.accept(body);
       if (status.kind === "success") {
-        return CreateResponse(201, "notification processed successfully");
+        return CreateSimpleResponse(201, "notification processed successfully");
       } else {
         logger.error(errorMessage, status.error);
-        return CreateResponse(500, errorMessage);
+        return CreateSimpleResponse(500, errorMessage);
       }
     } catch (err) {
       logger.error(errorMessage, err);
-      return CreateResponse(500, errorMessage);
+      return CreateSimpleResponse(500, errorMessage);
     }
   } else {
-    return CreateResponse(400, "received an invalid notification");
+    return CreateSimpleResponse(400, "received an invalid notification");
   }
 };
