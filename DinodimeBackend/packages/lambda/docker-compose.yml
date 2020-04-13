@@ -3,14 +3,14 @@ version: "3.4"
 services:
   app:
     build:
-      context: ../../
-      dockerfile: ./packages/lambda/Dockerfile
+      context: ../../../
+      dockerfile: ./DinodimeBackend/packages/lambda/Dockerfile
     env_file:
       - ../../integration-test.env
     volumes:
-      - ../../reports:/app/packages/lambda/reports
-      - ../../coverages/integration/lambda:/app/packages/lambda/coverages
-    command: sh -c "/wait && cd packages/lambda && npm run-script integtest -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integtests-lambda.xml"
+      - ../../reports:/app/DinodimeBackend/packages/lambda/reports
+      - ../../coverages/integration/lambda:/app/DinodimeBackend/packages/lambda/coverages
+    command: sh -c "/wait && cd DinodimeBackend/packages/lambda && npm run-script integtest -- --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/integtests-lambda.xml"
 
   database:
     image: postgres:12
