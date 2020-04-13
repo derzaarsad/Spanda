@@ -1,12 +1,12 @@
 {
   "extends": "./tsconfig-base.json",
   "references": [
+    { "path": "../DinodimeShared/message" },
     { "path": "packages/lib" },
     { "path": "packages/lambda" },
     { "path": "packages/infrastructure" },
     { "path": "packages/infrastructure-integtests" },
-    { "path": "packages/mock-finapi" },
-    { "path": "../DinodimeShared/message" }
+    { "path": "packages/mock-finapi" }
   ],
   "files": []
 }
