@@ -1,0 +1,10 @@
+{
+    "extends": "../../DinodimeBackend/tsconfig-base.json",
+    "compilerOptions": {
+        "rootDir": ".",
+        "outDir": "out",
+        "tsBuildInfoFile": "out/src/tsconfig.tsbuildinfo"
+    },
+    "include": ["src/*"],
+    "exclude": ["node_modules"]
+  }

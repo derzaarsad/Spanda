@@ -4,7 +4,8 @@
   "license": "UNLICENSED",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "../DinodimeShared/*"
   ],
   "scripts": {
     "build": "tsc -b -v",

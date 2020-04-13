@@ -17,6 +17,7 @@
     "all": true
   },
   "dependencies": {
+    "dinodime-message": "1.0.0",
     "dinodime-lib": "0.0.0",
     "winston": "^3.2.1"
   },

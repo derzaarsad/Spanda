@@ -14,6 +14,7 @@ import { isUserParams } from "../user-params";
 import { Authentication, Token } from "dinodime-lib";
 import { User, Users } from "dinodime-lib";
 import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dinodime-lib";
+import { UserVerificationMessage } from "dinodime-message";
 
 type RefreshTokenParams = {
   refresh_token: string;
@@ -71,10 +72,7 @@ export const isUserAuthenticated = async (
       logger.log("error", "error authenticating user", "user is not found in the database.");
       return CreateInternalErrorResponse("internal server error");
     }
-    return CreateResponse(200, {
-      is_recurrent_transaction_confirmed: user.isRecurrentTransactionConfirmed,
-      is_allowance_ready: user.isAllowanceReady,
-    });
+    return CreateResponse(200, new UserVerificationMessage(user.isRecurrentTransactionConfirmed, user.isAllowanceReady));
   } catch (err) {
     logger.log("error", "error authenticating user", err);
     return CreateSimpleResponse(401, "unauthorized");

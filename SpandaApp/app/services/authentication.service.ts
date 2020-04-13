@@ -5,6 +5,7 @@ import * as appSettings from "tns-core-modules/application-settings";
 import { User } from "~/models/user.model";
 import { JsonConvert } from "json2typescript";
 import { environment } from "~/environments/environment";
+import { UserVerificationMessage } from "~/../../DinodimeShared/message/src";
 export const AUTH_SERVICE_IMPL = new InjectionToken<IAuthentication>('authServiceImpl');
 
 /*
@@ -149,8 +150,9 @@ export class AuthenticationService implements IAuthentication {
             console.log("user is authenticated!");
             console.log(res);
             if(res["statusCode"] === 200) {
-                this.storedUser.IsRecurrentTransactionConfirmed = res["content"]["is_recurrent_transaction_confirmed"];
-                this.storedUser.IsAllowanceReady = res["content"]["is_allowance_ready"];
+                let content: UserVerificationMessage = res["content"];
+                this.storedUser.IsRecurrentTransactionConfirmed = content.is_recurrent_transaction_confirmed;
+                this.storedUser.IsAllowanceReady = content.is_allowance_ready;
                 let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
                 appSettings.setString("storedUser",storedUserJson);
 
