@@ -2,7 +2,7 @@ import { Injectable, Inject } from "@angular/core";
 import * as Https from 'nativescript-https';
 import { Bank } from "~/models/bank.model";
 import { IAuthentication, AUTH_SERVICE_IMPL } from "~/services/authentication.service";
-import { Token } from "~/models/token.model";
+import { Token } from "~/../../DinodimeShared/sharedmodel/src/Token";
 import { RecurrentTransaction } from "~/models/recurrent-transactions.model";
 import { environment } from "~/environments/environment";
 import * as appSettings from "tns-core-modules/application-settings";
@@ -24,7 +24,7 @@ export class BankService {
     __getRecurrentTransactions__() : [string,any] {
 
         let headerOptions = {
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
+            "Authorization": this.authenticationService.getStoredUser().UserToken.token_type + " " + this.authenticationService.getStoredUser().UserToken.access_token,
             "Content-Type": "application/json"
         };
 
@@ -34,7 +34,7 @@ export class BankService {
     __updateRecurrentTransactions__(recurrenttransactions: Array<RecurrentTransaction>): [string, any, any] {
 
         let headerOptions = {
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
+            "Authorization": this.authenticationService.getStoredUser().UserToken.token_type + " " + this.authenticationService.getStoredUser().UserToken.access_token,
             "Content-Type": "application/json"
         };
 
@@ -44,7 +44,7 @@ export class BankService {
     __getWebformIdAndToken__(bank: Bank): [string, any, any] {
 
         let headerOptions = {
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
+            "Authorization": this.authenticationService.getStoredUser().UserToken.token_type + " " + this.authenticationService.getStoredUser().UserToken.access_token,
             "Content-Type": "application/json"
         };
 
@@ -55,7 +55,7 @@ export class BankService {
 
         let headerOptions = {
             "Username": this.authenticationService.getStoredUser().Username,
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
+            "Authorization": this.authenticationService.getStoredUser().UserToken.token_type + " " + this.authenticationService.getStoredUser().UserToken.access_token,
             "Content-Type": "application/x-www-form-urlencoded"
         };
 

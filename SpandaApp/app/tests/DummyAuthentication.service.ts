@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { IAuthentication } from "../services/authentication.service";
 import { User } from "../models/user.model";
 import { environment } from "../environments/environment";
-import { Token } from "~/models/token.model";
+import { Token } from "~/../../DinodimeShared/sharedmodel/src/Token";
 
 @Injectable()
 export class DummyAuthenticationService implements IAuthentication {
@@ -17,7 +17,13 @@ export class DummyAuthenticationService implements IAuthentication {
 
     getStoredUser(): User {
         let user = new User();
-        user.UserToken = new Token("12345678","","bearer");
+        user.UserToken = {
+            access_token: "12345678",
+            refresh_token: "",
+            token_type: "bearer",
+            expires_in: 0,
+            scope: ""
+        };
         return user;
     }
 

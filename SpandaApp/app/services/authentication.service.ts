@@ -1,6 +1,6 @@
 import { Injectable, InjectionToken } from "@angular/core";
 import * as Https from 'nativescript-https';
-import { Token } from "~/models/token.model";
+import { Token } from "~/../../DinodimeShared/sharedmodel/src/Token";
 import * as appSettings from "tns-core-modules/application-settings";
 import { User } from "~/models/user.model";
 import { JsonConvert } from "json2typescript";
@@ -102,7 +102,7 @@ export class AuthenticationService implements IAuthentication {
             }
             this.storedUser.Username = username;
             this.storedUser.Password = password;
-            this.storedUser.UserToken = new Token(res["content"]["access_token"], res["content"]["refresh_token"], res["content"]["token_type"]);
+            this.storedUser.UserToken = res["content"];
             let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
             appSettings.setString("storedUser",storedUserJson);
 
@@ -111,7 +111,7 @@ export class AuthenticationService implements IAuthentication {
     }
 
     setNewRefreshAndAccessToken() : Promise<boolean> {
-        let request = this.__setNewRefreshAndAccessToken__(this.storedUser.UserToken.RefreshToken);
+        let request = this.__setNewRefreshAndAccessToken__(this.storedUser.UserToken.refresh_token);
         return Https.request({
             url: request[0],
             method: 'POST',
@@ -121,7 +121,7 @@ export class AuthenticationService implements IAuthentication {
         }).then(res => {
             console.log(res);
             if(res["statusCode"] === 200) {
-                this.storedUser.UserToken = new Token(res["content"]["token"]["access_token"], res["content"]["token"]["refresh_token"], res["content"]["token"]["token_type"]);
+                this.storedUser.UserToken = res["content"]["token"];
                 this.storedUser.IsRecurrentTransactionConfirmed = res["content"]["is_recurrent_transaction_confirmed"];
                 this.storedUser.IsAllowanceReady = res["content"]["is_allowance_ready"];
                 let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));

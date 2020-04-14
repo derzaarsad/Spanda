@@ -13,7 +13,7 @@ export { NotificationDecoder, NewTransactionsDecryptor, NewTransactionsEncryptor
 
 export { ClientSecretsProvider, Resolved, FromSSM } from "./client-secrets";
 
-export { Authentication, Basic, Token } from "./authentication";
+export { Authentication, Basic } from "./authentication";
 
 export { RuleHandle, RuleHandleFactory, BasicRuleHandleFactory, UUIDRuleHandleFactory } from "./rule-handle";
 

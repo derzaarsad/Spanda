@@ -11,10 +11,11 @@ import {
 
 import { getUserInfo } from "../userinfo";
 import { isUserParams } from "../user-params";
-import { Authentication, Token } from "dinodime-lib";
+import { Authentication } from "dinodime-lib";
 import { User, Users } from "dinodime-lib";
 import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dinodime-lib";
 import { UserVerificationMessage } from "dinodime-message";
+import { Token } from "dinodime-sharedmodel";
 
 type RefreshTokenParams = {
   refresh_token: string;

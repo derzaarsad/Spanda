@@ -16,6 +16,7 @@
     "all": true
   },
   "dependencies": {
+    "dinodime-sharedmodel": "1.0.0",
     "@types/string-similarity": "^3.0.0",
     "aws-sdk": "^2.610.0",
     "string-similarity": "4.0.1",

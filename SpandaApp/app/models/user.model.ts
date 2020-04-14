@@ -1,5 +1,5 @@
 import {JsonObject, JsonProperty} from "json2typescript";
-import { Token } from "~/models/token.model";
+import { Token } from "~/../../DinodimeShared/sharedmodel/src/Token";
 
 @JsonObject("User")
 export class User {
@@ -10,7 +10,6 @@ export class User {
     @JsonProperty("Password", String)
     Password: string = undefined;
 
-    @JsonProperty("UserToken", Token)
     UserToken: Token = undefined;
 
     @JsonProperty("IsRecurrentTransactionConfirmed", Boolean)

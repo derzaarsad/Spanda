@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig-base.json",
   "references": [
+    { "path": "../DinodimeShared/sharedmodel" },
     { "path": "../DinodimeShared/message" },
     { "path": "packages/lib" },
     { "path": "packages/lambda" },
