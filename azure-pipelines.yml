@@ -66,6 +66,8 @@ jobs:
         inputs:
           secureFile: 'google-services.json'
       - script: |
+          yarn install
+          yarn run build
           cd SpandaApp
           tns package-manager set yarn
           tns platform add android
