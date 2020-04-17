@@ -137,6 +137,7 @@ module.exports = env => {
             modules: [
                 resolve(__dirname, "node_modules/tns-core-modules"),
                 resolve(__dirname, "node_modules"),
+                resolve(__dirname + "/..", "node_modules"),
                 "node_modules/tns-core-modules",
                 "node_modules",
             ],
