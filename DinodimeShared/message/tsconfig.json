@@ -1,5 +1,5 @@
 {
-    "extends": "../../DinodimeBackend/tsconfig-base.json",
+    "extends": "../../tsconfig-base.json",
     "compilerOptions": {
         "rootDir": ".",
         "outDir": "out",
