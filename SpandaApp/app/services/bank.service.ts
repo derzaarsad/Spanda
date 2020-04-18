@@ -2,7 +2,6 @@ import { Injectable, Inject } from "@angular/core";
 import * as Https from 'nativescript-https';
 import { Bank } from "~/models/bank.model";
 import { IAuthentication, AUTH_SERVICE_IMPL } from "~/services/authentication.service";
-import { Token } from "~/../../DinodimeShared/sharedmodel/src/Token";
 import { RecurrentTransaction } from "~/models/recurrent-transactions.model";
 import { environment } from "~/environments/environment";
 import * as appSettings from "tns-core-modules/application-settings";
@@ -70,15 +69,19 @@ export class BankService {
             headers: request[1],
             timeout: 10
         }).then(res => {
-            // always take the first element, assumed blz is unique only to one bank
-            let bank = new Bank();
-            bank.Bic = res["content"]["banks"][0]["bic"];
-            bank.Blz = res["content"]["banks"][0]["blz"];
-            bank.Id = res["content"]["banks"][0]["id"];
-            bank.LoginHint = res["content"]["banks"][0]["loginHint"];
-            bank.Name = res["content"]["banks"][0]["name"];
+            if(res.statusCode === 200) {
+                // always take the first element, assumed blz is unique only to one bank
+                let bank = new Bank();
+                bank.Bic = res["content"]["banks"][0]["bic"];
+                bank.Blz = res["content"]["banks"][0]["blz"];
+                bank.Id = res["content"]["banks"][0]["id"];
+                bank.LoginHint = res["content"]["banks"][0]["loginHint"];
+                bank.Name = res["content"]["banks"][0]["name"];
 
-            return bank;
+                return bank;
+            }
+
+            return undefined;
         })
         .catch((err) => {
             console.log("Bank info acquisition failed!");
@@ -95,21 +98,25 @@ export class BankService {
             headers: request[1],
             timeout: 10
         }).then(res => {
-            let recurrentTransactions: Array<RecurrentTransaction> = [];
-            console.log(res);
-            for(let item in res["content"]["recurrenttransactions"]){
-                let r: RecurrentTransaction = new RecurrentTransaction();
-                r.Id = res["content"]["recurrenttransactions"][item]["id"];
-                r.AccountId = res["content"]["recurrenttransactions"][item]["accountId"];
-                r.AbsAmount = res["content"]["recurrenttransactions"][item]["absAmount"];
-                r.IsExpense = res["content"]["recurrenttransactions"][item]["isExpense"];
-                r.IsConfirmed = res["content"]["recurrenttransactions"][item]["isConfirmed"];
-                r.Frequency = res["content"]["recurrenttransactions"][item]["frequency"];
-                r.CounterPartName = res["content"]["recurrenttransactions"][item]["counterPartName"];
-                recurrentTransactions.push(r);
+            if(res.statusCode === 200) {
+                let recurrentTransactions: Array<RecurrentTransaction> = [];
+                console.log(res);
+                for(let item in res["content"]["recurrenttransactions"]){
+                    let r: RecurrentTransaction = new RecurrentTransaction();
+                    r.Id = res["content"]["recurrenttransactions"][item]["id"];
+                    r.AccountId = res["content"]["recurrenttransactions"][item]["accountId"];
+                    r.AbsAmount = res["content"]["recurrenttransactions"][item]["absAmount"];
+                    r.IsExpense = res["content"]["recurrenttransactions"][item]["isExpense"];
+                    r.IsConfirmed = res["content"]["recurrenttransactions"][item]["isConfirmed"];
+                    r.Frequency = res["content"]["recurrenttransactions"][item]["frequency"];
+                    r.CounterPartName = res["content"]["recurrenttransactions"][item]["counterPartName"];
+                    recurrentTransactions.push(r);
+                }
+
+                return recurrentTransactions;
             }
 
-            return recurrentTransactions;
+            return undefined;
         })
         .catch((err) => {
             console.log("Recurrent transactions acquisition failed!");

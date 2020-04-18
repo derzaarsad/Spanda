@@ -2,7 +2,6 @@ import { Injectable } from "@angular/core";
 import { IAuthentication } from "../services/authentication.service";
 import { User } from "../models/user.model";
 import { environment } from "../environments/environment";
-import { Token } from "~/../../DinodimeShared/sharedmodel/src/Token";
 
 @Injectable()
 export class DummyAuthenticationService implements IAuthentication {

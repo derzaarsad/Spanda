@@ -1,6 +1,5 @@
 import { Injectable, InjectionToken } from "@angular/core";
 import * as Https from 'nativescript-https';
-import { Token } from "~/../../DinodimeShared/sharedmodel/src/Token";
 import * as appSettings from "tns-core-modules/application-settings";
 import { User } from "~/models/user.model";
 import { JsonConvert } from "json2typescript";
@@ -97,16 +96,20 @@ export class AuthenticationService implements IAuthentication {
             headers: request[2],
             timeout: 10
         }).then(res => {
-            if(!this.storedUser) {
-                this.storedUser = new User();
-            }
-            this.storedUser.Username = username;
-            this.storedUser.Password = password;
-            this.storedUser.UserToken = res["content"];
-            let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
-            appSettings.setString("storedUser",storedUserJson);
+            if(res.statusCode === 200) {
+                if(!this.storedUser) {
+                    this.storedUser = new User();
+                }
+                this.storedUser.Username = username;
+                this.storedUser.Password = password;
+                this.storedUser.UserToken = res["content"];
+                let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
+                appSettings.setString("storedUser",storedUserJson);
 
-            return true;
+                return true;
+            }
+
+            return false;
         });
     }
 
