@@ -14,7 +14,7 @@ import { isUserParams } from "../user-params";
 import { Authentication } from "dinodime-lib";
 import { User, Users } from "dinodime-lib";
 import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dinodime-lib";
-import { UserVerificationMessage } from "dinodime-message";
+import { UserVerificationMessage, LoginMessage, UpdateTokenMessage } from "dinodime-message";
 import { Token } from "dinodime-sharedmodel";
 
 type RefreshTokenParams = {
@@ -180,7 +180,7 @@ export const authenticateAndSave = async (
 
   return authentication
     .getPasswordToken(clientSecrets, username, password)
-    .then((response: Token) => CreateResponse(200, response))
+    .then((response: Token) => CreateResponse(200, new LoginMessage(response)))
     .catch((err) => {
       logger.log("error", "could not obtain password token for user " + username, { cause: err });
       return CreateSimpleResponse(401, "unauthorized");
@@ -230,11 +230,10 @@ export const updateRefreshToken = async (
       logger.log("error", "error authenticating user", "user is not found in the database.");
       return CreateInternalErrorResponse("internal server error");
     }
-    return CreateResponse(200, {
-      token: token,
-      is_recurrent_transaction_confirmed: user.isRecurrentTransactionConfirmed,
-      is_allowance_ready: user.isAllowanceReady,
-    });
+    return CreateResponse(200, new UpdateTokenMessage(
+      token,
+      new UserVerificationMessage(user.isRecurrentTransactionConfirmed, user.isAllowanceReady)
+    ));
   } catch (err) {
     logger.log("error", "error authenticating user", err);
     return CreateSimpleResponse(401, "unauthorized");

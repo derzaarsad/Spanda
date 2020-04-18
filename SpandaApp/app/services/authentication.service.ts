@@ -4,7 +4,7 @@ import * as appSettings from "tns-core-modules/application-settings";
 import { User } from "~/models/user.model";
 import { JsonConvert } from "json2typescript";
 import { environment } from "~/environments/environment";
-import { UserVerificationMessage } from "~/../../DinodimeShared/message/src";
+import { UserVerificationMessage, LoginMessage, UpdateTokenMessage } from "dinodime-message";
 export const AUTH_SERVICE_IMPL = new InjectionToken<IAuthentication>('authServiceImpl');
 
 /*
@@ -97,12 +97,13 @@ export class AuthenticationService implements IAuthentication {
             timeout: 10
         }).then(res => {
             if(res.statusCode === 200) {
+                let content: LoginMessage = res["content"];
                 if(!this.storedUser) {
                     this.storedUser = new User();
                 }
                 this.storedUser.Username = username;
                 this.storedUser.Password = password;
-                this.storedUser.UserToken = res["content"];
+                this.storedUser.UserToken = content.token;
                 let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
                 appSettings.setString("storedUser",storedUserJson);
 
@@ -124,9 +125,10 @@ export class AuthenticationService implements IAuthentication {
         }).then(res => {
             console.log(res);
             if(res["statusCode"] === 200) {
-                this.storedUser.UserToken = res["content"]["token"];
-                this.storedUser.IsRecurrentTransactionConfirmed = res["content"]["is_recurrent_transaction_confirmed"];
-                this.storedUser.IsAllowanceReady = res["content"]["is_allowance_ready"];
+                let content: UpdateTokenMessage = res["content"];
+                this.storedUser.UserToken = content.token;
+                this.storedUser.IsRecurrentTransactionConfirmed = content.userVerificationMessage.is_recurrent_transaction_confirmed;
+                this.storedUser.IsAllowanceReady = content.userVerificationMessage.is_allowance_ready;
                 let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
                 appSettings.setString("storedUser",storedUserJson);
 
