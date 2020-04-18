@@ -7,7 +7,8 @@ import { updateRecurrentTransactions } from "../../src/controllers/bank-controll
 import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import { VoidTransport, FinAPI } from "dinodime-lib";
 import { Users, User } from "dinodime-lib";
-import { RecurrentTransactions, RecurrentTransaction, TransactionFrequency } from "dinodime-lib";
+import { RecurrentTransactions, RecurrentTransaction } from "dinodime-lib";
+import { TransactionFrequency } from "dinodime-sharedmodel";
 
 describe("unit: update recurrent transactions", function () {
   let logger: winston.Logger;
