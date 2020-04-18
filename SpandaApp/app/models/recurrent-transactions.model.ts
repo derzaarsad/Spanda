@@ -1,11 +1,5 @@
 import {JsonObject, JsonProperty} from "json2typescript";
-
-export enum TransactionFrequency {
-  Unknown = "Unknown",
-  Monthly = "Monthly",
-  Quarterly = "Quarterly",
-  Yearly = "Yearly"
-}
+import { TransactionFrequency } from "dinodime-sharedmodel";
 
 @JsonObject("RecurrentTransaction")
 export class RecurrentTransaction {

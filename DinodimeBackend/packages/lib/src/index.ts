@@ -34,7 +34,7 @@ export { NotificationCallback, NewTransactionsSNSPublisher } from "./notificatio
 export { User, Users } from "./users";
 export { BankConnection, BankConnections } from "./bank-connections";
 export { Transaction, Transactions } from "./transactions";
-export { RecurrentTransaction, RecurrentTransactions, TransactionFrequency } from "./recurrent-transactions";
+export { RecurrentTransaction, RecurrentTransactions } from "./recurrent-transactions";
 
 export { Algorithm } from "./algorithm";
 

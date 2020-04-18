@@ -7,7 +7,8 @@ import { IAuthentication,AUTH_SERVICE_IMPL } from "~/services/authentication.ser
 import { BankService } from "~/services/bank.service"
 import { AnimationCurve } from 'ui/enums';
 import * as dialogs from "tns-core-modules/ui/dialogs";
-import { RecurrentTransaction, TransactionFrequency } from "~/models/recurrent-transactions.model";
+import { RecurrentTransaction } from "~/models/recurrent-transactions.model";
+import { TransactionFrequency } from "dinodime-sharedmodel";
 
 @Component({
     selector: "allowance",
