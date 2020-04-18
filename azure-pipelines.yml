@@ -79,7 +79,7 @@ jobs:
         displayName: "Publish test results"
         condition: succeededOrFailed()
         inputs:
-          testRunner: JUnit
+          testResultsFormat: 'JUnit'
           testResultsFiles: "$(System.DefaultWorkingDirectory)/SpandaApp/reports/**/*.xml"
       - publish: $(System.DefaultWorkingDirectory)/SpandaApp
         artifact: NativescriptApp
@@ -189,7 +189,7 @@ jobs:
         displayName: "Publish test results"
         condition: succeededOrFailed()
         inputs:
-          testRunner: JUnit
+          testResultsFormat: 'JUnit'
           testResultsFiles: "$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/*.xml"
       - task: reportgenerator@4
         inputs:
