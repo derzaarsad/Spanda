@@ -79,7 +79,7 @@ jobs:
         inputs:
           scriptSource: 'filePath'
           scriptPath: '$(System.DefaultWorkingDirectory)/checkFilesExistence.py'
-          arguments: '$(System.DefaultWorkingDirectory)/SpandaApp/reports/TESTS-NativeScript_/_28_(9;_Android_SDK_built_for_x86).xml'
+          arguments: '$(System.DefaultWorkingDirectory)/SpandaApp/reports/unit-tests-app.xml'
           failOnStderr: true
         displayName: "Check Integration Test Results Existence"
       - task: PublishTestResults@2
@@ -87,7 +87,7 @@ jobs:
         condition: succeededOrFailed()
         inputs:
           testResultsFormat: 'JUnit'
-          testResultsFiles: "$(System.DefaultWorkingDirectory)/SpandaApp/reports/**/*.xml"
+          testResultsFiles: "$(System.DefaultWorkingDirectory)/SpandaApp/reports/*.xml"
       - publish: $(System.DefaultWorkingDirectory)/SpandaApp
         artifact: NativescriptApp
 
