@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { IAuthentication } from "../services/authentication.service";
 import { User } from "../models/user.model";
 import { environment } from "../environments/environment";
+import { Token } from "dinodime-sharedmodel";
 
 @Injectable()
 export class DummyAuthenticationService implements IAuthentication {
@@ -34,15 +35,15 @@ export class DummyAuthenticationService implements IAuthentication {
         return Promise.resolve(true);
     }
 
-    isUserAuthenticated(access_token: string, token_type: string) : Promise<boolean> {
+    isUserAuthenticated(token: Token) : Promise<boolean> {
         return Promise.resolve(true);
     }
 
     removeAllUserAuthentication(): void {
     }
 
-    register(username: string, password: string) : Promise<[boolean,string]> {
-        return Promise.resolve([true,""]);
+    register(username: string, password: string) : Promise<string | null> {
+        return Promise.resolve(null);
     }
 
     resetPassword(textSTr: string) : any {

@@ -89,11 +89,81 @@ describe("unit: get banks by BLZ handler", function() {
 
     const finapi = ({
       listBanksByBLZ: async () => {
-        return [
-          {
-            bank: "test"
-          }
-        ];
+        return {
+          banks: [
+            {
+                "id": 277672,
+                "name": "FinAPI Test Bank",
+                "loginHint": null,
+                "bic": null,
+                "blzs": [
+                    "00000000"
+                ],
+                "blz": "00000000",
+                "location": null,
+                "city": null,
+                "isSupported": true,
+                "isTestBank": true,
+                "popularity": 7,
+                "health": 80,
+                "loginFieldUserId": "Onlinebanking-ID",
+                "loginFieldCustomerId": null,
+                "loginFieldPin": "PIN",
+                "pinsAreVolatile": false,
+                "isCustomerIdPassword": false,
+                "supportedDataSources": [
+                    "FINTS_SERVER"
+                ],
+                "interfaces": [
+                    {
+                        "tppAuthenticationGroup": null,
+                        "loginCredentials": [
+                            {
+                                "label": "Onlinebanking-ID",
+                                "isSecret": false,
+                                "isVolatile": false
+                            },
+                            {
+                                "label": "PIN",
+                                "isSecret": true,
+                                "isVolatile": false
+                            }
+                        ],
+                        "properties": [],
+                        "loginHint": null,
+                        "health": 80,
+                        "lastCommunicationAttempt": "2020-04-19 17:56:55.000",
+                        "lastSuccessfulCommunication": "2020-04-19 17:56:55.000",
+                        "interface": "XS2A"
+                    },
+                    {
+                        "tppAuthenticationGroup": null,
+                        "loginCredentials": [
+                            {
+                                "label": "Onlinebanking-ID",
+                                "isSecret": false,
+                                "isVolatile": false
+                            },
+                            {
+                                "label": "PIN",
+                                "isSecret": true,
+                                "isVolatile": false
+                            }
+                        ],
+                        "properties": [],
+                        "loginHint": null,
+                        "health": 80,
+                        "lastCommunicationAttempt": "2020-04-19 18:00:09.000",
+                        "lastSuccessfulCommunication": "2020-04-19 18:00:10.000",
+                        "interface": "FINTS_SERVER"
+                    }
+                ],
+                "bankGroup": null,
+                "lastCommunicationAttempt": "2020-04-19 18:00:09.000",
+                "lastSuccessfulCommunication": "2020-04-19 18:00:10.000"
+            }
+          ]
+        };
       }
     } as unknown) as FinAPI;
 

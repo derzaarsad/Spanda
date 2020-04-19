@@ -15,6 +15,8 @@ import { Algorithm } from "dinodime-lib";
 import { Transaction, Transactions } from "dinodime-lib";
 import { RecurrentTransaction, RecurrentTransactions } from "dinodime-lib";
 import { BankConnection, BankConnections } from "dinodime-lib";
+import { SharedBank, SharedRecurrentTransaction } from "dinodime-sharedmodel";
+import { GetRecurrentTransactionsMessage, GetWebformIdMessage, UpdateRecurrentTransactionsMessage, GetAllowanceMessage, GetBankByBlzMessage } from "dinodime-message";
 
 const blzPattern = /^\d{8}$/;
 
@@ -65,7 +67,15 @@ export const getBankByBLZ = async (
 
   return bankInterface
     .listBanksByBLZ(authorization, pathParams["blz"])
-    .then((response) => CreateResponse(200, response))
+    .then(response => CreateResponse(200, new GetBankByBlzMessage(response.banks.map((el: FinAPIModel.Bank) => {
+      return {
+        bic: el.bic,
+        blz: el.blz,
+        id: el.id,
+        loginHint: el.loginHint,
+        name: el.name
+      };
+    }))))
     .catch((err) => {
       // TODO distinguish unauthorized from other errors
       logger.log("error", "error listing banks by BLZ", { cause: err });
@@ -127,10 +137,7 @@ export const getWebformId = async (
       /*
        * Client usage: {location}?callbackUrl={RestApi}/webForms/callback/{webFormAuth}
        */
-      return CreateResponse(200, {
-        location: response.location,
-        webFormAuth: response.webFormId + "-" + secret,
-      });
+      return CreateResponse(200, new GetWebformIdMessage(response.location, response.webFormId, secret));
     })
     .catch((err) => {
       logger.log("error", "error importing connection", { cause: err });
@@ -194,7 +201,7 @@ export const getRecurrentTransactions = async (
     return CreateSimpleResponse(204, "getting recurrent transactions failed");
   }
 
-  let recurrenttransactions = recurrentTransactions_.map((el) => {
+  let recurrenttransactions: SharedRecurrentTransaction[] = recurrentTransactions_.map((el) => {
     return {
       id: el.id,
       accountId: el.accountId,
@@ -202,11 +209,11 @@ export const getRecurrentTransactions = async (
       isExpense: el.isExpense,
       isConfirmed: el.isConfirmed,
       frequency: el.frequency,
-      counterPartName: el.counterPartName,
+      counterPartName: el.counterPartName ? el.counterPartName : "",
     };
   });
 
-  return CreateResponse(200, { recurrenttransactions });
+  return CreateResponse(200, new GetRecurrentTransactionsMessage(recurrenttransactions));
 };
 
 // @Post('/recurrentTransactions/update')
@@ -271,7 +278,7 @@ export const updateRecurrentTransactions = async (
 
   return users
     .save(user)
-    .then(() => CreateResponse(200, { message: "success" }))
+    .then(() => CreateResponse(200, new UpdateRecurrentTransactionsMessage("success")))
     .catch((err) => {
       logger.log("error", "error importing connection", { cause: err });
       return CreateSimpleResponse(500, "error updating the user");
@@ -334,5 +341,5 @@ export const getAllowance = async (
     return CreateInternalErrorResponse("error fetching allowance");
   }
 
-  return CreateResponse(200, { allowance: user.allowance });
+  return CreateResponse(200, new GetAllowanceMessage(user.allowance));
 };

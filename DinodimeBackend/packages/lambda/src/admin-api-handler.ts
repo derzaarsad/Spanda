@@ -8,6 +8,7 @@ import { User, Users } from "dinodime-lib";
 import { Transactions } from "dinodime-lib";
 import { RecurrentTransactions } from "dinodime-lib";
 import { BankConnection, BankConnections, Transaction } from "dinodime-lib";
+import { GetUserDataMessage } from "./message/GetUserDataMessage";
 
 const badRequest = CreateSimpleResponse(400, "bad request");
 const unauthorized = CreateSimpleResponse(401, "unauthorized");
@@ -120,7 +121,7 @@ export const getUserDataHandler = async (
   }
 
   logger.info(`Banking data for username ${user.username} retrieved susccesfully`);
-  return CreateResponse(200, result);
+  return CreateResponse(200, new GetUserDataMessage(result));
 };
 
 export const deleteUserDataHandler = async (
