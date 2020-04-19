@@ -75,6 +75,13 @@ jobs:
           tns test android --justlaunch
         displayName: "Run unit test"
         continueOnError: true
+      - task: PythonScript@0
+        inputs:
+          scriptSource: 'filePath'
+          scriptPath: '$(System.DefaultWorkingDirectory)/checkFilesExistence.py'
+          arguments: '$(System.DefaultWorkingDirectory)/SpandaApp/reports/TESTS-NativeScript_/_28_(9;_Android_SDK_built_for_x86).xml'
+          failOnStderr: true
+        displayName: "Check Integration Test Results Existence"
       - task: PublishTestResults@2
         displayName: "Publish test results"
         condition: succeededOrFailed()

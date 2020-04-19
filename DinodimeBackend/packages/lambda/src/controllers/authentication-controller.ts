@@ -14,7 +14,7 @@ import { isUserParams } from "../user-params";
 import { Authentication } from "dinodime-lib";
 import { User, Users } from "dinodime-lib";
 import { ClientSecretsProvider, FinAPI, FinAPIModel } from "dinodime-lib";
-import { UserVerificationMessage, LoginMessage, UpdateTokenMessage } from "dinodime-message";
+import { UserVerificationMessage, LoginMessage, UpdateTokenMessage, RegisterMessage } from "dinodime-message";
 import { Token } from "dinodime-sharedmodel";
 
 type RefreshTokenParams = {
@@ -150,7 +150,7 @@ export const registerUser = async (
 
   const newUser = new User(username, email, phone, isAutoUpdateEnabled);
 
-  return users.save(newUser).then((userData: User) => CreateResponse(201, userData));
+  return users.save(newUser).then((userData: User) => CreateResponse(201, new RegisterMessage("success")));
 };
 
 // @Post('/oauth/login')

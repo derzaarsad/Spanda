@@ -1,5 +1,6 @@
 import { APIGatewayProxyResult } from "aws-lambda";
 import { Token } from "dinodime-sharedmodel";
+import { RestMessage } from "dinodime-message";
 
 export const HasAuthorization = (header: any): string => {
   return header["authorization"] || header["Authorization"];
@@ -13,7 +14,7 @@ const EncodeResponse = (status: number, body: any): APIGatewayProxyResult => {
   };
 };
 
-export const CreateResponse = (status: number, body: any) => {
+export const CreateResponse = (status: number, body: RestMessage) => {
   return EncodeResponse(status, body);
 };
 
