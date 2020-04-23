@@ -87,6 +87,6 @@ describe("integration: authenticate user handler", function() {
 
     expect(result).to.be.an("object");
     expect(result.statusCode).to.equal(200);
-    expect(JSON.parse(result.body).access_token).to.exist;
+    expect(JSON.parse(result.body).token.access_token).to.exist;
   });
 });

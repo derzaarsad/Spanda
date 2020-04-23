@@ -167,15 +167,15 @@ describe("unit: get refresh token handler", function() {
 
     const body = JSON.parse(result.body);
     expect(body.token).to.exist;
-    expect(body.is_recurrent_transaction_confirmed).to.exist;
-    expect(body.is_allowance_ready).to.exist;
+    expect(body.userVerificationMessage.is_recurrent_transaction_confirmed).to.exist;
+    expect(body.userVerificationMessage.is_allowance_ready).to.exist;
 
     expect(body.token.refresh_token).to.equal("xyz_refreshtoken");
     expect(body.token.token_type).to.equal("bearer_refreshtoken");
     expect(body.token.scope).to.equal("test_refreshtoken");
     expect(body.token.access_token).to.equal("yyz_refreshtoken");
 
-    expect(body.is_recurrent_transaction_confirmed).to.equal(true);
-    expect(body.is_allowance_ready).to.equal(false);
+    expect(body.userVerificationMessage.is_recurrent_transaction_confirmed).to.equal(true);
+    expect(body.userVerificationMessage.is_allowance_ready).to.equal(false);
   });
 });
