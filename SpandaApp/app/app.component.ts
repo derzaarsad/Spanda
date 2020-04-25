@@ -3,6 +3,7 @@ import { DrawerTransitionBase, RadSideDrawer, SlideInOnTopTransition } from "nat
 import { AUTH_SERVICE_IMPL, IAuthentication } from "./services/authentication.service";
 import { RouterExtensions } from "nativescript-angular/router";
 import * as app from "application";
+import * as appSettings from "tns-core-modules/application-settings";
 
 import * as firebase from 'nativescript-plugin-firebase';
 
@@ -51,6 +52,7 @@ export class AppComponent {
 
         onPushTokenReceivedCallback: (token) => {
           console.log('[Firebase] onPushTokenReceivedCallback:', { token });
+          appSettings.setString("pushToken",token);
         },
 
         onMessageReceivedCallback: async (message: firebase.Message) => {
@@ -59,15 +61,13 @@ export class AppComponent {
 
           console.log('[Firebase] onMessageReceivedCallback:', { message });
 
-          console.log(this.activeRoute.children[0]);
-          console.log(this.activeRoute.children[0].children);
-          this.routerExtensions.navigate([{ outlets: { homeRouterOutlet: ['allowance'] } }], {
-            transition: {
-              name: "fade"
-            },
-            clearHistory: true,
-            relativeTo: this.activeRoute.children[0]
-          });
+          console.log(this.routerExtensions.router.url.toString());
+          if(this.routerExtensions.router.url.toString() === '/searchBank') {
+            this.routerExtensions.navigate(['../home'], { clearHistory: true, relativeTo: this.activeRoute });
+          }
+          else {
+            console.log("no event is triggered");
+          }
         }
       })
         .then(() => {

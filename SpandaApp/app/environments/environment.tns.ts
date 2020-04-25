@@ -11,7 +11,7 @@ export const environment = (() => {
     envVars = JSON.parse(process.env.environmentJson);
   } else {
     // a dummy value is filled for test
-    envVars = JSON.parse("{\"backendUrl\":\"onlyfortest\"}");
+    envVars = JSON.parse("{\"APIEndpointURL\":\"onlyfortest\",\"CallbackEndpointURL\":\"onlyfortest\"}");
   }
 
   return envVars;

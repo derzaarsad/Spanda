@@ -16,6 +16,7 @@ const callbackHandlerConfiguration = {
   log: services.logger,
   users: services.users,
   sqs: sqsPublisher,
+  pushMessaging: services.firebaseMessaging,
 };
 
 const fetchWebFormHandlerConfiguration: FetchWebFormHandlerConfiguration = {

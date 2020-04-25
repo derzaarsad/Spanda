@@ -11,6 +11,7 @@ import { BankService } from "./services/bank.service";
 
 import { HomeModule } from "./views/home/home.module";
 import { LoginModule } from "./views/login/login.module";
+import { SearchBankModule } from "./views/searchBank/searchBank.module";
 
 import { TranslateModule } from './@ngx-translate/core@10.0.2';
 
@@ -30,6 +31,7 @@ import { TranslateModule } from './@ngx-translate/core@10.0.2';
     AppRoutingModule,
     HomeModule,
     LoginModule,
+    SearchBankModule,
     NativeScriptModule,
     NativeScriptFormsModule,
     NativeScriptUISideDrawerModule,

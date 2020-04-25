@@ -13,6 +13,7 @@ import {
   BankConnection,
   SQSClient,
   SQSPublisher,
+  PushMessaging
 } from "dinodime-lib";
 
 import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from "aws-lambda";
@@ -23,6 +24,7 @@ const response = CreateSimpleResponse(202, "Accepted");
 export interface WebFormCallbackHandlerConfiguration {
   sqs: SQSPublisher;
   users: Users.UsersRepository;
+  pushMessaging: PushMessaging
   log: winston.Logger;
 }
 
@@ -37,6 +39,7 @@ export const webFormCallbackHandler = async (
   const log = configuration.log;
   const sqs = configuration.sqs;
   const users = configuration.users;
+  const pushMessaging = configuration.pushMessaging;
 
   const pathParameters = event.pathParameters;
   if (pathParameters === null || !pathParameters.webFormAuth) {
@@ -45,14 +48,24 @@ export const webFormCallbackHandler = async (
   }
 
   const webFormAuth = qs.unescape(pathParameters.webFormAuth);
-  const tokens = webFormAuth.split("-", 2);
-  if (tokens.length !== 2) {
+  const splitkey = "-";
+  const tokens = webFormAuth.split(splitkey);
+  if (tokens.length < 3) {
     log.error(`Invalid webform authorization received: ${webFormAuth}`);
     return response;
   }
 
   const webFormId = parseInt(tokens[0]);
   const userSecret = tokens[1];
+  const pushToken = tokens.slice(2).join(splitkey);
+
+  // Push a signal to the app to close the webform page.
+  // This signal should not have an await
+  pushMessaging.sendMessage(pushToken,{}, "push from webformCallback").then(res => {
+    log.info(res);
+  }).catch(err => {
+    log.error(err);
+  });
 
   if (isNaN(webFormId) || userSecret.length === 0) {
     log.error(`Invalid webform authorization received: ${webFormAuth}`);

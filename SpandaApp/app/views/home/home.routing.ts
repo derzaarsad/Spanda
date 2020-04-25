@@ -4,14 +4,14 @@ import { NativeScriptRouterModule } from "nativescript-angular/router";
 
 import { HomeComponent } from "./home.component";
 import { AllowanceComponent } from "../allowance/allowance.component";
-import { SearchBankComponent } from "../searchBank/searchBank.component";
+import { RecurrentTransactionComponent } from "../recurrentTransaction/recurrentTransaction.component";
 
 import { authProviders } from "../../app.routing"
 
 const routes: Routes = [
     { path: "home", component: HomeComponent, children: [
         { path: "allowance", component: AllowanceComponent, outlet: "homeRouterOutlet" },
-        { path: "searchBank", component: SearchBankComponent, outlet: "homeRouterOutlet" },
+        { path: "recurrentTransaction", component: RecurrentTransactionComponent, outlet: "homeRouterOutlet" },
     ],
     canActivate: authProviders }
 ];

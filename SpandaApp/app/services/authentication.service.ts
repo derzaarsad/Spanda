@@ -39,7 +39,7 @@ export class AuthenticationService implements IAuthentication {
     }
 
     getBackendUrl(): string {
-        return environment.backendUrl;
+        return environment.APIEndpointURL;
     }
 
     isStoredUserAvailable(): boolean {
@@ -56,7 +56,7 @@ export class AuthenticationService implements IAuthentication {
             "Content-Type": "application/json"
         };
 
-        return [environment.backendUrl + "/oauth/login", { username: username, password: password }, headerOptions ];
+        return [this.getBackendUrl() + "/oauth/login", { username: username, password: password }, headerOptions ];
     }
 
     __setNewRefreshAndAccessToken__(refreshToken: string) : [string, any, any] {
@@ -65,7 +65,7 @@ export class AuthenticationService implements IAuthentication {
             "Content-Type": "application/json"
         };
 
-        return [environment.backendUrl + "/oauth/token", { refresh_token: refreshToken }, headerOptions ];
+        return [this.getBackendUrl() + "/oauth/token", { refresh_token: refreshToken }, headerOptions ];
     }
 
     __isUserAuthenticated__(access_token: string, token_type: string) : [string, any] {
@@ -75,7 +75,7 @@ export class AuthenticationService implements IAuthentication {
             "Content-Type": "application/json"
          };
 
-         return [environment.backendUrl + "/users", headerOptions ];
+         return [this.getBackendUrl() + "/users", headerOptions ];
     }
 
     __register__(username: string, password: string) : [string, any, any] {
@@ -84,7 +84,7 @@ export class AuthenticationService implements IAuthentication {
             "Content-Type": "application/json"
         };
 
-        return [environment.backendUrl + "/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, headerOptions ];
+        return [this.getBackendUrl() + "/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, headerOptions ];
     }
 
     authenticateAndSave(username: string, password: string) : Promise<boolean> {

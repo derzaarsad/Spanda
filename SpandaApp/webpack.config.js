@@ -267,7 +267,7 @@ module.exports = env => {
 
                 /*
                  * environmentJson contains JSON string of the environment variable
-                 * use example: tns run android --env.environmentJson="{\"stage\":\"prototype\",\"backendUrl\":\"https://localhost:4000\"}"
+                 * use example: tns run android --env.environmentJson="{\"stage\":\"prototype\",\"APIEndpointURL\":\"https://localhost:4000\",\"CallbackEndpointURL\":\"https://localhost:8000\"}"
                  */
                 "process.env": {
                     environmentJson: (env && Object.prototype.hasOwnProperty.call(env, 'environmentJson')) ? JSON.stringify(env.environmentJson) : undefined
