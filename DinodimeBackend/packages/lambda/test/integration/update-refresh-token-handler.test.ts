@@ -139,15 +139,15 @@ describe("integration: get refresh token handler", function() {
 
     const body = JSON.parse(result.body);
     expect(body.token).to.exist;
-    expect(body.is_recurrent_transaction_confirmed).to.exist;
-    expect(body.is_allowance_ready).to.exist;
+    expect(body.userVerificationMessage.is_recurrent_transaction_confirmed).to.exist;
+    expect(body.userVerificationMessage.is_allowance_ready).to.exist;
 
     // Because the testUsername account is freshly made, we can assume that its refresh token is still valid.
     expect(body.token.refresh_token).to.equal(authorization.refresh_token);
     expect(body.token.token_type).to.equal(authorization.token_type);
     expect(body.token.scope).to.equal(authorization.scope);
 
-    expect(body.is_recurrent_transaction_confirmed).to.equal(true);
-    expect(body.is_allowance_ready).to.equal(false);
+    expect(body.userVerificationMessage.is_recurrent_transaction_confirmed).to.equal(true);
+    expect(body.userVerificationMessage.is_allowance_ready).to.equal(false);
   });
 });

@@ -1,13 +1,7 @@
 import { Repository, PostgresRepository } from "./repository";
 import { Schema } from "./schema/schema";
 import { Pool } from "pg";
-
-export enum TransactionFrequency {
-  Unknown = "Unknown",
-  Monthly = "Monthly",
-  Quarterly = "Quarterly",
-  Yearly = "Yearly",
-}
+import { TransactionFrequency } from "dinodime-sharedmodel";
 
 export class RecurrentTransaction {
   id: number;

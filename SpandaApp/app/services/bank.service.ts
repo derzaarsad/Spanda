@@ -1,84 +1,32 @@
 import { Injectable, Inject } from "@angular/core";
-import * as Https from 'nativescript-https';
-import { Bank } from "~/models/bank.model";
+import { SharedBank } from "dinodime-sharedmodel";
 import { IAuthentication, AUTH_SERVICE_IMPL } from "~/services/authentication.service";
-import { Token } from "~/models/token.model";
-import { RecurrentTransaction } from "~/models/recurrent-transactions.model";
+import { SharedRecurrentTransaction } from "dinodime-sharedmodel";
 import { environment } from "~/environments/environment";
 import * as appSettings from "tns-core-modules/application-settings";
+import { GetGetBankByBlz, GetGetRecurrentTransactions, PostGetWebformIdAndToken, PostUpdateRecurrentTransactions, GetGetAllowance } from "./bank-utils";
 
 @Injectable()
 export class BankService {
 
     constructor(@Inject(AUTH_SERVICE_IMPL) private authenticationService: IAuthentication) { }
 
-    __getBankByBLZ__(blz: string) : [string,any] {
+    getBankByBLZ(blz: string) : Promise<SharedBank> {
+        return GetGetBankByBlz(this.authenticationService.getBackendUrl(),blz).then(content => {
+            if(content.banks.length > 0) {
+                // always take the first element, assumed blz is unique only to one bank
+                let bank: SharedBank;
+                bank.bic = content.banks[0]["bic"];
+                bank.blz = content.banks[0]["blz"];
+                bank.id = content.banks[0]["id"];
+                bank.loginHint = content.banks[0]["loginHint"];
+                bank.name = content.banks[0]["name"];
 
-        let headerOptions = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        };
-
-        return [this.authenticationService.getBackendUrl() + "/banks/" + blz, headerOptions ];
-    }
-
-    __getRecurrentTransactions__() : [string,any] {
-
-        let headerOptions = {
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
-            "Content-Type": "application/json"
-        };
-
-        return [this.authenticationService.getBackendUrl() + "/recurrentTransactions", headerOptions ];
-    }
-
-    __updateRecurrentTransactions__(recurrenttransactions: Array<RecurrentTransaction>): [string, any, any] {
-
-        let headerOptions = {
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
-            "Content-Type": "application/json"
-        };
-
-        return [this.authenticationService.getBackendUrl() + "/recurrentTransactions/update", { recurrenttransactions: recurrenttransactions }, headerOptions ];
-    }
-
-    __getWebformIdAndToken__(bank: Bank): [string, any, any] {
-
-        let headerOptions = {
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
-            "Content-Type": "application/json"
-        };
-
-        return [this.authenticationService.getBackendUrl() + "/bankConnections/import", { bankId: bank.Id }, headerOptions ];
-    }
-
-    __getAllowance__(): [string, any] {
-
-        let headerOptions = {
-            "Username": this.authenticationService.getStoredUser().Username,
-            "Authorization": this.authenticationService.getStoredUser().UserToken.TokenType + " " + this.authenticationService.getStoredUser().UserToken.AccessToken,
-            "Content-Type": "application/x-www-form-urlencoded"
-        };
-
-        return [this.authenticationService.getBackendUrl() + "/allowance", headerOptions ];
-    }
-
-    getBankByBLZ(blz: string) : Promise<Bank> {
-        let request = this.__getBankByBLZ__(blz);
-        return Https.request({
-            url: request[0],
-            method: 'GET',
-            headers: request[1],
-            timeout: 10
-        }).then(res => {
-            // always take the first element, assumed blz is unique only to one bank
-            let bank = new Bank();
-            bank.Bic = res["content"]["banks"][0]["bic"];
-            bank.Blz = res["content"]["banks"][0]["blz"];
-            bank.Id = res["content"]["banks"][0]["id"];
-            bank.LoginHint = res["content"]["banks"][0]["loginHint"];
-            bank.Name = res["content"]["banks"][0]["name"];
-
-            return bank;
+                return bank;
+            }
+            else {
+                return undefined;
+            }
         })
         .catch((err) => {
             console.log("Bank info acquisition failed!");
@@ -87,30 +35,8 @@ export class BankService {
         });
     }
 
-    getRecurrentTransactions() : Promise<Array<RecurrentTransaction>> {
-        let request = this.__getRecurrentTransactions__();
-        return Https.request({
-            url: request[0],
-            method: 'GET',
-            headers: request[1],
-            timeout: 10
-        }).then(res => {
-            let recurrentTransactions: Array<RecurrentTransaction> = [];
-            console.log(res);
-            for(let item in res["content"]["recurrenttransactions"]){
-                let r: RecurrentTransaction = new RecurrentTransaction();
-                r.Id = res["content"]["recurrenttransactions"][item]["id"];
-                r.AccountId = res["content"]["recurrenttransactions"][item]["accountId"];
-                r.AbsAmount = res["content"]["recurrenttransactions"][item]["absAmount"];
-                r.IsExpense = res["content"]["recurrenttransactions"][item]["isExpense"];
-                r.IsConfirmed = res["content"]["recurrenttransactions"][item]["isConfirmed"];
-                r.Frequency = res["content"]["recurrenttransactions"][item]["frequency"];
-                r.CounterPartName = res["content"]["recurrenttransactions"][item]["counterPartName"];
-                recurrentTransactions.push(r);
-            }
-
-            return recurrentTransactions;
-        })
+    getRecurrentTransactions() : Promise<Array<SharedRecurrentTransaction>> {
+        return GetGetRecurrentTransactions(this.authenticationService.getBackendUrl(),this.authenticationService.getStoredUser().UserToken).then(content => content.recurrenttransactions)
         .catch((err) => {
             console.log("Recurrent transactions acquisition failed!");
             console.log(err);
@@ -121,21 +47,11 @@ export class BankService {
     /*
      * return [ Id , Access Token, Status ]
      */
-    getWebformIdAndToken(bank: Bank): Promise<[string, string, string, string]> {
-        let request = this.__getWebformIdAndToken__(bank);
-        return Https.request({
-            url: request[0],
-            method: 'POST',
-            body: request[1],
-            headers: request[2],
-            timeout: 10
-        }).then(res => {
-            if(res.statusCode != 200) {
-                return undefined;
-            }
+    getWebformIdAndToken(bank: SharedBank): Promise<[string, string, string, string]> {
+        return PostGetWebformIdAndToken(this.authenticationService.getBackendUrl(),bank,this.authenticationService.getStoredUser().UserToken).then(content => {
+
             console.log("WebForm Valid");
-            console.log(res);
-            return res["content"]["location"] + "?callbackUrl=" + encodeURIComponent(environment.CallbackEndpointURL + "/webForms/callback/" + encodeURIComponent(res["content"]["webFormAuth"] + "-" + appSettings.getString("pushToken")));
+            return content.location + "?callbackUrl=" + encodeURIComponent(environment.CallbackEndpointURL + "/webForms/callback/" + encodeURIComponent(content.webFormAuth + "-" + appSettings.getString("pushToken")));
         }, err => {
             console.log("WebForm Invalid");
             console.log(err);
@@ -146,33 +62,18 @@ export class BankService {
     /*
      * return [ Id , Access Token, Status ]
      */
-    updateRecurrentTransactions(recurrenttransactions: Array<RecurrentTransaction>): Promise<boolean> {
-        let request = this.__updateRecurrentTransactions__(recurrenttransactions);
-        return Https.request({
-            url: request[0],
-            method: 'POST',
-            body: request[1],
-            headers: request[2],
-            timeout: 10
-        }).then(res => {
-            console.log(res);
-            return (res.statusCode != 200);
-        }, err => {
-            console.log("Update Recurrent Transaction Failed");
-            console.log(err);
-            return false;
-        });
+    updateRecurrentTransactions(recurrenttransactions: Array<SharedRecurrentTransaction>): Promise<boolean> {
+        return PostUpdateRecurrentTransactions(this.authenticationService.getBackendUrl(),recurrenttransactions,this.authenticationService.getStoredUser().UserToken).then(content => true,
+            err => {
+                console.log("Update Recurrent Transaction Failed");
+                console.log(err);
+                return false;
+            });
     }
 
     getAllowance(): Promise<number> {
-        let request = this.__getAllowance__();
-        return Https.request({
-            url: request[0],
-            method: 'GET',
-            headers: request[1],
-            timeout: 10
-        }).then(res => {
-            return res["content"]["allowance"];
+        return GetGetAllowance(this.authenticationService.getBackendUrl(),this.authenticationService.getStoredUser().Username,this.authenticationService.getStoredUser().UserToken).then(content => {
+            return content.allowance;
         })
         .catch((err) => {
             console.log("Get allowance failed!");

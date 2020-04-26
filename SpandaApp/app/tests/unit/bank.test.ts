@@ -1,47 +1,110 @@
-import { BankService } from '../../services/bank.service';
-import { DummyAuthenticationService } from "../DummyAuthentication.service"
-import { Bank } from '~/models/bank.model';
+import { SharedBank, TransactionFrequency, Token, SharedRecurrentTransaction } from 'dinodime-sharedmodel';
+import { GetBankByBLZ, GetRecurrentTransactions, UpdateRecurrentTransactions, GetWebformIdAndToken } from "../../services/bank-utils";
 
 describe('App Component Test',() => {
 
-	let bankService;
+	let backendUrl;
 
     beforeEach(function() {
-		bankService = new BankService(new DummyAuthenticationService);
-	})
+		backendUrl = "onlyfortest";
+    })
 	
 	it('get bank by BLZ', async function() {
 
 		let testBlz = "00000000";
 
-		const result = bankService.__getBankByBLZ__(testBlz);
+		const result = GetBankByBLZ(backendUrl,testBlz);
 
-		expect(result.length).to.be.equal(2)
-		expect(result[0]).to.be.an('string')
-		expect(result[1]).to.be.an('object')
-
-		expect(result[0]).to.be.equal("onlyfortest/banks/" + testBlz)
-		expect(result[1]["Content-Type"]).to.be.equal("application/x-www-form-urlencoded")
+		expect(result.url).to.be.equal("onlyfortest/banks/" + testBlz)
+		expect(result.method).to.be.equal("GET");
+		expect(result.headers["Content-Type"]).to.be.equal("application/x-www-form-urlencoded")
 	})
 
 	it('get webform id and token', async function() {
 
-		let bank = new Bank();
-		bank.Id = 349347;
+		let bank: SharedBank = {
+			id: 349347,
+			name: "",
+			loginHint: "",
+			bic: "",
+			blz: ""
+		};
 
-		const result = bankService.__getWebformIdAndToken__(bank);
+		let token: Token = {
+			token_type: "bearer",
+			expires_in: 0,
+			scope: "",
+			refresh_token: "",
+			access_token: "o1cIunYA1BgmkkNn8OQE4p4_bxNP8ztNgAs6NBVuHFvHa4saLZBE0A0R1ACvMyXrxomcMhgWo8zPUq992xjctxw5RVMAfrZpyPje1AYtYH35ipQbXVCSgfJKgtPeamBM"
+		};
 
-		expect(result.length).to.be.equal(3)
-		expect(result[0]).to.be.an('string')
-		expect(result[1]).to.be.an('object')
-		expect(result[2]).to.be.an('object')
+		const result = GetWebformIdAndToken(backendUrl,bank,token);
 
-		expect(result[1].bankId).to.be.an('number')
+		expect(result.body.bankId).to.be.an('number')
 
-		expect(result[0]).to.be.equal("onlyfortest/bankConnections/import")
-		expect(result[1].bankId).to.be.equal(bank.Id)
-		expect(result[2]["Content-Type"]).to.be.equal("application/json")
-		expect(result[2]["Authorization"]).to.be.equal("bearer 12345678")
+		expect(result.url).to.be.equal("onlyfortest/bankConnections/import")
+		expect(result.method).to.be.equal("POST");
+		expect(result.body.bankId).to.be.equal(bank.id)
+		expect(result.headers["Content-Type"]).to.be.equal("application/json")
+		expect(result.headers["Authorization"]).to.be.equal("bearer o1cIunYA1BgmkkNn8OQE4p4_bxNP8ztNgAs6NBVuHFvHa4saLZBE0A0R1ACvMyXrxomcMhgWo8zPUq992xjctxw5RVMAfrZpyPje1AYtYH35ipQbXVCSgfJKgtPeamBM")
+	})
+
+	it('get recurrent transactions', async function() {
+
+		let token: Token = {
+			token_type: "bearer",
+			expires_in: 0,
+			scope: "",
+			refresh_token: "",
+			access_token: "o1cIunYA1BgmkkNn8OQE4p4_bxNP8ztNgAs6NBVuHFvHa4saLZBE0A0R1ACvMyXrxomcMhgWo8zPUq992xjctxw5RVMAfrZpyPje1AYtYH35ipQbXVCSgfJKgtPeamBM"
+		};
+
+		const result = GetRecurrentTransactions(backendUrl,token);
+
+		expect(result.url).to.be.equal("onlyfortest/recurrentTransactions")
+		expect(result.method).to.be.equal("GET");
+		expect(result.headers["Content-Type"]).to.be.equal("application/json")
+		expect(result.headers["Authorization"]).to.be.equal("bearer o1cIunYA1BgmkkNn8OQE4p4_bxNP8ztNgAs6NBVuHFvHa4saLZBE0A0R1ACvMyXrxomcMhgWo8zPUq992xjctxw5RVMAfrZpyPje1AYtYH35ipQbXVCSgfJKgtPeamBM")
+	})
+
+	it('update recurrent transactions', async function() {
+
+		let sharedRecurrentTransactions: SharedRecurrentTransaction[] = [
+			{
+				id: 1,
+				accountId: 2,
+				absAmount: 37,
+				isExpense: false,
+				isConfirmed: true,
+				frequency: TransactionFrequency.Quarterly,
+				counterPartName: "Dinodime GmbH"
+			}
+		];
+
+		let token: Token = {
+			token_type: "bearer",
+			expires_in: 0,
+			scope: "",
+			refresh_token: "",
+			access_token: "o1cIunYA1BgmkkNn8OQE4p4_bxNP8ztNgAs6NBVuHFvHa4saLZBE0A0R1ACvMyXrxomcMhgWo8zPUq992xjctxw5RVMAfrZpyPje1AYtYH35ipQbXVCSgfJKgtPeamBM"
+		};
+
+		const result = UpdateRecurrentTransactions(backendUrl,sharedRecurrentTransactions,token);
+
+		expect(result.url).to.be.equal("onlyfortest/recurrentTransactions/update")
+		expect(result.method).to.be.equal("POST");
+		expect(result.headers["Content-Type"]).to.be.equal("application/json")
+		expect(result.headers["Authorization"]).to.be.equal("bearer o1cIunYA1BgmkkNn8OQE4p4_bxNP8ztNgAs6NBVuHFvHa4saLZBE0A0R1ACvMyXrxomcMhgWo8zPUq992xjctxw5RVMAfrZpyPje1AYtYH35ipQbXVCSgfJKgtPeamBM")
+
+		expect(result.body.recurrenttransactions).to.be.exist;
+		expect(result.body.recurrenttransactions[0]).to.be.exist;
+		expect(result.body.recurrenttransactions[0].id).to.be.equal(1);
+		expect(result.body.recurrenttransactions[0].accountId).to.be.equal(2);
+		expect(result.body.recurrenttransactions[0].absAmount).to.be.equal(37);
+		expect(result.body.recurrenttransactions[0].isExpense).to.be.equal(false);
+		expect(result.body.recurrenttransactions[0].isConfirmed).to.be.equal(true);
+		expect(result.body.recurrenttransactions[0].frequency).to.be.equal(TransactionFrequency.Quarterly);
+		expect(result.body.recurrenttransactions[0].counterPartName).to.be.equal("Dinodime GmbH");
 	})
 
 });

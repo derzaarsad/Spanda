@@ -8,7 +8,7 @@ import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import { VoidTransport } from "dinodime-lib";
 import { RecurrentTransactions, Transactions } from "dinodime-lib";
 import { Transaction } from "dinodime-lib";
-import { TransactionFrequency } from "dinodime-lib";
+import { TransactionFrequency } from "dinodime-sharedmodel";
 
 describe("unit: deduce recurrent transactions", function() {
   let logger: winston.Logger;

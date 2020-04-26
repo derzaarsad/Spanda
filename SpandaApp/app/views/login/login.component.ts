@@ -77,8 +77,8 @@ export class LoginComponent {
             return;
         }
         this.authenticationService.register(this.Username, this.Password)
-            .then(([registrationSuccess,message]) => {
-                if(registrationSuccess) {
+            .then(errorMessage => {
+                if(!errorMessage) {
                     this.alert("Your account was successfully created.");
                     this.isLoggingIn = true;
                     this.authenticationService.authenticateAndSave(this.Username,this.Password)
@@ -86,7 +86,7 @@ export class LoginComponent {
                         this.routerExtension.navigate(['../home'], { clearHistory: true, relativeTo: this.activeRoute });
                     });
                 } else {
-                    this.alert(message);
+                    this.alert(errorMessage);
                 }
             })
             .catch((err) => {

@@ -9,7 +9,6 @@ import { VoidTransport, User } from "dinodime-lib";
 import {
   RecurrentTransaction,
   RecurrentTransactions,
-  TransactionFrequency,
   RecurrentTransactionsSchema
 } from "dinodime-lib";
 import { Users } from "dinodime-lib";
@@ -18,6 +17,7 @@ import { CreateUnittestInterfaces } from "../test-utility";
 import { Pool } from "pg";
 import format from "pg-format";
 import { UsersSchema } from "dinodime-lib";
+import { TransactionFrequency } from "dinodime-sharedmodel";
 
 describe("integration: update recurrent transactions", function() {
   let logger: winston.Logger;

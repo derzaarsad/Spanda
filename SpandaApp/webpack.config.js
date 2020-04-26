@@ -141,7 +141,9 @@ module.exports = env => {
                 "node_modules",
             ],
             alias: {
-                '~': appFullPath
+                '~': appFullPath,
+                'dinodime-sharedmodel': resolve(__dirname + "/..", "node_modules/dinodime-sharedmodel"),
+                'dinodime-message': resolve(__dirname + "/..", "node_modules/dinodime-message"),
             },
             symlinks: true
         },

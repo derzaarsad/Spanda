@@ -39,45 +39,52 @@ jobs:
     steps:
       - task: NodeTool@0
         inputs:
-          versionSpec: "12.x"
+          versionSpec: "10.x"
         displayName: "Install Node.js"
       - script: |
           npm install -g nativescript
         displayName: "install nativescript"
         continueOnError: false
       - bash: |
+          yarn install
+          yarn run build
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+        displayName: "buiĺd shared libraries"
+      - bash: |
+          tns package-manager set yarn
+          yarn install
+        workingDirectory: '$(System.DefaultWorkingDirectory)/SpandaApp'
+        displayName: "yarn install"
+      - bash: |
           echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install 'system-images;android-28;google_apis;x86'
-        displayName: "install Android image"
-      - script: |
-          $ANDROID_HOME/emulator/emulator -list-avds
-          echo '---'
           echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd -n test_android_emulator -k 'system-images;android-28;google_apis;x86' --force
-          echo '---'
           $ANDROID_HOME/emulator/emulator -list-avds
-        displayName: "create AVD"
-      - script: |
+          echo "adb devices list"
           $ANDROID_HOME/platform-tools/adb devices
-          echo '---'
-          nohup $ANDROID_HOME/emulator/emulator -avd test_android_emulator -no-snapshot > /dev/null 2>&1 & $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
-          echo '---'
-          $ANDROID_HOME/platform-tools/adb devices
-        displayName: "start Android emulator"
+        workingDirectory: '$(System.DefaultWorkingDirectory)/SpandaApp'
+        displayName: "configure Android emulator"
       - task: DownloadSecureFile@1
         inputs:
           secureFile: 'google-services.json'
       - script: |
-          cd SpandaApp
-          tns platform add android
           cp $(Agent.TempDirectory)/google-services.json $(System.DefaultWorkingDirectory)/SpandaApp/app/App_Resources/Android/google-services.json
           tns test android --justlaunch
+        workingDirectory: '$(System.DefaultWorkingDirectory)/SpandaApp'
         displayName: "Run unit test"
         continueOnError: true
+      - task: PythonScript@0
+        inputs:
+          scriptSource: 'filePath'
+          scriptPath: '$(System.DefaultWorkingDirectory)/checkFilesExistence.py'
+          arguments: '$(System.DefaultWorkingDirectory)/SpandaApp/reports/unit-tests-app.xml'
+          failOnStderr: true
+        displayName: "Check Unit Test Results Existence"
       - task: PublishTestResults@2
         displayName: "Publish test results"
         condition: succeededOrFailed()
         inputs:
-          testRunner: JUnit
-          testResultsFiles: "$(System.DefaultWorkingDirectory)/SpandaApp/reports/**/*.xml"
+          testResultsFormat: 'JUnit'
+          testResultsFiles: "$(System.DefaultWorkingDirectory)/SpandaApp/reports/*.xml"
       - publish: $(System.DefaultWorkingDirectory)/SpandaApp
         artifact: NativescriptApp
 
@@ -186,7 +193,7 @@ jobs:
         displayName: "Publish test results"
         condition: succeededOrFailed()
         inputs:
-          testRunner: JUnit
+          testResultsFormat: 'JUnit'
           testResultsFiles: "$(System.DefaultWorkingDirectory)/DinodimeBackend/reports/*.xml"
       - task: reportgenerator@4
         inputs:

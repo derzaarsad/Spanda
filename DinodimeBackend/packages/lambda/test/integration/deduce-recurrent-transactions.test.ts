@@ -13,7 +13,7 @@ import { TransactionsSchema } from "dinodime-lib";
 import { RecurrentTransactionsSchema } from "dinodime-lib";
 
 import { Transaction } from "dinodime-lib";
-import { TransactionFrequency } from "dinodime-lib";
+import { TransactionFrequency } from "dinodime-sharedmodel";
 
 describe("integration: deduce recurrent transactions", function() {
   let logger: winston.Logger;

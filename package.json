@@ -1,10 +1,11 @@
 {
-  "name": "dinodime-backend",
+  "name": "dinodime-code",
   "description": "Project root",
   "license": "UNLICENSED",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "DinodimeBackend/packages/*",
+    "DinodimeShared/*"
   ],
   "scripts": {
     "build": "tsc -b -v",

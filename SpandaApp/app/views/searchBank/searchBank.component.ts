@@ -7,7 +7,7 @@ import { alert } from "tns-core-modules/ui/dialogs";
 
 import { BankService } from "~/services/bank.service";
 import { AuthenticationService } from "~/services/authentication.service";
-import { Bank } from "~/models/bank.model";
+import { SharedBank } from "dinodime-sharedmodel";
 import * as utils from "tns-core-modules/utils/utils";
 import { WebView, LoadEventData } from "tns-core-modules/ui/web-view";
 
@@ -19,7 +19,7 @@ import { WebView, LoadEventData } from "tns-core-modules/ui/web-view";
 })
 export class SearchBankComponent implements OnInit {
     private SearchedBlz: string = "";
-    private bank: Bank;
+    private bank: SharedBank;
     private enableBank: boolean = false;
     private enableWebView: boolean = false;
     private webViewSrc = "";

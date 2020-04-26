@@ -8,7 +8,6 @@ import { Context, APIGatewayProxyEvent } from "aws-lambda";
 import { VoidTransport, FinAPI, User, BankConnection } from "dinodime-lib";
 import { RecurrentTransactions, Users, BankConnections } from "dinodime-lib";
 import { RecurrentTransaction } from "dinodime-lib";
-import { TransactionFrequency } from "dinodime-lib";
 import { CreateUnittestInterfaces } from "../test-utility";
 
 import { Pool } from "pg";

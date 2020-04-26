@@ -1,10 +1,10 @@
 import { Injectable, InjectionToken } from "@angular/core";
-import * as Https from 'nativescript-https';
-import { Token } from "~/models/token.model";
 import * as appSettings from "tns-core-modules/application-settings";
 import { User } from "~/models/user.model";
 import { JsonConvert } from "json2typescript";
 import { environment } from "~/environments/environment";
+import { Token } from "dinodime-sharedmodel";
+import { PostAuthenticateAndSave, PostUpdateToken, GetUserVerification, PostRegister } from "./authentication-utils";
 export const AUTH_SERVICE_IMPL = new InjectionToken<IAuthentication>('authServiceImpl');
 
 /*
@@ -17,9 +17,9 @@ export interface IAuthentication {
     getStoredUser(): User;
     authenticateAndSave(username: string, password: string) : Promise<boolean>;
     setNewRefreshAndAccessToken() : Promise<boolean>;
-    isUserAuthenticated(access_token: string, token_type: string) : Promise<boolean>;
+    isUserAuthenticated(token: Token) : Promise<boolean>;
     removeAllUserAuthentication(): void;
-    register(username: string, password: string) : Promise<[boolean,string]>;
+    register(username: string, password: string) : Promise<string | null>;
 
     resetPassword(textSTr: string) : any;
 }
@@ -50,87 +50,30 @@ export class AuthenticationService implements IAuthentication {
         return this.storedUser;
     }
 
-    __authenticateAndSave__(username: string, password: string) : [string, any, any] {
-
-        let headerOptions = {
-            "Content-Type": "application/json"
-        };
-
-        return [this.getBackendUrl() + "/oauth/login", { username: username, password: password }, headerOptions ];
-    }
-
-    __setNewRefreshAndAccessToken__(refreshToken: string) : [string, any, any] {
-
-        let headerOptions = {
-            "Content-Type": "application/json"
-        };
-
-        return [this.getBackendUrl() + "/oauth/token", { refresh_token: refreshToken }, headerOptions ];
-    }
-
-    __isUserAuthenticated__(access_token: string, token_type: string) : [string, any] {
-
-        let headerOptions = {
-            "Authorization": token_type + " " + access_token,
-            "Content-Type": "application/json"
-         };
-
-         return [this.getBackendUrl() + "/users", headerOptions ];
-    }
-
-    __register__(username: string, password: string) : [string, any, any] {
-
-        let headerOptions = {
-            "Content-Type": "application/json"
-        };
-
-        return [this.getBackendUrl() + "/users", { id: username, password: password, email: username, phone: "+49 99 999999-999", isAutoUpdateEnabled: false }, headerOptions ];
-    }
-
     authenticateAndSave(username: string, password: string) : Promise<boolean> {
-        let request = this.__authenticateAndSave__(username,password);
-        return Https.request({
-            url: request[0],
-            method: 'POST',
-            body: request[1],
-            headers: request[2],
-            timeout: 10
-        }).then(res => {
+        return PostAuthenticateAndSave(this.getBackendUrl(),username,password).then(content => {
             if(!this.storedUser) {
                 this.storedUser = new User();
             }
             this.storedUser.Username = username;
             this.storedUser.Password = password;
-            this.storedUser.UserToken = new Token(res["content"]["access_token"], res["content"]["refresh_token"], res["content"]["token_type"]);
+            this.storedUser.UserToken = content.token;
             let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
             appSettings.setString("storedUser",storedUserJson);
 
             return true;
-        });
+        }).catch(() => false);
     }
 
     setNewRefreshAndAccessToken() : Promise<boolean> {
-        let request = this.__setNewRefreshAndAccessToken__(this.storedUser.UserToken.RefreshToken);
-        return Https.request({
-            url: request[0],
-            method: 'POST',
-            body: request[1],
-            headers: request[2],
-            timeout: 10
-        }).then(res => {
-            console.log(res);
-            if(res["statusCode"] === 200) {
-                this.storedUser.UserToken = new Token(res["content"]["token"]["access_token"], res["content"]["token"]["refresh_token"], res["content"]["token"]["token_type"]);
-                this.storedUser.IsRecurrentTransactionConfirmed = res["content"]["is_recurrent_transaction_confirmed"];
-                this.storedUser.IsAllowanceReady = res["content"]["is_allowance_ready"];
-                let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
-                appSettings.setString("storedUser",storedUserJson);
+        return PostUpdateToken(this.getBackendUrl(),this.storedUser.UserToken).then(content => {
+            this.storedUser.UserToken = content.token;
+            this.storedUser.IsRecurrentTransactionConfirmed = content.userVerificationMessage.is_recurrent_transaction_confirmed;
+            this.storedUser.IsAllowanceReady = content.userVerificationMessage.is_allowance_ready;
+            let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
+            appSettings.setString("storedUser",storedUserJson);
 
-                return true;
-            }
-            else {
-                return false;
-            }
+            return true;
         }, err => {
             console.log("invalid refresh_token");
             console.log(err);
@@ -138,27 +81,15 @@ export class AuthenticationService implements IAuthentication {
         });
     }
 
-    isUserAuthenticated(access_token: string, token_type: string) : Promise<boolean> {
-        let request = this.__isUserAuthenticated__(access_token, token_type);
-        return Https.request({
-            url: request[0],
-            method: 'GET',
-            headers: request[1],
-            timeout: 10
-        }).then(res => {
+    isUserAuthenticated(token: Token) : Promise<boolean> {
+        return GetUserVerification(this.getBackendUrl(),token).then(content => {
             console.log("user is authenticated!");
-            console.log(res);
-            if(res["statusCode"] === 200) {
-                this.storedUser.IsRecurrentTransactionConfirmed = res["content"]["is_recurrent_transaction_confirmed"];
-                this.storedUser.IsAllowanceReady = res["content"]["is_allowance_ready"];
-                let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
-                appSettings.setString("storedUser",storedUserJson);
+            this.storedUser.IsRecurrentTransactionConfirmed = content.is_recurrent_transaction_confirmed;
+            this.storedUser.IsAllowanceReady = content.is_allowance_ready;
+            let storedUserJson: string = JSON.stringify(this.jsonConvert.serialize(this.storedUser));
+            appSettings.setString("storedUser",storedUserJson);
 
-                return true;
-            }
-            else {
-                return false;
-            }
+            return true;
         }, err => {
             console.log("user not authenticated!");
             console.log(err);
@@ -170,18 +101,8 @@ export class AuthenticationService implements IAuthentication {
         appSettings.remove("storedUser");
     }
 
-    register(username: string, password: string) : Promise<[boolean,string]> {
-        let request = this.__register__(username, password);
-        return Https.request({
-            url: request[0],
-            method: 'POST',
-            body: request[1],
-            headers: request[2],
-            timeout: 10
-        }).then(res => {
-            console.log(res);
-            return [((res["statusCode"] === 201) ? true : false), res.content["message"]];
-        });
+    register(username: string, password: string) : Promise<string | null> {
+        return PostRegister(this.getBackendUrl(),username,password).then(() => null).catch(err => err.message);
     }
 
     resetPassword(textSTr: string) : any {

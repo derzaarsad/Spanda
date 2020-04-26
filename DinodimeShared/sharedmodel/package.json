@@ -1,0 +1,13 @@
+{
+  "name": "dinodime-sharedmodel",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "main": "out/src/index.js",
+  "module": "out/src/index.mjs",
+  "types": "out/src/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": ""
+}
