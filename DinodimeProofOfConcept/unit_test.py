@@ -1,7 +1,7 @@
 import unittest
 
 from datetime import timedelta, date
-from dinodime import CashActivity, daterange, dailyPayEntityFactory, create8HoursSalary, monthlySalaryFactory, calculateDailyBalance
+from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateDailyBalance
 
 class TestDinodimeMethods(unittest.TestCase):
 
@@ -20,11 +20,11 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(len(dates),1)
         self.assertEqual(dates[0],date(2012,3,4))
 
-    def test_dailyPayEntityFactory(self):
+    def test_reccurentCashActivitiesFactory(self):
         with self.assertRaises(ValueError):
-            dailyPayEntityFactory(-10.0,date(2013,4,5),date(2013,4,4))
+            reccurentCashActivitiesFactory(-10.0,date(2013,4,5),date(2013,4,4))
         
-        cash_activities = dailyPayEntityFactory(-10.0,date(2013,4,5),date(2013,4,8))
+        cash_activities = reccurentCashActivitiesFactory(-10.0,date(2013,4,5),date(2013,4,8))
         self.assertEqual(len(cash_activities),4)
         self.assertEqual(cash_activities[0].execution_date,date(2013,4,5))
         self.assertEqual(cash_activities[1].execution_date,date(2013,4,6))

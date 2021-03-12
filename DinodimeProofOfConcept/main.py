@@ -1,5 +1,5 @@
 from datetime import timedelta, date
-from dinodime import CashActivity, monthlySalaryFactory, dailyPayEntityFactory, calculateDailyBalance, getAllowance
+from dinodime import CashActivity, monthlySalaryFactory, reccurentCashActivitiesFactory, calculateDailyBalance, getAllowance
 
 ########################### PLAYGROUND ###########################
 
@@ -7,7 +7,7 @@ start_eval_date = date(2021,2,4)
 end_eval_date = date(2022,5,2)
 salaries = monthlySalaryFactory(1200.0,3,4,2021,2022)
 bonuses = [CashActivity(3000.0,timedelta(0,0,0,0,0,0,0),date(2021,12,31))]
-expenses = dailyPayEntityFactory(-10.0,start_eval_date,end_eval_date)
+expenses = reccurentCashActivitiesFactory(-10.0,start_eval_date,end_eval_date)
 cash_entities = salaries + bonuses + expenses
 total_balance_available = 1520
 

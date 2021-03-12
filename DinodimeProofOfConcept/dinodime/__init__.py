@@ -48,7 +48,7 @@ def monthlySalaryFactory(amount,start_month,end_month,start_year,end_year):
     end_dt = date(tmp.year,tmp.month,1)-timedelta(days=1)
     return create8HoursSalary(amount,start_dt,end_dt)
 
-def dailyPayEntityFactory(daily_amount,start_date,end_date):
+def reccurentCashActivitiesFactory(daily_amount,start_date,end_date):
     dates = daterange(start_date, end_date)
     cash_entities = []
     for dt in dates:
