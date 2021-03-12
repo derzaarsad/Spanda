@@ -16,8 +16,13 @@ class CashActivity:
 def daterange(date1, date2):
     assert isinstance(date1, date)
     assert isinstance(date2, date)
+    if(date2 < date1):
+        raise ValueError("The end date cannot be before the start date!")
+    
+    dates = []
     for n in range(int ((date2 - date1).days)+1):
-        yield date1 + timedelta(n)
+        dates.append(date1 + timedelta(n))
+    return dates
 
 def create8HoursSalary(amount,dates):
     assert isinstance(amount, float)
