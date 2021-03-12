@@ -38,4 +38,4 @@ while name!= "exit":
 
 # TEST: one of the days must have a total balance near 0
 #allowance_used = dailyPayEntityFactory(-round(allowance,8),start_eval_date,date(2021,3,27))
-#calculateFinalBalance(1520,timedelta(0,0,0,0,0,10,0),start_eval_date,end_eval_date,cash_activities + allowance_used,True)
+#calculateEndBalance(1520,timedelta(0,0,0,0,0,10,0),start_eval_date,end_eval_date,cash_activities + allowance_used,True)
