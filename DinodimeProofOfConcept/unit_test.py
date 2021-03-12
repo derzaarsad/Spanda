@@ -1,7 +1,7 @@
 import unittest
 
 from datetime import timedelta, date
-from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateDailyBalance
+from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff
 
 class TestDinodimeMethods(unittest.TestCase):
 
@@ -64,12 +64,12 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cash_activities[58].cash_amount,1500.0)
         self.assertEqual(cash_activities[88].cash_amount,1500.0)
     
-    def test_calculateDailyBalance(self):
+    def test_calculateBalanceDiff(self):
         cash_activities = [
             CashActivity(11.0,timedelta(0,0,0,0,0,45,0),date(2013,9,20)),
             CashActivity(-9.0,timedelta(0,0,0,0,0,13,0),date(2013,9,20))
         ]
-        daily_balance, daily_work_duration = calculateDailyBalance(date(2013,9,21), cash_activities)
+        daily_balance, daily_work_duration = calculateBalanceDiff(date(2013,9,21), cash_activities)
         self.assertEqual(daily_balance,0.0)
         self.assertEqual(daily_work_duration,timedelta(0,0,0,0,0,0,0))
 
@@ -81,7 +81,7 @@ class TestDinodimeMethods(unittest.TestCase):
             CashActivity(1100.0,timedelta(0,0,0,0,0,4500,0),date(2013,9,22)),
             CashActivity(-900.0,timedelta(0,0,0,0,0,1300,0),date(2013,9,22))
         ]
-        daily_balance, daily_work_duration = calculateDailyBalance(date(2013,9,21), cash_activities)
+        daily_balance, daily_work_duration = calculateBalanceDiff(date(2013,9,21), cash_activities)
         self.assertEqual(daily_balance,20.0)
         self.assertEqual(daily_work_duration,timedelta(0,0,0,0,0,580,0))
     

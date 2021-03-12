@@ -55,7 +55,7 @@ def reccurentCashActivitiesFactory(daily_amount,start_date,end_date):
         cash_activities.append(CashActivity(daily_amount,timedelta(0,0,0,0,0,0,0),dt))
     return cash_activities
 
-def calculateDailyBalance(dt, cash_activities):
+def calculateBalanceDiff(dt, cash_activities):
     cash_activities_dt = list(filter(lambda cash_entity: cash_entity.execution_date == dt, cash_activities))
     daily_balance = 0
     daily_work_duration = timedelta(0,0,0,0,0,0,0)
@@ -69,10 +69,10 @@ def calculateFinalBalance(initial_amount,max_daily_work_duration,start_date,end_
     assert(max_daily_work_duration < timedelta(1,0,0,0,0,0,0))
     total_balance = initial_amount
     dates = daterange(start_date, end_date)
-    minimum_total_balance = initial_amount + calculateDailyBalance(start_date,cash_activities)[0]
+    minimum_total_balance = initial_amount + calculateBalanceDiff(start_date,cash_activities)[0]
     days_with_minimum_total_balance = start_date
     for dt in dates:
-        daily_balance, daily_work_duration = calculateDailyBalance(dt,cash_activities)
+        daily_balance, daily_work_duration = calculateBalanceDiff(dt,cash_activities)
         total_balance += daily_balance
         # check everything here
         if daily_work_duration > max_daily_work_duration:

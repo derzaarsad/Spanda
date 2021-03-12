@@ -1,5 +1,5 @@
 from datetime import timedelta, date
-from dinodime import CashActivity, monthlySalaryFactory, reccurentCashActivitiesFactory, calculateDailyBalance, getAllowance
+from dinodime import CashActivity, monthlySalaryFactory, reccurentCashActivitiesFactory, calculateBalanceDiff, getAllowance
 
 ########################### PLAYGROUND ###########################
 
@@ -17,7 +17,7 @@ start_date = start_eval_date
 
 name = "not"
 while name!= "exit":
-    total_balance_before_allowance = total_balance_available + (calculateDailyBalance(start_date,cash_activities)[0])
+    total_balance_before_allowance = total_balance_available + (calculateBalanceDiff(start_date,cash_activities)[0])
     allowance = getAllowance(total_balance_available,timedelta(0,0,0,0,0,10,0),start_date,end_eval_date,cash_activities, 15000)
     print("total balance available: " + str(total_balance_before_allowance))
     print("allowance at ",end="")
