@@ -86,8 +86,10 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(daily_work_duration,timedelta(0,0,0,0,0,580,0))
     
     def test_create8HoursSalary(self):
-        dates = daterange(date(2021,5,27),date(2021,6,2))
-        cash_activities = create8HoursSalary(1200.0,dates)
+        with self.assertRaises(ValueError):
+            create8HoursSalary(-1200.0,date(2021,5,27),date(2021,6,2))
+        
+        cash_activities = create8HoursSalary(1200.0,date(2021,5,27),date(2021,6,2))
         self.assertEqual(len(cash_activities),7)
         self.assertEqual(cash_activities[0].execution_date,date(2021,5,27))
         self.assertEqual(cash_activities[1].execution_date,date(2021,5,28))
@@ -113,8 +115,7 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cash_activities[5].cash_amount,0.0)
         self.assertEqual(cash_activities[6].cash_amount,0.0)
 
-        dates = daterange(date(2021,8,27),date(2021,9,2))
-        cash_activities = create8HoursSalary(1200.0,dates)
+        cash_activities = create8HoursSalary(1200.0,date(2021,8,27),date(2021,9,2))
         self.assertEqual(len(cash_activities),7)
         self.assertEqual(cash_activities[0].execution_date,date(2021,8,27))
         self.assertEqual(cash_activities[1].execution_date,date(2021,8,28))
@@ -140,8 +141,7 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cash_activities[5].cash_amount,0.0)
         self.assertEqual(cash_activities[6].cash_amount,0.0)
 
-        dates = daterange(date(2021,3,27),date(2021,4,2))
-        cash_activities = create8HoursSalary(1200.0,dates)
+        cash_activities = create8HoursSalary(1200.0,date(2021,3,27),date(2021,4,2))
         self.assertEqual(len(cash_activities),7)
         self.assertEqual(cash_activities[0].execution_date,date(2021,3,27))
         self.assertEqual(cash_activities[1].execution_date,date(2021,3,28))
@@ -167,8 +167,7 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cash_activities[5].cash_amount,0.0)
         self.assertEqual(cash_activities[6].cash_amount,0.0)
 
-        dates = daterange(date(2021,6,27),date(2021,7,3))
-        cash_activities = create8HoursSalary(1200.0,dates)
+        cash_activities = create8HoursSalary(1200.0,date(2021,6,27),date(2021,7,3))
         self.assertEqual(len(cash_activities),7)
         self.assertEqual(cash_activities[0].execution_date,date(2021,6,27))
         self.assertEqual(cash_activities[1].execution_date,date(2021,6,28))

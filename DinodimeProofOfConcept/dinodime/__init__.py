@@ -24,8 +24,10 @@ def daterange(date1, date2):
         dates.append(date1 + timedelta(n))
     return dates
 
-def create8HoursSalary(amount,dates):
-    assert isinstance(amount, float)
+def create8HoursSalary(amount,start_date,end_date):
+    if amount < 0:
+        raise ValueError("Salary cannot be negative!")
+    dates = daterange(start_date, end_date)
     cash_activities = []
     amount_to_be_applied = 0.0
     for dt in dates:
@@ -41,16 +43,12 @@ def create8HoursSalary(amount,dates):
 # 2. Working 8 hours a day from Monday to Friday
 # 3. Salary pay day at 28th date of the month or the next working day if on the weekend
 def monthlySalaryFactory(amount,start_month,end_month,start_year,end_year):
-    assert isinstance(amount, float)
-    assert(amount > 0)
     start_dt = date(start_year, start_month, 1)
     tmp = date(end_year, end_month, 1)+timedelta(days=31)
     end_dt = date(tmp.year,tmp.month,1)-timedelta(days=1)
-    dates = daterange(start_dt, end_dt)
-    return create8HoursSalary(amount,dates)
+    return create8HoursSalary(amount,start_dt,end_dt)
 
 def dailyPayEntityFactory(daily_amount,start_date,end_date):
-    assert isinstance(daily_amount, float)
     dates = daterange(start_date, end_date)
     cash_entities = []
     for dt in dates:
@@ -68,8 +66,6 @@ def calculateDailyBalance(dt, cash_entities):
 
 # Only consider pay entities in the scope of start and end date
 def calculateFinalBalance(initial_amount,max_daily_work_duration,start_date,end_date,cash_entities, print_daily = False):
-    assert isinstance(start_date, date)
-    assert isinstance(end_date, date)
     assert(max_daily_work_duration < timedelta(1,0,0,0,0,0,0))
     total_balance = initial_amount
     dates = daterange(start_date, end_date)
