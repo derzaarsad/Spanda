@@ -18,7 +18,7 @@ def daterange(date1, date2):
     assert isinstance(date2, date)
     if(date2 < date1):
         raise ValueError("The end date cannot be before the start date!")
-    
+
     dates = []
     for n in range(int ((date2 - date1).days)+1):
         dates.append(date1 + timedelta(n))
@@ -27,14 +27,19 @@ def daterange(date1, date2):
 def create8HoursSalary(amount,dates):
     assert isinstance(amount, float)
     cash_activities = []
+    amount_to_be_applied = 0.0
     for dt in dates:
-        cash_activities.append(CashActivity(0.0 if dt.day != 28 else amount,timedelta(0,0,0,0,0,8 if dt.weekday() < 5 else 0,0),dt))
+        if dt.day == 28:
+            amount_to_be_applied = amount
+        cash_activities.append(CashActivity(0.0 if dt.weekday() > 4 else amount_to_be_applied,timedelta(0,0,0,0,0,8 if dt.weekday() < 5 else 0,0),dt))
+        if dt.weekday() <= 4:
+            amount_to_be_applied = 0.0
     return cash_activities
 
 # Assumptions:
 # 1. No public holiday
 # 2. Working 8 hours a day from Monday to Friday
-# 3. Salary pay day at 28th date of the month and paid regardless of the weekend
+# 3. Salary pay day at 28th date of the month or the next working day if on the weekend
 def monthlySalaryFactory(amount,start_month,end_month,start_year,end_year):
     assert isinstance(amount, float)
     assert(amount > 0)

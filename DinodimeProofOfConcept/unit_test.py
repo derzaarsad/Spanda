@@ -1,7 +1,7 @@
 import unittest
 
 from datetime import timedelta, date
-from dinodime import daterange, dailyPayEntityFactory
+from dinodime import daterange, dailyPayEntityFactory, create8HoursSalary
 
 class TestDinodimeMethods(unittest.TestCase):
 
@@ -40,6 +40,115 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cash_activities[1].cash_amount,-10.0)
         self.assertEqual(cash_activities[2].cash_amount,-10.0)
         self.assertEqual(cash_activities[3].cash_amount,-10.0)
+    
+    def test_create8HoursSalary(self):
+        dates = daterange(date(2021,5,27),date(2021,6,2))
+        cash_activities = create8HoursSalary(1200.0,dates)
+        self.assertEqual(len(cash_activities),7)
+        self.assertEqual(cash_activities[0].execution_date,date(2021,5,27))
+        self.assertEqual(cash_activities[1].execution_date,date(2021,5,28))
+        self.assertEqual(cash_activities[2].execution_date,date(2021,5,29))
+        self.assertEqual(cash_activities[3].execution_date,date(2021,5,30))
+        self.assertEqual(cash_activities[4].execution_date,date(2021,5,31))
+        self.assertEqual(cash_activities[5].execution_date,date(2021,6,1))
+        self.assertEqual(cash_activities[6].execution_date,date(2021,6,2))
+
+        self.assertEqual(cash_activities[0].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[1].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[2].work_effort,timedelta(0,0,0,0,0,0,0))
+        self.assertEqual(cash_activities[3].work_effort,timedelta(0,0,0,0,0,0,0))
+        self.assertEqual(cash_activities[4].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[5].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[6].work_effort,timedelta(0,0,0,0,0,8,0))
+
+        self.assertEqual(cash_activities[0].cash_amount,0.0)
+        self.assertEqual(cash_activities[1].cash_amount,1200.0)
+        self.assertEqual(cash_activities[2].cash_amount,0.0)
+        self.assertEqual(cash_activities[3].cash_amount,0.0)
+        self.assertEqual(cash_activities[4].cash_amount,0.0)
+        self.assertEqual(cash_activities[5].cash_amount,0.0)
+        self.assertEqual(cash_activities[6].cash_amount,0.0)
+
+        dates = daterange(date(2021,8,27),date(2021,9,2))
+        cash_activities = create8HoursSalary(1200.0,dates)
+        self.assertEqual(len(cash_activities),7)
+        self.assertEqual(cash_activities[0].execution_date,date(2021,8,27))
+        self.assertEqual(cash_activities[1].execution_date,date(2021,8,28))
+        self.assertEqual(cash_activities[2].execution_date,date(2021,8,29))
+        self.assertEqual(cash_activities[3].execution_date,date(2021,8,30))
+        self.assertEqual(cash_activities[4].execution_date,date(2021,8,31))
+        self.assertEqual(cash_activities[5].execution_date,date(2021,9,1))
+        self.assertEqual(cash_activities[6].execution_date,date(2021,9,2))
+
+        self.assertEqual(cash_activities[0].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[1].work_effort,timedelta(0,0,0,0,0,0,0))
+        self.assertEqual(cash_activities[2].work_effort,timedelta(0,0,0,0,0,0,0))
+        self.assertEqual(cash_activities[3].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[4].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[5].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[6].work_effort,timedelta(0,0,0,0,0,8,0))
+
+        self.assertEqual(cash_activities[0].cash_amount,0.0)
+        self.assertEqual(cash_activities[1].cash_amount,0.0)
+        self.assertEqual(cash_activities[2].cash_amount,0.0)
+        self.assertEqual(cash_activities[3].cash_amount,1200.0)
+        self.assertEqual(cash_activities[4].cash_amount,0.0)
+        self.assertEqual(cash_activities[5].cash_amount,0.0)
+        self.assertEqual(cash_activities[6].cash_amount,0.0)
+
+        dates = daterange(date(2021,3,27),date(2021,4,2))
+        cash_activities = create8HoursSalary(1200.0,dates)
+        self.assertEqual(len(cash_activities),7)
+        self.assertEqual(cash_activities[0].execution_date,date(2021,3,27))
+        self.assertEqual(cash_activities[1].execution_date,date(2021,3,28))
+        self.assertEqual(cash_activities[2].execution_date,date(2021,3,29))
+        self.assertEqual(cash_activities[3].execution_date,date(2021,3,30))
+        self.assertEqual(cash_activities[4].execution_date,date(2021,3,31))
+        self.assertEqual(cash_activities[5].execution_date,date(2021,4,1))
+        self.assertEqual(cash_activities[6].execution_date,date(2021,4,2))
+
+        self.assertEqual(cash_activities[0].work_effort,timedelta(0,0,0,0,0,0,0))
+        self.assertEqual(cash_activities[1].work_effort,timedelta(0,0,0,0,0,0,0))
+        self.assertEqual(cash_activities[2].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[3].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[4].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[5].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[6].work_effort,timedelta(0,0,0,0,0,8,0))
+
+        self.assertEqual(cash_activities[0].cash_amount,0.0)
+        self.assertEqual(cash_activities[1].cash_amount,0.0)
+        self.assertEqual(cash_activities[2].cash_amount,1200.0)
+        self.assertEqual(cash_activities[3].cash_amount,0.0)
+        self.assertEqual(cash_activities[4].cash_amount,0.0)
+        self.assertEqual(cash_activities[5].cash_amount,0.0)
+        self.assertEqual(cash_activities[6].cash_amount,0.0)
+
+        dates = daterange(date(2021,6,27),date(2021,7,3))
+        cash_activities = create8HoursSalary(1200.0,dates)
+        self.assertEqual(len(cash_activities),7)
+        self.assertEqual(cash_activities[0].execution_date,date(2021,6,27))
+        self.assertEqual(cash_activities[1].execution_date,date(2021,6,28))
+        self.assertEqual(cash_activities[2].execution_date,date(2021,6,29))
+        self.assertEqual(cash_activities[3].execution_date,date(2021,6,30))
+        self.assertEqual(cash_activities[4].execution_date,date(2021,7,1))
+        self.assertEqual(cash_activities[5].execution_date,date(2021,7,2))
+        self.assertEqual(cash_activities[6].execution_date,date(2021,7,3))
+
+        self.assertEqual(cash_activities[0].work_effort,timedelta(0,0,0,0,0,0,0))
+        self.assertEqual(cash_activities[1].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[2].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[3].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[4].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[5].work_effort,timedelta(0,0,0,0,0,8,0))
+        self.assertEqual(cash_activities[6].work_effort,timedelta(0,0,0,0,0,0,0))
+
+        self.assertEqual(cash_activities[0].cash_amount,0.0)
+        self.assertEqual(cash_activities[1].cash_amount,1200.0)
+        self.assertEqual(cash_activities[2].cash_amount,0.0)
+        self.assertEqual(cash_activities[3].cash_amount,0.0)
+        self.assertEqual(cash_activities[4].cash_amount,0.0)
+        self.assertEqual(cash_activities[5].cash_amount,0.0)
+        self.assertEqual(cash_activities[6].cash_amount,0.0)
 
 if __name__ == '__main__':
     unittest.main()
