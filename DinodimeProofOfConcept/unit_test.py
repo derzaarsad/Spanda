@@ -1,7 +1,7 @@
 import unittest
 
 from datetime import timedelta, date
-from dinodime import daterange, dailyPayEntityFactory, create8HoursSalary
+from dinodime import daterange, dailyPayEntityFactory, create8HoursSalary, monthlySalaryFactory
 
 class TestDinodimeMethods(unittest.TestCase):
 
@@ -40,6 +40,29 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cash_activities[1].cash_amount,-10.0)
         self.assertEqual(cash_activities[2].cash_amount,-10.0)
         self.assertEqual(cash_activities[3].cash_amount,-10.0)
+    
+    def test_monthlySalaryFactory(self):
+        with self.assertRaises(ValueError):
+            monthlySalaryFactory(1500.0,1,1,2010,2009)
+        
+        cash_activities = monthlySalaryFactory(1500.0,8,8,2021,2021)
+        self.assertEqual(len(cash_activities),31)
+        for i in range(31):
+            self.assertEqual(cash_activities[i].execution_date,date(2021,8,i+1))
+            if i == 29:
+                self.assertEqual(cash_activities[i].cash_amount,1500.0)
+            else:
+                self.assertEqual(cash_activities[i].cash_amount,0.0)
+            if date(2021,8,i+1).weekday() > 4:
+                self.assertEqual(cash_activities[i].work_effort,timedelta(0,0,0,0,0,0,0))
+            else:
+                self.assertEqual(cash_activities[i].work_effort,timedelta(0,0,0,0,0,8,0))
+        
+        cash_activities = monthlySalaryFactory(1500.0,8,10,2021,2021)
+        self.assertEqual(len(cash_activities),92)
+        self.assertEqual(cash_activities[29].cash_amount,1500.0)
+        self.assertEqual(cash_activities[58].cash_amount,1500.0)
+        self.assertEqual(cash_activities[88].cash_amount,1500.0)
     
     def test_create8HoursSalary(self):
         dates = daterange(date(2021,5,27),date(2021,6,2))
