@@ -50,29 +50,29 @@ def monthlySalaryFactory(amount,start_month,end_month,start_year,end_year):
 
 def reccurentCashActivitiesFactory(daily_amount,start_date,end_date):
     dates = daterange(start_date, end_date)
-    cash_entities = []
+    cash_activities = []
     for dt in dates:
-        cash_entities.append(CashActivity(daily_amount,timedelta(0,0,0,0,0,0,0),dt))
-    return cash_entities
+        cash_activities.append(CashActivity(daily_amount,timedelta(0,0,0,0,0,0,0),dt))
+    return cash_activities
 
-def calculateDailyBalance(dt, cash_entities):
-    cash_entities_dt = list(filter(lambda cash_entity: cash_entity.execution_date == dt, cash_entities))
+def calculateDailyBalance(dt, cash_activities):
+    cash_activities_dt = list(filter(lambda cash_entity: cash_entity.execution_date == dt, cash_activities))
     daily_balance = 0
     daily_work_duration = timedelta(0,0,0,0,0,0,0)
-    for n in cash_entities_dt:
+    for n in cash_activities_dt:
         daily_balance += n.cash_amount
         daily_work_duration += n.work_effort
     return daily_balance, daily_work_duration
 
 # Only consider pay entities in the scope of start and end date
-def calculateFinalBalance(initial_amount,max_daily_work_duration,start_date,end_date,cash_entities, print_daily = False):
+def calculateFinalBalance(initial_amount,max_daily_work_duration,start_date,end_date,cash_activities, print_daily = False):
     assert(max_daily_work_duration < timedelta(1,0,0,0,0,0,0))
     total_balance = initial_amount
     dates = daterange(start_date, end_date)
-    minimum_total_balance = initial_amount + calculateDailyBalance(start_date,cash_entities)[0]
+    minimum_total_balance = initial_amount + calculateDailyBalance(start_date,cash_activities)[0]
     days_with_minimum_total_balance = start_date
     for dt in dates:
-        daily_balance, daily_work_duration = calculateDailyBalance(dt,cash_entities)
+        daily_balance, daily_work_duration = calculateDailyBalance(dt,cash_activities)
         total_balance += daily_balance
         # check everything here
         if daily_work_duration > max_daily_work_duration:
@@ -88,8 +88,8 @@ def calculateFinalBalance(initial_amount,max_daily_work_duration,start_date,end_
             print("daily balance: " + str(daily_balance) + ", work duration: " + str(daily_work_duration) + ", total balance: " + str(total_balance))
     return total_balance,((end_date - start_date).days+1), minimum_total_balance, days_with_minimum_total_balance
 
-def getAllowance(initial_amount,max_daily_work_duration,start_date,end_date,cash_entities,goal):
-    tb,total_days, minimum_total_balance, days_with_minimum_total_balance = calculateFinalBalance(initial_amount,max_daily_work_duration,start_date,end_date,cash_entities)
+def getAllowance(initial_amount,max_daily_work_duration,start_date,end_date,cash_activities,goal):
+    tb,total_days, minimum_total_balance, days_with_minimum_total_balance = calculateFinalBalance(initial_amount,max_daily_work_duration,start_date,end_date,cash_activities)
     print("total balance: " + str(tb) + ", count: " + str(total_days))
     total_allowance = tb - goal
     assert(total_allowance >= 0)
