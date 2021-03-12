@@ -118,15 +118,15 @@ while name!= "exit":
     name = input("How much do you want to spend at " + str(start_date.strftime("%Y-%m-%d")) + "? (write exit to finish) ")
     print("###########################################################################################")
     try:
+        if name == "exit":
+            print("Exiting..")
+            break
         allowance = float(name)
 
         total_balance_available = total_balance_before_allowance - allowance
         start_date += timedelta(days=1)
     except:
         print("Input has to be a float number!")
-
-    if name == "exit":
-        print("Exiting..")
 
 # TEST: one of the days must have a total balance near 0
 #allowance_used = dailyPayEntityFactory(-round(allowance,8),start_eval_date,date(2021,3,27))
