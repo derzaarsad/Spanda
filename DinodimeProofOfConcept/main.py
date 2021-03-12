@@ -21,8 +21,10 @@ def daterange(date1, date2):
 
 def create8HoursSalary(amount,dates):
     assert isinstance(amount, float)
+    cash_activities = []
     for dt in dates:
-        yield CashActivity(0.0 if dt.day != 28 else amount,timedelta(0,0,0,0,0,8 if dt.weekday() < 5 else 0,0),dt)
+        cash_activities.append(CashActivity(0.0 if dt.day != 28 else amount,timedelta(0,0,0,0,0,8 if dt.weekday() < 5 else 0,0),dt))
+    return cash_activities
 
 # Assumptions:
 # 1. No public holiday
@@ -35,7 +37,7 @@ def monthlySalaryFactory(amount,start_month,end_month,start_year,end_year):
     tmp = date(end_year, end_month, 1)+timedelta(days=31)
     end_dt = date(tmp.year,tmp.month,1)-timedelta(days=1)
     dates = daterange(start_dt, end_dt)
-    return list(create8HoursSalary(amount,dates))
+    return create8HoursSalary(amount,dates)
 
 def dailyPayEntityFactory(daily_amount,start_date,end_date):
     assert isinstance(daily_amount, float)
