@@ -86,10 +86,11 @@ def calculateFinalBalance(initial_amount,max_daily_work_duration,start_date,end_
         if print_daily:
             print(dt,end=" ")
             print("daily balance: " + str(daily_balance) + ", work duration: " + str(daily_work_duration) + ", total balance: " + str(total_balance))
-    return total_balance,((end_date - start_date).days+1), minimum_total_balance, days_with_minimum_total_balance
+    return total_balance, minimum_total_balance, days_with_minimum_total_balance
 
 def getAllowance(initial_amount,max_daily_work_duration,start_date,end_date,cash_activities,goal):
-    tb,total_days, minimum_total_balance, days_with_minimum_total_balance = calculateFinalBalance(initial_amount,max_daily_work_duration,start_date,end_date,cash_activities)
+    tb, minimum_total_balance, days_with_minimum_total_balance = calculateFinalBalance(initial_amount,max_daily_work_duration,start_date,end_date,cash_activities)
+    total_days = (end_date - start_date).days+1
     print("total balance: " + str(tb) + ", count: " + str(total_days))
     total_allowance = tb - goal
     assert(total_allowance >= 0)
