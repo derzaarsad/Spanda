@@ -65,6 +65,7 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cash_activities[88].cash_amount,1500.0)
     
     def test_calculateBalanceDiff(self):
+        # Only consider activities from the relevant date
         cash_activities = [
             CashActivity(11.0,timedelta(0,0,0,0,0,45,0),date(2013,9,20)),
             CashActivity(-9.0,timedelta(0,0,0,0,0,13,0),date(2013,9,20))
@@ -164,9 +165,11 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(date_with_minimum_balance,date(2012,1,4))
     
     def test_create8HoursSalary(self):
+        # Salary cannot be negative
         with self.assertRaises(ValueError):
             create8HoursSalary(-1200.0,date(2021,5,27),date(2021,6,2))
         
+        # Pay day on Friday
         cash_activities = create8HoursSalary(1200.0,date(2021,5,27),date(2021,6,2))
         self.assertEqual(len(cash_activities),7)
         self.assertEqual(cash_activities[0].execution_date,date(2021,5,27))
@@ -193,6 +196,7 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cash_activities[5].cash_amount,0.0)
         self.assertEqual(cash_activities[6].cash_amount,0.0)
 
+        # Pay day on Saturday
         cash_activities = create8HoursSalary(1200.0,date(2021,8,27),date(2021,9,2))
         self.assertEqual(len(cash_activities),7)
         self.assertEqual(cash_activities[0].execution_date,date(2021,8,27))
@@ -219,6 +223,7 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cash_activities[5].cash_amount,0.0)
         self.assertEqual(cash_activities[6].cash_amount,0.0)
 
+        # Pay day on Sunday
         cash_activities = create8HoursSalary(1200.0,date(2021,3,27),date(2021,4,2))
         self.assertEqual(len(cash_activities),7)
         self.assertEqual(cash_activities[0].execution_date,date(2021,3,27))
@@ -245,6 +250,7 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cash_activities[5].cash_amount,0.0)
         self.assertEqual(cash_activities[6].cash_amount,0.0)
 
+        # Pay day on Monday
         cash_activities = create8HoursSalary(1200.0,date(2021,6,27),date(2021,7,3))
         self.assertEqual(len(cash_activities),7)
         self.assertEqual(cash_activities[0].execution_date,date(2021,6,27))
