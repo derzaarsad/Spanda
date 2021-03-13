@@ -1,7 +1,7 @@
 import unittest
 
 from datetime import timedelta, date
-from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance
+from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance, getAllowance
 
 class TestDinodimeMethods(unittest.TestCase):
 
@@ -164,6 +164,53 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(balance_at_minimum,183.0)
         self.assertEqual(date_with_minimum_balance,date(2012,1,4))
     
+    def test_getAllowance(self):
+        cash_activities = [
+            CashActivity(-1.0,timedelta(0,0,0,0,0,0,0),date(2010,1,2)),
+            CashActivity(998.0,timedelta(0,0,0,0,0,0,0),date(2010,1,3)),
+            CashActivity(-990.0,timedelta(0,0,0,0,0,0,0),date(2010,1,4)),
+            CashActivity(1.0,timedelta(0,0,0,0,0,0,0),date(2010,1,5)),
+            CashActivity(-7.0,timedelta(0,0,0,0,0,0,0),date(2010,1,6)),
+            CashActivity(495.0,timedelta(0,0,0,0,0,0,0),date(2010,1,7)),
+            CashActivity(501.0,timedelta(0,0,0,0,0,0,0),date(2010,1,8))
+        ]
+
+        # The 1st day
+        allowance = getAllowance(3.0,timedelta(0,0,0,0,0,10,0),date(2010,1,1),date(2010,1,9),cash_activities,400.0)
+        self.assertEqual(allowance,1.0)
+
+        # The 2nd day
+        allowance = getAllowance(2.0,timedelta(0,0,0,0,0,10,0),date(2010,1,2),date(2010,1,9),cash_activities,400.0)
+        self.assertEqual(allowance,1.0)
+
+        # The 3rd day
+        allowance = getAllowance(0.0,timedelta(0,0,0,0,0,10,0),date(2010,1,3),date(2010,1,9),cash_activities,400.0)
+        self.assertEqual(allowance,0.5)
+
+        # The 4th day
+        allowance = getAllowance(997.5,timedelta(0,0,0,0,0,10,0),date(2010,1,4),date(2010,1,9),cash_activities,400.0)
+        self.assertEqual(allowance,0.5)
+
+        # The 5th day
+        allowance = getAllowance(7.0,timedelta(0,0,0,0,0,10,0),date(2010,1,5),date(2010,1,9),cash_activities,400.0)
+        self.assertEqual(allowance,0.5)
+
+        # The 6th day
+        allowance = getAllowance(7.5,timedelta(0,0,0,0,0,10,0),date(2010,1,6),date(2010,1,9),cash_activities,400.0)
+        self.assertEqual(allowance,0.5)
+
+        # The 7th day
+        allowance = getAllowance(0.0,timedelta(0,0,0,0,0,10,0),date(2010,1,7),date(2010,1,9),cash_activities,400.0)
+        self.assertEqual(allowance,495.0)
+
+        # The 8th day
+        allowance = getAllowance(0.0,timedelta(0,0,0,0,0,10,0),date(2010,1,8),date(2010,1,9),cash_activities,400.0)
+        self.assertEqual(allowance,101.0)
+
+        # Zero allowance
+        allowance = getAllowance(400.0,timedelta(0,0,0,0,0,10,0),date(2010,1,9),date(2010,1,9),cash_activities,400.0)
+        self.assertEqual(allowance,0.0)
+
     def test_create8HoursSalary(self):
         # Salary cannot be negative
         with self.assertRaises(ValueError):
