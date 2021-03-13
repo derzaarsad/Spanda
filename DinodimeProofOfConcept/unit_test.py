@@ -1,7 +1,7 @@
 import unittest
 
 from datetime import timedelta, date
-from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff
+from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance
 
 class TestDinodimeMethods(unittest.TestCase):
 
@@ -84,6 +84,84 @@ class TestDinodimeMethods(unittest.TestCase):
         daily_balance, daily_work_duration = calculateBalanceDiff(date(2013,9,21), cash_activities)
         self.assertEqual(daily_balance,20.0)
         self.assertEqual(daily_work_duration,timedelta(0,0,0,0,0,580,0))
+    
+    def test_calculateEndBalance(self):
+        # Maximum work duration must be less than 1 day
+        with self.assertRaises(ValueError):
+            calculateEndBalance(99.0,timedelta(0,0,0,0,0,24,0),date(2012,1,2),date(2012,1,5),[])
+        
+        # Total work effort in one day must not exceed the maximum allowed
+        with self.assertRaises(ValueError):
+            calculateEndBalance(99.0,timedelta(0,0,0,0,0,1,0),date(2012,1,2),date(2012,1,5),[CashActivity(20.0,timedelta(0,0,0,0,0,2,0),date(2012,1,4))])
+        
+        # Balance must not be zero
+        with self.assertRaises(ValueError):
+            calculateEndBalance(99.0,timedelta(0,0,0,0,0,10,0),date(2012,1,2),date(2012,1,5),[CashActivity(-100.0,timedelta(0,0,0,0,0,0,0),date(2012,1,4))])
+        
+        # Calculation range starts earlier and ends later than cash activities
+        cash_activities = [
+            CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3)),
+            CashActivity(100.0,timedelta(0,0,0,0,0,0,0),date(2012,1,4))
+        ]
+
+        end_balance, balance_at_minimum, date_with_minimum_balance = calculateEndBalance(99.0,timedelta(0,0,0,0,0,0,0),date(2012,1,2),date(2012,1,5),cash_activities)
+        self.assertEqual(end_balance,189.0)
+        self.assertEqual(balance_at_minimum,89.0)
+        self.assertEqual(date_with_minimum_balance,date(2012,1,3))
+
+        # Calculation range starts later and ends earlier than cash activities
+        cash_activities = [
+            CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,2)),
+            CashActivity(0.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3)),
+            CashActivity(0.0,timedelta(0,0,0,0,0,0,0),date(2012,1,4)),
+            CashActivity(100.0,timedelta(0,0,0,0,0,0,0),date(2012,1,5))
+        ]
+
+        end_balance, balance_at_minimum, date_with_minimum_balance = calculateEndBalance(99.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3),date(2012,1,4),cash_activities)
+        self.assertEqual(end_balance,99.0)
+        self.assertEqual(balance_at_minimum,99.0)
+        self.assertEqual(date_with_minimum_balance,date(2012,1,3))
+
+        # Calculation range starts earlier and ends earlier than cash activities
+        cash_activities = [
+            CashActivity(10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,2)),
+            CashActivity(100.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3)),
+            CashActivity(1000.0,timedelta(0,0,0,0,0,0,0),date(2012,1,4)),
+            CashActivity(10000.0,timedelta(0,0,0,0,0,0,0),date(2012,1,5))
+        ]
+
+        end_balance, balance_at_minimum, date_with_minimum_balance = calculateEndBalance(99.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1),date(2012,1,4),cash_activities)
+        self.assertEqual(end_balance,1209.0)
+        self.assertEqual(balance_at_minimum,99.0)
+        self.assertEqual(date_with_minimum_balance,date(2012,1,1))
+
+        # Calculation range starts later and ends later than cash activities
+        cash_activities = [
+            CashActivity(10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,2)),
+            CashActivity(100.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3)),
+            CashActivity(1000.0,timedelta(0,0,0,0,0,0,0),date(2012,1,4)),
+            CashActivity(10000.0,timedelta(0,0,0,0,0,0,0),date(2012,1,5))
+        ]
+
+        end_balance, balance_at_minimum, date_with_minimum_balance = calculateEndBalance(99.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3),date(2012,1,6),cash_activities)
+        self.assertEqual(end_balance,11199.0)
+        self.assertEqual(balance_at_minimum,199.0)
+        self.assertEqual(date_with_minimum_balance,date(2012,1,3))
+
+        # Only considers cash activities in the evaluation range
+        cash_activities = [
+            CashActivity(9.0,timedelta(0,0,0,0,0,0,0),date(2012,1,2)),
+            CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3)),
+            CashActivity(100.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3)),
+            CashActivity(7.0,timedelta(0,0,0,0,0,0,0),date(2012,1,4)),
+            CashActivity(-13.0,timedelta(0,0,0,0,0,0,0),date(2012,1,4)),
+            CashActivity(121.0,timedelta(0,0,0,0,0,0,0),date(2012,1,5))
+        ]
+
+        end_balance, balance_at_minimum, date_with_minimum_balance = calculateEndBalance(99.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3),date(2012,1,4),cash_activities)
+        self.assertEqual(end_balance,183.0)
+        self.assertEqual(balance_at_minimum,183.0)
+        self.assertEqual(date_with_minimum_balance,date(2012,1,4))
     
     def test_create8HoursSalary(self):
         with self.assertRaises(ValueError):

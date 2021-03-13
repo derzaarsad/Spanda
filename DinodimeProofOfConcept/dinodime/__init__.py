@@ -66,7 +66,8 @@ def calculateBalanceDiff(dt, cash_activities):
 
 # Only consider pay entities in the scope of start and end date
 def calculateEndBalance(initial_amount,max_daily_work_duration,start_date,end_date,cash_activities, print_daily = False):
-    assert(max_daily_work_duration < timedelta(1,0,0,0,0,0,0))
+    if max_daily_work_duration >= timedelta(1,0,0,0,0,0,0):
+        raise ValueError("Maximum work duration must be less than one day!")
     end_balance = initial_amount
     dates = daterange(start_date, end_date)
     balance_at_minimum = initial_amount + calculateBalanceDiff(start_date,cash_activities)[0]
@@ -76,10 +77,10 @@ def calculateEndBalance(initial_amount,max_daily_work_duration,start_date,end_da
         end_balance += balance_diff
         # check everything here
         if total_work_effort > max_daily_work_duration:
-            raise Exception('Cannot work more than ' + str(max_daily_work_duration) + ' hours!')
+            raise ValueError('Cannot work more than ' + str(max_daily_work_duration) + ' hours!')
         if end_balance < 0:
             print(dt)
-            raise Exception('Not enough balance!')
+            raise ValueError('Not enough balance!')
         if(end_balance < balance_at_minimum):
             balance_at_minimum = end_balance
             date_with_minimum_balance = dt
