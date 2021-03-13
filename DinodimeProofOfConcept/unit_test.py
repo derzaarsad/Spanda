@@ -211,6 +211,13 @@ class TestDinodimeMethods(unittest.TestCase):
         allowance = getAllowance(400.0,timedelta(0,0,0,0,0,10,0),date(2010,1,9),date(2010,1,9),cash_activities,400.0)
         self.assertEqual(allowance,0.0)
 
+        # The cash flow is increasing and decreasing
+        cash_activities += [CashActivity(-3.0,timedelta(0,0,0,0,0,0,0),date(2010,1,3))]
+
+        # The 1st day
+        allowance = getAllowance(6.0,timedelta(0,0,0,0,0,10,0),date(2010,1,1),date(2010,1,9),cash_activities,600.0)
+        self.assertEqual(allowance,0.6666666666666666)
+
     def test_create8HoursSalary(self):
         # Salary cannot be negative
         with self.assertRaises(ValueError):
