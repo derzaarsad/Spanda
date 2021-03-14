@@ -92,15 +92,16 @@ def calculateEndBalance(initial_amount,max_daily_work_duration,start_date,end_da
 def getAllowance(initial_amount,max_daily_work_duration,start_date,end_date,cash_activities,goal):
     end_balance, balance_at_minimum, date_with_minimum_balance = calculateEndBalance(initial_amount,max_daily_work_duration,start_date,end_date,cash_activities)
     print("total balance: " + str(end_balance))
-    total_allowance = end_balance - goal
-    assert(total_allowance >= 0)
-    print("total allowance: " + str(total_allowance))
+    diff_to_balance = end_balance - goal
+    if diff_to_balance < 0:
+        return 0.0, diff_to_balance
+    print("total allowance: " + str(diff_to_balance))
     print("minimum total balance: " + str(balance_at_minimum) + ", days: " + str(date_with_minimum_balance))
     total_days_to_divide = (date_with_minimum_balance - start_date).days+1
     print("days until minimum balance reached: " + str(total_days_to_divide))
-    allowance_to_divide = balance_at_minimum if balance_at_minimum < total_allowance else total_allowance
+    allowance_to_divide = balance_at_minimum if balance_at_minimum < diff_to_balance else diff_to_balance
     allowance = allowance_to_divide / total_days_to_divide
-    return allowance
+    return allowance, diff_to_balance
 
 def investmentAllowance(return_days,profit_model,initial_amount,max_daily_work_duration,start_date,end_date,cash_activities):
     if return_days < 0:

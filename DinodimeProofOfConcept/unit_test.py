@@ -176,47 +176,62 @@ class TestDinodimeMethods(unittest.TestCase):
         ]
 
         # The 1st day
-        allowance = getAllowance(3.0,timedelta(0,0,0,0,0,10,0),date(2010,1,1),date(2010,1,9),cash_activities,400.0)
+        allowance, diff_to_balance = getAllowance(3.0,timedelta(0,0,0,0,0,10,0),date(2010,1,1),date(2010,1,9),cash_activities,400.0)
         self.assertEqual(allowance,1.0)
+        self.assertEqual(diff_to_balance,600.0)
 
         # The 2nd day
-        allowance = getAllowance(2.0,timedelta(0,0,0,0,0,10,0),date(2010,1,2),date(2010,1,9),cash_activities,400.0)
+        allowance, diff_to_balance = getAllowance(2.0,timedelta(0,0,0,0,0,10,0),date(2010,1,2),date(2010,1,9),cash_activities,400.0)
         self.assertEqual(allowance,1.0)
+        self.assertEqual(diff_to_balance,599.0)
 
         # The 3rd day
-        allowance = getAllowance(0.0,timedelta(0,0,0,0,0,10,0),date(2010,1,3),date(2010,1,9),cash_activities,400.0)
+        allowance, diff_to_balance = getAllowance(0.0,timedelta(0,0,0,0,0,10,0),date(2010,1,3),date(2010,1,9),cash_activities,400.0)
         self.assertEqual(allowance,0.5)
+        self.assertEqual(diff_to_balance,598.0)
 
         # The 4th day
-        allowance = getAllowance(997.5,timedelta(0,0,0,0,0,10,0),date(2010,1,4),date(2010,1,9),cash_activities,400.0)
+        allowance, diff_to_balance = getAllowance(997.5,timedelta(0,0,0,0,0,10,0),date(2010,1,4),date(2010,1,9),cash_activities,400.0)
         self.assertEqual(allowance,0.5)
+        self.assertEqual(diff_to_balance,597.5)
 
         # The 5th day
-        allowance = getAllowance(7.0,timedelta(0,0,0,0,0,10,0),date(2010,1,5),date(2010,1,9),cash_activities,400.0)
+        allowance, diff_to_balance = getAllowance(7.0,timedelta(0,0,0,0,0,10,0),date(2010,1,5),date(2010,1,9),cash_activities,400.0)
         self.assertEqual(allowance,0.5)
+        self.assertEqual(diff_to_balance,597.0)
 
         # The 6th day
-        allowance = getAllowance(7.5,timedelta(0,0,0,0,0,10,0),date(2010,1,6),date(2010,1,9),cash_activities,400.0)
+        allowance, diff_to_balance = getAllowance(7.5,timedelta(0,0,0,0,0,10,0),date(2010,1,6),date(2010,1,9),cash_activities,400.0)
         self.assertEqual(allowance,0.5)
+        self.assertEqual(diff_to_balance,596.5)
 
         # The 7th day
-        allowance = getAllowance(0.0,timedelta(0,0,0,0,0,10,0),date(2010,1,7),date(2010,1,9),cash_activities,400.0)
+        allowance, diff_to_balance = getAllowance(0.0,timedelta(0,0,0,0,0,10,0),date(2010,1,7),date(2010,1,9),cash_activities,400.0)
         self.assertEqual(allowance,495.0)
+        self.assertEqual(diff_to_balance,596.0)
 
         # The 8th day
-        allowance = getAllowance(0.0,timedelta(0,0,0,0,0,10,0),date(2010,1,8),date(2010,1,9),cash_activities,400.0)
+        allowance, diff_to_balance = getAllowance(0.0,timedelta(0,0,0,0,0,10,0),date(2010,1,8),date(2010,1,9),cash_activities,400.0)
         self.assertEqual(allowance,101.0)
+        self.assertEqual(diff_to_balance,101.0)
 
         # Zero allowance
-        allowance = getAllowance(400.0,timedelta(0,0,0,0,0,10,0),date(2010,1,9),date(2010,1,9),cash_activities,400.0)
+        allowance, diff_to_balance = getAllowance(400.0,timedelta(0,0,0,0,0,10,0),date(2010,1,9),date(2010,1,9),cash_activities,400.0)
         self.assertEqual(allowance,0.0)
+        self.assertEqual(diff_to_balance,0.0)
 
         # The cash flow is increasing and decreasing
         cash_activities += [CashActivity(-3.0,timedelta(0,0,0,0,0,0,0),date(2010,1,3))]
 
         # The 1st day
-        allowance = getAllowance(6.0,timedelta(0,0,0,0,0,10,0),date(2010,1,1),date(2010,1,9),cash_activities,600.0)
+        allowance, diff_to_balance = getAllowance(6.0,timedelta(0,0,0,0,0,10,0),date(2010,1,1),date(2010,1,9),cash_activities,600.0)
         self.assertEqual(allowance,0.6666666666666666)
+        self.assertEqual(diff_to_balance,400.0)
+
+        # If the goal is bigger than the available end balance, gives zero allowance
+        allowance, diff_to_balance = getAllowance(6.0,timedelta(0,0,0,0,0,10,0),date(2010,1,1),date(2010,1,9),cash_activities,1800.0)
+        self.assertEqual(allowance,0.0)
+        self.assertEqual(diff_to_balance,-800.0)
 
     def test_investmentAllowance(self):
         profit_model = lambda x:1.1 * x
