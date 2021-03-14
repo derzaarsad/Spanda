@@ -102,7 +102,7 @@ def getAllowance(initial_amount,max_daily_work_duration,start_date,end_date,cash
     allowance = allowance_to_divide / total_days_to_divide
     return allowance
 
-def calculateMaxInvestment(return_days,profit_model,initial_amount,max_daily_work_duration,start_date,end_date,cash_activities):
+def investmentAllowance(return_days,profit_model,initial_amount,max_daily_work_duration,start_date,end_date,cash_activities):
     if return_days < 0:
         raise ValueError("The profit cannot be received in the past!")
     elif return_days == 0:
@@ -113,4 +113,5 @@ def calculateMaxInvestment(return_days,profit_model,initial_amount,max_daily_wor
     if one_day_before_profit >= end_date:
         return 0.0
     end_balance, balance_at_minimum, _ = calculateEndBalance(initial_amount,max_daily_work_duration,start_date,one_day_before_profit,cash_activities)
-    return balance_at_minimum
+    profit_at_minimum = profit_model(balance_at_minimum)
+    return balance_at_minimum if profit_at_minimum > balance_at_minimum else 0.0
