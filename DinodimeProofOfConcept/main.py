@@ -18,8 +18,8 @@ start_date = start_eval_date
 name = "not"
 while name!= "exit":
     total_balance_before_allowance = total_balance_available + (calculateBalanceDiff(start_date,cash_activities)[0])
-    allowance = getAllowance(total_balance_available,timedelta(0,0,0,0,0,10,0),start_date,end_eval_date,cash_activities, 15000)
-    print("total balance available: " + str(total_balance_before_allowance))
+    allowance, diff_to_balance = getAllowance(total_balance_available,timedelta(0,0,0,0,0,10,0),start_date,end_eval_date,cash_activities, 115000)
+    print("total balance available: " + str(total_balance_before_allowance) + ", total allowance: " + str(diff_to_balance))
     print("allowance at ",end="")
     print(start_date,end="")
     print(": " + str(allowance))
