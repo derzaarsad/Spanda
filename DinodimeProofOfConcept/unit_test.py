@@ -1,7 +1,7 @@
 import unittest
 
 from datetime import timedelta, date
-from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance, getAllowance
+from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance, getAllowance, calculateMaxInvestment
 
 class TestDinodimeMethods(unittest.TestCase):
 
@@ -217,6 +217,31 @@ class TestDinodimeMethods(unittest.TestCase):
         # The 1st day
         allowance = getAllowance(6.0,timedelta(0,0,0,0,0,10,0),date(2010,1,1),date(2010,1,9),cash_activities,600.0)
         self.assertEqual(allowance,0.6666666666666666)
+
+    def test_calculateMaxInvestment(self):
+        profit_model = lambda x:1.1 * x
+        no_profit_model = lambda x:1.0 * x
+        loss_model = lambda x:0.99 * x
+
+        # Return days cannot be negative
+        with self.assertRaises(ValueError):
+            calculateMaxInvestment(-1,profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
+
+        # If the return date is the same as the investment date, and assuming that the model gives profit, return the balance at that date
+        investment_allowance = calculateMaxInvestment(0,profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
+        self.assertEqual(investment_allowance,1190.0)
+
+        # If the return date is the same as the investment date, and assuming that the model gives no profit, return 0
+        investment_allowance = calculateMaxInvestment(0,no_profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
+        self.assertEqual(investment_allowance,0.0)
+
+        investment_allowance = calculateMaxInvestment(0,loss_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
+        self.assertEqual(investment_allowance,0.0)
+
+        # If the return date is out of the end date scope, gives 0
+        investment_allowance = calculateMaxInvestment(4,profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
+        self.assertEqual(investment_allowance,0.0)
+
 
     def test_create8HoursSalary(self):
         # Salary cannot be negative
