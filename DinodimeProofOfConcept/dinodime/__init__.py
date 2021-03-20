@@ -80,8 +80,8 @@ def create8HoursSalary(amount,start_date,end_date,pay_date):
     for dt in dates:
         if dt.day == pay_date:
             amount_to_be_applied = amount
-        cash_activities.append(CashActivity(0.0 if dt.weekday() > 4 else amount_to_be_applied,timedelta(0,0,0,0,0,8 if dt.weekday() < 5 else 0,0),dt))
         if dt.weekday() <= 4:
+            cash_activities.append(CashActivity(amount_to_be_applied,timedelta(0,0,0,0,0,8,0),dt))
             amount_to_be_applied = 0.0
     return cash_activities
 
