@@ -1,7 +1,7 @@
 import unittest
 
 from datetime import timedelta, date
-from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance, getAllowance, investmentAllowance
+from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance, getAllowance, investmentAllowance, getWorkingDay
 
 class TestDinodimeMethods(unittest.TestCase):
 
@@ -296,6 +296,28 @@ class TestDinodimeMethods(unittest.TestCase):
             CashActivity(10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,5))
             ])
         self.assertEqual(investment_allowance,0.0)
+
+    def test_getWorkingDay(self):
+        working_day = getWorkingDay(date(2021,3,15))
+        self.assertEqual(working_day,date(2021,3,15))
+
+        working_day = getWorkingDay(date(2021,3,16))
+        self.assertEqual(working_day,date(2021,3,16))
+
+        working_day = getWorkingDay(date(2021,3,17))
+        self.assertEqual(working_day,date(2021,3,17))
+
+        working_day = getWorkingDay(date(2021,3,18))
+        self.assertEqual(working_day,date(2021,3,18))
+
+        working_day = getWorkingDay(date(2021,3,19))
+        self.assertEqual(working_day,date(2021,3,19))
+
+        working_day = getWorkingDay(date(2021,3,20))
+        self.assertEqual(working_day,date(2021,3,22))
+
+        working_day = getWorkingDay(date(2021,3,21))
+        self.assertEqual(working_day,date(2021,3,22))
 
     def test_create8HoursSalary(self):
         # Salary cannot be negative

@@ -64,6 +64,11 @@ def daterange(date1, date2):
         dates.append(date1 + timedelta(n))
     return dates
 
+def getWorkingDay(date_to_be_converted):
+    if date_to_be_converted.weekday() > 4:
+        return date_to_be_converted + timedelta(days=(7-date_to_be_converted.weekday()))
+    return date_to_be_converted
+
 def create8HoursSalary(amount,start_date,end_date):
     if amount < 0:
         raise ValueError("Salary cannot be negative!")
