@@ -69,14 +69,16 @@ def getWorkingDay(date_to_be_converted):
         return date_to_be_converted + timedelta(days=(7-date_to_be_converted.weekday()))
     return date_to_be_converted
 
-def create8HoursSalary(amount,start_date,end_date):
+def create8HoursSalary(amount,start_date,end_date,pay_date):
+    if(pay_date > 28):
+        raise ValueError("Pay date must be earlier than 29th!")
     if amount < 0:
         raise ValueError("Salary cannot be negative!")
     dates = daterange(start_date, end_date)
     cash_activities = []
     amount_to_be_applied = 0.0
     for dt in dates:
-        if dt.day == 28:
+        if dt.day == pay_date:
             amount_to_be_applied = amount
         cash_activities.append(CashActivity(0.0 if dt.weekday() > 4 else amount_to_be_applied,timedelta(0,0,0,0,0,8 if dt.weekday() < 5 else 0,0),dt))
         if dt.weekday() <= 4:
@@ -91,7 +93,7 @@ def monthlySalaryFactory(amount,start_month,end_month,start_year,end_year):
     start_dt = date(start_year, start_month, 1)
     tmp = date(end_year, end_month, 1)+timedelta(days=31)
     end_dt = date(tmp.year,tmp.month,1)-timedelta(days=1)
-    return create8HoursSalary(amount,start_dt,end_dt)
+    return create8HoursSalary(amount,start_dt,end_dt,28)
 
 def reccurentCashActivitiesFactory(daily_amount,start_date,end_date):
     dates = daterange(start_date, end_date)
