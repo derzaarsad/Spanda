@@ -37,7 +37,7 @@ class SellGoods(Income):
         self.sale_price = sale_price
 
     def __profitModel__(self,investment):
-        raise self.sale_price
+        return self.sale_price
 
     def __createDividendActivity__(self,investment,start_date,return_date):
         return []
