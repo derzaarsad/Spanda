@@ -1,7 +1,7 @@
 import unittest
 
 from datetime import timedelta, date
-from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance, getAllowance, investmentAllowance, getWorkingDay, StockInvestment
+from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance, getAllowance, investmentAllowance, getWorkingDay, StockInvestment, SellGoods
 
 class TestStockInvestment(StockInvestment):
     def __init__(self, return_days):
@@ -441,6 +441,16 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cashActivities[2].cash_amount,4.0)
         self.assertEqual(cashActivities[3].cash_amount,4.0)
         self.assertEqual(cashActivities[4].cash_amount,210.0)
+
+    def test_SellGoods(self):
+        sellGoods = SellGoods(100.0)
+
+        # The sale price is assumed to be independent from investment price
+        cashActivities = sellGoods.createCashActivities(123.0,date(2021,1,1))
+
+        self.assertEqual(len(cashActivities),1)
+        self.assertEqual(cashActivities[0].execution_date,date(2021,1,1))
+        self.assertEqual(cashActivities[0].cash_amount,100.0)
 
 if __name__ == '__main__':
     unittest.main()
