@@ -99,16 +99,15 @@ def getAllowance(initial_amount,max_daily_work_duration,start_date,end_date,cash
     allowance = allowance_to_divide / total_days_to_divide
     return allowance, diff_to_balance
 
-def investmentAllowance(return_days,profit_model,initial_amount,max_daily_work_duration,start_date,end_date,cash_activities):
-    if return_days < 0:
-        raise ValueError("The profit cannot be received in the past!")
-    elif return_days == 0:
+def investmentAllowance(income,initial_amount,max_daily_work_duration,start_date,end_date,cash_activities):
+    # TODO: Update the function!
+    if income.return_days == 0:
         balance_on_start_date = initial_amount + calculateBalanceDiff(start_date,cash_activities)[0]
-        profit_on_start_date = profit_model(balance_on_start_date)
+        profit_on_start_date = income.__profitModel__(balance_on_start_date)
         return balance_on_start_date if profit_on_start_date > balance_on_start_date else 0.0
-    one_day_before_profit = start_date+timedelta(days=(return_days-1))
+    one_day_before_profit = start_date+timedelta(days=(income.return_days-1))
     if one_day_before_profit >= end_date:
         return 0.0
     end_balance, balance_at_minimum, _ = calculateEndBalance(initial_amount,max_daily_work_duration,start_date,one_day_before_profit,cash_activities)
-    profit_at_minimum = profit_model(balance_at_minimum)
+    profit_at_minimum = income.__profitModel__(balance_at_minimum)
     return balance_at_minimum if profit_at_minimum > balance_at_minimum else 0.0

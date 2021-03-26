@@ -3,6 +3,27 @@ import unittest
 from datetime import timedelta, date
 from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance, getAllowance, investmentAllowance, getWorkingDay, StockInvestment, SellGoods, Income
 
+class TestProfitModel(Income):
+    def __init__(self,return_days):
+        Income.__init__(self,return_days,timedelta(0,0,0,0,0,0,0))
+
+    def __profitModel__(self,investment):
+        return 1.1 * investment
+
+class TestNoProfitModel(Income):
+    def __init__(self,return_days):
+        Income.__init__(self,return_days,timedelta(0,0,0,0,0,0,0))
+
+    def __profitModel__(self,investment):
+        return investment
+
+class TestLossModel(Income):
+    def __init__(self,return_days):
+        Income.__init__(self,return_days,timedelta(0,0,0,0,0,0,0))
+
+    def __profitModel__(self,investment):
+        return 0.99 * investment
+
 class TestStockInvestment(StockInvestment):
     def __init__(self, return_days):
         StockInvestment.__init__(self, return_days)
@@ -247,31 +268,23 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(diff_to_balance,-800.0)
 
     def test_investmentAllowance(self):
-        profit_model = lambda x:1.1 * x
-        no_profit_model = lambda x:1.0 * x
-        loss_model = lambda x:0.99 * x
-
-        # Return days cannot be negative
-        with self.assertRaises(ValueError):
-            investmentAllowance(-1,profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
-
         # If the return date is the same as the investment date, and assuming that the model gives profit, return the balance at that date
-        investment_allowance = investmentAllowance(0,profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
+        investment_allowance = investmentAllowance(TestProfitModel(0),1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
         self.assertEqual(investment_allowance,1190.0)
 
         # If the return date is the same as the investment date, and assuming that the model gives no profit, return 0
-        investment_allowance = investmentAllowance(0,no_profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
+        investment_allowance = investmentAllowance(TestNoProfitModel(0),1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
         self.assertEqual(investment_allowance,0.0)
 
-        investment_allowance = investmentAllowance(0,loss_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
+        investment_allowance = investmentAllowance(TestLossModel(0),1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
         self.assertEqual(investment_allowance,0.0)
 
         # If the return date is out of the end date scope, gives 0
-        investment_allowance = investmentAllowance(4,profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
+        investment_allowance = investmentAllowance(TestProfitModel(4),1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,4),[CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1))])
         self.assertEqual(investment_allowance,0.0)
 
         # If the return date is on the minimum balance date, return the minimum of the previous date range
-        investment_allowance = investmentAllowance(2,profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,5),[
+        investment_allowance = investmentAllowance(TestProfitModel(2),1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,5),[
             CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1)),
             CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,2)),
             CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3)),
@@ -281,7 +294,7 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(investment_allowance,1180.0)
 
         # And of course 0 if there is no profit
-        investment_allowance = investmentAllowance(2,no_profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,5),[
+        investment_allowance = investmentAllowance(TestNoProfitModel(2),1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,5),[
             CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1)),
             CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,2)),
             CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3)),
@@ -291,7 +304,7 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(investment_allowance,0.0)
 
         # Even if the global minimum balance is after the return date, return the minimum balance on the previous date range
-        investment_allowance = investmentAllowance(2,profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,5),[
+        investment_allowance = investmentAllowance(TestProfitModel(2),1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,5),[
             CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1)),
             CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,2)),
             CashActivity(10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3)),
@@ -301,7 +314,7 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(investment_allowance,1180.0)
 
         # And of course 0 if there is no profit
-        investment_allowance = investmentAllowance(2,no_profit_model,1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,5),[
+        investment_allowance = investmentAllowance(TestNoProfitModel(2),1200.0,timedelta(0,0,0,0,0,10,0),date(2012,1,1),date(2012,1,5),[
             CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,1)),
             CashActivity(-10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,2)),
             CashActivity(10.0,timedelta(0,0,0,0,0,0,0),date(2012,1,3)),
