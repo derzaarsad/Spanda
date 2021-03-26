@@ -1,7 +1,22 @@
 import unittest
 
 from datetime import timedelta, date
-from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance, getAllowance, investmentAllowance, getWorkingDay
+from dinodime import CashActivity, daterange, reccurentCashActivitiesFactory, create8HoursSalary, monthlySalaryFactory, calculateBalanceDiff, calculateEndBalance, getAllowance, investmentAllowance, getWorkingDay, StockInvestment
+
+class TestStockInvestment(StockInvestment):
+    def __init__(self, return_days):
+        StockInvestment.__init__(self, return_days)
+
+    def __profitModel__(self,investment):
+        return investment * 2.1
+
+    def __createDividendActivity__(self,investment,start_date,return_date):
+        dividend_activities = []
+        current_date = start_date + timedelta(weeks=12)
+        while current_date < return_date:
+            dividend_activities.append(CashActivity(0.04 * investment, timedelta(0,0,0,0,0,0,0), current_date))
+            current_date += timedelta(weeks=12)
+        return dividend_activities
 
 class TestDinodimeMethods(unittest.TestCase):
 
@@ -409,6 +424,23 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cash_activities[2].cash_amount,0.0)
         self.assertEqual(cash_activities[3].cash_amount,0.0)
         self.assertEqual(cash_activities[4].cash_amount,0.0)
+
+    def test_StockInvestment(self):
+        testStockInvestment = TestStockInvestment(365)
+        cashActivities = testStockInvestment.createCashActivities(100.0,date(2021,1,1))
+
+        self.assertEqual(len(cashActivities),5)
+        self.assertEqual(cashActivities[0].execution_date,date(2021,3,26))
+        self.assertEqual(cashActivities[1].execution_date,date(2021,6,18))
+        self.assertEqual(cashActivities[2].execution_date,date(2021,9,10))
+        self.assertEqual(cashActivities[3].execution_date,date(2021,12,3))
+        self.assertEqual(cashActivities[4].execution_date,date(2022,1,1))
+
+        self.assertEqual(cashActivities[0].cash_amount,4.0)
+        self.assertEqual(cashActivities[1].cash_amount,4.0)
+        self.assertEqual(cashActivities[2].cash_amount,4.0)
+        self.assertEqual(cashActivities[3].cash_amount,4.0)
+        self.assertEqual(cashActivities[4].cash_amount,210.0)
 
 if __name__ == '__main__':
     unittest.main()
