@@ -443,7 +443,7 @@ class TestDinodimeMethods(unittest.TestCase):
         self.assertEqual(cashActivities[4].cash_amount,210.0)
 
     def test_SellGoods(self):
-        sellGoods = SellGoods(100.0)
+        sellGoods = SellGoods(100.0,0)
 
         # The sale price is assumed to be independent from investment price
         cashActivities = sellGoods.createCashActivities(123.0,date(2021,1,1))

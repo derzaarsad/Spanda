@@ -32,12 +32,12 @@ class Income:
         return self.__createDividendActivity__(investment,start_date,return_date) + [CashActivity(self.__profitModel__(investment),self.work_effort,return_date)]
 
 class SellGoods(Income):
-    def __init__(self,sale_price):
-        Income.__init__(self, 0, timedelta(0,0,0,0,0,0,0))
-        self.sale_price = sale_price
+    def __init__(self,sell_price,sell_days):
+        Income.__init__(self, sell_days, timedelta(0,0,0,0,0,0,0))
+        self.sell_price = sell_price
 
     def __profitModel__(self,investment):
-        return self.sale_price
+        return self.sell_price
 
     def __createDividendActivity__(self,investment,start_date,return_date):
         return []
