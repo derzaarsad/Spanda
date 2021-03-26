@@ -10,9 +10,9 @@ class TestStockInvestment(StockInvestment):
     def __profitModel__(self,investment):
         return investment * 2.1
 
-    def __createDividendActivity__(self,investment,start_date,return_date):
+    def __createDividendActivity__(self,investment,investment_date,return_date):
         dividend_activities = []
-        current_date = start_date + timedelta(weeks=12)
+        current_date = investment_date + timedelta(weeks=12)
         while current_date < return_date:
             dividend_activities.append(CashActivity(0.04 * investment, timedelta(0,0,0,0,0,0,0), current_date))
             current_date += timedelta(weeks=12)

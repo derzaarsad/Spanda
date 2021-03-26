@@ -21,15 +21,15 @@ class Income:
         self.return_days = return_days
         self.work_effort = work_effort
 
-    def __createDividendActivity__(self,investment,start_date,return_date):
+    def __createDividendActivity__(self,investment,investment_date,return_date):
         raise ValueError("This method must be overriden!")
 
     def __profitModel__(self,investment):
         raise ValueError("This method must be overriden!")
 
-    def createCashActivities(self,investment,start_date):
-        return_date = start_date + timedelta(days=self.return_days)
-        return self.__createDividendActivity__(investment,start_date,return_date) + [CashActivity(self.__profitModel__(investment),self.work_effort,return_date)]
+    def createCashActivities(self,investment,investment_date):
+        return_date = investment_date + timedelta(days=self.return_days)
+        return self.__createDividendActivity__(investment,investment_date,return_date) + [CashActivity(self.__profitModel__(investment),self.work_effort,return_date)]
 
 class SellGoods(Income):
     def __init__(self,sell_price,sell_days):
@@ -39,7 +39,7 @@ class SellGoods(Income):
     def __profitModel__(self,investment):
         return self.sell_price
 
-    def __createDividendActivity__(self,investment,start_date,return_date):
+    def __createDividendActivity__(self,investment,investment_date,return_date):
         return []
 
 class StockInvestment(Income):
@@ -49,5 +49,5 @@ class StockInvestment(Income):
     def __profitModel__(self,investment):
         raise ValueError("This method must be overriden!")
 
-    def __createDividendActivity__(self,investment,start_date,return_date):
+    def __createDividendActivity__(self,investment,investment_date,return_date):
         raise ValueError("This method must be overriden!")
