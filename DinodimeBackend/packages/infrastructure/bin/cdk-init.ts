@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-import * as cdk from "@aws-cdk/core";
-import * as ec2 from "@aws-cdk/aws-ec2";
+import { Duration, aws_ec2, App } from "aws-cdk-lib";
 
 import { Services } from "../src/services";
 import { PostgresStorage } from "../src/postgres-storage";
@@ -12,7 +11,7 @@ import { LambdaPermissionProps } from "../src/lambda-factory";
 import { MockFinApi } from "../src/mock-finapi";
 import { AdminApi } from "../src/admin-api";
 
-const app = new cdk.App();
+const app = new App();
 
 const account = app.node.tryGetContext("awsAccount")! as string;
 const region = app.node.tryGetContext("awsRegion")! as string;
@@ -41,9 +40,9 @@ const postgresProps: PostgresDeploymentProps = {
     databaseName: pgDatabaseName,
     masterUsername: pgMasterUserName,
     masterUserPassword: infrastructure.databasePassword,
-    instanceClass: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
+    instanceClass: aws_ec2.InstanceType.of(aws_ec2.InstanceClass.BURSTABLE2, aws_ec2.InstanceSize.MICRO),
     deletionProtection: false,
-    backupRetention: cdk.Duration.days(0),
+    backupRetention: Duration.days(0),
     deleteAutomatedBackups: true,
     storageEncrypted: false,
     multiAz: false

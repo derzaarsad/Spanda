@@ -1,18 +1,18 @@
-import * as cdk from "@aws-cdk/core";
-import * as ecr from "@aws-cdk/aws-ecr";
+import { aws_ecr, Stack, StackProps, RemovalPolicy, CfnOutput } from "aws-cdk-lib";
+import { Construct } from 'constructs';
 
-export class DatabaseMigrationsRepository extends cdk.Stack {
-  readonly repository: ecr.Repository;
+export class DatabaseMigrationsRepository extends Stack {
+  readonly repository: aws_ecr.Repository;
 
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id);
 
-    this.repository = new ecr.Repository(this, "DatabaseMigrationsRepository", {
+    this.repository = new aws_ecr.Repository(this, "DatabaseMigrationsRepository", {
       repositoryName: "dinodime-db-migrations",
-      removalPolicy: cdk.RemovalPolicy.DESTROY
+      removalPolicy: RemovalPolicy.DESTROY
     });
 
-    new cdk.CfnOutput(this, "RepositoryURI", {
+    new CfnOutput(this, "RepositoryURI", {
       description: "The database migrations container repository URI",
       value: this.repository.repositoryUri
     });

@@ -175,7 +175,7 @@ export const deleteUserDataHandler = async (
 const getAuthenticatedUser = async (
   configuration: AuthenticationConfiguration,
   headers: {
-    [name: string]: string;
+    [name: string]: string | undefined;
   }
 ): Promise<User | null> => {
   const { logger, users } = configuration;

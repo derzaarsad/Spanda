@@ -1,9 +1,9 @@
-import * as cdk from "@aws-cdk/core";
+import { StackProps } from "aws-cdk-lib";
 
 /**
  * Configuration interface for the infrastructure stack.
  */
-export interface InfrastructureProps extends cdk.StackProps {
+export interface InfrastructureProps extends StackProps {
   databasePortNumber?: number;
   sshPortNumber?: number;
   vpcCidr?: string;

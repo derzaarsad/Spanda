@@ -1,38 +1,34 @@
-import * as cdk from "@aws-cdk/core";
-import * as ec2 from "@aws-cdk/aws-ec2";
-import * as iam from "@aws-cdk/aws-iam";
-import * as sm from "@aws-cdk/aws-secretsmanager";
+import { Stack, aws_ec2, aws_secretsmanager, aws_iam, App, Fn } from "aws-cdk-lib";
 
 import { InfrastructureProps } from "./infrastructure-props";
-import { CfnLaunchTemplate, UserData } from "@aws-cdk/aws-ec2";
 
 /**
  * A stack laying the foundations for the backend resources: networking and security.
  */
-export class Infrastructure extends cdk.Stack {
-  readonly vpc: ec2.Vpc;
-  readonly databaseApplicationsSecurityGroup: ec2.SecurityGroup;
-  readonly databasesSecurityGroup: ec2.SecurityGroup;
+export class Infrastructure extends Stack {
+  readonly vpc: aws_ec2.Vpc;
+  readonly databaseApplicationsSecurityGroup: aws_ec2.SecurityGroup;
+  readonly databasesSecurityGroup: aws_ec2.SecurityGroup;
 
   readonly databasePortNumber: number;
   readonly sshPortNumber: number;
 
-  readonly databasePort: ec2.Port;
-  readonly sshPort: ec2.Port;
+  readonly databasePort: aws_ec2.Port;
+  readonly sshPort: aws_ec2.Port;
 
-  readonly lambdaManagedPolicies: iam.IManagedPolicy[];
-  readonly databasePassword: sm.Secret;
+  readonly lambdaManagedPolicies: aws_iam.IManagedPolicy[];
+  readonly databasePassword: aws_secretsmanager.Secret;
 
-  constructor(scope: cdk.App, id: string, props: InfrastructureProps) {
+  constructor(scope: App, id: string, props: InfrastructureProps) {
     super(scope, id, props);
 
     this.databasePortNumber = props.databasePortNumber || 5432;
     this.sshPortNumber = props.sshPortNumber || 22;
 
-    this.databasePort = ec2.Port.tcp(this.databasePortNumber);
-    this.sshPort = ec2.Port.tcp(this.sshPortNumber);
+    this.databasePort = aws_ec2.Port.tcp(this.databasePortNumber);
+    this.sshPort = aws_ec2.Port.tcp(this.sshPortNumber);
 
-    this.vpc = new ec2.Vpc(this, "VPC", {
+    this.vpc = new aws_ec2.Vpc(this, "VPC", {
       maxAzs: props.numberOfAzs || 2,
       cidr: props.vpcCidr,
       natGateways: 1,
@@ -40,38 +36,38 @@ export class Infrastructure extends cdk.Stack {
         {
           cidrMask: 20,
           name: "public",
-          subnetType: ec2.SubnetType.PUBLIC,
+          subnetType: aws_ec2.SubnetType.PUBLIC,
         },
         {
           cidrMask: 20,
           name: "private",
-          subnetType: ec2.SubnetType.PRIVATE,
+          subnetType: aws_ec2.SubnetType.PRIVATE,
         },
         {
           cidrMask: 24,
           name: "rds",
-          subnetType: ec2.SubnetType.ISOLATED,
+          subnetType: aws_ec2.SubnetType.ISOLATED,
         },
       ],
     });
 
-    this.databaseApplicationsSecurityGroup = new ec2.SecurityGroup(this, "DatabaseApplicationsSG", {
+    this.databaseApplicationsSecurityGroup = new aws_ec2.SecurityGroup(this, "DatabaseApplicationsSG", {
       vpc: this.vpc,
       description: "A security group of instances that are able to connect to the database",
     });
 
-    const bastionSecurityGroup = new ec2.SecurityGroup(this, "BastionsSG", {
+    const bastionSecurityGroup = new aws_ec2.SecurityGroup(this, "BastionsSG", {
       vpc: this.vpc,
       description: "A security group for bastion hosts",
     });
 
     bastionSecurityGroup.addIngressRule(
-      ec2.Peer.ipv4(this.vpc.vpcCidrBlock),
+      aws_ec2.Peer.ipv4(this.vpc.vpcCidrBlock),
       this.sshPort,
       "Grants SSH access from within the VPC"
     );
 
-    this.databasesSecurityGroup = new ec2.SecurityGroup(this, "DatabasesSG", {
+    this.databasesSecurityGroup = new aws_ec2.SecurityGroup(this, "DatabasesSG", {
       vpc: this.vpc,
       description: "A security group for RDS instances",
     });
@@ -91,12 +87,12 @@ export class Infrastructure extends cdk.Stack {
     this.initializeBastionHostsConfig(this.vpc.privateSubnets, bastionSecurityGroup);
 
     this.lambdaManagedPolicies = [
-      iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
-      iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole"),
-      iam.ManagedPolicy.fromAwsManagedPolicyName("AWSXRayDaemonWriteAccess"),
+      aws_iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
+      aws_iam.ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole"),
+      aws_iam.ManagedPolicy.fromAwsManagedPolicyName("AWSXRayDaemonWriteAccess"),
     ];
 
-    this.databasePassword = new sm.Secret(this, "DatabaseSecret", {
+    this.databasePassword = new aws_secretsmanager.Secret(this, "DatabaseSecret", {
       description: "The database master user secret",
       secretName: "database-password",
       generateSecretString: { excludeCharacters: '",|@/\\;' },
@@ -115,26 +111,26 @@ export class Infrastructure extends cdk.Stack {
     return this.vpc.publicSubnets;
   }
 
-  public isolatedSubnetSelection(): ec2.SubnetSelection {
+  public isolatedSubnetSelection(): aws_ec2.SubnetSelection {
     return { subnets: this.vpc.isolatedSubnets };
   }
 
-  public privateSubnetSelection(): ec2.SubnetSelection {
+  public privateSubnetSelection(): aws_ec2.SubnetSelection {
     return { subnets: this.vpc.privateSubnets };
   }
 
-  public publicSubnetSelection(): ec2.SubnetSelection {
+  public publicSubnetSelection(): aws_ec2.SubnetSelection {
     return { subnets: this.vpc.publicSubnets };
   }
 
-  private initializeBastionHostsConfig(subnets: ec2.ISubnet[], bastionSecurityGroup: ec2.SecurityGroup) {
-    const amiLookup = new ec2.LookupMachineImage({
+  private initializeBastionHostsConfig(subnets: aws_ec2.ISubnet[], bastionSecurityGroup: aws_ec2.SecurityGroup) {
+    const amiLookup = new aws_ec2.LookupMachineImage({
       name: "amzn2-ami-hvm-*-x86_64-gp2",
       owners: ["amazon"],
     });
 
     const ami = amiLookup.getImage(this);
-    const userData = UserData.forLinux();
+    const userData = aws_ec2.UserData.forLinux();
     userData.addCommands(
       "yum -y update",
       "yum update -y amazon-ssm-agent",
@@ -143,21 +139,21 @@ export class Infrastructure extends cdk.Stack {
       "usermod -a -G docker ec2-user"
     );
 
-    const ssmManagementRole = new iam.Role(this, "BastionSSMManagedInstanceRole", {
-      assumedBy: new iam.ServicePrincipal("ec2.amazonaws.com"),
-      managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")],
+    const ssmManagementRole = new aws_iam.Role(this, "BastionSSMManagedInstanceRole", {
+      assumedBy: new aws_iam.ServicePrincipal("ec2.amazonaws.com"),
+      managedPolicies: [aws_iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore")],
     });
 
     const bastionInstanceProfileName = "BastionInstanceProfile";
-    const bastionInstanceProfile = new iam.CfnInstanceProfile(this, "BastionSSMRole", {
+    const bastionInstanceProfile = new aws_iam.CfnInstanceProfile(this, "BastionSSMRole", {
       instanceProfileName: bastionInstanceProfileName,
       roles: [ssmManagementRole.roleName],
     });
 
-    subnets.map((subnet: ec2.ISubnet, index: number) => {
+    subnets.map((subnet: aws_ec2.ISubnet, index: number) => {
       const templateId = `BastionLaunchTemplate${this.pad(index, 2)}`;
 
-      return new CfnLaunchTemplate(this, templateId, {
+      return new aws_ec2.CfnLaunchTemplate(this, templateId, {
         launchTemplateName: `BastionHostOn${subnet.subnetId}`,
         launchTemplateData: {
           imageId: ami.imageId,
@@ -188,7 +184,7 @@ export class Infrastructure extends cdk.Stack {
               },
             },
           ],
-          userData: cdk.Fn.base64(userData.render()),
+          userData: Fn.base64(userData.render()),
         },
       });
     });

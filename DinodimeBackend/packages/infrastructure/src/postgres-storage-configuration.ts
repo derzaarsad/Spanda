@@ -1,6 +1,6 @@
-import ec2 = require("@aws-cdk/aws-ec2");
+import { aws_ec2 } from "aws-cdk-lib";
 
 export interface PostgresInfrastructureConfiguration {
-  vpc: ec2.Vpc;
-  vpcSubnets: ec2.SubnetSelection;
+  vpc: aws_ec2.Vpc;
+  vpcSubnets: aws_ec2.SubnetSelection;
 }

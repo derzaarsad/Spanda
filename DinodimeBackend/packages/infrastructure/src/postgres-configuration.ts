@@ -1,10 +1,10 @@
-import * as sm from "@aws-cdk/aws-secretsmanager";
+import { aws_secretsmanager } from "aws-cdk-lib";
 
 export interface PostgresConfiguration {
   pgDatabase: string;
   pgHost: string;
   pgPort: number;
   pgUser: string;
-  pgPassword: sm.Secret;
+  pgPassword: aws_secretsmanager.Secret;
   storageBackend: "POSTGRESQL";
 }

@@ -23,6 +23,7 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "aws-cdk-lib": "^2.0.0",
     "@types/aws-lambda": "^8.10.44",
     "aws-sdk": "^2.610.0",
     "@types/chai": "^4.1.3",

@@ -1,14 +1,7 @@
-import * as cdk from "@aws-cdk/core";
-import * as dynamo from "@aws-cdk/aws-dynamodb";
-import * as sns from "@aws-cdk/aws-sns";
-import * as subs from "@aws-cdk/aws-sns-subscriptions";
-import * as sqs from "@aws-cdk/aws-sqs";
-import * as lambda from "@aws-cdk/aws-lambda";
-import * as apigw from "@aws-cdk/aws-apigateway";
-import * as iam from "@aws-cdk/aws-iam";
+import { Duration, RemovalPolicy, aws_apigateway, aws_sns, aws_lambda, aws_iam, aws_sqs, aws_sns_subscriptions, aws_dynamodb } from "aws-cdk-lib";
+import { Construct } from "constructs";
 import * as path from "path";
 
-import { Duration, RemovalPolicy } from "@aws-cdk/core";
 import { LambdaFactory } from "./lambda-factory";
 
 const tableName = "RuleHandleTable";
@@ -21,40 +14,40 @@ export interface NewTransactionsNotificationsProps {
   lambdaPermissionProps: LambdaPermissionProps;
 }
 
-export class NewTransactionsNotifications extends cdk.Construct {
-  readonly restAPI: apigw.LambdaRestApi;
-  readonly notificationsTopic: sns.Topic;
-  readonly notificationsQueue: sqs.Queue;
-  readonly table: dynamo.Table;
+export class NewTransactionsNotifications extends Construct {
+  readonly restAPI: aws_apigateway.LambdaRestApi;
+  readonly notificationsTopic: aws_sns.Topic;
+  readonly notificationsQueue: aws_sqs.Queue;
+  readonly table: aws_dynamodb.Table;
 
-  constructor(scope: cdk.Construct, id: string, props: NewTransactionsNotificationsProps) {
+  constructor(scope: Construct, id: string, props: NewTransactionsNotificationsProps) {
     super(scope, id);
 
     const decryptionKey = props.decryptionKey;
 
-    const table = new dynamo.Table(this, tableName, {
+    const table = new aws_dynamodb.Table(this, tableName, {
       tableName: tableName,
       removalPolicy: RemovalPolicy.DESTROY,
       partitionKey: {
         name: "id",
-        type: dynamo.AttributeType.STRING
+        type: aws_dynamodb.AttributeType.STRING
       }
     });
 
-    const notifcationsQueue = new sqs.Queue(this, "NotificationsQueue", {
-      visibilityTimeout: cdk.Duration.seconds(300)
+    const notifcationsQueue = new aws_sqs.Queue(this, "NotificationsQueue", {
+      visibilityTimeout: Duration.seconds(300)
     });
 
-    const notificationsTopic = new sns.Topic(this, "NotificationsTopic");
-    notificationsTopic.addSubscription(new subs.SqsSubscription(notifcationsQueue));
+    const notificationsTopic = new aws_sns.Topic(this, "NotificationsTopic");
+    notificationsTopic.addSubscription(new aws_sns_subscriptions.SqsSubscription(notifcationsQueue));
 
-    const role = new iam.Role(this, "NewTransactionsNotificationLambdaRole", {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com")
+    const role = new aws_iam.Role(this, "NewTransactionsNotificationLambdaRole", {
+      assumedBy: new aws_iam.ServicePrincipal("lambda.amazonaws.com")
     });
 
     const lambdaFactory = new LambdaFactory({
       scope: this,
-      runtime: lambda.Runtime.NODEJS_12_X,
+      runtime: aws_lambda.Runtime.NODEJS_12_X,
       duration: Duration.seconds(20),
       deploymentProps: props.lambdaDeploymentProps,
       permissionProps: props.lambdaPermissionProps,
@@ -68,14 +61,14 @@ export class NewTransactionsNotifications extends cdk.Construct {
 
     const fn = lambdaFactory.createLambda(
       "CallbackHandler",
-      lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-notifications-callback")),
+      aws_lambda.Code.fromAsset(path.join("..", "lambda", "dist", "lambda-notifications-callback")),
       "main.handler"
     );
 
     table.grantReadData(fn);
     notificationsTopic.grantPublish(fn);
 
-    const restAPI = new apigw.LambdaRestApi(this, "NotificationsEndpoint", {
+    const restAPI = new aws_apigateway.LambdaRestApi(this, "NotificationsEndpoint", {
       handler: fn,
       endpointExportName: "NotificationsEndpointURL"
     });

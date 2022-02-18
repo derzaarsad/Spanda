@@ -1,21 +1,17 @@
-import * as cdk from "@aws-cdk/core";
-import * as lambda from "@aws-cdk/aws-lambda";
-import * as apigw from "@aws-cdk/aws-apigateway";
-import * as iam from "@aws-cdk/aws-iam";
+import { Duration, aws_apigateway, aws_iam, aws_lambda } from "aws-cdk-lib";
+import { Construct } from "constructs";
 import * as path from "path";
 
-import { Duration } from "@aws-cdk/core";
-import { LambdaIntegration } from "@aws-cdk/aws-apigateway";
 import { LambdaFactory } from "./lambda-factory";
 import { ServicesProps, lambdaEnvironment } from "./services-props";
 
-export class DinodimeAPI extends cdk.Construct {
-  readonly restAPI: apigw.RestApi;
+export class DinodimeAPI extends Construct {
+  readonly restAPI: aws_apigateway.RestApi;
 
-  constructor(scope: cdk.Construct, id: string, props: ServicesProps) {
+  constructor(scope: Construct, id: string, props: ServicesProps) {
     super(scope, id);
 
-    const restAPI = new apigw.RestApi(this, "DinodimeAPI", {
+    const restAPI = new aws_apigateway.RestApi(this, "DinodimeAPI", {
       endpointExportName: "APIEndpointURL",
     });
 
@@ -24,16 +20,16 @@ export class DinodimeAPI extends cdk.Construct {
     this.restAPI = restAPI;
   }
 
-  private initializeAppApi(restAPI: apigw.RestApi, props: ServicesProps) {
+  private initializeAppApi(restAPI: aws_apigateway.RestApi, props: ServicesProps) {
     const environment = lambdaEnvironment(props);
 
-    const role = new iam.Role(this, "APIMethodLambdaRole", {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+    const role = new aws_iam.Role(this, "APIMethodLambdaRole", {
+      assumedBy: new aws_iam.ServicePrincipal("lambda.amazonaws.com"),
     });
 
     const lambdaFactory = new LambdaFactory({
       scope: this,
-      runtime: lambda.Runtime.NODEJS_12_X,
+      runtime: aws_lambda.Runtime.NODEJS_12_X,
       duration: Duration.seconds(20),
       deploymentProps: props.lambdaDeploymentProps,
       permissionProps: props.lambdaPermissionProps,
@@ -41,20 +37,20 @@ export class DinodimeAPI extends cdk.Construct {
       env: environment,
     });
 
-    const asset = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-api"));
+    const asset = aws_lambda.Code.fromAsset(path.join("..", "lambda", "dist", "lambda-api"));
 
     // Authenticaction controller
     const users = restAPI.root.addResource("users");
 
     const isUserAuthenticated = lambdaFactory.createLambda("IsUserAuthenticated", asset, "main.isUserAuthenticated");
 
-    users.addMethod("GET", new LambdaIntegration(isUserAuthenticated), {
+    users.addMethod("GET", new aws_apigateway.LambdaIntegration(isUserAuthenticated), {
       operationName: "is user authenticated",
     });
 
     const registerUser = lambdaFactory.createLambda("RegisterUser", asset, "main.registerUser");
 
-    users.addMethod("POST", new LambdaIntegration(registerUser), {
+    users.addMethod("POST", new aws_apigateway.LambdaIntegration(registerUser), {
       operationName: "register user",
     });
 
@@ -67,7 +63,7 @@ export class DinodimeAPI extends cdk.Construct {
       "main.authenticateAndSaveUser"
     );
 
-    login.addMethod("POST", new LambdaIntegration(authenticateAndSaveUser), {
+    login.addMethod("POST", new aws_apigateway.LambdaIntegration(authenticateAndSaveUser), {
       operationName: "authenticate and save user",
     });
 
@@ -75,7 +71,7 @@ export class DinodimeAPI extends cdk.Construct {
 
     const updateRefreshToken = lambdaFactory.createLambda("UpdateRefreshToken", asset, "main.updateRefreshToken");
 
-    token.addMethod("POST", new LambdaIntegration(updateRefreshToken), {
+    token.addMethod("POST", new aws_apigateway.LambdaIntegration(updateRefreshToken), {
       operationName: "update fefresh token",
     });
 
@@ -85,20 +81,20 @@ export class DinodimeAPI extends cdk.Construct {
 
     const getBankByBLZ = lambdaFactory.createLambda("GetBankByBLZ", asset, "main.getBankByBLZ");
 
-    blz.addMethod("GET", new LambdaIntegration(getBankByBLZ), { operationName: "get bank by BLZ" });
+    blz.addMethod("GET", new aws_apigateway.LambdaIntegration(getBankByBLZ), { operationName: "get bank by BLZ" });
 
     const bankConnections = restAPI.root.addResource("bankConnections");
     const importBankConnections = bankConnections.addResource("import");
 
     const getWebFormId = lambdaFactory.createLambda("GetWebFormId", asset, "main.getWebFormId");
 
-    importBankConnections.addMethod("POST", new LambdaIntegration(getWebFormId), {
+    importBankConnections.addMethod("POST", new aws_apigateway.LambdaIntegration(getWebFormId), {
       operationName: "get webform id",
     });
 
     const allowance = restAPI.root.addResource("allowance");
     const getAllowance = lambdaFactory.createLambda("GetAllowance", asset, "main.getAllowance");
-    allowance.addMethod("GET", new LambdaIntegration(getAllowance), {
+    allowance.addMethod("GET", new aws_apigateway.LambdaIntegration(getAllowance), {
       operationName: "get allowance",
     });
 
@@ -116,11 +112,11 @@ export class DinodimeAPI extends cdk.Construct {
       "main.updateRecurrentTransactions"
     );
 
-    recurrentTransactions.addMethod("GET", new LambdaIntegration(getRecurrentTransactions), {
+    recurrentTransactions.addMethod("GET", new aws_apigateway.LambdaIntegration(getRecurrentTransactions), {
       operationName: "get recurrent transactions",
     });
 
-    updateRT.addMethod("POST", new LambdaIntegration(updateRecurrentTransactions), {
+    updateRT.addMethod("POST", new aws_apigateway.LambdaIntegration(updateRecurrentTransactions), {
       operationName: "update recurrent transactions",
     });
   }

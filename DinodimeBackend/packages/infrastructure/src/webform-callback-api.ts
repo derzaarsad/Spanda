@@ -1,30 +1,25 @@
-import * as cdk from "@aws-cdk/core";
-import * as lambda from "@aws-cdk/aws-lambda";
-import * as apigw from "@aws-cdk/aws-apigateway";
-import * as iam from "@aws-cdk/aws-iam";
-import * as sqs from "@aws-cdk/aws-sqs";
+import { Duration, aws_apigateway, aws_sqs, aws_iam, aws_lambda, aws_lambda_event_sources } from "aws-cdk-lib";
+import { Construct } from "constructs";
 import * as path from "path";
-import { SqsEventSource } from "@aws-cdk/aws-lambda-event-sources";
 import { ServicesProps, lambdaEnvironment } from "./services-props";
-import { Duration } from "@aws-cdk/core";
 import { LambdaFactory } from "./lambda-factory";
 
-export class WebFormCallbackAPI extends cdk.Construct {
-  readonly restAPI: apigw.RestApi;
-  readonly completionsQueue: sqs.Queue;
-  readonly completionsDLQ: sqs.Queue;
+export class WebFormCallbackAPI extends Construct {
+  readonly restAPI: aws_apigateway.RestApi;
+  readonly completionsQueue: aws_sqs.Queue;
+  readonly completionsDLQ: aws_sqs.Queue;
 
-  constructor(scope: cdk.Construct, id: string, props: ServicesProps) {
+  constructor(scope: Construct, id: string, props: ServicesProps) {
     super(scope, id);
 
-    const restAPI = new apigw.RestApi(this, "WebFormCallbackAPI", {
+    const restAPI = new aws_apigateway.RestApi(this, "WebFormCallbackAPI", {
       endpointExportName: "WebFormCallbackAPIEndpoint",
     });
 
-    this.completionsDLQ = new sqs.Queue(this, "WebFormCompletionsDLQ");
+    this.completionsDLQ = new aws_sqs.Queue(this, "WebFormCompletionsDLQ");
 
-    const completionsQueue = new sqs.Queue(this, "WebFormCompletionsQueue", {
-      visibilityTimeout: cdk.Duration.seconds(120),
+    const completionsQueue = new aws_sqs.Queue(this, "WebFormCompletionsQueue", {
+      visibilityTimeout: Duration.seconds(120),
       deadLetterQueue: {
         queue: this.completionsDLQ,
         maxReceiveCount: 3,
@@ -45,19 +40,19 @@ export class WebFormCallbackAPI extends cdk.Construct {
     this.completionsQueue = completionsQueue;
   }
 
-  private createWebFrontend(completionsQueue: sqs.Queue, props: ServicesProps): apigw.LambdaIntegration {
+  private createWebFrontend(completionsQueue: aws_sqs.Queue, props: ServicesProps): aws_apigateway.LambdaIntegration {
     const env = lambdaEnvironment(props);
     env["QUEUE_URL"] = completionsQueue.queueUrl;
 
-    const callbackRole = new iam.Role(this, "WebFormCallbackLambdaRole", {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+    const callbackRole = new aws_iam.Role(this, "WebFormCallbackLambdaRole", {
+      assumedBy: new aws_iam.ServicePrincipal("lambda.amazonaws.com"),
     });
 
     completionsQueue.grantSendMessages(callbackRole);
 
     const lambdaFactory = new LambdaFactory({
       scope: this,
-      runtime: lambda.Runtime.NODEJS_12_X,
+      runtime: aws_lambda.Runtime.NODEJS_12_X,
       duration: Duration.seconds(20),
       deploymentProps: props.lambdaDeploymentProps,
       permissionProps: props.lambdaPermissionProps,
@@ -66,24 +61,24 @@ export class WebFormCallbackAPI extends cdk.Construct {
       withTracing: true,
     });
 
-    const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-webform-callback"));
+    const handler = aws_lambda.Code.fromAsset(path.join("..", "lambda", "dist", "lambda-webform-callback"));
     const webFormCallback = lambdaFactory.createLambda("WebFormCallback", handler, "main.webFormCallback");
-    return new apigw.LambdaIntegration(webFormCallback);
+    return new aws_apigateway.LambdaIntegration(webFormCallback);
   }
 
-  private createProcessingBackend(completionsQueue: sqs.Queue, props: ServicesProps): void {
+  private createProcessingBackend(completionsQueue: aws_sqs.Queue, props: ServicesProps): void {
     const env = lambdaEnvironment(props);
     env["QUEUE_URL"] = completionsQueue.queueUrl;
 
-    const processingRole = new iam.Role(this, "WebFormCallbackProcessingLambdaRole", {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+    const processingRole = new aws_iam.Role(this, "WebFormCallbackProcessingLambdaRole", {
+      assumedBy: new aws_iam.ServicePrincipal("lambda.amazonaws.com"),
     });
 
     completionsQueue.grantConsumeMessages(processingRole);
 
     const lambdaFactory = new LambdaFactory({
       scope: this,
-      runtime: lambda.Runtime.NODEJS_12_X,
+      runtime: aws_lambda.Runtime.NODEJS_12_X,
       duration: Duration.seconds(20),
       deploymentProps: props.lambdaDeploymentProps,
       permissionProps: props.lambdaPermissionProps,
@@ -92,11 +87,11 @@ export class WebFormCallbackAPI extends cdk.Construct {
       withTracing: true,
     });
 
-    const handler = lambda.Code.asset(path.join("..", "lambda", "dist", "lambda-webform-callback"));
+    const handler = aws_lambda.Code.fromAsset(path.join("..", "lambda", "dist", "lambda-webform-callback"));
     const processor = lambdaFactory.createLambda("FetchWebForm", handler, "main.fetchWebForm");
 
     processor.addEventSource(
-      new SqsEventSource(completionsQueue, {
+      new aws_lambda_event_sources.SqsEventSource(completionsQueue, {
         batchSize: 1,
       })
     );

@@ -1,4 +1,4 @@
-import * as cdk from "@aws-cdk/core";
+import { StackProps } from "aws-cdk-lib";
 import { PostgresConfiguration } from "./postgres-configuration";
 import { InMemoryConfiguration } from "./in-memory-configuration";
 import { FinApiProps } from "./finapi-configuration";
@@ -8,7 +8,7 @@ import { FirebaseProps } from "./firebase-configuration";
 /**
  * Configuration interface for the services stack.
  */
-export interface ServicesProps extends cdk.StackProps {
+export interface ServicesProps extends StackProps {
   loggerLevel?: string;
   finApiProps: FinApiProps;
   backendConfiguration: PostgresConfiguration | InMemoryConfiguration;

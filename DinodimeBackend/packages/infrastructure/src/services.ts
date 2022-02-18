@@ -1,11 +1,11 @@
-import * as cdk from "@aws-cdk/core";
+import { Stack, App, CfnOutput } from "aws-cdk-lib";
 import { NewTransactionsNotifications } from "./new-transactions-notifications";
 import { DinodimeAPI } from "./dinodime-api";
 import { ServicesProps } from "./services-props";
 import { WebFormCallbackAPI } from "./webform-callback-api";
 
-export class Services extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props: ServicesProps) {
+export class Services extends Stack {
+  constructor(scope: App, id: string, props: ServicesProps) {
     super(scope, id, props);
 
     const notifications = new NewTransactionsNotifications(this, "DinodimeNewTransactionsNotifications", {
@@ -19,35 +19,35 @@ export class Services extends cdk.Stack {
     const api = new DinodimeAPI(this, "DinodimeAPI", props);
 
     // Outputs
-    new cdk.CfnOutput(this, "APIEndpointURL", {
+    new CfnOutput(this, "APIEndpointURL", {
       value: api.restAPI.url,
     });
 
-    new cdk.CfnOutput(this, "NotificationsTableName", {
+    new CfnOutput(this, "NotificationsTableName", {
       value: notifications.table.tableName,
     });
 
-    new cdk.CfnOutput(this, "NotificationsQueueURL", {
+    new CfnOutput(this, "NotificationsQueueURL", {
       value: notifications.notificationsQueue.queueUrl,
     });
 
-    new cdk.CfnOutput(this, "NotificationsApiEndpointURL", {
+    new CfnOutput(this, "NotificationsApiEndpointURL", {
       value: notifications.restAPI.url,
     });
 
-    new cdk.CfnOutput(this, "NotificationsTopicARN", {
+    new CfnOutput(this, "NotificationsTopicARN", {
       value: notifications.notificationsTopic.topicArn,
     });
 
-    new cdk.CfnOutput(this, "CallbackEndpointURL", {
+    new CfnOutput(this, "CallbackEndpointURL", {
       value: callbackAPI.restAPI.url,
     });
 
-    new cdk.CfnOutput(this, "WebFormCompletionsQueueURL", {
+    new CfnOutput(this, "WebFormCompletionsQueueURL", {
       value: callbackAPI.completionsQueue.queueUrl,
     });
 
-    new cdk.CfnOutput(this, "WebFormCompletionsDLQURL", {
+    new CfnOutput(this, "WebFormCompletionsDLQURL", {
       value: callbackAPI.completionsDLQ.queueUrl,
     });
   }

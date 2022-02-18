@@ -1,22 +1,19 @@
-import * as cdk from "@aws-cdk/core";
-import * as iam from "@aws-cdk/aws-iam";
-import * as ec2 from "@aws-cdk/aws-ec2";
-import * as lambda from "@aws-cdk/aws-lambda";
-import { Tracing } from "@aws-cdk/aws-lambda";
+import { aws_iam, aws_lambda, aws_ec2, Duration } from "aws-cdk-lib"
+import { Construct } from 'constructs';
 
 /**
  * Configuration interface for services stacks deploying lambda functions.
  */
 export class LambdaPermissionProps {
-  managedPolicies: iam.IManagedPolicy[];
-  policyStatements: iam.PolicyStatement[];
+  managedPolicies: aws_iam.IManagedPolicy[];
+  policyStatements: aws_iam.PolicyStatement[];
 
-  constructor(managedPolicies?: iam.IManagedPolicy[], policyStatements?: iam.PolicyStatement[]) {
+  constructor(managedPolicies?: aws_iam.IManagedPolicy[], policyStatements?: aws_iam.PolicyStatement[]) {
     this.managedPolicies = managedPolicies || [];
     this.policyStatements = policyStatements || [];
   }
 
-  addManagedPolicy(managedPolicy: iam.IManagedPolicy): LambdaPermissionProps {
+  addManagedPolicy(managedPolicy: aws_iam.IManagedPolicy): LambdaPermissionProps {
     const policies = this.managedPolicies.slice();
     const statements = this.policyStatements.slice();
 
@@ -24,7 +21,7 @@ export class LambdaPermissionProps {
     return new LambdaPermissionProps(policies, statements);
   }
 
-  addPolicyStatement(policyStatement: iam.PolicyStatement) {
+  addPolicyStatement(policyStatement: aws_iam.PolicyStatement) {
     const policies = this.managedPolicies.slice();
     const statements = this.policyStatements.slice();
 
@@ -32,7 +29,7 @@ export class LambdaPermissionProps {
     return new LambdaPermissionProps(policies, statements);
   }
 
-  applyToRole(role: iam.Role) {
+  applyToRole(role: aws_iam.Role) {
     this.managedPolicies.forEach((managedPolicy) => {
       role.addManagedPolicy(managedPolicy);
     });
@@ -47,18 +44,18 @@ export class LambdaPermissionProps {
  * Configuration interface for services stacks deploying lambda functions.
  */
 export interface LambdaDeploymentProps {
-  vpc?: ec2.Vpc;
-  subnets?: ec2.SubnetSelection;
-  securityGroups?: ec2.SecurityGroup[];
+  vpc?: aws_ec2.Vpc;
+  subnets?: aws_ec2.SubnetSelection;
+  securityGroups?: aws_ec2.SecurityGroup[];
 }
 
 interface LambdaFactoryProps {
-  scope: cdk.Construct;
+  scope: Construct;
   deploymentProps?: LambdaDeploymentProps;
   permissionProps?: LambdaPermissionProps;
-  runtime: lambda.Runtime;
-  duration: cdk.Duration;
-  executionRole: iam.Role;
+  runtime: aws_lambda.Runtime;
+  duration: Duration;
+  executionRole: aws_iam.Role;
   withTracing?: boolean;
   env?: { [key: string]: string };
 }
@@ -67,13 +64,13 @@ interface LambdaFactoryProps {
  * A utility object for creating functions with a common purpose.
  */
 export class LambdaFactory {
-  scope: cdk.Construct;
+  scope: Construct;
   deploymentProps?: LambdaDeploymentProps;
   permissionProps?: LambdaPermissionProps;
-  runtime: lambda.Runtime;
-  duration: cdk.Duration;
+  runtime: aws_lambda.Runtime;
+  duration: Duration;
   env: { [key: string]: string };
-  executionRole: iam.Role;
+  executionRole: aws_iam.Role;
   withTracing: boolean;
 
   constructor(props: LambdaFactoryProps) {
@@ -91,8 +88,8 @@ export class LambdaFactory {
     }
   }
 
-  public createLambda(id: string, asset: lambda.AssetCode, handler: string): lambda.Function {
-    const fn = new lambda.Function(this.scope, id, {
+  public createLambda(id: string, asset: aws_lambda.AssetCode, handler: string): aws_lambda.Function {
+    const fn = new aws_lambda.Function(this.scope, id, {
       code: asset,
       handler: handler,
       runtime: this.runtime,
@@ -102,7 +99,7 @@ export class LambdaFactory {
       vpc: this.deploymentProps ? this.deploymentProps.vpc : undefined,
       vpcSubnets: this.deploymentProps ? this.deploymentProps.subnets : undefined,
       role: this.executionRole,
-      tracing: this.withTracing ? Tracing.ACTIVE : Tracing.DISABLED,
+      tracing: this.withTracing ? aws_lambda.Tracing.ACTIVE : aws_lambda.Tracing.DISABLED,
     });
 
     return fn;

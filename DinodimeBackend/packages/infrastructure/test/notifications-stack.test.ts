@@ -1,17 +1,18 @@
 import mocha from "mocha";
 
-import * as cdk from "@aws-cdk/core";
-import { expect as expectCDK, haveResource } from "@aws-cdk/assert";
+import { App } from "aws-cdk-lib";
+import { Capture, Match, Template } from "aws-cdk-lib/assertions";
 import { Services } from "../src/services";
 import { ServicesProps } from "../src/services-props";
 import { LambdaPermissionProps } from "../src/lambda-factory";
+import { expect } from "chai";
 
 describe("The services stack", () => {
-  let app: cdk.App;
+  let app: App;
   let props: ServicesProps;
 
   beforeEach("setup", () => {
-    app = new cdk.App();
+    app = new App();
     props = {
       env: {},
       finApiProps: {
@@ -36,17 +37,17 @@ describe("The services stack", () => {
     // WHEN
     const stack = new Services(app, "MyTestStack", props);
     // THEN
-    expectCDK(stack).to(
-      haveResource("AWS::SQS::Queue", {
-        VisibilityTimeout: 300
-      })
-    );
+    const template = Template.fromStack(stack);
+    template.hasResource("AWS::SQS::Queue", {
+      VisibilityTimeout: 300
+    });
   });
 
   it("Contains an SNS topic", () => {
     // WHEN
     const stack = new Services(app, "MyTestStack", props);
     // THEN
-    expectCDK(stack).to(haveResource("AWS::SNS::Topic"));
+    const template = Template.fromStack(stack);
+    template.hasResource("AWS::SNS::Topic",{});
   });
 });

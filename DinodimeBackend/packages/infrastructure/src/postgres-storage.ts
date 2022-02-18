@@ -1,51 +1,28 @@
-import * as cdk from "@aws-cdk/core";
-import * as rds from "@aws-cdk/aws-rds";
-import * as ec2 from "@aws-cdk/aws-ec2";
+import { Stack, App, SecretValue, aws_rds, aws_ec2 } from "aws-cdk-lib";
 
 import { PostgresInfrastructureConfiguration } from "./postgres-storage-configuration";
-import { ClusterParameterGroup } from "@aws-cdk/aws-rds";
 import { PostgresDeploymentProps } from "./postgres-deployment-props";
-import { DatabaseMigrations } from "./db-migrations";
 
-export class PostgresStorage extends cdk.Stack {
-  readonly instance: rds.DatabaseInstance;
+export class PostgresStorage extends Stack {
+  readonly instance: aws_rds.DatabaseInstance;
 
-  constructor(scope: cdk.App, id: string, props: PostgresDeploymentProps) {
+  constructor(scope: App, id: string, props: PostgresDeploymentProps) {
     super(scope, id, props);
 
-    new DatabaseMigrations(this, "DatabaseMigrations", {
-      databaseConfiguration: {
-        username: props.instanceProps.masterUsername,
-        password: props.instanceProps.masterUserPassword,
-        databaseName: props.instanceProps.databaseName
-      },
-      vpcConfiguration: {
-        vpc: props.infrastructureProps.vpc,
-        securityGroup: props.migrationsContainerProps.securityGroup,
-        subnets: props.migrationsContainerProps.subnetPlacement
-      },
-      imageConfiguration: {
-        imageRepository: props.migrationsContainerProps.imageRepository,
-        imageTag: props.migrationsContainerProps.imageTag
-      },
-      lambdaManagedPolicies: props.migrationsContainerProps.lambdaManagedPolicies
-    });
-
-    this.instance = new rds.DatabaseInstance(this, "DinodimeDatabase", {
-      engine: rds.DatabaseInstanceEngine.POSTGRES,
+    this.instance = new aws_rds.DatabaseInstance(this, "DinodimeDatabase", {
+      engine: aws_rds.DatabaseInstanceEngine.POSTGRES,
       databaseName: props.instanceProps.databaseName,
-      masterUsername: props.instanceProps.masterUsername,
-      masterUserPassword: cdk.SecretValue.secretsManager(
+      credentials: aws_rds.Credentials.fromPassword(props.instanceProps.masterUsername,SecretValue.secretsManager(
         props.instanceProps.masterUserPassword.secretArn
-      ),
-      instanceClass: props.instanceProps.instanceClass,
+      )),
+      instanceType: props.instanceProps.instanceClass,
       deletionProtection: props.instanceProps.deletionProtection,
       backupRetention: props.instanceProps.backupRetention,
       deleteAutomatedBackups: props.instanceProps.deleteAutomatedBackups,
       storageEncrypted: props.instanceProps.storageEncrypted,
       multiAz: props.instanceProps.multiAz,
       vpc: props.infrastructureProps.vpc,
-      vpcPlacement: props.infrastructureProps.subnetPlacement,
+      vpcSubnets: props.infrastructureProps.subnetPlacement,
       securityGroups: [props.infrastructureProps.databaseSecurityGroup]
     });
   }
@@ -55,7 +32,7 @@ export class PostgresStorage extends cdk.Stack {
   }
 
   private databaseCluster(infra: PostgresInfrastructureConfiguration) {
-    const params = new ClusterParameterGroup(this, "Params", {
+    const params = new aws_rds.CfnDBClusterParameterGroup(this, "Params", {
       family: "aurora-postgresql10",
       description: "Postgres parameter group",
       parameters: {
@@ -63,16 +40,14 @@ export class PostgresStorage extends cdk.Stack {
       }
     });
 
-    new rds.DatabaseCluster(this, "DinodimeDatabase", {
+    new aws_rds.DatabaseCluster(this, "DinodimeDatabase", {
       defaultDatabaseName: "postgres",
       instances: 1,
-      masterUser: {
-        username: "postgres"
-      },
-      engine: rds.DatabaseClusterEngine.AURORA_POSTGRESQL,
-      parameterGroup: params,
+      credentials: aws_rds.Credentials.fromUsername("postgres"),
+      engine: aws_rds.DatabaseClusterEngine.AURORA_POSTGRESQL,
+      //parameterGroup: params,
       instanceProps: {
-        instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.SMALL),
+        instanceType: aws_ec2.InstanceType.of(aws_ec2.InstanceClass.BURSTABLE2, aws_ec2.InstanceSize.SMALL),
         vpc: infra.vpc,
         vpcSubnets: infra.vpcSubnets
       }
